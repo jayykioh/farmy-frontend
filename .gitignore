@@ -1,0 +1,10 @@
+# Standard project files (example)
+node_modules/
+.env
+.env.local
+dist/
+build/
+.DS_Store
+
+# (Optional) If your IDE generates temporary local settings files:
+.vscode/workspace-state.json
