@@ -407,7 +407,7 @@ CREATE TABLE archived_chats (
 > **Quy tắc đơn giản:** Dữ liệu cần JOIN, transaction, quan hệ rõ ràng → PostgreSQL. Dữ liệu schema thay đổi liên tục, nested document, write volume cao, không cần JOIN → MongoDB.
 
 | Tiêu chí | → PostgreSQL | → MongoDB |
-|---|---|---|
+|---|---|---| 
 | Schema | Cố định, rõ từ đầu | Flexible, thay đổi theo model/version |
 | Quan hệ | Nhiều JOIN | Document tự chứa, ít quan hệ |
 | Transaction | Cần ACID | Eventual consistency chấp nhận được |

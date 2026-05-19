@@ -125,7 +125,7 @@ sequenceDiagram
     Note over User, Nest: Access Token hết hạn (sau 15 phút)
     
     User->>Nest: Request API bất kỳ mang Access Token (Expired)
-    Nest-->>User: Trả lỗi 419 (Token Expired)
+    Nest-->>User: Trả lỗi 401 + errorCode: AUTH_TOKEN_EXPIRED
     
     User->>Nest: POST /auth/refresh (Gửi HTTP-Only Refresh Token tự động)
     Nest->>DB: Truy vấn & verify hash(Refresh Token) còn hạn & chưa revoke
@@ -273,6 +273,8 @@ erDiagram
         uuid id PK
         uuid user_id FK
         string token_hash UK
+        uuid family_id "NOT NULL — nhóm token cùng chuỗi lineage"
+        uuid replaced_by "FK self — token mới thay thế token này"
         string device_info
         inet ip_address
         timestamptz expires_at
@@ -474,8 +476,16 @@ Kẻ tấn công có thể đổi đuôi file `.exe` hay `.sh` thành `.jpg` hò
 
 ### 5.3 Ngăn ngừa Tấn công chiếm dụng phiên (Token Theft Detection)
 Nếu kẻ tấn công đánh cắp được `Refresh Token` từ máy người dùng:
-*   Mỗi khi một Refresh Token được sử dụng để lấy Access Token mới, backend sẽ mã hóa và cập nhật một giá trị băm mới trong bảng `refresh_tokens`.
-*   Nếu backend phát hiện một Refresh Token cũ (đã được băm và đánh dấu sử dụng trước đó) đột ngột được gửi lại hệ thống -> Backend ngay lập tức kích hoạt cơ chế **Token Theft Alarm**: thu hồi ngay lập tức toàn bộ các Access/Refresh Token thuộc về user đó, bắt buộc đăng nhập lại trên mọi thiết bị.
+*   Mỗi khi một Refresh Token được sử dụng để lấy Access Token mới, backend tạo token mới và đặt `replaced_by = new_token.id` trên token cũ, sau đó đánh dấu token cũ là `revoked_at = now()`.
+*   **Token Theft Detection Logic:** Nếu backend phát hiện một Refresh Token cũ (có `revoked_at IS NOT NULL` hoặc đã có `replaced_by`) đột ngột được gửi lại hệ thống, đây là dấu hiệu chắc chắn bị đánh cắp. Backend kích hoạt **Token Theft Alarm** thông qua `family_id`:
+    ```sql
+    -- Tìm và revoke toàn bộ token cùng lineage (cùng family_id)
+    UPDATE refresh_tokens
+    SET revoked_at = NOW()
+    WHERE family_id = :compromised_family_id
+      AND revoked_at IS NULL;
+    ```
+*   Kết quả: Thu hồi ngay lập tức **toàn bộ các token cùng family** (không revoke token của các phiên khác), bắt buộc đăng nhập lại trên mọi thiết bị trong cùng chuỗi đó.
 
 ---
 
