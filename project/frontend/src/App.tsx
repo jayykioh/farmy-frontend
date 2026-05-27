@@ -1,122 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { MainLayout } from './components/layout/MainLayout';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { PageHeaderProvider } from './contexts/PageHeaderContext';
 
-function App() {
-  const [count, setCount] = useState(0)
+// Pages
+import WelcomeAuth from './pages/WelcomeAuth';
+import OnboardingStep1 from './pages/OnboardingStep1';
+import OnboardingStep2 from './pages/OnboardingStep2';
+import OnboardingStep3 from './pages/OnboardingStep3';
+import Home from './pages/Home';
+import DiaryList from './pages/DiaryList';
+import DiaryHistory from './pages/DiaryHistory';
+import CreateDiary from './pages/CreateDiary';
+import ChatList from './pages/ChatList';
+import ChatActive from './pages/ChatActive';
+import PlantScan from './pages/PlantScan';
+import Shop from './pages/Shop';
+import Profile from './pages/Profile';
+import Celebration from './pages/Celebration';
+import Reminders from './pages/Reminders';
+import CreateReminder from './pages/CreateReminder';
+import Settings from './pages/Settings';
+import HelpSupport from './pages/HelpSupport';
+import AccountSettings from './pages/AccountSettings';
 
+// Error & Status Pages
+import NotFound404 from './pages/NotFound404';
+import LoadingScreen from './pages/LoadingScreen';
+import NetworkError from './pages/NetworkError';
+import MaintenanceMode from './pages/MaintenanceMode';
+
+export function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <ErrorBoundary>
+      <PageHeaderProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<WelcomeAuth />} />
+              <Route path="/onboarding-1" element={<OnboardingStep1 />} />
+              <Route path="/onboarding-2" element={<OnboardingStep2 />} />
+              <Route path="/onboarding-3" element={<OnboardingStep3 />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/diary" element={<DiaryList />} />
+              <Route path="/diary-history" element={<DiaryHistory />} />
+              <Route path="/diary/create" element={<CreateDiary />} />
+              <Route path="/chat" element={<ChatActive />} />
+              <Route path="/chat-list" element={<ChatList />} />
+              <Route path="/scan" element={<PlantScan />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/help-support" element={<HelpSupport />} />
+              <Route path="/account-settings" element={<AccountSettings />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/reminders" element={<Reminders />} />
+              <Route path="/reminders/create" element={<CreateReminder />} />
+              <Route path="/celebration" element={<Celebration />} />
+              
+              {/* Error & Status Pages - Outside MainLayout */}
+              <Route path="/loading" element={<LoadingScreen />} />
+              <Route path="/network-error" element={<NetworkError />} />
+              <Route path="/maintenance" element={<MaintenanceMode />} />
+              <Route path="/404" element={<NotFound404 />} />
+              
+              {/* Catch-all 404 */}
+              <Route path="*" element={<NotFound404 />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </PageHeaderProvider>
+    </ErrorBoundary>
+  );
 }
 
-export default App
+export default App;
