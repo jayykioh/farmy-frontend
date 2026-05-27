@@ -1,35 +1,30 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { PageHeader } from '../components/PageHeader';
+import { Plus } from 'lucide-react';
 
 export const ChatList: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 text-left font-sans pb-[100px] relative overflow-hidden">
+      <PageHeader title="Tri Kỷ AI" leftButton="none" />
       
       {/* Background Decorative Elements */}
       <div className="absolute top-1/4 left-[-20px] w-40 h-40 bg-primary-light/20 rounded-full blur-[60px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-[-20px] w-60 h-60 bg-secondary-light/20 rounded-full blur-[80px] pointer-events-none"></div>
 
       {/* Main Content Area */}
-      <main className="w-full max-w-3xl mx-auto px-4 md:px-8 pt-4 pb-12 relative min-h-[100svh] flex flex-col">
+      <main className="w-full max-w-3xl mx-auto px-4 md:px-8 pt-24 pb-12 relative min-h-[100svh] flex flex-col">
         
-        {/* Header - TopAppBar alternative */}
-        <div className="flex justify-between items-center mb-6 mt-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center overflow-hidden border border-border-main/50 shadow-sm p-1">
-              <MascotLottie className="w-full h-full -mt-1" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-text-h">Tri Kỷ AI</h1>
-          </div>
+        {/* Action button */}
+        <div className="flex justify-end mb-6">
           <button 
             onClick={() => navigate('/chat/active')}
-            className="flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-full font-bold shadow-sm active:scale-95 hover:bg-primary-container transition-all"
+            className="flex items-center gap-1.5 px-5 py-2.5 bg-primary text-white rounded-full font-bold shadow-md active:scale-95 hover:bg-primary-container transition-all"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus className="w-5 h-5" />
             Chat mới
           </button>
         </div>

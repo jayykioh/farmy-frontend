@@ -1,6 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { SnapCard } from '../components/SnapCard';
+import { mockSnaps } from '../mocks/snapData';
+import { SnapFAB } from '../components/SnapFAB';
+import { Flame } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -17,9 +21,7 @@ export const Home: React.FC = () => {
           {/* Header & Streak */}
           <section className="flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
             <div className="inline-flex items-center gap-2 bg-bg-surface border border-border-main/50 shadow-sm rounded-full px-4 py-1.5 mb-3">
-              <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11.64 5.93h1.43v4.28h-1.43zM11.64 12.36h1.43v1.43h-1.43zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-              </svg>
+              <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
               <span className="font-bold text-text-main/70 text-sm">7-day streak</span>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-text-h tracking-tight">Good morning, Nông Dân!</h2>
@@ -136,6 +138,35 @@ export const Home: React.FC = () => {
         </div>
         
       </div>
+
+      {/* Farm Feed Preview Section */}
+      <section className="w-full mt-2 md:mt-4">
+        <div className="flex justify-between items-end mb-4">
+          <h3 className="text-xl md:text-2xl font-extrabold text-text-main">Farm Feed gần đây 🌱</h3>
+          <button 
+            onClick={() => navigate('/farm-feed')}
+            className="text-primary font-bold text-sm hover:underline flex items-center gap-1 active:scale-95 transition-transform"
+          >
+            Xem tất cả
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+          {mockSnaps.map(snap => (
+            <SnapCard 
+              key={snap.id}
+              snap={snap}
+              mini={true}
+              onClick={() => navigate(`/snap/${snap.id}`)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <SnapFAB />
     </div>
   );
 };

@@ -1,20 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
+import { SnapFAB } from '../components/SnapFAB';
+import { PageHeader } from '../components/PageHeader';
 
 export const DiaryList: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="w-full min-h-full">
-      <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-4 pb-8 flex flex-col gap-6">
-        {/* Header equivalent */}
-        <div className="flex items-center gap-3 mt-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden border border-border-main/50 shadow-sm bg-white flex items-center justify-center p-1">
-            <MascotLottie className="w-full h-full -mt-1" />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-h tracking-tight">Nhật ký nông trại</h1>
-        </div>
+      <PageHeader title="Nhật ký nông trại" leftButton="none" />
+      <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-8 flex flex-col gap-6">
 
         {/* Filter Chips */}
         <section className="flex gap-2 overflow-x-auto scrollbar-hide py-2">
@@ -114,16 +109,18 @@ export const DiaryList: React.FC = () => {
         </div>
       </main>
 
-      {/* Floating Action Button */}
+      {/* Floating Action Button for Create Diary */}
       <button 
         onClick={() => navigate('/diary/create')}
-        className="fixed bottom-[100px] right-6 md:bottom-8 md:right-8 lg:bottom-12 lg:right-12 w-14 h-14 md:w-16 md:h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-primary/30 z-40 transition-transform hover:scale-110 active:scale-95"
+        className="fixed bottom-[140px] right-4 md:bottom-24 md:right-8 w-14 h-14 bg-white text-primary border border-primary/20 rounded-full flex items-center justify-center shadow-lg shadow-black/5 z-40 transition-transform hover:scale-110 active:scale-95"
+        aria-label="Tạo Nhật ký"
       >
-        <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
       </button>
 
+      <SnapFAB />
     </div>
   );
 };

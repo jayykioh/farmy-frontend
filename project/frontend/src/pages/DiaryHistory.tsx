@@ -1,18 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { PageHeader } from '../components/PageHeader';
 
 export const DiaryHistory: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full flex flex-col gap-6 px-4 md:px-8 mt-6 mb-8 max-w-5xl mx-auto min-h-screen">
-      
-      {/* Header Section */}
-      <section className="flex flex-col gap-2 items-center text-center mt-4">
-        <h2 className="text-3xl font-extrabold text-text-h tracking-tight">Farm History</h2>
-        <p className="text-lg text-text-main/70">Your weekly progress and diary records.</p>
-      </section>
+    <div className="w-full min-h-screen bg-bg-surface-1">
+      <PageHeader title="Farm History" subtitle="Your weekly progress and diary records" leftButton="back" />
+      <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
 
       {/* Bé Thóc Encouragement */}
       <section className="flex items-end gap-4 w-full">
@@ -128,7 +125,7 @@ export const DiaryHistory: React.FC = () => {
           View All Records
         </button>
       </section>
-      
+      </div>
     </div>
   );
 };

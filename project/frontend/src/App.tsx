@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PageHeaderProvider } from './contexts/PageHeaderContext';
@@ -23,6 +23,8 @@ import CreateReminder from './pages/CreateReminder';
 import Settings from './pages/Settings';
 import HelpSupport from './pages/HelpSupport';
 import AccountSettings from './pages/AccountSettings';
+import FarmFeed from './pages/FarmFeed';
+import SnapDetail from './pages/SnapDetail';
 
 // Error & Status Pages
 import NotFound404 from './pages/NotFound404';
@@ -56,6 +58,8 @@ export function App() {
               <Route path="/reminders" element={<Reminders />} />
               <Route path="/reminders/create" element={<CreateReminder />} />
               <Route path="/celebration" element={<Celebration />} />
+              <Route path="/farm-feed" element={<FarmFeed />} />
+              <Route path="/snap/:id" element={<SnapDetail />} />
               
               {/* Error & Status Pages - Outside MainLayout */}
               <Route path="/loading" element={<LoadingScreen />} />

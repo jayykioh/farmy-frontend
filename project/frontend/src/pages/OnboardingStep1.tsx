@@ -21,9 +21,7 @@ export const OnboardingStep1: React.FC = () => {
             <p className="hidden text-xs font-extrabold uppercase tracking-[0.18em] text-text-secondary/70 md:block">Farm setup</p>
           </div>
         </div>
-        <div className="hidden rounded-full border border-border-main/60 bg-bg-surface-1 px-4 py-2 text-sm font-extrabold text-text-secondary lg:block">
-          Bước 1 trong 3
-        </div>
+
         <button aria-label="Notifications" className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-primary transition-colors duration-200 hover:bg-bg-surface-1 focus:outline-none focus:ring-2 focus:ring-primary-light active:scale-95">
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -58,20 +56,7 @@ export const OnboardingStep1: React.FC = () => {
               <div className="absolute bottom-5 left-1/2 h-4 w-40 -translate-x-1/2 rounded-full bg-text-main/10 blur-md lg:w-56" />
             </div>
 
-            <div className="mt-4 hidden grid-cols-3 gap-3 lg:grid">
-              <div className="rounded-2xl border border-border-main/60 bg-bg-surface/80 p-3 text-center shadow-sm">
-                <p className="text-xl font-black text-primary">3</p>
-                <p className="text-xs font-extrabold text-text-secondary/70">bước thiết lập</p>
-              </div>
-              <div className="rounded-2xl border border-border-main/60 bg-bg-surface/80 p-3 text-center shadow-sm">
-                <p className="text-xl font-black text-primary">+XP</p>
-                <p className="text-xs font-extrabold text-text-secondary/70">habit loop</p>
-              </div>
-              <div className="rounded-2xl border border-border-main/60 bg-bg-surface/80 p-3 text-center shadow-sm">
-                <p className="text-xl font-black text-primary">AI</p>
-                <p className="text-xs font-extrabold text-text-secondary/70">cá nhân hóa</p>
-              </div>
-            </div>
+
           </div>
         </section>
 
@@ -101,18 +86,21 @@ export const OnboardingStep1: React.FC = () => {
 
               <div className="space-y-2">
                 <p className="ml-2 text-sm font-bold text-text-main/70">Loại cây trồng chính</p>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
-                  <button type="button" className="min-h-12 cursor-pointer rounded-full bg-primary-container px-5 py-3 font-bold text-white shadow-lg transition-colors duration-200 hover:bg-primary active:scale-95">
-                    Lúa nước
+                <div className="flex flex-wrap gap-3">
+                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full bg-primary-container px-5 py-3 font-bold text-white shadow-lg transition-colors duration-200 hover:bg-primary active:scale-95 flex items-center justify-center gap-2">
+                    🌾 Lúa nước
                   </button>
-                  <button type="button" className="min-h-12 cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95">
-                    Cây ăn trái
+                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
+                    🍎 Cây ăn trái
                   </button>
-                  <button type="button" className="min-h-12 cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95">
-                    Cà phê
+                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
+                    ☕ Cà phê
                   </button>
-                  <button type="button" className="min-h-12 cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95">
-                    Rau màu
+                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
+                    🥬 Rau màu
+                  </button>
+                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
+                    🌱 Khác
                   </button>
                 </div>
               </div>

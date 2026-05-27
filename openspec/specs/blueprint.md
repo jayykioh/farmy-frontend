@@ -254,7 +254,13 @@ CREATE TYPE notification_pref_enum AS ENUM ('auto', 'push', 'zalo', 'email', 'no
 | InsightModule | Weekly insight cron, distributed schedule BullMQ | RAGModule, LLMModule | 1 |
 | FeedbackModule | Log AI feedback, rating, A/B test data | — | 1 |
 | KnowledgeModule | CRUD knowledge docs, admin, embedding trigger | EmbeddingModule | 2 |
-| *SocialModule* | *Post, follow, comment — CHỈ sau khi đủ metrics* | DiaryModule | 4+ |
+| **SnapModule** | Farm Snap instant photo share, AI training data flywheel, community feed, XP trigger | DiaryModule, PetModule | 2 |
+| *SocialModule* | *Post, follow, comment — CHỈ sau khi đủ metrics* | DiaryModule, SnapModule | 4+ |Farm Snap
+Update version: v3.0 → v3.1
+Specs xong rồi. Bạn duyệt để mình bắt đầu implement không? 🚀
+
+2:42 PM
+
 
 ---
 
@@ -562,6 +568,42 @@ CREATE TABLE zalo_webhooks (
   payload JSONB,
   processed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Farm Snaps (Phase 2) — Instant photo sharing + AI training data
+CREATE TYPE snap_condition_enum AS ENUM ('healthy', 'issue', 'harvest', 'other');
+CREATE TYPE snap_reaction_enum AS ENUM ('like', 'helpful', 'worry', 'celebrate');
+
+CREATE TABLE farm_snaps (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  image_url      TEXT NOT NULL,
+  image_key      TEXT NOT NULL,
+  caption        TEXT CHECK (char_length(caption) <= 100),
+  crop_type      TEXT NOT NULL,
+  condition      snap_condition_enum NOT NULL,
+  condition_note TEXT CHECK (char_length(condition_note) <= 200),
+  location       JSONB,
+  weather        JSONB,
+  captured_at    TIMESTAMPTZ NOT NULL,
+  is_public      BOOLEAN DEFAULT true,
+  is_flagged     BOOLEAN DEFAULT false,
+  quality_score  SMALLINT,
+  xp_earned      SMALLINT DEFAULT 10,
+  created_at     TIMESTAMPTZ DEFAULT now(),
+  updated_at     TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX ON farm_snaps (user_id, created_at DESC);
+CREATE INDEX ON farm_snaps (created_at DESC) WHERE is_public = true AND is_flagged = false;
+CREATE INDEX ON farm_snaps (crop_type, condition) WHERE quality_score IS NOT NULL;
+
+CREATE TABLE snap_reactions (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  snap_id    UUID NOT NULL REFERENCES farm_snaps(id) ON DELETE CASCADE,
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type       snap_reaction_enum NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (snap_id, user_id, type)
 );
 
 -- Social (Phase 4+)

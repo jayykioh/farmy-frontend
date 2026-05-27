@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 
 export const AccountSettings: React.FC = () => {
-  const navigate = useNavigate();
   const [isEditingName, setIsEditingName] = useState(false);
   const [name, setName] = useState('Nguyễn Văn Nông');
   const [farmName, setFarmName] = useState('Nông trại Vườn Xanh');
@@ -14,6 +12,8 @@ export const AccountSettings: React.FC = () => {
 
   const handleSaveName = () => {
     setName(editName);
+    setFarmName(editFarmName);
+    setRegion(editRegion);
     setIsEditingName(false);
   };
 

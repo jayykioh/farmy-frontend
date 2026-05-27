@@ -797,6 +797,162 @@ Motion constraints:
 
 ---
 
-*FarmDiaries AI - Screen Flow and Interaction Architecture v3.0*
+## 14. SCR-10: Farm Snap — Camera Capture Modal
+
+Entry points:
+- FAB 📸 nổi trên Home, DiaryList, FarmFeed
+- Nút [📸 Chụp ngay] trong FarmFeed header
+
+API: POST /api/v1/snaps/upload-url → PUT <signedUrl> → POST /api/v1/snaps
+
+```
+[Tap FAB 📸]
+       |
+       v
+[Check camera permission]
+       |
+       +-- DENIED → Toast "Can quyen camera" + [Mo Cai dat]
+       | GRANTED
+       v
++------------------------------------------------------------------+
+| SCR-10: SnapCaptureModal (fullscreen, dark theme)                |
+|                                                                  |
+| [X Dong]                           [Be Thoc: happy nho]          |
+|                                                                  |
+| +------------------------------------------------------------+   |
+| |                                                            |   |
+| |            Live camera feed (full bleed)                   |   |
+| |                                                            |   |
+| +------------------------------------------------------------+   |
+|                                                                  |
+| [Loai cay: Lua ▾]   [Khoe][Co van de][Thu hoach]               |
+|                                                                  |
+| [Thu vien]      [● CHUP]       [Doi camera]                     |
++------------------------------------------------------------------+
+       | (Chup / chon tu thu vien)
+       v
++------------------------------------------------------------------+
+| Preview & Confirm                                                |
+|                                                                  |
+| [Anh vua chup - full width 4:5]                                  |
+| [Lua · Co van de] (pill label)                                   |
+|                                                                  |
+| Caption (optional, max 100 chars):                               |
+| [                                            ]                   |
+|                                                                  |
+| [Chup lai]              [Dang len Feed +10XP]                   |
++------------------------------------------------------------------+
+       | (Dang)
+       v
+[Uploading: spinner + "Dang dang..."]
+BUOC 1: POST /api/v1/snaps/upload-url
+BUOC 2: PUT <signedUrl> (truc tiep len R2)
+BUOC 3: POST /api/v1/snaps { imageUrl, cropType, condition, ... }
+       |
+  +----+---------------------------+
+  | 201 Created                   | Error
+  v                               v
+[+10XP popup]              Toast theo bang loi (Section 11)
+[Modal tu dong dong 1.5s]
+[FarmFeed refresh]
+[PetService: addXp(10)]
+[BadgeCheck: moc 10/50/100 snaps]
+```
+
+---
+
+## 15. SCR-11: Farm Feed — Community Snap Feed
+
+Entry point: Home → section "Farm Feed gan day" → [Xem tat ca] HOAC FAB direct to /farm-feed
+
+API: GET /api/v1/snaps/feed?limit=20&cursor=<iso>&cropType=&condition=
+
+```
++------------------------------------------------------------------+
+| "Farm Feed 🌱"                              [📸 Chup ngay]      |
++------------------------------------------------------------------+
+| [Tat ca] [Khoe] [Co van de] [Thu hoach] [Cua toi]              |
++------------------------------------------------------------------+
+| [SnapCard 1]                                                     |
+| [SnapCard 2]                                                     |
+| [SnapCard 3]                                                     |
+| ...                                                              |
+| [Shimmer loading - khi scroll den cuoi]                          |
+| [Da xem het feed] - khi hasMore = false                          |
++------------------------------------------------------------------+
+| Empty state:                                                     |
+| Be Thoc (happy) + "Chua co snap nao!"                           |
+| [Chup Farm Snap dau tien] (primary CTA)                         |
++------------------------------------------------------------------+
+```
+
+Desktop: 2-column masonry grid (gap-4, thi le 4:5 moi card)
+Mobile: 1 column, infinite scroll (cursor pagination)
+
+### SCR-11 SnapCard Anatomy
+
+```
++------------------------------------------------------------------+
+| [Anh - ty le 4:5, object-fit cover, bo goc 20px]                |
+|                                                                  |
+| Overlay top (gradient):                                          |
+| [Lua He Thu]  [Co van de]   (condition pills)                   |
+|                                                                  |
+| Overlay bottom (gradient den):                                   |
+| "Phat hien la vang o goc..."           (caption - 2 dong max)   |
+| Nguyen Van Ruong · An Giang · 2 gio truoc                       |
+| [😍 12] [👍 8] [😟 2] [🎉 5]    [💬 Hoi AI ve cay nay]        |
++------------------------------------------------------------------+
+```
+
+Tap anh → SCR-11B: SnapDetail (fullscreen bottom sheet / modal)
+Tap [Hoi AI] → navigate /chat voi pre-filled: "Toi thay [cropType] dang [condition]..."
+Reaction tap → POST /api/v1/snaps/:id/react { type } (toggle)
+
+### SCR-11B: SnapDetail
+
+Full-screen modal overlay:
+- Anh full-width (header)
+- Label pills: crop, condition
+- Caption day du
+- Reaction bar
+- Comments section (Phase 4+)
+- [Hoi Be Thoc ve cay nay] CTA → navigate to /chat
+
+---
+
+## 16. Home Integration — Farm Feed Preview Section
+
+SCR-02 (Home) bo sung 1 section o cuoi trang (sau Quick Actions):
+
+```
++------------------------------------------------------------------+
+| Farm Feed gan day 🌱                         [Xem tat ca →]     |
++------------------------------------------------------------------+
+| [Mini SnapCard 1] [Mini SnapCard 2] [Mini SnapCard 3]           |
+| (Horizontal scroll, 160px wide x 200px tall cards)               |
++------------------------------------------------------------------+
+```
+
+API: GET /api/v1/snaps/feed?limit=5 (preview nho)
+
+---
+
+## 17. Error State Additions (Farm Snap)
+
+Bo sung vao bang Section 11:
+
+| API / Scenario | HTTP | Error Code | UI Response |
+|---|---|---|---|
+| Snap - Upload qua 10MB | 400 | SNAP_FILE_TOO_LARGE | Toast: "Anh qua lon, toi da 10MB" |
+| Snap - Sai dinh dang | 400 | SNAP_INVALID_FORMAT | Toast: "Chi nhan JPG/PNG/WebP" |
+| Snap - Vuot rate limit | 429 | SNAP_QUOTA_EXCEEDED | Bottom sheet: "Da dang du 10 snap hom nay!" |
+| Snap - Khong co quyen camera | — | — | Toast: "Can quyen camera" + [Mo Cai dat] |
+| Snap - Network khi upload | — | — | Toast: "Dang that bai, thu lai" |
+
+---
+
+*FarmDiaries AI - Screen Flow and Interaction Architecture v3.1*
 *Navigation: 4 tabs (Home / Diary / AI Pet / Profile) - PlantScan in Chat - Shop in Profile*
+*v3.1: Added Farm Snap (SCR-10, SCR-11), Home Feed Preview, Snap error states*
 *Source of Truth for all UI flows and API integration points*

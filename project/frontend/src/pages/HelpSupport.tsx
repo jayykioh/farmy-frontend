@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 
 interface FAQItem {
@@ -10,7 +9,6 @@ interface FAQItem {
 }
 
 export const HelpSupport: React.FC = () => {
-  const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 

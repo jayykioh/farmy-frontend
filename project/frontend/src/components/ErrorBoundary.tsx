@@ -1,4 +1,5 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+import React from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -20,7 +21,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<State> {
+  static getDerivedStateFromError(_error: Error): Partial<State> {
     return { hasError: true };
   }
 
@@ -77,7 +78,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             </div>
 
             {/* Error Details (Development Only) */}
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="w-full bg-error-light/10 border border-error-main/30 rounded-[16px] p-4 text-left max-h-48 overflow-auto">
                 <p className="text-xs font-bold text-error mb-2 uppercase">Chi tiết lỗi (chỉ dành cho phát triển):</p>
                 <details className="text-xs text-error-main/80 font-mono whitespace-pre-wrap break-words">

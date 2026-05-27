@@ -1,13 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import bethocAnimation from '../assets/bethoc.json';
-
-// Lazy load Lottie for better performance
-const Lottie = React.lazy(() => import('lottie-react').catch(() => {
-  // Fallback if lottie-react not available
-  return {
-    default: () => <div className="w-32 h-32 bg-primary-container/20 rounded-full animate-pulse" />
-  };
-}));
 
 interface LoadingScreenProps {
   message?: string;

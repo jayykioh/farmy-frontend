@@ -1,14 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../components/PageHeader';
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full flex flex-col gap-6 px-4 md:px-8 mt-4 md:mt-8 pb-[100px] max-w-3xl mx-auto bg-bg-main min-h-screen">
+    <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-[100px] max-w-3xl mx-auto bg-bg-main min-h-screen">
+      <PageHeader title="Hồ sơ cá nhân" leftButton="none" />
       
       {/* Header / Profile Summary */}
-      <section className="flex items-center gap-4 bg-white p-6 rounded-[24px] border border-border-main/50 relative overflow-hidden shadow-sm mt-4">
+      <section className="flex items-center gap-4 bg-white p-6 rounded-[24px] border border-border-main/50 relative overflow-hidden shadow-sm">
         <div className="w-24 h-24 rounded-full border-[3px] border-white shadow-sm bg-bg-surface-1 flex-shrink-0 overflow-hidden z-10 relative">
           <img alt="Farmer Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsbCWDiuGTF5iEwK2O9pm1CMMzFdWx0hc4ellAPSIR0Fd0W04AaUk2McKFTBpkyt54F7qbz59AxRVm00X7l_paTxXsYAhKb0DJ2UtW18iwcftc8NpvHSUtky7QtZ3LYS_Jvnwzb_uyHj7Snd_GZJ5qRjx6kGvs2Y-yZafDMesEmvqIG9HZ3b06V39xa_0py0IGkepiBfpB_L-Nfe8YfQg-4VDdxhF78xd9seUk1RNYLfCuF3wEdwSvukiK2uu0wpN98-IjRJs9NRru" />
         </div>
