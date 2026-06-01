@@ -5,13 +5,15 @@
 |---|---|
 | **Phiên bản** | v6.0 — Production-Grade (nâng từ v5.0 Improved) |
 | **Trạng thái** | Source of Truth · Specs folder |
-| **Stack** | Node.js + NestJS + PostgreSQL + pgvector + Redis + MongoDB + Cloudflare R2 |
+| **Stack** | Node.js + NestJS + MongoDB Atlas + Atlas Vector Search + Redis + Cloudflare R2 |
 | **AI Strategy** | Gemini free-first · RAG · Rule-based Feed · Vision Scan |
 | **Notification** | Zalo OA (Phase 1–2) → PWA Push (Phase 3+) |
 | **Triết lý** | MVP-first · Log everything · Security by default · Scale when ready |
 | **Cập nhật** | v6.0 bổ sung: Security, Observability, CI/CD, Testing, DB Migration & Backup, Privacy & Compliance, AI Safety, Production Deployment |
 
 ---
+
+> **MongoDB-first update:** Backend database decisions in this project now follow `openspec/specs/mongodb_stack_analysis.md`. Any older sections in this blueprint that mention PostgreSQL, pgvector, SQL migrations, or TypeORM should be treated as historical reference and adapted to MongoDB Atlas, Mongoose/Typegoose, and Atlas Vector Search.
 
 ## Mục lục
 
@@ -55,8 +57,8 @@ v6.0 nâng cấp toàn diện từ v5.0 để đạt tiêu chuẩn **Production-
 | **Styling** | Tailwind CSS + Shadcn/UI | Free | Giao diện hiện đại, tối ưu UX, responsive |
 | **State** | Zustand + React Query | Free | Quản lý state gọn nhẹ, cache API mạnh mẽ |
 | **Backend** | Node.js + NestJS | Free (Railway) | Hệ khung vững chắc, Clean Architecture, DI |
-| **DB Primary** | PostgreSQL + pgvector | Free (Self-host/PaaS) | Lưu dữ liệu quan hệ & Vector Embeddings (RAG) |
-| **DB Secondary** | MongoDB Atlas | Free Tier (512MB) | Lưu dữ liệu phi cấu trúc, log chat & event |
+| **DB Primary** | MongoDB Atlas | Free Tier / Shared Cluster | Lưu dữ liệu ứng dụng chính, chat, scan, diary, reminders, events |
+| **Vector Search** | MongoDB Atlas Vector Search | Atlas Search | Lưu embedding và truy vấn RAG trong cùng MongoDB cluster |
 | **Cache/Queue** | Redis + BullMQ | Free | Xử lý rate limit AI & lập lịch gửi ZNS/Push |
 | **Storage** | Cloudflare R2 | Free Tier (10GB) | Lưu trữ ảnh nhật ký & ảnh quét bệnh (S3 API) |
 | **Auth** | Supabase Auth | Free (50k MAU) | Authentication an toàn, nhanh gọn |
@@ -65,7 +67,8 @@ v6.0 nâng cấp toàn diện từ v5.0 để đạt tiêu chuẩn **Production-
 
 ### 2.2 Biện luận và So sánh Kiến trúc (Architecture Decision Rationale)
 
-#### A. Chiến lược Hybrid Database: PostgreSQL + MongoDB (Trọng tâm)
+#### A. Chiến lược MongoDB-first Database (Trọng tâm)
+> Cập nhật: phần phân tích hybrid cũ bên dưới được thay thế bởi `mongodb_stack_analysis.md`. Thiết kế mới dùng MongoDB Atlas làm primary DB và Atlas Vector Search cho RAG.
 Thay vì dùng một cơ sở dữ liệu duy nhất, hệ thống kết hợp **PostgreSQL** và **MongoDB** để tối ưu hóa hiệu năng, chi phí và tính toàn vẹn dữ liệu:
 *   **PostgreSQL (Primary DB):**
     *   *Mục đích:* Lưu trữ các thực thể có cấu trúc chặt chẽ, cần tính toàn vẹn cao (ACID) và liên kết phức tạp: `users`, `diary_entries`, `reminders`, `pet_state`, `weekly_insights` và dữ liệu social (`posts`, `follows`, `comments`).
@@ -82,7 +85,8 @@ Thay vì dùng một cơ sở dữ liệu duy nhất, hệ thống kết hợp *
     *   *Tốc độ phát triển:* Đồng bộ 100% codebase, dễ dàng cập nhật tính năng mới (instant update) mà không cần chờ duyệt ứng dụng.
     *   *Khả năng tái sử dụng:* Codebase React+Vite hiện tại tái sử dụng được hơn 60% logic và giao diện khi phát triển lên ứng dụng React Native ở Phase sau.
 
-#### C. Lựa chọn AI & RAG: Gemini API + pgvector vs. OpenAI + Vector DB chuyên dụng
+#### C. Lựa chọn AI & RAG: Gemini API + MongoDB Atlas Vector Search
+> Cập nhật: RAG không dùng pgvector theo yêu cầu MongoDB-first. Embedding được lưu trong `knowledge_chunks` / `memory_embeddings` và truy vấn bằng Atlas Vector Search.
 *   **Gemini Flash & text-embedding-004:** Được lựa chọn vì gói Free Tier cực kỳ hào phóng (15 RPM đối với Flash và 100 RPM đối với Embedding), đáp ứng dư dả quy mô MVP mà không phát sinh chi phí ban đầu. Khả năng đọc hiểu hình ảnh (Gemini Vision) cực tốt giúp triển khai tính năng Quét bệnh cây trồng ([PlantScanModule](file:///d:/coding/farmdiary/project/backend/src/modules/plant-scan/plant-scan.service.ts)) một cách mượt mượt mà.
 *   **pgvector (HNSW Index) vs. Dedicated Vector DB:** pgvector tích hợp trực tiếp vào PostgreSQL giúp đồng bộ hóa dữ liệu tuyệt đối (không lo trễ đồng bộ giữa DB chính và DB Vector). Việc tự vận hành pgvector trên database PostgreSQL hiện tại hoàn toàn miễn phí, hiệu năng tìm kiếm ANN (HNSW) cực nhanh cho quy mô dưới 1 triệu vector, loại bỏ hoàn toàn chi phí đắt đỏ của các dịch vụ đám mây Vector DB bên thứ ba.
 
@@ -410,7 +414,7 @@ CREATE TABLE archived_chats (
 
 ### Nguyên tắc phân chia
 
-> **Quy tắc đơn giản:** Dữ liệu cần JOIN, transaction, quan hệ rõ ràng → PostgreSQL. Dữ liệu schema thay đổi liên tục, nested document, write volume cao, không cần JOIN → MongoDB.
+> **Quy tắc MongoDB-first:** Mặc định mọi dữ liệu ứng dụng mới dùng MongoDB collection. Chỉ cân nhắc thêm database khác khi có yêu cầu phân tích/quan hệ đặc biệt, đã có repository interface và được team thống nhất.
 
 | Tiêu chí | → PostgreSQL | → MongoDB |
 |---|---|---| 
@@ -420,7 +424,7 @@ CREATE TABLE archived_chats (
 | Write volume | Thấp–vừa | Cao (event mỗi click, message mỗi chat turn) |
 | Ví dụ | users, diaries, reminders, posts, follows | ai_chats, user_events, plant_scans |
 
-### PostgreSQL — Primary DB Schema
+### Legacy PostgreSQL Schema Reference (Superseded by MongoDB-first model)
 
 ```sql
 -- Users

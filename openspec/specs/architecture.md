@@ -11,6 +11,8 @@
 
 ---
 
+> **MongoDB-first update:** This ADD still contains older hybrid PostgreSQL/pgvector diagrams. For new backend implementation, use MongoDB Atlas as the primary database and Atlas Vector Search for RAG as specified in `openspec/specs/mongodb_stack_analysis.md`.
+
 ## 1. Bản đồ tổng quan Kiến trúc Hệ thống (System Architecture)
 
 Hệ thống tuân thủ mô hình **Decoupled Modern Web PWA / Hybrid Cloud**, kết nối thông qua RESTful API tốc độ cao viết trên NestJS. Dưới đây là sơ đồ luồng dữ liệu và tương tác giữa các thành phần:
