@@ -1,17 +1,17 @@
 # FarmDiaries AI — Core Architecture Design Document (ADD)
-### System Design · Hybrid Database Orchestration · AI Pipeline · Security Blueprint
+### System Design · MongoDB Primary · pgvector Search Index · AI Pipeline · Security Blueprint
 
 | Thuộc tính | Giá trị |
 |---|---|
 | **Dự án** | FarmDiaries AI (SDN392 Capstone Project) |
 | **Tài liệu** | Core Architecture Design Document (ADD) |
-| **Phiên bản** | v1.0 (Align với Technical Blueprint v6.0) |
+| **Phiên bản** | v2.0 (MongoDB-primary · pgvector search index) |
 | **Tác giả** | Team 4 - Antigravity Agentic Assistant |
 | **Trạng thái** | Active · specs folder |
 
 ---
 
-> **MongoDB-first update:** This ADD still contains older hybrid PostgreSQL/pgvector diagrams. For new backend implementation, use MongoDB Atlas as the primary database and Atlas Vector Search for RAG as specified in `openspec/specs/mongodb_stack_analysis.md`.
+> **Architecture Decision:** MongoDB is the **primary database** for ALL application data. pgvector (PostgreSQL extension) is used **ONLY as a vector search index** — it stores `(embedding, source_id, source_type, minimal metadata)` and nothing else. No business data lives in pgvector. See `openspec/specs/embedding_spec.md` for full RAG architecture.
 
 ## 1. Bản đồ tổng quan Kiến trúc Hệ thống (System Architecture)
 
@@ -47,9 +47,9 @@ graph TD
     end
 
     %% Database & Cache
-    subgraph Data_Storage [Hybrid Database & Storage Layer]
-        PostgreSQL[(PostgreSQL + pgvector)]
-        MongoDB[(MongoDB Atlas - Chat & Event Logs)]
+    subgraph Data_Storage [Database & Storage Layer]
+        MongoDB[(MongoDB Atlas - PRIMARY DB)]
+        PGVector[(pgvector - Vector Search Index ONLY)]
         Redis[(Redis - Rate Limiting & Queue Cache)]
         BullMQ[BullMQ - Distributed Scheduler]
         R2[Cloudflare R2 Object Storage]
@@ -71,13 +71,15 @@ graph TD
     %% Module routes
     Auth_G --> Core_Modules
     Diary -->|Upload Images| R2
-    Plant -->| Laplacian Blur Check & Upload | R2
+    Plant -->|Laplacian Blur Check & Upload| R2
     
     %% AI Interactions
     Chat --> RAG
-    RAG -->|Similarity Search| PostgreSQL
+    RAG -->|1. ANN search - returns IDs only| PGVector
+    RAG -->|2. Fetch full docs by ID| MongoDB
     RAG --> Embed
     Embed -->|text-embedding-004| GeminiAPI
+    Embed -->|Write embedding + source_id| PGVector
     Chat --> LLM
     LLM -->|Redis Counter Check| Redis
     LLM -->|Gemini Flash API| GeminiAPI
@@ -88,10 +90,8 @@ graph TD
     BullMQ -->|Broker| Redis
     BullMQ -->|Execute job| Core_Modules
     
-    %% Database routing
-    Core_Modules -->|ACID Transactions| PostgreSQL
-    Chat -->|Append session message| MongoDB
-    Plant -->|Save scan logs & pHash| MongoDB
+    %% ALL business data → MongoDB (primary DB)
+    Core_Modules -->|All CRUD - users/diary/chat/pet/reminders| MongoDB
     
     %% Notification Output
     Reminder -->|Send ZNS| ZaloAPI
@@ -203,7 +203,7 @@ sequenceDiagram
 ---
 
 ### 2.3 Luồng Trò chuyện RAG & Bảo vệ Quota (Gemini API Free-Tier Guard)
-Cơ chế bảo vệ Quota miễn phí (15 RPM) của Gemini, đảm bảo người dùng chat không bao giờ bị nghẽn thông qua hàng đợi Redis và BullMQ:
+Cơ chế bảo vệ Quota miễn phí (15 RPM) của Gemini. RAG flow: embed query → pgvector search (returns IDs) → MongoDB fetch (full content) → assemble context → LLM.
 
 ```mermaid
 sequenceDiagram
@@ -211,191 +211,98 @@ sequenceDiagram
     actor User as Nông dân
     participant Nest as NestJS (ChatModule)
     participant Redis as Redis Quota Counter
-    participant RAG as RAGModule (Vector Search)
-    participant Embed as EmbeddingModule (pgvector)
-    participant PG as PostgreSQL (knowledge_docs)
+    participant RAG as RAGModule
+    participant Embed as EmbeddingModule
+    participant PGVector as pgvector (Search Index)
+    participant Mongo as MongoDB Atlas (PRIMARY DB)
     participant Bull as BullMQ Delay Queue
     participant Gemini as Gemini Flash API
-    participant Mongo as MongoDB Atlas (ai_chats)
 
     User->>Nest: Gửi tin nhắn chat ("Lúa bị rầy nâu phun gì?")
     Nest->>Redis: Increment & Get Counter "llm:rpm:limit" (TTL 60s)
     
     alt Counter > 14 (Chạm ngưỡng giới hạn)
         Nest->>Bull: Đưa request vào llm_queue (High priority)
-        Bull-->>Nest: Enqueued (User nhận thông báo: "AI đang bận, sẽ trả lời sau giây lát...")
-        Note over Nest, Bull: Chờ worker trống (Redis counter giảm) để xử lý tiếp
+        Bull-->>Nest: Enqueued (User nhận: "AI đang bận, sẽ trả lời sau giây lát...")
+        Note over Nest, Bull: Chờ worker trống để xử lý tiếp
     else Counter <= 14 (Hoạt động bình thường)
         Redis-->>Nest: OK
     end
 
     Nest->>RAG: Truy vấn tài liệu bổ trợ (Context Retrieval)
-    RAG->>Embed: Tạo Vector Embedding của tin nhắn (text-embedding-004)
-    Embed->>Gemini: Gọi API sinh vector (768 dimensions)
-    Gemini-->>Embed: Trả Vector Array
     
-    Embed->>PG: Tìm kiếm lân cận HNSW (Cosine Similarity) trên bảng knowledge_docs & memory_embeddings
-    PG-->>RAG: Trả về top 3 văn bản kỹ thuật nông nghiệp liên quan nhất
+    RAG->>Embed: Embed tin nhắn người dùng (text-embedding-004)
+    Embed->>Gemini: Gọi API sinh vector 768 chiều
+    Gemini-->>Embed: vector[768]
     
-    RAG->>Nest: Kết hợp [System Prompt] + [Tin nhắn User] + [Context kỹ thuật từ PG]
+    RAG->>PGVector: ANN search — ORDER BY embedding <=> $queryVector LIMIT 10
+    Note over PGVector: Chỉ trả về source_id, source_type, score (NO content)
+    PGVector-->>RAG: [{ source_id, source_type, score }] — IDs only
+    
+    RAG->>Mongo: findByIds(diaryIds) + findByIds(knowledgeIds)
+    Note over Mongo: MongoDB là nguồn nội dung thật — fetch full text
+    Mongo-->>RAG: Full documents (notes, chunkText, metadata)
+    
+    RAG->>Nest: Kết hợp [System Prompt] + [User message] + [Context từ MongoDB]
     Nest->>Gemini: Gọi Gemini Flash sinh câu trả lời
     Gemini-->>Nest: Trả về text câu trả lời
     
-    Nest->>Mongo: Lưu lượt chat mới vào tài liệu ai_chats (Session ID)
+    Nest->>Mongo: Lưu lượt chat vào chat_sessions (MongoDB)
     Nest-->>User: Trả về câu trả lời hướng dẫn chuẩn kỹ thuật nông nghiệp 🌱
 ```
 
 ---
 
-## 3. Cấu trúc Hybrid Database & Sơ đồ Thực thể (ERD)
+## 3. Database Architecture — MongoDB Primary + pgvector Search Index
 
-### 3.1 PostgreSQL - Mô hình quan hệ chính (ERD)
+### 3.1 MongoDB Collections (Primary Database — Source of Truth)
 
-Các bảng liên quan đến ACID, bảo mật, nhật ký nông nghiệp và Vector Search lưu tại PostgreSQL:
+All business data lives in MongoDB. See `openspec/specs/mongodb_stack_analysis.md` for the complete collection index plan.
+
+| Collection | Stores | Key indexes |
+|---|---|---|
+| `users` | User profile, Zalo/push prefs, role, soft-delete | `email`, `zaloUserId` |
+| `refresh_tokens` | Token hash, family lineage, expiry, device | `tokenHash` unique, `expiresAt` TTL |
+| `diary_entries` | Crop log, notes, photos, weather, location, flags | `userId+createdAt`, `userId+cropType` |
+| `pet_states` | Current mood, streak, last diary timestamp | `userId` unique |
+| `pet_events` | Mood change history, milestones | `userId+createdAt` |
+| `plant_scans` | Image metadata, pHash, AI diagnosis JSON | `userId+createdAt`, `pHash` |
+| `chat_sessions` | Message array, citations, AI metadata, TTL 90d | `userId+updatedAt`, `sessionId` unique |
+| `knowledge_chunks` | Technical content chunks, crop tags, quality score | `cropType+qualityScore`, vector search |
+| `memory_embeddings` | (legacy name) — if using pure MongoDB RAG, store here | `userId+sourceId` |
+| `reminders` | Scheduled jobs, status, retry, channel | `status+scheduledAt`, `userId` |
+| `notification_subscriptions` | Push/Zalo/email destinations | `userId` |
+| `notification_logs` | Delivery outcomes | `userId+createdAt` |
+| `weekly_insights` | Generated insight, delivery state, user feedback | `userId+weekStartDate` |
+| `audit_logs` | Compliance records (append-only) | `userId+createdAt`, `action+createdAt` |
+| `user_events` | Product analytics events, TTL 30d | `userId+createdAt`, `eventType` |
+| `farm_snaps` | Photo share, condition, reactions, XP | `userId+createdAt`, `isPublic+createdAt` |
+| `ai_feedback` | Chat ratings, A/B test data | `userId+createdAt` |
+
+### 3.2 pgvector — Search Index Only
+
+pgvector hosts **one table only**: `embeddings(id, source_id, source_type, embedding vector(768), metadata jsonb, is_active bool, created_at)`.
+
+No business data lives here. See `openspec/specs/embedding_spec.md` for the full schema and RAG flow.
 
 ```mermaid
 erDiagram
-    USERS {
+    EMBEDDINGS {
         uuid id PK
-        string email UK
-        string name
-        enum role
-        string zalo_user_id
-        string zalo_access_token_encrypted
-        boolean zalo_notification_enabled
-        jsonb push_subscription
-        enum notification_preference
-        boolean is_deleted
-        timestamptz deleted_at
-        timestamptz created_at
-        timestamptz updated_at
-    }
-
-    REFRESH_TOKENS {
-        uuid id PK
-        uuid user_id FK
-        string token_hash UK
-        uuid family_id "NOT NULL — nhóm token cùng chuỗi lineage"
-        uuid replaced_by "FK self — token mới thay thế token này"
-        string device_info
-        inet ip_address
-        timestamptz expires_at
-        timestamptz revoked_at
+        text source_id "MongoDB ObjectId as string"
+        text source_type "diary_entry or knowledge_chunk"
+        vector embedding "768-dim — text-embedding-004"
+        jsonb metadata "cropType, userId, chunkIndex — minimal only"
+        boolean is_active "false = soft-deactivated, awaiting cleanup"
         timestamptz created_at
     }
-
-    DIARY_ENTRIES {
-        uuid id PK
-        uuid user_id FK
-        string crop_type
-        string growth_stage
-        text notes
-        string_array photo_urls
-        boolean watered
-        boolean fertilized
-        jsonb weather
-        string location_text
-        boolean is_deleted
-        timestamptz created_at
-        timestamptz updated_at
-    }
-
-    PET_STATE {
-        uuid id PK
-        uuid user_id FK "Unique"
-        enum mood
-        int streak_count
-        timestamptz last_diary_at
-        text mood_reason
-        timestamptz updated_at
-    }
-
-    REMINDERS {
-        uuid id PK
-        uuid user_id FK
-        enum type
-        enum channel
-        timestamptz scheduled_at
-        timestamptz delivered_at
-        string zalo_message_id
-        enum status
-        int retry_count
-        timestamptz created_at
-    }
-
-    AI_FEEDBACK {
-        uuid id PK
-        uuid user_id FK
-        string mongo_chat_id
-        smallint rating
-        boolean helpful
-        text comment
-        string model_used
-        string prompt_version
-        timestamptz created_at
-    }
-
-    MEMORY_EMBEDDINGS {
-        uuid id PK
-        uuid source_id FK "diary_entries"
-        string source_type
-        string source_model
-        vector embedding "768-dim"
-        text chunk_text
-        jsonb metadata
-        timestamptz created_at
-    }
-
-    KNOWLEDGE_DOCS {
-        uuid id PK
-        string title
-        string category
-        text chunk_text
-        string source_model
-        vector embedding "768-dim"
-        uuid verified_by FK "users"
-        smallint quality_score
-        timestamptz created_at
-        timestamptz updated_at
-    }
-
-    WEEKLY_INSIGHTS {
-        uuid id PK
-        uuid user_id FK
-        text insight_text
-        string model_used
-        int tokens_used
-        string delivery_status
-        smallint user_rating
-        date week_start_date
-        timestamptz created_at
-    }
-
-    AUDIT_LOG {
-        bigint id PK
-        uuid user_id FK
-        string action
-        string resource_type
-        string resource_id
-        inet ip_address
-        text user_agent
-        jsonb metadata
-        timestamptz created_at
-    }
-
-    USERS ||--o{ REFRESH_TOKENS : "owns"
-    USERS ||--o{ DIARY_ENTRIES : "writes"
-    USERS ||--|| PET_STATE : "has"
-    USERS ||--o{ REMINDERS : "receives"
-    USERS ||--o{ AI_FEEDBACK : "gives"
-    USERS ||--o{ WEEKLY_INSIGHTS : "receives"
-    USERS ||--o{ AUDIT_LOG : "triggers"
-    DIARY_ENTRIES ||--o{ MEMORY_EMBEDDINGS : "has_embeddings"
 ```
+
+> <!-- REVIEWER FLAG: pgvector must NOT contain users, diary_entries, pet_state, reminders, or any other business entity. Only the `embeddings` table is permitted. -->
 
 ---
 
-### 3.2 MongoDB - Mô hình Document phi cấu trúc (Secondary Collections)
+### 3.3 MongoDB Document Examples
 
 Tách biệt các dạng dữ liệu tần suất ghi cực cao, schema linh động và có thể lưu trữ ngắn hạn:
 
@@ -449,7 +356,8 @@ Backend được thiết kế chặt chẽ theo tư tưởng **Hexagonal / Clean
                                      v
 +-------------------------------------------------------------------------+
 |                          LAYER 4: INFRASTRUCTURE                        |
-|  (TypeORM PostgreSQL, Mongoose MongoDB, BullMQ, Redis, CF R2, Gemini)   |
+|  (Mongoose MongoDB [primary], pgvector [search index], BullMQ, Redis,   |
+|   Cloudflare R2, Gemini API)                                            |
 +-------------------------------------------------------------------------+
 ```
 
