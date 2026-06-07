@@ -5,13 +5,15 @@
 |---|---|
 | **Phiên bản** | v6.0 — Production-Grade (nâng từ v5.0 Improved) |
 | **Trạng thái** | Source of Truth · Specs folder |
-| **Stack** | Node.js + NestJS + PostgreSQL + pgvector + Redis + MongoDB + Cloudflare R2 |
+| **Stack** | Node.js + NestJS + MongoDB Atlas (primary) + pgvector (search index) + Redis + Cloudflare R2 |
 | **AI Strategy** | Gemini free-first · RAG · Rule-based Feed · Vision Scan |
 | **Notification** | Zalo OA (Phase 1–2) → PWA Push (Phase 3+) |
 | **Triết lý** | MVP-first · Log everything · Security by default · Scale when ready |
 | **Cập nhật** | v6.0 bổ sung: Security, Observability, CI/CD, Testing, DB Migration & Backup, Privacy & Compliance, AI Safety, Production Deployment |
 
 ---
+
+> **Database Decision:** MongoDB is the **primary database** for ALL application data. pgvector is used **only as a vector search index** (`embeddings` table: source_id, source_type, vector, metadata). No business data lives in pgvector. See `openspec/specs/embedding_spec.md` for the full RAG architecture.
 
 ## Mục lục
 
@@ -55,8 +57,8 @@ v6.0 nâng cấp toàn diện từ v5.0 để đạt tiêu chuẩn **Production-
 | **Styling** | Tailwind CSS + Shadcn/UI | Free | Giao diện hiện đại, tối ưu UX, responsive |
 | **State** | Zustand + React Query | Free | Quản lý state gọn nhẹ, cache API mạnh mẽ |
 | **Backend** | Node.js + NestJS | Free (Railway) | Hệ khung vững chắc, Clean Architecture, DI |
-| **DB Primary** | PostgreSQL + pgvector | Free (Self-host/PaaS) | Lưu dữ liệu quan hệ & Vector Embeddings (RAG) |
-| **DB Secondary** | MongoDB Atlas | Free Tier (512MB) | Lưu dữ liệu phi cấu trúc, log chat & event |
+| **DB Primary** | MongoDB Atlas | Free Tier / Shared Cluster | Lưu dữ liệu ứng dụng chính, chat, scan, diary, reminders, events |
+| **Vector Search** | pgvector (PostgreSQL extension) | Free — self-hosted | Search index only: `embeddings(source_id, source_type, vector(768), metadata)`. No business data. |
 | **Cache/Queue** | Redis + BullMQ | Free | Xử lý rate limit AI & lập lịch gửi ZNS/Push |
 | **Storage** | Cloudflare R2 | Free Tier (10GB) | Lưu trữ ảnh nhật ký & ảnh quét bệnh (S3 API) |
 | **Auth** | Supabase Auth | Free (50k MAU) | Authentication an toàn, nhanh gọn |
@@ -65,26 +67,23 @@ v6.0 nâng cấp toàn diện từ v5.0 để đạt tiêu chuẩn **Production-
 
 ### 2.2 Biện luận và So sánh Kiến trúc (Architecture Decision Rationale)
 
-#### A. Chiến lược Hybrid Database: PostgreSQL + MongoDB (Trọng tâm)
-Thay vì dùng một cơ sở dữ liệu duy nhất, hệ thống kết hợp **PostgreSQL** và **MongoDB** để tối ưu hóa hiệu năng, chi phí và tính toàn vẹn dữ liệu:
-*   **PostgreSQL (Primary DB):**
-    *   *Mục đích:* Lưu trữ các thực thể có cấu trúc chặt chẽ, cần tính toàn vẹn cao (ACID) và liên kết phức tạp: `users`, `diary_entries`, `reminders`, `pet_state`, `weekly_insights` và dữ liệu social (`posts`, `follows`, `comments`).
-    *   *Lý do chọn:* PostgreSQL cung cấp độ tin cậy tuyệt đối, hỗ trợ đầy đủ khóa ngoại và các ràng buộc dữ liệu. Đồng thời, extension `pgvector` cho phép lưu trữ và tìm kiếm vector (Cosine Similarity) trực tiếp trên cơ sở dữ liệu quan hệ, giúp thực hiện RAG (truy vấn tài liệu nghiên cứu nông nghiệp) ngay tại chỗ mà không cần tốn chi phí thuê một Vector Database chuyên dụng (như Pinecone hay Milvus).
-*   **MongoDB (Secondary DB):**
-    *   *Mục đích:* Lưu trữ dữ liệu phi cấu trúc, có tần suất ghi cực cao và thay đổi schema liên tục: `ai_chats` (lịch sử chat dạng cây/nested, thay đổi theo từng lượt trò chuyện), `user_events` (nhật ký hành vi người dùng phục vụ phân tích), và `plant_scans` (kết quả chẩn đoán bệnh từ Gemini Vision chứa nhiều metadata linh hoạt).
-    *   *Lý do chọn:* MongoDB xử lý ghi (write volume) rất nhanh với dữ liệu bán cấu trúc (BSON). Việc tách lịch sử chat và log sự kiện ra MongoDB giúp **tránh làm phình to cơ sở dữ liệu chính (PostgreSQL)**, giảm tải cho các tác vụ JOIN dữ liệu quan hệ quan trọng và cho phép đặt chỉ mục TTL (Time-To-Live) tự động dọn dẹp tin nhắn chat sau 90 ngày và event log sau 30 ngày một cách dễ dàng.
+#### A. Chiến lược MongoDB-first Database (Trọng tâm)
+**MongoDB là primary database duy nhất** cho tất cả dữ liệu ứng dụng: users, diary entries, chat sessions, pet states, farm snaps, reminders, weekly insights, audit logs, knowledge chunks.
+
+pgvector (được chạy như một PostgreSQL extension) được dùng **chỉ như một search index**: nó lưu `(embedding vector, source_id, source_type, metadata tối thiểu)`. Không có business data nào ở pgvector. MongoDB là source of truth; pgvector là derived index có thể rebuild hoàn toàn từ MongoDB bất cứ lúc nào.
+
 
 #### B. Nền tảng ứng dụng: Web PWA (React + Vite) vs. Mobile App Native
 *   **Web PWA (React + Vite + TypeScript):** Được chọn làm nền tảng cốt lõi cho giai đoạn MVP.
 *   **Lý do chọn:**
-    *   *Không rào cản cài đặt:* Nông dân có thể sử dụng ngay lập tức qua liên kết hoặc quét mã QR mà không cần thông qua các chợ ứng dụng (Google Play, App Store) phức tạp.
-    *   *Tối ưu hóa dung lượng & Băng thông:* PWA cực nhẹ, hỗ trợ offline-first qua Service Workers, rất phù hợp với điều kiện mạng 3G/4G yếu ở vùng nông thôn Việt Nam.
-    *   *Tốc độ phát triển:* Đồng bộ 100% codebase, dễ dàng cập nhật tính năng mới (instant update) mà không cần chờ duyệt ứng dụng.
-    *   *Khả năng tái sử dụng:* Codebase React+Vite hiện tại tái sử dụng được hơn 60% logic và giao diện khi phát triển lên ứng dụng React Native ở Phase sau.
+    *   *Không rào cản cài đặt:* Nông dân có thể sử dụng ngay lập tức qua liên kết hoặc quét mã QR.
+    *   *Tối ưu hóa dung lượng & Băng thông:* PWA cực nhẹ, hỗ trợ offline-first qua Service Workers.
+    *   *Tốc độ phát triển:* Đồng bộ 100% codebase, dễ dàng cập nhật tính năng mới.
 
-#### C. Lựa chọn AI & RAG: Gemini API + pgvector vs. OpenAI + Vector DB chuyên dụng
-*   **Gemini Flash & text-embedding-004:** Được lựa chọn vì gói Free Tier cực kỳ hào phóng (15 RPM đối với Flash và 100 RPM đối với Embedding), đáp ứng dư dả quy mô MVP mà không phát sinh chi phí ban đầu. Khả năng đọc hiểu hình ảnh (Gemini Vision) cực tốt giúp triển khai tính năng Quét bệnh cây trồng ([PlantScanModule](file:///d:/coding/farmdiary/project/backend/src/modules/plant-scan/plant-scan.service.ts)) một cách mượt mượt mà.
-*   **pgvector (HNSW Index) vs. Dedicated Vector DB:** pgvector tích hợp trực tiếp vào PostgreSQL giúp đồng bộ hóa dữ liệu tuyệt đối (không lo trễ đồng bộ giữa DB chính và DB Vector). Việc tự vận hành pgvector trên database PostgreSQL hiện tại hoàn toàn miễn phí, hiệu năng tìm kiếm ANN (HNSW) cực nhanh cho quy mô dưới 1 triệu vector, loại bỏ hoàn toàn chi phí đắt đỏ của các dịch vụ đám mây Vector DB bên thứ ba.
+#### C. Lựa chọn AI & RAG: Gemini API + pgvector Search Index
+> **RAG decision:** pgvector được dùng làm vector search index (không phải database). Embedding được ghi vào bảng `embeddings` trong pgvector; nội dung thật được fetch từ MongoDB bằng IDs. Xem `openspec/specs/embedding_spec.md`.
+*   **Gemini Flash & text-embedding-004:** Được lựa chọn vì gói Free Tier cực kỳ hào phóng (15 RPM đối với Flash và 100 RPM đối với Embedding), đáp ứng dư dả quy mô MVP mà không phát sinh chi phí ban đầu. Khả năng đọc hiểu hình ảnh (Gemini Vision) cực tốt giúp triển khai tính năng Quét bệnh cây trồng ([PlantScanModule](file:///d:/coding/farmdiary/project/backend/src/modules/plant-scan/plant-scan.service.ts)) một cách mượt mà.
+*   **pgvector (HNSW Index) vs. Atlas Vector Search:** pgvector được chọn vì latency < 10ms (HNSW in-process) so với Atlas Vector Search 50–200ms (Lucene layer + round trip) và miễn phí (Atlas Vector Search cần cluster M10+ tối thiểu $57/tháng). Xem mục "Why pgvector" trong `embedding_spec.md` để biết chi tiết đầy đủ.
 
 ---
 
@@ -103,8 +102,6 @@ Câu trả lời ngắn: **NestJS được đề xuất** cho FarmDiaries. App c
 | Background Jobs | Tích hợp BullMQ tốt nhưng cần config tay | NestJS BullMQ module — declarative | NestJS |
 | Test | Jest + Supertest tự setup | Built-in testing module — dễ mock DI | NestJS |
 | Migrate lên microservice | Khó — refactor lớn | Dễ hơn — tách module là tách service | NestJS |
-
-**Nếu chọn Express:** bắt buộc dùng TypeScript + tổ chức folder chặt (routes/controllers/services/repositories), tự implement guard/pipe/interceptor qua express-validator + passport.js + winston. Không dùng plain JS Express.
 
 ### Cấu trúc thư mục — NestJS (chuẩn)
 
@@ -223,17 +220,6 @@ async send(userId: string, template: NotificationTemplate, data: Record<string, 
 }
 ```
 
-Schema bổ sung vào bảng `users`:
-
-```sql
-ALTER TABLE users ADD COLUMN push_subscription JSONB;
-ALTER TABLE users ADD COLUMN zalo_user_id TEXT;
-ALTER TABLE users ADD COLUMN zalo_notification_enabled BOOLEAN DEFAULT false;
-ALTER TABLE users ADD COLUMN notification_preference notification_pref_enum DEFAULT 'auto';
-
-CREATE TYPE notification_pref_enum AS ENUM ('auto', 'push', 'zalo', 'email', 'none');
-```
-
 ---
 
 ## 6. Backend Module Structure
@@ -244,8 +230,8 @@ CREATE TYPE notification_pref_enum AS ENUM ('auto', 'push', 'zalo', 'email', 'no
 | ChatModule | Nhận message, điều phối các service, trả response | LLMModule, RAGModule, PetModule | 1 |
 | **LLMModule** | Gọi Gemini API, retry logic, rate limit queue, log tokens | — | 1 |
 | **PromptModule** | Build system prompt, inject context, version prompt | — | 1 |
-| RAGModule | Retrieve diary memory + KB docs, cosine search pgvector | EmbeddingModule | 2 |
-| EmbeddingModule | Tạo embedding, lưu pgvector, handle re-embed | LLMModule | 2 |
+| RAGModule | Retrieve diary memory + KB docs, pgvector ANN search (IDs) → MongoDB fetch | EmbeddingModule | 2 |
+| EmbeddingModule | Tạo embedding, ghi vào pgvector `embeddings` table, handle re-embed | LLMModule | 2 |
 | PetModule | Rule-based mood, streak, bubble message | DiaryModule | 1 |
 | ReminderModule | Tạo jobs BullMQ, xử lý schedule, gửi qua Notification | NotificationModule | 1 |
 | **NotificationModule** | Orchestrate ZNS / Web Push / Email, fallback chain | — | 1 |
@@ -289,23 +275,35 @@ Specs xong rồi. Bạn duyệt để mình bắt đầu implement không? 🚀
 | Weekly insight batch | Spread trong 4 tiếng | BullMQ delay: i * (14400000/userCount) ms |
 | Token daily limit | Alert khi 800k, switch Gemini Pro | Cron check mỗi giờ |
 
-### pgvector HNSW Index
+### pgvector HNSW Index (Search Index Only)
 
 ```sql
--- Chạy ngay khi create table, không để sau
-CREATE INDEX ON memory_embeddings USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
-CREATE INDEX ON knowledge_docs USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+-- pgvector: ONE TABLE ONLY. No business data lives here.
+-- Source of truth is MongoDB.
+CREATE EXTENSION IF NOT EXISTS vector;
 
--- Track model version cho re-embed
-ALTER TABLE memory_embeddings ADD COLUMN source_model VARCHAR(50) DEFAULT 'gemini-embedding-004';
-ALTER TABLE knowledge_docs ADD COLUMN source_model VARCHAR(50) DEFAULT 'gemini-embedding-004';
+CREATE TABLE embeddings (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  source_id   TEXT NOT NULL,        -- MongoDB ObjectId as string
+  source_type TEXT NOT NULL,        -- 'diary_entry' | 'knowledge_chunk'
+  embedding   vector(768) NOT NULL,
+  metadata    JSONB,                -- minimal: { cropType, userId, chunkIndex }
+  is_active   BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- HNSW index for fast ANN search (< 10ms p99)
+CREATE INDEX ON embeddings
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+
+-- Active-only composite index
+CREATE INDEX idx_embeddings_active
+  ON embeddings (source_type, is_active)
+  WHERE is_active = TRUE;
 ```
 
-| Index Type | Khi nào dùng | Trade-off |
-|---|---|---|
-| IVFFlat | < 100k vectors, cần exact search | Chính xác hơn nhưng chậm hơn HNSW |
-| **HNSW (đề xuất)** | MVP đến 1M+ vectors, fast ANN | Approximate nhưng đủ tốt, nhanh |
-| Flat (không index) | Chỉ khi < 1000 vectors, test local | Chính xác 100% nhưng O(n) |
+<!-- REVIEWER FLAG: If you see any pgvector table other than `embeddings`, or if `embeddings` contains columns like `email`, `notes`, `user_id` (business columns), that is a spec violation. -->
 
 ---
 
@@ -337,47 +335,45 @@ ALTER TABLE knowledge_docs ADD COLUMN source_model VARCHAR(50) DEFAULT 'gemini-e
 
 | Table | Retention | Action sau retention |
 |---|---|---|
-| chat_messages | Active: 90 ngày. Archive: 1 năm | Xóa content, giữ metadata (tokens, latency) |
-| ai_feedback | Vĩnh viễn | Không xóa — valuable for research |
-| memory_embeddings | Theo diary entry lifecycle | Xóa khi diary entry bị xóa (CASCADE) |
-| plant_scans | Metadata: 1 năm. Ảnh R2: 6 tháng | Xóa ảnh R2, giữ metadata + prediction |
-| user_events | Raw: 30 ngày. Aggregated: vĩnh viễn | Aggregate vào feed_analytics trước khi drop |
-| reminders | Delivered: 30 ngày | Hard delete sau 30 ngày |
+| chat_sessions (MongoDB) | Active: 90 ngày (TTL index). Archive: 1 năm | Xóa content, giữ metadata (tokens, latency) |
+| ai_feedback (MongoDB) | Vĩnh viễn | Không xóa — valuable for research |
+| embeddings (pgvector) | Theo diary entry lifecycle | is_active=false khi diary bị xóa; DELETE sau 24h |
+| plant_scans (MongoDB) | Metadata: 1 năm. Ảnh R2: 6 tháng | Xóa ảnh R2, giữ metadata + prediction |
+| user_events (MongoDB) | Raw: 30 ngày (TTL index). Aggregated: vĩnh viễn | Aggregate vào analytics trước khi drop |
+| reminders (MongoDB) | Delivered: 30 ngày | Hard delete sau 30 ngày |
 
-### Partition Strategy cho chat_messages
+### Retention Strategy cho chat_sessions (MongoDB)
 
-```sql
--- Partition theo tháng, tạo đầu mỗi tháng qua cron
-CREATE TABLE chat_messages (
-  id UUID PRIMARY KEY,
-  user_id UUID NOT NULL,
-  content TEXT,
-  tokens_used INT,
-  model_used VARCHAR(50),
-  prompt_version VARCHAR(20),
-  created_at TIMESTAMPTZ NOT NULL
-) PARTITION BY RANGE (created_at);
+Chat sessions được quản lý hoàn toàn trong MongoDB với TTL index tự động xóa sau 90 ngày:
 
-CREATE TABLE chat_messages_2025_01 PARTITION OF chat_messages
-  FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+```javascript
+// chat_sessions collection — TTL index tự động cleanup
+db.chat_sessions.createIndex(
+  { createdAt: 1 },
+  { expireAfterSeconds: 7776000 } // 90 ngày
+);
 
--- Index trong mỗi partition
-CREATE INDEX ON chat_messages_2025_01 (user_id, created_at DESC);
+// Index tìm kiếm session của user
+db.chat_sessions.createIndex({ userId: 1, updatedAt: -1 });
+db.chat_sessions.createIndex({ sessionId: 1 }, { unique: true });
 ```
 
-### Archive Strategy
+### Archive Strategy (MongoDB)
 
-```sql
--- archived_chats: content đã redact, chỉ giữ metadata
-CREATE TABLE archived_chats (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  mongo_chat_id VARCHAR(24), -- reference sang MongoDB _id
-  user_id UUID NOT NULL,
-  tokens_used INT,
-  model_used VARCHAR(50),
-  prompt_version VARCHAR(20),
-  archived_at TIMESTAMPTZ DEFAULT now()
-);
+```javascript
+// archived_chat_metadata collection — chỉ giữ metadata sau khi content xóa
+// Schema:
+// {
+//   _id: ObjectId,
+//   originalSessionId: String, // reference tới chat_sessions._id (đã xóa)
+//   userId: String,
+//   tokensUsed: Number,
+//   modelUsed: String,
+//   promptVersion: String,
+//   messageCount: Number,
+//   archivedAt: ISODate
+// }
+db.archived_chat_metadata.createIndex({ userId: 1, archivedAt: -1 });
 ```
 
 ---
@@ -410,17 +406,17 @@ CREATE TABLE archived_chats (
 
 ### Nguyên tắc phân chia
 
-> **Quy tắc đơn giản:** Dữ liệu cần JOIN, transaction, quan hệ rõ ràng → PostgreSQL. Dữ liệu schema thay đổi liên tục, nested document, write volume cao, không cần JOIN → MongoDB.
+> **Quy tắc MongoDB-first:** Mặc định mọi dữ liệu ứng dụng mới dùng MongoDB collection. pgvector chỉ chứa bảng `embeddings` (vector search index). Không có business data nào trong pgvector.
 
-| Tiêu chí | → PostgreSQL | → MongoDB |
-|---|---|---| 
-| Schema | Cố định, rõ từ đầu | Flexible, thay đổi theo model/version |
-| Quan hệ | Nhiều JOIN | Document tự chứa, ít quan hệ |
-| Transaction | Cần ACID | Eventual consistency chấp nhận được |
-| Write volume | Thấp–vừa | Cao (event mỗi click, message mỗi chat turn) |
-| Ví dụ | users, diaries, reminders, posts, follows | ai_chats, user_events, plant_scans |
+| Tiêu chí | → pgvector (search index only) | → MongoDB (primary — all business data) |
+|---|---|---|
+| Loại dữ liệu | Vector embedding + source_id | Tất cả: users, diary, chat, pet, reminder, snap, insight, audit |
+| Vai trò | Derived, rebuildable index | Source of truth |
+| Query | ANN similarity search | CRUD, aggregation, TTL cleanup |
+| Nếu mất | Chỉ mất search coverage; rebuild từ MongoDB | Dữ liệu mất hoàn toàn |
 
-### PostgreSQL — Primary DB Schema
+### Legacy PostgreSQL Schema Reference
+<!-- REVIEWER FLAG: The SQL below is LEGACY reference only. All these entities now live in MongoDB collections as defined in mongodb_stack_analysis.md. The only pgvector/SQL table in active use is `embeddings` in embedding_spec.md. -->
 
 ```sql
 -- Users
@@ -622,7 +618,7 @@ CREATE TABLE comments (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), post_id UU
 CREATE TABLE reactions (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE, user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, type TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT now(), UNIQUE (post_id, user_id));
 ```
 
-### MongoDB — Secondary DB (3 collections)
+### MongoDB — Primary Database (All Application Data)
 
 **ai_chats:**
 ```json
@@ -718,18 +714,9 @@ db.plant_scans.createIndex({ pHash: 1 });
 // 2. Access token hết hạn → client call /auth/refresh → issue access_token mới
 // 3. Refresh token hết hạn hoặc revoked → force login lại
 
-// Lưu refresh token trong DB để có thể revoke
-CREATE TABLE refresh_tokens (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token_hash TEXT NOT NULL UNIQUE, -- bcrypt hash của token
-  device_info TEXT,
-  ip_address INET,
-  expires_at TIMESTAMPTZ NOT NULL,
-  revoked_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX ON refresh_tokens (user_id, expires_at);
+// JWT Refresh Token — stored in MongoDB `refresh_tokens` collection
+// See mongodb_stack_analysis.md for the full index plan.
+// Fields: userId, tokenHash (unique), familyId, replacedBy, deviceInfo, ipAddress, expiresAt, revokedAt, createdAt
 ```
 
 **RBAC — Role-Based Access Control:**
@@ -834,8 +821,8 @@ async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {
 # CI/CD: GitHub Actions secrets
 
 # Các secrets cần quản lý:
-DATABASE_URL=
-MONGODB_URI=
+DATABASE_URL=           # pgvector PostgreSQL connection — search index only (NOT primary DB)
+MONGODB_URI=            # MongoDB Atlas — PRIMARY DATABASE (all business data)
 REDIS_URL=
 GEMINI_API_KEY=
 ZALO_APP_ID=
@@ -1057,13 +1044,13 @@ export const activeUsers = new Gauge({
 // tracing.ts — khởi tạo trước app bootstrap
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-import { PgInstrumentation } from '@opentelemetry/instrumentation-pg';
+import { MongoDBInstrumentation } from '@opentelemetry/instrumentation-mongodb';
 
 const sdk = new NodeSDK({
   serviceName: 'farmdiaries-api',
   instrumentations: [
     new HttpInstrumentation(),
-    new PgInstrumentation(),
+    new MongoDBInstrumentation(), // MongoDB primary DB tracing
   ],
 });
 sdk.start();

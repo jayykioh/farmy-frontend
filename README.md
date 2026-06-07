@@ -4,8 +4,8 @@
 
 ---
 
-[![Tech Stack](https://img.shields.io/badge/Stack-NestJS%20%7C%20React%20%7C%20Postgres%20%7C%20MongoDB%20%7C%20Redis-blue.svg)](https://nestjs.com/)
-[![AI Powered](https://img.shields.io/badge/AI-Gemini%20Flash%20%7C%20pgvector%20RAG%20%7C%20Vision-orange.svg)](https://deepmind.google/technologies/gemini/)
+[![Tech Stack](https://img.shields.io/badge/Stack-NestJS%20%7C%20React%20%7C%20MongoDB%20Atlas%20%7C%20Redis-blue.svg)](https://nestjs.com/)
+[![AI Powered](https://img.shields.io/badge/AI-Gemini%20Flash%20%7C%20Atlas%20Vector%20Search%20%7C%20Vision-orange.svg)](https://deepmind.google/technologies/gemini/)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20First%20%7C%20Vite-green.svg)](https://vitejs.dev/)
 [![Security](https://img.shields.io/badge/Security-Helmet%20%7C%20Supabase%20Auth%20%7C%20AES--256-red.svg)](https://supabase.com/)
 
@@ -18,7 +18,7 @@
 2. [Key Core Features](#-key-core-features)
 3. [Architecture Decisions & Tech Stack](#%EF%B8%8F-architecture-decisions--tech-stack)
 4. [Project Structure](#-project-structure)
-5. [Database Architecture & Hybrid Strategy](#%EF%B8%8F-database-architecture--hybrid-strategy)
+5. [MongoDB-First Database Strategy](#mongodb-first-database-strategy)
 6. [AI & RAG Strategy](#%EF%B8%8F-ai--rag-strategy)
 7. [Installation & Setup](#%EF%B8%8F-installation--setup)
 8. [Production Readiness & Safety Guardrails](#%EF%B8%8F-production-readiness--safety-guardrails)
@@ -35,7 +35,7 @@
 | --- | --- |
 | **Team Member 1 (Lead)** | System Architect, NestJS Backend & Database Integrations |
 | **Team Member 2** | React PWA Frontend, State Management & Mobile Responsive UX |
-| **Team Member 3** | AI & RAG Engine (Gemini API, pgvector, prompt sanitization) |
+| **Team Member 3** | AI & RAG Engine (Gemini API, MongoDB Atlas Vector Search, prompt sanitization) |
 | **Team Member 4** | DevOps, CI/CD pipelines, Zalo Webhook Integration & Testing |
 
 ---
@@ -78,77 +78,38 @@
                       ┌───────────────────────┼───────────────────────┐
                       ▼                       ▼                       ▼
           ┌──────────────────────┐┌──────────────────────┐┌──────────────────────┐
-          │  PostgreSQL (ACID)   ││   MongoDB (Logs)     ││    Redis (Cache)     │
-          │  - pgvector RAG      ││   - Chat History     ││    - BullMQ Jobs     │
-          │  - Primary Entities  ││   - Event Tracking   ││    - Rate Limiting   │
+          │ MongoDB Atlas        ││ Atlas Vector Search  ││    Redis (Cache)     │
+          │ - Primary Documents  ││ - RAG Embeddings     ││    - BullMQ Jobs     │
+          │ - Chat/Scan/Diary    ││ - Semantic Search    ││    - Rate Limiting   │
           └──────────────────────┘└──────────────────────┘└──────────────────────┘
 ```
 
 ### Why NestJS over Express?
 NestJS was chosen to enforce **Modular Clean Architecture** and **Dependency Injection (DI)** across our 4-person team. NestJS enforces code consistency out-of-the-box, ensuring type safety (TypeScript-first), simple mock testing, and a highly scalable modular design that prevents technical debt when scaling the project.
 
-### Hybrid Database Strategy
-* **PostgreSQL (Primary DB):** Guarantees ACID compliance for structured transactions (users, diary logs, pets, scheduled reminders). Embeds `pgvector` for fast cosine-similarity RAG indexing without the overhead of external paid Vector DB services.
-* **MongoDB Atlas (Secondary DB):** Stores high-throughput semi-structured data (`ai_chats` with deep nested structure, `user_events` for behavior analytics, `plant_scans`). Configured with auto-expiry TTL indexes (90 days for chats, 30 days for events) to keep PostgreSQL lightweight and fast.
-* **Redis:** Powers rate limit counters (Gemini Flash free-tier buffer) and runs reliable distributed background jobs via **BullMQ**.
-* **Cloudflare R2:** S3-compliant secure object storage for uploaded image files utilizing pre-signed URLs with short Time-To-Live (TTL) bounds.
+### MongoDB-First Database Strategy
+The backend is now designed around MongoDB Atlas as the primary application database. Diary entries, users, pet state, plant scans, chat sessions, reminders, insights, audit logs, and RAG chunks are modeled as MongoDB collections. Redis remains dedicated to cache, rate limits, locks, and BullMQ jobs. For the full rationale and feature mapping, see [mongodb_stack_analysis.md](file:///d:/coding/farmdiary/openspec/specs/mongodb_stack_analysis.md).
 
 ---
 
 ## 📂 Project Structure
 
-The project is structured as a monorepo containing distinct `frontend` and `backend` codebases:
+This is the frontend repository of the **FarmDiaries AI** ecosystem (`farmdiaries-fe`). The backend has been separated into its own repository.
 
 ```
 farmdiary/
 ├── openspec/                     # Design specs, API schema, & Technical Blueprint
-│   └── specs/blueprint.md        # Technical Source of Truth (Database & Module architectures)
-└── project/
-    ├── backend/                  # NestJS Monolith API Application
-    │   ├── src/
-    │   │   ├── modules/          # Domain business modules (auth, diary, llm, zalo, etc.)
-    │   │   ├── common/           # Custom decorators, global guards, pipes, filters
-    │   │   └── config/           # Database configurations and environments
-    │   └── test/                 # Jest unit, integration, and E2E tests
-    └── frontend/                 # React PWA Web Application
-        ├── src/
-        │   ├── assets/           # Visual UI components and design assets
-        │   ├── main.tsx          # Application bootstrapper
-        │   └── App.tsx           # Global routing & main navigation shell
-        └── vite.config.ts        # Vite + TypeScript + PWA manifest config
-```
-
----
-
-## 🗄️ Database Architecture & Hybrid Strategy
-
-The schema layout utilizes standard migrations (managed in NestJS using TypeORM):
-
-```sql
--- Users table carrying Zalo credentials & PWA push credentials
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email TEXT UNIQUE NOT NULL,
-  name TEXT,
-  role user_role_enum DEFAULT 'user',
-  zalo_user_id TEXT,
-  zalo_access_token_encrypted TEXT,
-  zalo_notification_enabled BOOLEAN DEFAULT false,
-  push_subscription JSONB,
-  notification_preference notification_pref_enum DEFAULT 'auto',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- pgvector Knowledge base table with HNSW index for ultra-fast ANN search
-CREATE TABLE knowledge_docs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  chunk_text TEXT NOT NULL,
-  source_model VARCHAR(50) DEFAULT 'gemini-embedding-004',
-  embedding vector(768) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX ON knowledge_docs USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+│   └── specs/mongodb_stack_analysis.md # MongoDB-first backend source of truth
+├── public/                       # PWA static assets
+├── src/                          # React components, pages, hooks, state management
+│   ├── assets/                   # Visual UI components and design assets
+│   ├── components/               # Custom layout and common components
+│   ├── pages/                    # Main app pages (Home, Scanner, Chat, etc.)
+│   ├── App.tsx                   # Routing & shell
+│   └── main.tsx                  # Bootstrapper
+├── package.json                  # Dependencies & scripts
+├── tsconfig.json                 # TypeScript configurations
+└── vite.config.ts                # Vite PWA bundler config
 ```
 
 ---
@@ -157,38 +118,14 @@ CREATE INDEX ON knowledge_docs USING hnsw (embedding vector_cosine_ops) WITH (m 
 
 ### Prerequisites
 * Node.js v20.x
-* PostgreSQL v16 (with `pgvector` extension)
-* MongoDB (Atlas Free Tier or Local instance)
-* Redis
+* Backend API service running (refer to [CREATE_BACKEND_REPO.md](file:///d:/coding/farmdiary/CREATE_BACKEND_REPO.md) for backend repository setup)
 
-### 1. Backend Setup
-1. Navigate to backend:
-   ```bash
-   cd project/backend
-   ```
-2. Install dependencies:
+### Setup & Run
+1. Install dependencies at the root directory:
    ```bash
    npm install
    ```
-3. Copy environment sample and populate secrets:
-   ```bash
-   cp .env.example .env
-   ```
-4. Start NestJS server in development:
-   ```bash
-   npm run start:dev
-   ```
-
-### 2. Frontend Setup
-1. Navigate to frontend:
-   ```bash
-   cd project/frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start Vite dev server:
+2. Start the Vite development server:
    ```bash
    npm run dev
    ```
@@ -201,7 +138,7 @@ We enforce **100% Security & Observability** requirements before launch:
 * **JWT Access (15m) + Rotate Refresh Tokens (30d):** Stored securely inside secure, httpOnly cookies.
 * **Pino Structured Logger:** Configured with active redaction of sensitive credentials (`Authorization`, `password`, `tokens`).
 * **AI Guardrails:** Standardized Prompt Injection Sanitizer applied to all user entries prior to RAG context building.
-* **Audit Logging:** Every critical administrative action and database write is logged into an immutable `audit_log` partition table.
+* **Audit Logging:** Every critical administrative action and sensitive data write is logged into append-only MongoDB `audit_logs` documents with strict redaction.
 
 ---
 

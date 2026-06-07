@@ -34,61 +34,73 @@
 
 ## 2. Data Schema
 
-### 2.1 FarmSnap Entity (PostgreSQL — bảng `farm_snaps`)
+### 2.1 FarmSnap Entity (MongoDB — collection `farm_snaps`)
 
-```sql
-CREATE TABLE farm_snaps (
-  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+```javascript
+// Schema validation rules cho farm_snaps
+{
+  "_id": "ObjectId",
+  "userId": "UUID string", // Tham chiếu tới users
+  
+  // Media
+  "imageUrl": "string",    // Cloudflare R2 public URL
+  "imageKey": "string",    // R2 object key (for deletion)
+  "caption": "string",     // Optional, max 100 chars
+  
+  // AI Training Labels (core value)
+  "cropType": "string",    // "Lúa" | "Bưởi" | "Cà phê" | "Rau màu" | "Khác"
+  "condition": "string",   // "healthy" | "issue" | "harvest" | "other"
+  "conditionNote": "string", // Free text nếu condition = 'issue'
+  
+  // Auto-collected metadata
+  "location": {
+    "lat": "number",
+    "lng": "number",
+    "province": "string",
+    "district": "string"
+  },
+  "weather": {
+    "temp": "number",
+    "humidity": "number",
+    "condition": "string",
+    "source": "string"
+  },
+  "capturedAt": "ISODate", // Thời điểm chụp (từ client)
+  
+  // Moderation & Quality
+  "isPublic": "boolean",   // default true
+  "isFlagged": "boolean",  // default false
+  "qualityScore": "number", // 1-5 = AI/admin review
+  
+  // Engagement
+  "xpEarned": "number",    // default 10
+  
+  "createdAt": "ISODate",
+  "updatedAt": "ISODate"
+}
 
-  -- Media
-  image_url      TEXT NOT NULL,           -- Cloudflare R2 public URL
-  image_key      TEXT NOT NULL,           -- R2 object key (for deletion)
-  caption        TEXT,                    -- Optional, max 100 chars
-
-  -- AI Training Labels (core value)
-  crop_type      TEXT NOT NULL,           -- "Lúa" | "Bưởi" | "Cà phê" | "Rau màu" | "Khác"
-  condition      snap_condition_enum NOT NULL,
-  condition_note TEXT,                    -- Free text nếu condition = 'issue'
-
-  -- Auto-collected metadata (AI features)
-  location       JSONB,                   -- { lat, lng, province, district }
-  weather        JSONB,                   -- { temp, humidity, condition, source }
-  captured_at    TIMESTAMPTZ NOT NULL,    -- Thời điểm chụp (từ client)
-
-  -- Moderation & Quality
-  is_public      BOOLEAN DEFAULT true,
-  is_flagged     BOOLEAN DEFAULT false,
-  quality_score  SMALLINT,               -- NULL = chưa chấm. 1-5 = AI/admin review
-
-  -- Engagement
-  xp_earned      SMALLINT DEFAULT 10,
-
-  created_at     TIMESTAMPTZ DEFAULT now(),
-  updated_at     TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TYPE snap_condition_enum AS ENUM ('healthy', 'issue', 'harvest', 'other');
-
-CREATE INDEX ON farm_snaps (user_id, created_at DESC);
-CREATE INDEX ON farm_snaps (created_at DESC) WHERE is_public = true AND is_flagged = false;
-CREATE INDEX ON farm_snaps (crop_type, condition) WHERE quality_score IS NOT NULL;
+// Indexes
+db.farm_snaps.createIndex({ userId: 1, createdAt: -1 });
+db.farm_snaps.createIndex({ createdAt: -1 }, { partialFilterExpression: { isPublic: true, isFlagged: false } });
+db.farm_snaps.createIndex({ cropType: 1, condition: 1 });
 ```
 
-### 2.2 SnapReaction Entity (PostgreSQL — bảng `snap_reactions`)
+### 2.2 SnapReaction Entity (MongoDB — collection `snap_reactions`)
 
-```sql
-CREATE TABLE snap_reactions (
-  id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  snap_id  UUID NOT NULL REFERENCES farm_snaps(id) ON DELETE CASCADE,
-  user_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  type     snap_reaction_enum NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE (snap_id, user_id, type)
-);
+```javascript
+// Schema validation rules cho snap_reactions
+{
+  "_id": "ObjectId",
+  "snapId": "ObjectId",    // Tham chiếu tới farm_snaps
+  "userId": "UUID string", // Tham chiếu tới users
+  "type": "string",        // "like" | "helpful" | "worry" | "celebrate"
+  "createdAt": "ISODate"
+}
 
-CREATE TYPE snap_reaction_enum AS ENUM ('like', 'helpful', 'worry', 'celebrate');
+// Đảm bảo mỗi user chỉ react 1 type trên 1 snap
+db.snap_reactions.createIndex({ snapId: 1, userId: 1, type: 1 }, { unique: true });
 ```
+
 
 ### 2.3 Frontend Interface
 
