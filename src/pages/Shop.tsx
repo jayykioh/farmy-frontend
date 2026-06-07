@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { getPetState } from '../api/farm';
+import type { PetState } from '../api/farm';
 
 export const Shop: React.FC = () => {
   const navigate = useNavigate();
+  const [petState, setPetState] = useState<PetState | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    getPetState()
+      .then((data) => {
+        setPetState(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch pet state:', err);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-[#d0e5fa] to-[#79fc9e] bg-fixed overflow-x-hidden font-sans">
@@ -26,7 +42,6 @@ export const Shop: React.FC = () => {
       </div>
 
       {/* Bottom Sheet / Modal Container */}
-      {/* On mobile: Bottom sheet. On desktop: Centered Modal */}
       <div className="fixed inset-x-0 bottom-0 top-[10%] md:top-auto md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-white md:rounded-[40px] rounded-t-[40px] shadow-2xl flex flex-col z-40 overflow-hidden w-full md:max-w-4xl md:w-[90vw] md:h-[80vh] mx-auto border border-border-main/20">
         
         {/* Sheet Handle */}
@@ -45,12 +60,14 @@ export const Shop: React.FC = () => {
             </svg>
           </button>
           <h1 className="text-xl md:text-2xl font-extrabold text-text-h text-center flex-1">Cửa hàng Phụ kiện</h1>
-          {/* Currency Badge */}
+          
+          {/* Dynamic Currency / XP Badge */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-full px-3 py-1.5 md:px-4 md:py-2 flex items-center gap-1.5 shadow-sm hover:scale-105 transition-transform">
+            <span className="font-extrabold text-yellow-800 md:text-sm text-xs bg-yellow-100/50 px-2 py-0.5 rounded-full font-mono">Lv.{petState?.level ?? 1}</span>
             <svg className="w-4 h-4 md:w-5 md:h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
             </svg>
-            <span className="font-extrabold text-yellow-800 md:text-lg">1,250</span>
+            <span className="font-extrabold text-yellow-800 md:text-lg font-mono">{petState?.xp ?? 0} XP</span>
           </div>
         </div>
 
@@ -86,7 +103,7 @@ export const Shop: React.FC = () => {
               {/* Mascot (Bé Thóc) */}
               <div className="relative z-10 animate-[bounce_4s_ease-in-out_infinite] flex flex-col items-center">
                 <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full shadow-lg bg-white border-4 border-white overflow-hidden p-2">
-                  <MascotLottie className="w-full h-full -mt-2 drop-shadow-md" />
+                  <MascotLottie className="w-full h-full -mt-2 drop-shadow-md" state={petState?.mood || 'happy'} />
                 </div>
                 {/* Equipped Accessory Indicator */}
                 <div className="absolute -top-4 right-0 lg:-top-2 lg:right-2 bg-secondary rounded-full p-1 lg:p-2 shadow-md border-2 border-white">
@@ -109,7 +126,7 @@ export const Shop: React.FC = () => {
               <h3 className="font-bold text-text-main text-center mb-1 w-full truncate">Nón Lá Truyền Thống</h3>
               <div className="flex items-center gap-1 bg-bg-surface-1 border border-border-main/30 rounded-full px-2 py-0.5 mb-4">
                 <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                <span className="font-bold text-text-main/70 text-sm">300</span>
+                <span className="font-bold text-text-main/70 text-sm font-mono">300</span>
               </div>
               <button className="w-full py-2 bg-primary text-white rounded-full font-bold shadow-sm active:scale-95 transition-transform border-b-[3px] border-primary-container active:border-b-0 active:translate-y-[3px]">
                 Đã trang bị
@@ -124,7 +141,7 @@ export const Shop: React.FC = () => {
               <h3 className="font-bold text-text-main text-center mb-1 w-full truncate">Mũ Rơm Đi Biển</h3>
               <div className="flex items-center gap-1 bg-bg-surface-1 border border-border-main/30 rounded-full px-2 py-0.5 mb-4">
                 <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                <span className="font-bold text-text-main/70 text-sm">450</span>
+                <span className="font-bold text-text-main/70 text-sm font-mono">450</span>
               </div>
               <button className="w-full py-2 bg-white border border-border-main/50 text-text-main rounded-full font-bold active:scale-95 transition-transform hover:bg-bg-surface-1 shadow-sm">
                 Mua ngay
@@ -139,31 +156,41 @@ export const Shop: React.FC = () => {
               <h3 className="font-bold text-text-main text-center mb-1 w-full truncate">Kính Râm Ngầu</h3>
               <div className="flex items-center gap-1 bg-bg-surface-1 border border-border-main/30 rounded-full px-2 py-0.5 mb-4">
                 <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                <span className="font-bold text-text-main/70 text-sm">200</span>
+                <span className="font-bold text-text-main/70 text-sm font-mono">200</span>
               </div>
               <button className="w-full py-2 bg-white border border-border-main/50 text-text-main rounded-full font-bold active:scale-95 transition-transform hover:bg-bg-surface-1 shadow-sm">
                 Mua ngay
               </button>
             </div>
             
-            {/* Item Card 4 */}
-            <div className="bg-white border border-border-main/50 shadow-sm rounded-[24px] p-4 flex flex-col items-center">
-              <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border border-border-main/30 mb-3 flex items-center justify-center relative overflow-hidden">
-                <div className="text-text-main/30 flex flex-col items-center">
-                  <svg className="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span className="font-bold text-xs uppercase tracking-wide">Cấp 5</span>
-                </div>
+            {/* Item Card 4 (Locked under Level 5) */}
+            <div className="bg-white border border-border-main/50 shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-shadow">
+              <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border border-border-main/30 mb-3 flex items-center justify-center relative overflow-hidden group-hover:bg-primary-lightest/20 transition-colors">
+                {(petState?.level ?? 1) >= 5 ? (
+                  <img alt="Mũ Ảo Thuật" className="w-3/4 h-3/4 object-contain animate-[bounce_4s_ease-in-out_infinite]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzSmV6cdrTVHzXBG0N7bXXKN3XoZOzRMPXfVSxi0cvLV86eZCvMCQUZfvsIwGmGFQCrdkVZZ0fPQlcFxA7lT7026GIQqk5q37hMvRuTScXcwmvL2MxEFkY_EjgDBSeSHb7xTRqUPbj1MRY_BqwkhLCcAZ36PrGji9H9EPDb67uNr4UmWBqmiirxAhuuidfFZvbiQYTWZytovpLIpFDBOt949vcQkwFPZijhl9qeWhHM_-dZdg6jkw_Rc8N5-0j2r42RYKLnkeCUeC1" />
+                ) : (
+                  <div className="text-text-main/30 flex flex-col items-center">
+                    <svg className="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span className="font-bold text-xs uppercase tracking-wide">Cấp 5</span>
+                  </div>
+                )}
               </div>
-              <h3 className="font-bold text-text-main/50 text-center mb-1 w-full truncate">Mũ Ảo Thuật</h3>
-              <div className="flex items-center gap-1 bg-bg-surface-1 border border-border-main/30 rounded-full px-2 py-0.5 mb-4 opacity-50">
+              <h3 className="font-bold text-text-main text-center mb-1 w-full truncate">Mũ Ảo Thuật</h3>
+              <div className="flex items-center gap-1 bg-bg-surface-1 border border-border-main/30 rounded-full px-2 py-0.5 mb-4">
                 <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                <span className="font-bold text-text-main/50 text-sm">800</span>
+                <span className="font-bold text-text-main/70 text-sm font-mono">800</span>
               </div>
-              <button className="w-full py-2 bg-bg-surface border border-border-main/30 text-text-main/30 rounded-full font-bold cursor-not-allowed">
-                Khóa
-              </button>
+              {(petState?.level ?? 1) >= 5 ? (
+                <button className="w-full py-2 bg-white border border-border-main/50 text-text-main rounded-full font-bold active:scale-95 transition-transform hover:bg-bg-surface-1 shadow-sm">
+                  Mua ngay
+                </button>
+              ) : (
+                <button className="w-full py-2 bg-bg-surface border border-border-main/30 text-text-main/30 rounded-full font-bold cursor-not-allowed">
+                  Khóa
+                </button>
+              )}
             </div>
             
           </div>

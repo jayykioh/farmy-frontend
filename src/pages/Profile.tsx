@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
+import { getPetState } from '../api/farm';
+import type { PetState } from '../api/farm';
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
+  const [petState, setPetState] = useState<PetState | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    getPetState()
+      .then((data) => {
+        setPetState(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch pet state:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const getLevelTitle = (level: number) => {
+    if (level < 5) return 'Làm Vườn Tập Sự (Novice Farmer) 🪴';
+    if (level < 10) return 'Nông Dân Thực Thụ (Active Farmer) 🚜';
+    if (level < 15) return 'Chuyên Gia Trồng Trọt (Crop Cultivator) 🌾';
+    return 'Vua Nông Trại (Master Farmer) 👑';
+  };
+
+  const xpNeeded = (petState?.level ?? 1) * 100;
+  const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
 
   return (
     <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-[100px] max-w-3xl mx-auto bg-bg-main min-h-screen">
@@ -29,7 +55,7 @@ export const Profile: React.FC = () => {
           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
           </svg>
-          Master Farmer
+          {petState?.level && petState.level >= 15 ? 'Vua Nông Trại' : petState?.level && petState.level >= 10 ? 'Chuyên Gia' : 'Tập Sự'}
         </div>
         {/* Decorative background pattern */}
         <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-primary-lightest/30 rounded-full pointer-events-none"></div>
@@ -37,19 +63,77 @@ export const Profile: React.FC = () => {
 
       {/* Level / XP Summary Card */}
       <section className="bg-white border border-border-main/50 rounded-[24px] p-6 relative shadow-sm">
-        <div className="flex justify-between items-end mb-4">
-          <div>
-            <h3 className="text-xl font-bold text-text-h">Level 12</h3>
-            <p className="text-base font-semibold text-text-main/70">Rice Cultivator</p>
-          </div>
-          <div className="text-right">
-            <span className="font-extrabold text-primary text-lg">2,450 XP</span>
-            <p className="text-xs font-bold text-text-main/50 uppercase tracking-wide">/ 3,000 XP to Lvl 13</p>
-          </div>
-        </div>
-        {/* Progress Bar */}
-        <div className="h-4 bg-bg-surface-1 rounded-full overflow-hidden relative border border-border-main/30">
-          <div className="absolute top-0 left-0 h-full bg-primary rounded-full w-[81%] shadow-inner transition-all duration-1000"></div>
+        {loading ? (
+          <div className="py-4 text-center font-bold text-text-main/50">Đang tải thông tin cấp độ...</div>
+        ) : (
+          <>
+            <div className="flex justify-between items-end mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-text-h">Cấp độ {petState?.level ?? 1}</h3>
+                <p className="text-base font-semibold text-text-main/70">
+                  {getLevelTitle(petState?.level ?? 1)}
+                </p>
+              </div>
+              <div className="text-right flex flex-col items-end">
+                <span className="font-extrabold text-primary text-lg font-mono">
+                  {petState?.xp ?? 0} XP
+                </span>
+                <p className="text-xs font-bold text-text-main/50 uppercase tracking-wide">
+                  / {xpNeeded} XP lên cấp {(petState?.level ?? 1) + 1}
+                </p>
+              </div>
+            </div>
+            {/* Progress Bar */}
+            <div className="h-4 bg-bg-surface-1 rounded-full overflow-hidden relative border border-border-main/30">
+              <div 
+                className="absolute top-0 left-0 h-full bg-primary rounded-full shadow-inner transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              ></div>
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* Bảng quy định điểm tích lũy (XP rules table) */}
+      <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
+        <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
+          🎯 Bảng Quy Đổi Điểm (XP Rules)
+        </h3>
+        <p className="text-sm text-text-main/70">
+          Hãy tích cực thực hiện các hoạt động làm vườn để giúp Bé Thóc mau lớn và thăng cấp!
+        </p>
+        <div className="overflow-x-auto border border-border-main/30 rounded-xl">
+          <table className="w-full text-left border-collapse text-sm min-w-[500px]">
+            <thead>
+              <tr className="bg-bg-surface-2 border-b border-border-main/30 font-bold text-text-main/80">
+                <th className="p-3">Hành động</th>
+                <th className="p-3 text-center">XP nhận được</th>
+                <th className="p-3">Tác động tâm trạng</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border-main/20 text-text-main/80 font-medium">
+              <tr className="hover:bg-bg-surface-1/50 transition-colors">
+                <td className="p-3">📝 Ghi nhật ký vụ mùa (mỗi ngày)</td>
+                <td className="p-3 text-center text-primary font-bold font-mono">+30 XP</td>
+                <td className="p-3 text-xs text-green-600">Vui vẻ / Hào hứng (Excited)</td>
+              </tr>
+              <tr className="hover:bg-bg-surface-1/50 transition-colors">
+                <td className="p-3">💧 Hoàn thành nhắc nhở sớm</td>
+                <td className="p-3 text-center text-primary font-bold font-mono">+10 XP</td>
+                <td className="p-3 text-xs text-green-600">Vui vẻ (Happy)</td>
+              </tr>
+              <tr className="hover:bg-bg-surface-1/50 transition-colors bg-red-50/10">
+                <td className="p-3 text-error">⏰ Bỏ lỡ nhắc nhở quá giờ</td>
+                <td className="p-3 text-center text-error font-bold font-mono">0 XP</td>
+                <td className="p-3 text-xs text-error">Buồn bã (Sad)</td>
+              </tr>
+              <tr className="hover:bg-bg-surface-1/50 transition-colors bg-orange-50/10">
+                <td className="p-3 text-orange-600">⚠️ Báo động sâu bệnh vườn</td>
+                <td className="p-3 text-center text-orange-600 font-bold font-mono">0 XP</td>
+                <td className="p-3 text-xs text-orange-600">Lo lắng (Worried)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -60,24 +144,33 @@ export const Profile: React.FC = () => {
             <svg className="w-6 h-6 text-orange-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24">
               <path d="M11.64 5.93h1.43v4.28h-1.43zM11.64 12.36h1.43v1.43h-1.43zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
             </svg>
-            14 Day Streak!
+            Chuỗi {petState?.streak_count ?? 0} ngày chăm chỉ liên tiếp!
           </h3>
-          <span className="font-bold text-sm bg-bg-surface-1 text-text-main/70 px-3 py-1 rounded-full border border-border-main/30">August</span>
+          <span className="font-bold text-sm bg-bg-surface-1 text-text-main/70 px-3 py-1 rounded-full border border-border-main/30">
+            {new Date().toLocaleString('vi-VN', { month: 'long' })}
+          </span>
         </div>
         <div className="grid grid-cols-7 gap-2 text-center mb-2">
-          {['M','T','W','T','F','S','S'].map((day, i) => (
+          {['T2','T3','T4','T5','T6','T7','CN'].map((day, i) => (
             <div key={i} className="font-bold text-xs text-text-main/50">{day}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-2 gap-y-3">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${i === 13 ? 'bg-primary text-white shadow-md scale-110' : 'text-text-main/70 bg-bg-surface-1'}`}>
-                {i + 1}
-              </span>
-              <div className={`w-1.5 h-1.5 rounded-full ${i >= 3 ? 'bg-primary' : 'bg-border-main/50'}`}></div>
-            </div>
-          ))}
+          {Array.from({ length: Math.max(7, Math.min(30, (petState?.streak_count ?? 0) + 3)) }).map((_, i) => {
+            const isCompleted = i < (petState?.streak_count ?? 0);
+            return (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                  isCompleted 
+                    ? 'bg-primary text-white shadow-md scale-105' 
+                    : 'text-text-main/70 bg-bg-surface-1 border border-border-main/10'
+                }`}>
+                  {i + 1}
+                </span>
+                <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isCompleted ? 'bg-primary scale-110' : 'bg-border-main/50'}`}></div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -85,7 +178,7 @@ export const Profile: React.FC = () => {
       <section>
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-text-h">Badge Shelf</h3>
-          <button className="font-bold text-primary text-sm hover:underline active:scale-95 transition-transform">
+          <button className="font-bold text-primary text-sm hover:underline active:scale-95 transition-transform" onClick={() => navigate('/shop')}>
             Go to Shop →
           </button>
         </div>
@@ -111,51 +204,51 @@ export const Profile: React.FC = () => {
         </div>
       </section>
 
-       {/* Settings / Account List */}
-       <section className="mb-4">
-         <h3 className="text-xl font-bold text-text-h mb-4">Account</h3>
-         <div className="bg-white border border-border-main/50 rounded-[24px] flex flex-col divide-y divide-border-main/30 overflow-hidden shadow-sm">
-           <button 
-             onClick={() => navigate('/account-settings')}
-             className="flex items-center justify-between p-4 md:px-6 bg-white hover:bg-bg-surface-1 transition-colors group active:bg-bg-surface cursor-pointer"
-           >
-             <div className="flex items-center gap-4">
-               <div className="w-10 h-10 rounded-full bg-bg-surface-1 flex items-center justify-center text-text-main/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-               </div>
-               <span className="font-bold text-base text-text-main">Personal Information</span>
-             </div>
-             <svg className="w-5 h-5 text-text-main/30 group-hover:text-primary/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
-           </button>
-           <button 
-             onClick={() => navigate('/settings')}
-             className="flex items-center justify-between p-4 md:px-6 bg-white hover:bg-bg-surface-1 transition-colors group active:bg-bg-surface cursor-pointer"
-           >
-             <div className="flex items-center gap-4">
-               <div className="w-10 h-10 rounded-full bg-bg-surface-1 flex items-center justify-center text-text-main/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-               </div>
-               <span className="font-bold text-base text-text-main">App Settings</span>
-             </div>
-             <svg className="w-5 h-5 text-text-main/30 group-hover:text-primary/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
-           </button>
-           <button 
-             onClick={() => navigate('/help-support')}
-             className="flex items-center justify-between p-4 md:px-6 bg-white hover:bg-bg-surface-1 transition-colors group active:bg-bg-surface cursor-pointer"
-           >
-             <div className="flex items-center gap-4">
-               <div className="w-10 h-10 rounded-full bg-bg-surface-1 flex items-center justify-center text-text-main/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-               </div>
-               <span className="font-bold text-base text-text-main">Help & Support</span>
-             </div>
-             <svg className="w-5 h-5 text-text-main/30 group-hover:text-primary/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
-           </button>
-         </div>
-         <button 
-           onClick={() => navigate('/')} 
-           className="w-full mt-6 bg-white text-error font-bold text-base py-4 rounded-[20px] border border-error-container hover:bg-error-container/20 active:bg-error-container/40 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-         >
+      {/* Settings / Account List */}
+      <section className="mb-4">
+        <h3 className="text-xl font-bold text-text-h mb-4">Account</h3>
+        <div className="bg-white border border-border-main/50 rounded-[24px] flex flex-col divide-y divide-border-main/30 overflow-hidden shadow-sm">
+          <button 
+            onClick={() => navigate('/account-settings')}
+            className="flex items-center justify-between p-4 md:px-6 bg-white hover:bg-bg-surface-1 transition-colors group active:bg-bg-surface cursor-pointer"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-bg-surface-1 flex items-center justify-center text-text-main/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              </div>
+              <span className="font-bold text-base text-text-main">Personal Information</span>
+            </div>
+            <svg className="w-5 h-5 text-text-main/30 group-hover:text-primary/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <button 
+            onClick={() => navigate('/settings')}
+            className="flex items-center justify-between p-4 md:px-6 bg-white hover:bg-bg-surface-1 transition-colors group active:bg-bg-surface cursor-pointer"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-bg-surface-1 flex items-center justify-center text-text-main/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <span className="font-bold text-base text-text-main">App Settings</span>
+            </div>
+            <svg className="w-5 h-5 text-text-main/30 group-hover:text-primary/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <button 
+            onClick={() => navigate('/help-support')}
+            className="flex items-center justify-between p-4 md:px-6 bg-white hover:bg-bg-surface-1 transition-colors group active:bg-bg-surface cursor-pointer"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-bg-surface-1 flex items-center justify-center text-text-main/70 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <span className="font-bold text-base text-text-main">Help & Support</span>
+            </div>
+            <svg className="w-5 h-5 text-text-main/30 group-hover:text-primary/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <button 
+          onClick={() => navigate('/')} 
+          className="w-full mt-6 bg-white text-error font-bold text-base py-4 rounded-[20px] border border-error-container hover:bg-error-container/20 active:bg-error-container/40 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+        >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           Sign Out
         </button>

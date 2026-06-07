@@ -1,11 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { api } from '../api/client';
 
 export const WelcomeAuth: React.FC = () => {
+  const navigate = useNavigate();
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1';
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleGoogleLogin = () => {
     window.location.assign(`${apiBaseUrl}/auth/google`);
+  };
+
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const res = await api.post('/auth/login', {
+        email: 'user@farmy.com',
+        password: 'UserPassword123',
+      });
+      const token = res.data?.data?.accessToken;
+      if (token) {
+        localStorage.setItem('access_token', token);
+        navigate('/home');
+      } else {
+        setErrorMsg('Không lấy được token đăng nhập!');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.response?.data?.message || 'Đăng nhập thử nghiệm thất bại!');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,6 +49,7 @@ export const WelcomeAuth: React.FC = () => {
           <div className="text-center max-w-[320px] w-full flex flex-col gap-4">
             <h1 className="text-4xl font-bold text-text-h">Grow better every day</h1>
             <p className="text-lg text-text-main/70">Track your farm, build habits, and care for your crops with AI.</p>
+            {errorMsg && <p className="text-sm font-bold text-red-500 bg-red-50 px-3 py-2 rounded-xl">{errorMsg}</p>}
           </div>
         </main>
 
@@ -29,7 +58,7 @@ export const WelcomeAuth: React.FC = () => {
             <button 
               onClick={handleGoogleLogin}
               type="button"
-              className="w-full bg-white text-gray-700 font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out border border-gray-300 shadow-sm hover:bg-gray-50 active:scale-95"
+              className="w-full bg-white text-gray-700 font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out border border-gray-300 shadow-sm hover:bg-gray-50 active:scale-95 cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -39,8 +68,16 @@ export const WelcomeAuth: React.FC = () => {
               </svg>
               Continue with Google
             </button>
+            <button
+              onClick={handleDemoLogin}
+              type="button"
+              disabled={loading}
+              className="w-full bg-primary text-white font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out shadow-md hover:bg-primary-dark active:scale-95 cursor-pointer disabled:opacity-50"
+            >
+              {loading ? 'Đang kết nối...' : 'Đăng nhập Demo (user@farmy.com)'}
+            </button>
           </div>
-          <p className="text-sm text-text-main/60 text-center">Sign in with Google to continue</p>
+          <p className="text-sm text-text-main/60 text-center">Sign in to start managing your farm</p>
         </div>
       </div>
     </div>
