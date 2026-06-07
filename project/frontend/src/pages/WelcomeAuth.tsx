@@ -1,9 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 
 export const WelcomeAuth: React.FC = () => {
-  const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1';
+
+  const handleGoogleLogin = () => {
+    window.location.assign(`${apiBaseUrl}/auth/google`);
+  };
 
   return (
     <div className="w-full min-h-[100svh] flex flex-col relative overflow-hidden bg-bg-surface md:justify-center md:items-center">
@@ -24,7 +27,8 @@ export const WelcomeAuth: React.FC = () => {
         <div className="w-full bg-bg-main rounded-t-[32px] md:rounded-none border-t-2 md:border-t border-border-main pt-8 pb-10 px-6 flex flex-col gap-6 shadow-2xl md:shadow-none">
           <div className="flex flex-col gap-3">
             <button 
-              onClick={() => navigate('/onboarding-1')}
+              onClick={handleGoogleLogin}
+              type="button"
               className="w-full bg-white text-gray-700 font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out border border-gray-300 shadow-sm hover:bg-gray-50 active:scale-95"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +40,7 @@ export const WelcomeAuth: React.FC = () => {
               Continue with Google
             </button>
           </div>
-          <p className="text-sm text-text-main/60 text-center">Start your farming journey</p>
+          <p className="text-sm text-text-main/60 text-center">Sign in with Google to continue</p>
         </div>
       </div>
     </div>
