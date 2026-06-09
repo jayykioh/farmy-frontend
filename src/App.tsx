@@ -5,6 +5,7 @@ import { PageHeaderProvider } from './contexts/PageHeaderContext';
 
 // Pages
 import WelcomeAuth from './pages/WelcomeAuth';
+import Register from './pages/Register';
 import OnboardingStep1 from './pages/OnboardingStep1';
 import OnboardingStep2 from './pages/OnboardingStep2';
 import OnboardingStep3 from './pages/OnboardingStep3';
@@ -40,14 +41,15 @@ export function App() {
           <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<WelcomeAuth />} />
+              <Route path="/register" element={<Register />} />
               <Route path="/onboarding-1" element={<OnboardingStep1 />} />
               <Route path="/onboarding-2" element={<OnboardingStep2 />} />
               <Route path="/onboarding-3" element={<OnboardingStep3 />} />
               <Route path="/home" element={<Home />} />
               <Route path="/diary" element={<DiaryList />} />
-              <Route path="/diary-history" element={<DiaryHistory />} />
+              <Route path="/diary/history" element={<DiaryHistory />} />
               <Route path="/diary/create" element={<CreateDiary />} />
-              <Route path="/chat" element={<ChatActive />} />
+              <Route path="/chat/active" element={<ChatActive />} />
               <Route path="/chat-list" element={<ChatList />} />
               <Route path="/scan" element={<PlantScan />} />
               <Route path="/profile" element={<Profile />} />
@@ -56,7 +58,7 @@ export function App() {
               <Route path="/account-settings" element={<AccountSettings />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/reminders" element={<Reminders />} />
-              <Route path="/reminders/create" element={<CreateReminder />} />
+              <Route path="/reminder/create" element={<CreateReminder />} />
               <Route path="/celebration" element={<Celebration />} />
               <Route path="/farm-feed" element={<FarmFeed />} />
               <Route path="/snap/:id" element={<SnapDetail />} />
