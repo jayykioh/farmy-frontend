@@ -8,15 +8,30 @@ const Lottie = (LottiePackage as any).default || LottiePackage;
 
 interface MascotLottieProps extends Omit<LottieComponentProps, 'animationData'> {
   className?: string;
-  state?: 'happy' | 'worried' | 'excited' | 'analytical' | 'celebrating' | 'sleeping';
+  state?: 'happy' | 'worried' | 'excited' | 'analytical' | 'celebrating' | 'sleeping' | 'neutral' | 'sad' | 'hungry' | 'sleepy';
 }
 
 /**
  * MascotLottie replaces static images of Bé Thóc.
- * Currently uses a single lottie file, but 'state' prop can be used later 
- * to swap between different animations if available.
+ * Renders SVG assets from public/pet for main moods, falls back to Lottie for others.
  */
 export const MascotLottie: React.FC<MascotLottieProps> = ({ className, state = 'happy', ...props }) => {
+  const svgStates = ['happy', 'excited', 'neutral', 'sad', 'worried', 'hungry', 'sleepy', 'sleeping'];
+
+  if (svgStates.includes(state)) {
+    // Map 'sleeping' state name to the 'sleepy.svg' file name
+    const fileName = state === 'sleeping' ? 'sleepy' : state;
+    return (
+      <div className={className}>
+        <img 
+          src={`/pet/${fileName}.svg`} 
+          alt={`Bé Thóc - ${state}`} 
+          className="w-full h-full object-contain"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
       <Lottie 

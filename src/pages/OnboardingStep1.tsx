@@ -46,13 +46,8 @@ export const OnboardingStep1: React.FC = () => {
                 Bé Thóc sẽ dùng thông tin này để cá nhân hóa nhật ký, nhắc việc và gợi ý chăm sóc cây trồng hằng ngày.
               </p>
             </div>
-
             <div className="relative">
-              <div className="absolute -top-12 right-0 z-20 rounded-[20px] rounded-bl-sm border border-border-main/50 bg-white/90 px-4 py-2 shadow-lg backdrop-blur-md lg:-right-8 lg:-top-4">
-                <p className="font-bold text-primary">Chào bạn mới!</p>
-                <div className="absolute bottom-[-8px] left-4 h-4 w-4 rotate-45 border-b border-r border-border-main/50 bg-white/90" />
-              </div>
-              <MascotLottie className="h-52 w-52 drop-shadow-2xl md:h-60 md:w-60 lg:h-64 lg:w-64 xl:h-72 xl:w-72" />
+              <MascotLottie state="excited" className="h-52 w-52 drop-shadow-2xl md:h-60 md:w-60 lg:h-64 lg:w-64 xl:h-72 xl:w-72" />
               <div className="absolute bottom-5 left-1/2 h-4 w-40 -translate-x-1/2 rounded-full bg-text-main/10 blur-md lg:w-56" />
             </div>
 

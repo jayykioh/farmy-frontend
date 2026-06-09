@@ -29,7 +29,7 @@ export const OnboardingStep3: React.FC = () => {
         <div className="relative w-full aspect-square md:aspect-auto md:w-1/2 flex items-center justify-center z-10 md:h-full">
           <div className="relative w-64 h-64 md:w-80 md:h-80">
             {/* Mascot Lottie */}
-            <MascotLottie className="w-full h-full" />
+            <MascotLottie state="sleepy" className="w-full h-full" />
             {/* Floating Bell Element */}
             <div className="absolute bottom-10 right-10 origin-top animate-[spin_2s_ease-in-out_infinite]">
               <svg className="w-12 h-12 text-[#FFC107] drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">

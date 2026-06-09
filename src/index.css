@@ -72,3 +72,164 @@ h1, h2, h3, h4, h5, h6 {
 code, .counter {
   font-family: var(--mono);
 }
+
+/* ── Pet Mascot ────────────────────────────────────────────────────────────── */
+
+.pet-mascot-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.pet-mascot-img {
+  display: block;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Subtle scale-down during transition, then snaps back */
+.pet-mascot-img--transitioning {
+  opacity: 0.6;
+  transform: scale(0.93);
+}
+
+/* ── Speech Bubble ─────────────────────────────────────────────────────────── */
+
+@keyframes bubble-pop {
+  0%   { opacity: 0; transform: scale(0.85) translateY(6px); }
+  60%  { transform: scale(1.04) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pet-mood-bubble {
+  position: relative;
+  background: #ffffff;
+  border: 1.5px solid var(--color-border-main);
+  border-radius: 16px;
+  padding: 8px 14px;
+  max-width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  animation: bubble-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  margin-bottom: 8px;
+}
+
+.pet-mood-bubble__emoji {
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.pet-mood-bubble__text {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Triangle tail pointing downward */
+.pet-mood-bubble__tail {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 9px solid #ffffff;
+  filter: drop-shadow(0 2px 1px rgba(0,0,0,0.06));
+}
+
+/* ── PetStatusCard ─────────────────────────────────────────────────────────── */
+
+.pet-status-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1.5px solid var(--color-border-main);
+  border-radius: 28px;
+  padding: 20px 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.pet-status-card__mascot {
+  display: flex;
+  justify-content: center;
+}
+
+.pet-status-card__mood-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pet-status-card__emoji {
+  font-size: 1.4rem;
+}
+
+.pet-status-card__mood-label {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--color-text-main);
+}
+
+.pet-status-card__stats {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.pet-status-card__stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.pet-status-card__stat-icon { font-size: 1rem; }
+.pet-status-card__stat-value { font-weight: 800; color: var(--color-text-main); }
+.pet-status-card__stat-label { color: var(--color-text-muted); }
+
+.pet-status-card__xp {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pet-status-card__xp-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.pet-status-card__xp-track {
+  width: 100%;
+  height: 10px;
+  background: var(--color-bg-surface-2);
+  border-radius: 99px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-main);
+}
+
+.pet-status-card__xp-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pet-status-card__missed-warning {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-error);
+  text-align: center;
+}
+
