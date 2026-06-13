@@ -1,21 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, BookText, Bot, User, Sprout } from 'lucide-react';
-import { getPetState } from '../../api/farm';
-import type { PetState } from '../../api/farm';
+import { useGetPetStateQuery } from '../../store/api/farmApi';
 
 export const Sidebar: React.FC = () => {
-  const [petState, setPetState] = useState<PetState | null>(null);
-
-  useEffect(() => {
-    getPetState()
-      .then((data) => {
-        setPetState(data);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch pet state in Sidebar:', err);
-      });
-  }, []);
+  const { data: petState } = useGetPetStateQuery();
 
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },

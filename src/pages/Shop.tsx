@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
-import { getPetState } from '../api/farm';
-import type { PetState } from '../api/farm';
+import { useGetPetStateQuery } from '../store/api/farmApi';
 
 export const Shop: React.FC = () => {
   const navigate = useNavigate();
-  const [petState, setPetState] = useState<PetState | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    getPetState()
-      .then((data) => {
-        setPetState(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch pet state:', err);
-        setLoading(false);
-      });
-  }, []);
+  const { data: petState } = useGetPetStateQuery();
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-[#d0e5fa] to-[#79fc9e] bg-fixed overflow-x-hidden font-sans">

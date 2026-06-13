@@ -1,26 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SnapFAB } from '../components/SnapFAB';
 import { PageHeader } from '../components/PageHeader';
-import { getDiaries } from '../api/farm';
-import type { Diary } from '../api/farm';
+import { useGetDiariesQuery } from '../store/api/farmApi';
 
 export const DiaryList: React.FC = () => {
   const navigate = useNavigate();
-  const [diaries, setDiaries] = useState<Diary[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getDiaries()
-      .then(data => {
-        setDiaries(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+  const { data: diaries = [], isLoading: loading } = useGetDiariesQuery();
 
   const getCropImage = (cropType: string) => {
     const typeLower = cropType.toLowerCase();

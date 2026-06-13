@@ -1,45 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
-import { getPendingReminders, completeReminder, getPetState } from '../api/farm';
-import type { Reminder, PetState } from '../api/farm';
+import {
+  useGetPendingRemindersQuery,
+  useGetPetStateQuery,
+  useCompleteReminderMutation,
+} from '../store/api/farmApi';
 
 export const Reminders: React.FC = () => {
   const navigate = useNavigate();
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [petState, setPetState] = useState<PetState | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: reminders = [], isLoading: remindersLoading } = useGetPendingRemindersQuery();
+  const { data: petState, isLoading: petLoading } = useGetPetStateQuery();
+  const [completeReminder] = useCompleteReminderMutation();
 
-  const fetchReminders = async () => {
-    try {
-      const data = await getPendingReminders();
-      setReminders(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPetState = async () => {
-    try {
-      const data = await getPetState();
-      setPetState(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchReminders();
-    fetchPetState();
-  }, []);
+  const loading = remindersLoading || petLoading;
 
   const handleComplete = async (id: string) => {
     try {
-      await completeReminder(id);
-      setReminders(prev => prev.filter(r => r._id !== id));
+      await completeReminder(id).unwrap();
     } catch (err) {
       console.error(err);
       alert('Không thể hoàn thành nhắc nhở!');

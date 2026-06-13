@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
-import { createReminder, getDiaries, getPlots } from '../api/farm';
-import type { Diary } from '../api/farm';
+import {
+  useGetPlotsQuery,
+  useGetDiariesQuery,
+  useCreateReminderMutation,
+} from '../store/api/farmApi';
 
 export const CreateReminder: React.FC = () => {
   const navigate = useNavigate();
@@ -37,36 +40,23 @@ export const CreateReminder: React.FC = () => {
   });
 
   const [diaryId, setDiaryId] = useState('');
-  const [diaries, setDiaries] = useState<Diary[]>([]);
-  const [plots, setPlots] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
-  const [repeat, setRepeat] = useState<'none' | 'daily' | 'weekly'>('daily');
+  const [repeat] = useState<'none' | 'daily' | 'weekly'>('daily');
 
-  // Fetch diaries and plots to display them in the selector
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [plotsData, diariesData] = await Promise.all([getPlots(), getDiaries()]);
-        
-        // Map plot ID to name
-        const plotMap: Record<string, string> = {};
-        plotsData.forEach(p => {
-          plotMap[p._id] = p.name;
-        });
-        setPlots(plotMap);
+  const { data: plotsData = [] } = useGetPlotsQuery();
+  const { data: diariesData = [] } = useGetDiariesQuery();
+  const [createReminder, { isLoading: loading }] = useCreateReminderMutation();
 
-        // Populate plot_name locally if needed, then set state
-        const formattedDiaries = diariesData.map(d => ({
-          ...d,
-          plot_name: plotMap[d.plot_id] || 'Mảnh vườn'
-        }));
-        setDiaries(formattedDiaries);
-      } catch (err) {
-        console.error('Failed to load diaries/plots:', err);
-      }
-    };
-    fetchData();
-  }, []);
+  const diaries = React.useMemo(() => {
+    const plotMap: Record<string, string> = {};
+    plotsData.forEach(p => {
+      plotMap[p._id] = p.name;
+    });
+
+    return diariesData.map(d => ({
+      ...d,
+      plot_name: plotMap[d.plot_id] || 'Mảnh vườn'
+    }));
+  }, [plotsData, diariesData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,27 +65,24 @@ export const CreateReminder: React.FC = () => {
       return;
     }
 
-    setLoading(true);
     try {
       // Parse local date & time strings back to a Date object
       const [year, month, day] = dateStr.split('-').map(Number);
       const [hours, minutes] = timeStr.split(':').map(Number);
       
       const remindAt = new Date(year, month - 1, day, hours, minutes);
-
+ 
       await createReminder({
         title,
         remind_at: remindAt.toISOString(),
         diary_id: diaryId || undefined,
         repeat,
-      });
+      }).unwrap();
 
       navigate('/reminders');
     } catch (err) {
       console.error(err);
       alert('Không thể tạo nhắc nhở. Vui lòng kiểm tra lại!');
-    } finally {
-      setLoading(false);
     }
   };
 

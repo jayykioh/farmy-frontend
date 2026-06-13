@@ -1,50 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
-import { getDiaryDetail, getDiaryLogs, getDiaries } from '../api/farm';
-import type { Diary, DiaryLog } from '../api/farm';
+import {
+  useGetDiaryDetailQuery,
+  useGetDiaryLogsQuery,
+  useGetDiariesQuery,
+} from '../store/api/farmApi';
 
 export const DiaryHistory: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const diaryIdParam = searchParams.get('diaryId');
 
-  const [diary, setDiary] = useState<Diary | null>(null);
-  const [logs, setLogs] = useState<DiaryLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();
+  const activeDiaryId = diaryIdParam || (diaries.length > 0 ? diaries[0]._id : undefined);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        let activeDiaryId = diaryIdParam;
-        
-        // If no diaryId is provided in URL, fallback to the first active diary
-        if (!activeDiaryId) {
-          const list = await getDiaries();
-          if (list.length > 0) {
-            activeDiaryId = list[0]._id;
-          }
-        }
+  const { data: diary, isLoading: diaryLoading } = useGetDiaryDetailQuery(activeDiaryId || '', {
+    skip: !activeDiaryId,
+  });
 
-        if (activeDiaryId) {
-          const [diaryDetail, diaryLogs] = await Promise.all([
-            getDiaryDetail(activeDiaryId),
-            getDiaryLogs(activeDiaryId)
-          ]);
-          setDiary(diaryDetail);
-          setLogs(diaryLogs);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: logs = [], isLoading: logsLoading } = useGetDiaryLogsQuery(activeDiaryId || '', {
+    skip: !activeDiaryId,
+  });
 
-    fetchData();
-  }, [diaryIdParam]);
+  const loading = diariesLoading || diaryLoading || logsLoading;
 
   // Activity type icon helpers
   const getActivityIcon = (activityType: string) => {

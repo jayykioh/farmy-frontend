@@ -2,34 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
-import { getDiaries, createDiaryLog } from '../api/farm';
-import type { Diary } from '../api/farm';
+import { useGetDiariesQuery, useCreateDiaryLogMutation } from '../store/api/farmApi';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
-  const [diaries, setDiaries] = useState<Diary[]>([]);
+  const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
+  const [createDiaryLog, { isLoading: loading }] = useCreateDiaryLogMutation();
   const [selectedDiaryId, setSelectedDiaryId] = useState<string>('');
   const [growthStage, setGrowthStage] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('https://lh3.googleusercontent.com/aida-public/AB6AXuBBsDRgI1pvIo50IOk1rW3XMKV7rFhTt9_s8aTQNkN_WywF7AIGqdVhXjoHALtZprcHrXKjLhttsRZCpjA4uvk_Um24WBesbsE838pimS7ZoudphdnkPFClv9WTTHUkJeYPc4xmdfViit333Cz9CIlJOwN1Q3vb7F72FPHvJMjnyqxQTdgnBBr2O-MnyEgAEIaPO1Dm6D_LT6RC8NAcso7A3hw9dfbzxz58X2roER3BslU56C5sb_vWdPjtLft7MqmLlOGLkEQso-ij'); // default placeholder image
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
-    getDiaries()
-      .then(data => {
-        setDiaries(data);
-        if (data.length > 0) {
-          setSelectedDiaryId(data[0]._id);
-        }
-        setFetching(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setFetching(false);
-      });
-  }, []);
+    if (diaries.length > 0 && !selectedDiaryId) {
+      setSelectedDiaryId(diaries[0]._id);
+    }
+  }, [diaries, selectedDiaryId]);
 
   const toggleActivity = (activity: string) => {
     setActiveActivities(prev => 
@@ -43,7 +32,6 @@ export const CreateDiary: React.FC = () => {
       alert('Vui lòng chọn hoặc tạo nhật ký vụ mùa trước!');
       return;
     }
-    setLoading(true);
     try {
       // activity type is derived from toggled activities
       let activityType = 'Chăm sóc định kỳ';
@@ -64,18 +52,19 @@ export const CreateDiary: React.FC = () => {
       }
       const content = contentParts.join('. ') || 'Đã thực hiện cập nhật ruộng vườn hàng ngày.';
 
-      await createDiaryLog(selectedDiaryId, {
-        activity_type: activityType,
-        content,
-        image_url: imageUrl || undefined,
-      });
+      await createDiaryLog({
+        diaryId: selectedDiaryId,
+        log: {
+          activity_type: activityType,
+          content,
+          image_url: imageUrl || undefined,
+        }
+      }).unwrap();
 
       navigate('/diary');
     } catch (err) {
       console.error(err);
       alert('Không thể lưu nhật ký hoạt động!');
-    } finally {
-      setLoading(false);
     }
   };
 

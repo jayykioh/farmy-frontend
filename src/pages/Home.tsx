@@ -1,37 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { SnapCard } from '../components/SnapCard';
 import { mockSnaps } from '../mocks/snapData';
 import { SnapFAB } from '../components/SnapFAB';
 import { Flame } from 'lucide-react';
-import { getPetState } from '../api/farm';
-import type { PetState } from '../api/farm';
+import { useGetPetStateQuery } from '../store/api/farmApi';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [petState, setPetState] = useState<PetState | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    let active = true;
-    getPetState()
-      .then((data) => {
-        if (active) {
-          setPetState(data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch pet state:', err);
-        if (active) {
-          setLoading(false);
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { data: petState } = useGetPetStateQuery();
 
   const xpNeeded = (petState?.level ?? 1) * 100;
   const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
