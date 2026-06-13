@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <style>
+    @keyframes sleep-breathe {
+      0%, 100% { transform: translateY(0px) scaleY(1) scaleX(1); }
+      50% { transform: translateY(1.5px) scaleY(0.97) scaleX(1.03); }
+    }
+    @keyframes sleep-sprout {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+    @keyframes z-float {
+      0% { transform: translate(0px, 0px) scale(0.5); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { transform: translate(8px, -20px) scale(1.1); opacity: 0.8; }
+      100% { transform: translate(12px, -28px) scale(0.5); opacity: 0; }
+    }
+    @keyframes shadow-scale {
+      0%, 100% { transform: scaleX(1); opacity: 0.6; }
+      50% { transform: scaleX(1.04); opacity: 0.7; }
+    }
+    
+    .character {
+      animation: sleep-breathe 3s ease-in-out infinite;
+      transform-origin: 50% 95px;
+    }
+    .sprout {
+      animation: sleep-sprout 3s ease-in-out infinite;
+      transform-origin: 50% 12px;
+    }
+    .shadow-el {
+      animation: shadow-scale 3s ease-in-out infinite;
+      transform-origin: 50% 112px;
+    }
+    .z1 {
+      animation: z-float 3s linear infinite;
+      transform-origin: 70px 50px;
+    }
+    .z2 {
+      animation: z-float 3s linear infinite;
+      animation-delay: 1s;
+      transform-origin: 70px 50px;
+    }
+    .z3 {
+      animation: z-float 3s linear infinite;
+      animation-delay: 2s;
+      transform-origin: 70px 50px;
+    }
+  </style>
+  
+  <!-- Soft Shadow -->
+  <ellipse class="shadow-el" cx="50" cy="112" rx="24" ry="4.5" fill="#CBD5E1"/>
+  
+  <!-- Character Group -->
+  <g class="character">
+    <!-- Base Stem -->
+    <path d="M 50 96 Q 50 108, 47 110" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Stubby Legs -->
+    <path d="M 42 94 L 40 106 Q 37 106, 36 108 L 43 108 L 44 94" fill="#6C3A00"/>
+    <path d="M 58 94 L 60 106 Q 63 106, 64 108 L 57 108 L 56 94" fill="#6C3A00"/>
+
+    <!-- Rice Grain Body -->
+    <path d="M50 12 C65 35, 72 65, 68 90 C66 96, 34 96, 32 90 C28 65, 35 35, 50 12 Z" fill="#FFC000" stroke="#6C3A00" stroke-width="3.5" stroke-linejoin="round"/>
+    
+    <!-- Grain Highlight -->
+    <path d="M50 15.5 C38 36, 34 65, 36 88 C38 89.5, 42 89.5, 43.5 88 C40 65, 43 36, 50 15.5 Z" fill="#FFE066" opacity="0.7"/>
+
+    <!-- Ridges -->
+    <path d="M43 18 C37 42, 37 68, 41 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+    <path d="M57 18 C63 42, 63 68, 59 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+
+    <!-- Sleepy Sprout (resting) -->
+    <g class="sprout">
+      <path d="M50 12 Q55 7, 51 2 Q49 8, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+      <path d="M50 12 Q44 8, 39 4 Q46 11, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+    </g>
+
+    <!-- Folded Arms (Sleepy/Relaxed) -->
+    <path d="M 32 72 Q 38 77, 44 75" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 68 72 Q 62 77, 56 75" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Sleeping Eyes (u u) -->
+    <path d="M34 63 Q39 67, 44 63" fill="none" stroke="#6C3A00" stroke-width="4" stroke-linecap="round"/>
+    <path d="M56 63 Q61 67, 66 63" fill="none" stroke="#6C3A00" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Breathing Snore Mouth -->
+    <ellipse cx="50" cy="71" rx="2" ry="3" fill="#6C3A00"/>
+
+    <!-- Soft Cozy Blush Cheeks -->
+    <circle cx="33" cy="69" r="4.5" fill="#FF8A8A" opacity="0.65"/>
+    <circle cx="67" cy="69" r="4.5" fill="#FF8A8A" opacity="0.65"/>
+
+    <!-- Floating Zzz (Relative to character, so they breathe with it) -->
+    <g class="z1" transform="translate(68, 35)">
+      <path d="M-4 -4 L4 -4 L-4 4 L4 4" fill="none" stroke="#6C3A00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g class="z2" transform="translate(72, 30)">
+      <path d="M-3 -3 L3 -3 L-3 3 L3 3" fill="none" stroke="#6C3A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g class="z3" transform="translate(66, 25)">
+      <path d="M-2 -2 L2 -2 L-2 2 L2 2" fill="none" stroke="#6C3A00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>

@@ -1,92 +1,132 @@
-import axios from 'axios';
-import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 
-// Create a configured Axios Instance
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+
+type RetryableRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+};
+
+type TokenRefreshSubscriber = {
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+};
+
+type RefreshTokenResponse = {
+  success: true;
+  data: {
+    accessToken: string;
+  };
+};
+
+export type ApiResponse<T> = {
+  success: true;
+  data: T;
+};
+
+let accessToken: string | null = null;
+let isRefreshing = false;
+let refreshQueue: TokenRefreshSubscriber[] = [];
+
+export const getAccessToken = () => accessToken;
+
+export const setAccessToken = (token: string | null) => {
+  accessToken = token;
+};
+
+export const clearAccessToken = () => {
+  setAccessToken(null);
+};
+
+const processRefreshQueue = (error: unknown, accessToken?: string) => {
+  refreshQueue.forEach(({ resolve, reject }) => {
+    if (accessToken) {
+      resolve(accessToken);
+      return;
+    }
+
+    reject(error);
+  });
+
+  refreshQueue = [];
+};
+
 export const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Crucial for receiving httpOnly refresh token cookies
+  withCredentials: true,
 });
 
-// Request Interceptor: Automatically inject Bearer JWT Access Token
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const accessToken = localStorage.getItem('access_token');
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use((config) => {
+  const accessToken = getAccessToken();
 
-// Response Interceptor: Handle Token Rotation (Rotate on 401 Unauthorized)
-let isRefreshing = false;
-let failedQueue: any[] = [];
+  if (accessToken && config.headers) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
 
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (token) {
-      prom.resolve(token);
-    } else {
-      prom.reject(error);
-    }
-  });
-  failedQueue = [];
-};
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as RetryableRequestConfig | undefined;
 
-    // Detect 401 from expired Access Token (skip refresh endpoint to avoid loops)
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        const baseURL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-        // Trigger NestJS AuthModule Refresh endpoint (cookies supply original refresh token)
-        const response = await axios.post(
-          `${baseURL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
-        
-        const { accessToken: access_token } = response.data.data;
-        localStorage.setItem('access_token', access_token);
-        
-        processQueue(null, access_token);
-        isRefreshing = false;
-        
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError, null);
-        isRefreshing = false;
-        
-        // Refresh token expired: clear local credentials and redirect to login
-        localStorage.removeItem('access_token');
-        window.location.href = '/';
-        return Promise.reject(refreshError);
-      }
+    if (!originalRequest) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
-  }
+    const isUnauthorized = error.response?.status === 401;
+    const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
+
+    if (!isUnauthorized || originalRequest._retry || isRefreshRequest) {
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      return new Promise<string>((resolve, reject) => {
+        refreshQueue.push({ resolve, reject });
+      }).then((accessToken) => {
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const response = await axios.post<RefreshTokenResponse>(
+        `${API_BASE_URL}/auth/refresh`,
+        {},
+        { withCredentials: true },
+      );
+
+      const { accessToken } = response.data.data;
+
+      if (!accessToken) {
+        throw new Error('Refresh response did not include accessToken');
+      }
+
+      setAccessToken(accessToken);
+      processRefreshQueue(null, accessToken);
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+      return api(originalRequest);
+    } catch (refreshError) {
+      processRefreshQueue(refreshError);
+      clearAccessToken();
+      window.location.href = '/';
+
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
+  },
 );

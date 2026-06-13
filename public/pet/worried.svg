@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <style>
+    @keyframes shiver {
+      0%, 100% { transform: translateX(0px); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-0.8px); }
+      20%, 40%, 60%, 80% { transform: translateX(0.8px); }
+    }
+    @keyframes wiggle-worry {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-4deg); }
+    }
+    @keyframes sweat-slide {
+      0% { transform: translateY(0px); opacity: 0; }
+      10% { opacity: 1; }
+      80% { transform: translateY(10px); opacity: 1; }
+      100% { transform: translateY(12px); opacity: 0; }
+    }
+    @keyframes shadow-scale {
+      0%, 100% { transform: scaleX(1); opacity: 0.6; }
+      50% { transform: scaleX(0.92); opacity: 0.45; }
+    }
+    
+    .character {
+      animation: shiver 0.4s linear infinite;
+      transform-origin: 50% 95px;
+    }
+    .sprout {
+      animation: wiggle-worry 2s ease-in-out infinite;
+      transform-origin: 50% 12px;
+    }
+    .sweat {
+      animation: sweat-slide 2s ease-in infinite;
+      transform-origin: 67px 52px;
+    }
+    .shadow-el {
+      animation: shadow-scale 2s ease-in-out infinite;
+      transform-origin: 50% 112px;
+    }
+  </style>
+  
+  <!-- Soft Shadow -->
+  <ellipse class="shadow-el" cx="50" cy="112" rx="24" ry="4.5" fill="#CBD5E1"/>
+  
+  <!-- Character Group -->
+  <g class="character">
+    <!-- Base Stem -->
+    <path d="M 50 96 Q 50 108, 47 110" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Stubby Legs -->
+    <path d="M 42 94 L 40 106 Q 37 106, 36 108 L 43 108 L 44 94" fill="#6C3A00"/>
+    <path d="M 58 94 L 60 106 Q 63 106, 64 108 L 57 108 L 56 94" fill="#6C3A00"/>
+
+    <!-- Rice Grain Body -->
+    <path d="M50 12 C65 35, 72 65, 68 90 C66 96, 34 96, 32 90 C28 65, 35 35, 50 12 Z" fill="#FFC000" stroke="#6C3A00" stroke-width="3.5" stroke-linejoin="round"/>
+    
+    <!-- Grain Highlight -->
+    <path d="M50 15.5 C38 36, 34 65, 36 88 C38 89.5, 42 89.5, 43.5 88 C40 65, 43 36, 50 15.5 Z" fill="#FFE066" opacity="0.7"/>
+
+    <!-- Ridges -->
+    <path d="M43 18 C37 42, 37 68, 41 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+    <path d="M57 18 C63 42, 63 68, 59 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+
+    <!-- Wiggling Sprout -->
+    <g class="sprout">
+      <path d="M50 12 Q57 3, 64 7 Q56 11, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+      <path d="M50 12 Q43 5, 37 9 Q45 12, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+    </g>
+
+    <!-- Worried Arms (Clutching face) -->
+    <path d="M 28 72 Q 33 70, 36 67" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 72 72 Q 67 70, 64 67" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Slanted Eyebrows -->
+    <path d="M34 56 Q40 60, 44 57" fill="none" stroke="#6C3A00" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M56 57 Q60 60, 66 56" fill="none" stroke="#6C3A00" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- Wide Worried Eyes -->
+    <circle cx="41" cy="64" r="5" fill="#6C3A00"/>
+    <circle cx="59" cy="64" r="5" fill="#6C3A00"/>
+    <circle cx="41.5" cy="63.5" r="1.5" fill="#FFFFFF"/>
+    <circle cx="59.5" cy="63.5" r="1.5" fill="#FFFFFF"/>
+
+    <!-- Squiggly Mouth -->
+    <path d="M43 74 Q46 71, 48 74 T 53 74 T 57 74" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Sweat Slide -->
+    <g class="sweat">
+      <path d="M67 52 C69 52, 71 54, 71 56 C71 58, 69 60, 67 60 C65 60, 63 58, 63 56 C63 54, 65 52, 67 52 Z" fill="#38BDF8"/>
+    </g>
+  </g>
+</svg>

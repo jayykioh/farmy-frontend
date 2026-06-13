@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <style>
+    @keyframes neutral-idle {
+      0%, 100% { transform: translateY(0px) scaleY(1) scaleX(1) rotate(0deg); }
+      50% { transform: translateY(-4px) scaleY(1.02) scaleX(0.98) rotate(1.5deg); }
+    }
+    @keyframes wiggle-delayed {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-8deg); }
+    }
+    @keyframes blink-snappy {
+      0%, 88%, 94%, 100% { transform: scaleY(1); }
+      91% { transform: scaleY(0.08); }
+    }
+    @keyframes shadow-scale {
+      0%, 100% { transform: scaleX(1) scaleY(1); opacity: 0.6; }
+      50% { transform: scaleX(0.86) scaleY(0.86); opacity: 0.35; }
+    }
+    @keyframes arm-breathe-left {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-6deg); }
+    }
+    @keyframes arm-breathe-right {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(6deg); }
+    }
+    
+    .character {
+      animation: neutral-idle 2s cubic-bezier(0.45, 0, 0.35, 1) infinite;
+      transform-origin: 50% 95px;
+    }
+    .sprout {
+      animation: wiggle-delayed 2s cubic-bezier(0.45, 0, 0.35, 1) infinite;
+      animation-delay: 0.25s; /* Delayed secondary animation */
+      transform-origin: 50% 12px;
+    }
+    .eye {
+      animation: blink-snappy 2s linear infinite;
+      transform-origin: 50% 62px;
+    }
+    .shadow-el {
+      animation: shadow-scale 2s cubic-bezier(0.45, 0, 0.35, 1) infinite;
+      transform-origin: 50% 112px;
+    }
+    .left-arm {
+      animation: arm-breathe-left 2s cubic-bezier(0.45, 0, 0.35, 1) infinite;
+      transform-origin: 32px 70px;
+    }
+    .right-arm {
+      animation: arm-breathe-right 2s cubic-bezier(0.45, 0, 0.35, 1) infinite;
+      transform-origin: 68px 70px;
+    }
+  </style>
+  
+  <!-- Soft Shadow -->
+  <ellipse class="shadow-el" cx="50" cy="112" rx="24" ry="4.5" fill="#CBD5E1"/>
+  
+  <!-- Character Group -->
+  <g class="character">
+    <!-- Base Stem -->
+    <path d="M 50 96 Q 50 108, 47 110" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Stubby Legs -->
+    <path d="M 41 94 L 39 105 Q 36 105, 35 107 L 42 107 L 43 94" fill="#6C3A00"/>
+    <path d="M 59 94 L 61 105 Q 64 105, 65 107 L 58 107 L 56 94" fill="#6C3A00"/>
+
+    <!-- Rice Grain Body -->
+    <path d="M50 12 C65 35, 72 65, 68 90 C66 96, 34 96, 32 90 C28 65, 35 35, 50 12 Z" fill="#FFC000" stroke="#6C3A00" stroke-width="3.5" stroke-linejoin="round"/>
+    
+    <!-- Grain Highlight -->
+    <path d="M50 15.5 C38 36, 35.5 65, 37.5 88 C39 89.5, 42 89.5, 43.5 88 C40 65, 43 36, 50 15.5 Z" fill="#FFE066" opacity="0.7"/>
+
+    <!-- Ridges -->
+    <path d="M43 18 C37 42, 37 68, 41 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+    <path d="M57 18 C63 42, 63 68, 59 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+
+    <!-- Wiggling Sprout -->
+    <g class="sprout">
+      <path d="M50 12 Q57 3, 64 7 Q56 11, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+      <path d="M50 12 Q43 5, 37 9 Q45 12, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+    </g>
+
+    <!-- Stubby Left Arm -->
+    <g class="left-arm">
+      <path d="M 32 70 Q 25 72, 27 80 Q 29 82, 31 76" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Stubby Right Arm -->
+    <g class="right-arm">
+      <path d="M 68 70 Q 75 72, 73 80 Q 71 82, 69 76" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Large Expressive Eyes (Blinking) -->
+    <g class="eye">
+      <circle cx="41.5" cy="62" r="5" fill="#6C3A00"/>
+      <circle cx="58.5" cy="62" r="5" fill="#6C3A00"/>
+      <circle cx="43" cy="60" r="1.5" fill="#FFFFFF"/>
+      <circle cx="60" cy="60" r="1.5" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Tiny smile -->
+    <path d="M47 71 Q50 73, 53 71" fill="none" stroke="#6C3A00" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

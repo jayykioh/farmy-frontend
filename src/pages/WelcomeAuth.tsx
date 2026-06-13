@@ -42,23 +42,55 @@ export const WelcomeAuth: React.FC = () => {
       <div className="absolute top-1/3 -right-16 w-48 h-48 bg-secondary/30 rounded-full blur-3xl"></div>
       
       <div className="w-full max-w-xl mx-auto flex flex-col h-full md:h-auto md:bg-white md:shadow-xl md:rounded-3xl md:border md:border-border-main overflow-hidden relative z-10">
-        <main className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-8 md:py-16 relative">
-          <div className="w-48 h-48 mb-8 relative flex items-center justify-center">
+        <main className="flex-1 flex flex-col items-center justify-center px-6 pt-8 pb-4 md:py-8 relative">
+          <div className="w-32 h-32 mb-4 relative flex items-center justify-center">
             <MascotLottie className="w-full h-full drop-shadow-md" />
           </div>
-          <div className="text-center max-w-[320px] w-full flex flex-col gap-4">
-            <h1 className="text-4xl font-bold text-text-h">Grow better every day</h1>
-            <p className="text-lg text-text-main/70">Track your farm, build habits, and care for your crops with AI.</p>
-            {errorMsg && <p className="text-sm font-bold text-red-500 bg-red-50 px-3 py-2 rounded-xl">{errorMsg}</p>}
+          <div className="text-center max-w-[320px] w-full flex flex-col gap-2">
+            <h1 className="text-3xl font-bold text-text-h">Grow better every day</h1>
+            <p className="text-base text-text-main/70">Track your farm, build habits, and care for your crops with AI.</p>
           </div>
         </main>
 
-        <div className="w-full bg-bg-main rounded-t-[32px] md:rounded-none border-t-2 md:border-t border-border-main pt-8 pb-10 px-6 flex flex-col gap-6 shadow-2xl md:shadow-none">
+        <div className="w-full bg-bg-main rounded-t-[32px] md:rounded-none border-t-2 md:border-t border-border-main pt-6 pb-8 px-6 flex flex-col gap-4 shadow-2xl md:shadow-none">
           <div className="flex flex-col gap-3">
+            <div className="space-y-1">
+              <label className="text-sm font-bold text-text-main ml-2" htmlFor="username">Tên đăng nhập</label>
+              <input 
+                id="username"
+                type="text" 
+                placeholder="Email hoặc số điện thoại" 
+                className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none" 
+              />
+            </div>
+            
+            <div className="space-y-1">
+              <label className="text-sm font-bold text-text-main ml-2" htmlFor="password">Mật khẩu</label>
+              <input 
+                id="password"
+                type="password" 
+                placeholder="Nhập mật khẩu" 
+                className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none" 
+              />
+            </div>
+            
             <button 
-              onClick={handleGoogleLogin}
-              type="button"
-              className="w-full bg-white text-gray-700 font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out border border-gray-300 shadow-sm hover:bg-gray-50 active:scale-95 cursor-pointer"
+              onClick={() => navigate('/onboarding-1')}
+              className="w-full bg-primary text-white font-bold py-3 px-6 rounded-full shadow-[0_4px_14px_rgba(8,168,85,0.25)] hover:bg-primary-container active:scale-95 transition-all cursor-pointer mt-1"
+            >
+              Đăng nhập
+            </button>
+            
+            <div className="relative flex items-center justify-center my-1">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border-main/50"></div>
+              </div>
+              <div className="relative bg-bg-main px-4 text-xs text-text-main/50 font-bold">HOẶC</div>
+            </div>
+
+            <button 
+              onClick={() => navigate('/onboarding-1')}
+              className="w-full bg-white text-gray-700 font-bold py-3 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out border border-gray-300 shadow-sm hover:bg-gray-50 active:scale-95 cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -77,7 +109,9 @@ export const WelcomeAuth: React.FC = () => {
               {loading ? 'Đang kết nối...' : 'Đăng nhập Demo (user@farmy.com)'}
             </button>
           </div>
-          <p className="text-sm text-text-main/60 text-center">Sign in to start managing your farm</p>
+          <p className="text-sm text-text-main/60 text-center mt-2">
+            Chưa có tài khoản? <button onClick={() => navigate('/register')} className="text-primary font-bold hover:underline cursor-pointer">Đăng ký ngay</button>
+          </p>
         </div>
       </div>
     </div>

@@ -34,7 +34,7 @@ export const OnboardingStep2: React.FC = () => {
         {/* Mascot Area */}
         <div className="relative w-full h-[45%] md:h-auto md:flex-1 flex items-center justify-center">
           <div className="relative w-64 h-64 md:w-80 md:h-80">
-            <MascotLottie className="w-full h-full" />
+            <MascotLottie state="happy" className="w-full h-full" />
             {/* Shadow for Mascot */}
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 md:w-48 h-4 bg-black/5 blur-lg rounded-full"></div>
           </div>

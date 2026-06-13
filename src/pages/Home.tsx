@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { PET_MOOD_UI_MAP } from '../features/pet/constants/petMood.constants';
 import { SnapCard } from '../components/SnapCard';
 import { mockSnaps } from '../mocks/snapData';
 import { SnapFAB } from '../components/SnapFAB';
@@ -13,6 +15,15 @@ export const Home: React.FC = () => {
 
   const xpNeeded = (petState?.level ?? 1) * 100;
   const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
+
+  // Fetch authoritative pet status from backend
+  const { data: petStatus } = usePetStatus();
+
+  const mood   = petStatus?.mood ?? 'neutral';
+  const streak = petStatus?.streakCount ?? 0;
+  const level  = petStatus?.level ?? 1;
+  const xp     = petStatus?.exp ?? 0;
+  const bubbleMessage = petStatus?.bubbleMessage ?? PET_MOOD_UI_MAP[mood]?.description ?? 'Chào chủ vườn!';
 
   return (
     <div className="w-full flex flex-col gap-6 px-4 md:px-8 md:py-8 pt-4 pb-8 max-w-7xl mx-auto">
@@ -27,9 +38,7 @@ export const Home: React.FC = () => {
           <section className="flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
             <div className="inline-flex items-center gap-2 bg-bg-surface border border-border-main/50 shadow-sm rounded-full px-4 py-1.5 mb-3">
               <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-              <span className="font-bold text-text-main/70 text-sm">
-                {petState ? `${petState.streak_count}-day streak` : '0-day streak'}
-              </span>
+              <span className="font-bold text-text-main/70 text-sm">{streak}-day streak</span>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-text-h tracking-tight">Good morning, Nông Dân!</h2>
             <p className="text-text-main/70 mt-2 font-medium">Bạn đã sẵn sàng để chăm sóc nông trại hôm nay chưa?</p>
@@ -41,13 +50,11 @@ export const Home: React.FC = () => {
             <div className="absolute inset-0 bg-primary-container/20 rounded-full md:rounded-[40px] scale-75 md:scale-100 blur-3xl md:blur-2xl opacity-50"></div>
             {/* Mascot Container */}
             <div className="relative w-full h-full max-w-[240px] md:max-w-[400px] rounded-[32px] md:rounded-[40px] overflow-hidden bg-white/80 backdrop-blur-sm border border-border-main/50 shadow-sm flex items-center justify-center p-4 md:p-8">
-              <MascotLottie className="w-full h-full drop-shadow-md" state={petState?.mood || 'happy'} />
+              <PetMascot status={petStatus} size={200} className="w-full h-full drop-shadow-md" />
             </div>
             {/* Floating Dialogue Bubble */}
-            <div className="absolute top-0 md:top-8 right-4 md:right-8 bg-white border border-border-main/50 rounded-[20px] rounded-bl-none px-5 py-3 shadow-md animate-[bounce_4s_ease-in-out_infinite] max-w-[180px] md:max-w-[260px]">
-              <p className="font-bold text-text-main md:text-base text-sm leading-snug">
-                {petState?.bubble_message || 'Ready to grow?'}
-              </p>
+            <div className="absolute top-0 md:top-8 right-4 md:right-8 bg-white border border-border-main/50 rounded-[20px] rounded-bl-none px-5 py-3 shadow-md animate-[bounce_4s_ease-in-out_infinite]">
+              <p className="font-bold text-text-main md:text-lg">{bubbleMessage}</p>
             </div>
           </section>
 
@@ -75,18 +82,13 @@ export const Home: React.FC = () => {
             <div className="flex justify-between items-end">
               <div className="flex flex-col gap-1">
                 <span className="font-bold text-secondary-dark bg-secondary-light/20 px-2 py-0.5 rounded-full text-xs uppercase tracking-wider self-start">Current Status</span>
-                <span className="text-3xl font-extrabold text-text-main tracking-tight mt-1">Lv. {petState?.level ?? 1}</span>
+                <span className="text-3xl font-extrabold text-text-main tracking-tight mt-1">Lv. {level}</span>
               </div>
-              <span className="font-bold text-primary bg-primary-lightest/50 px-3 py-1 rounded-full font-mono">
-                {petState?.xp ?? 0}/{xpNeeded} XP
-              </span>
+              <span className="font-bold text-primary bg-primary-lightest/50 px-3 py-1 rounded-full">{xp}/{level * 100} XP</span>
             </div>
             {/* Thick Progress Bar */}
             <div className="w-full h-4 rounded-full bg-bg-surface-2 relative overflow-hidden border border-border-main/20">
-              <div 
-                className="absolute top-0 left-0 h-full bg-primary rounded-full border-t border-primary-light shadow-sm transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              ></div>
+              <div className="absolute top-0 left-0 h-full bg-primary rounded-full border-t border-primary-light shadow-sm" style={{ width: `${Math.min(100, (xp / (level * 100)) * 100)}%` }}></div>
             </div>
             <p className="text-sm font-medium text-text-main/50 mt-1">
               {petState?.mood_reason || 'Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}

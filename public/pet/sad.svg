@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <style>
+    @keyframes sad-sigh {
+      0%, 100% { transform: translateY(0px) scaleY(1) scaleX(1) rotate(-1.5deg); }
+      30% { transform: translateY(3px) scaleY(0.95) scaleX(1.05) rotate(-0.5deg); }
+      48% { transform: translateY(3.5px) scaleY(0.94) scaleX(1.06) rotate(0.5deg); }
+      54% { transform: translateY(3px) scaleY(0.95) scaleX(1.05) rotate(0deg); }
+      85% { transform: translateY(-1px) scaleY(1.01) scaleX(0.99) rotate(-1.5deg); }
+    }
+    @keyframes wiggle-droop {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-5deg); }
+    }
+    @keyframes tear-drop {
+      0% { transform: translateY(0px) scale(0); opacity: 0; }
+      15% { transform: translateY(2px) scale(1); opacity: 1; }
+      75% { transform: translateY(16px) scale(1.1); opacity: 1; }
+      92% { transform: translateY(22px) scale(0.6); opacity: 0; }
+      100% { transform: translateY(22px) scale(0); opacity: 0; }
+    }
+    @keyframes shadow-scale {
+      0%, 100% { transform: scaleX(0.96) scaleY(0.96); opacity: 0.5; }
+      30%, 54% { transform: scaleX(1.06) scaleY(1.06); opacity: 0.65; }
+    }
+    @keyframes sob-arm-left {
+      0%, 100% { transform: rotate(0deg); }
+      48%, 54% { transform: rotate(-4deg) translateY(-0.5px); }
+      50% { transform: rotate(4deg) translateY(0.5px); }
+    }
+    @keyframes sob-arm-right {
+      0%, 100% { transform: rotate(0deg); }
+      48%, 54% { transform: rotate(4deg) translateY(-0.5px); }
+      50% { transform: rotate(-4deg) translateY(0.5px); }
+    }
+    
+    .character {
+      animation: sad-sigh 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: 50% 95px;
+    }
+    .sprout {
+      animation: wiggle-droop 2s ease-in-out infinite;
+      animation-delay: 0.15s;
+      transform-origin: 50% 12px;
+    }
+    .tear {
+      animation: tear-drop 2s cubic-bezier(0.6, 0.04, 0.98, 0.335) infinite;
+      transform-origin: 34px 72px;
+    }
+    .shadow-el {
+      animation: shadow-scale 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transform-origin: 50% 112px;
+    }
+    .left-arm {
+      animation: sob-arm-left 2s ease-in-out infinite;
+      transform-origin: 32px 70px;
+    }
+    .right-arm {
+      animation: sob-arm-right 2s ease-in-out infinite;
+      transform-origin: 68px 70px;
+    }
+  </style>
+  
+  <!-- Soft Shadow -->
+  <ellipse class="shadow-el" cx="50" cy="112" rx="23" ry="3.5" fill="#CBD5E1"/>
+  
+  <!-- Character Group -->
+  <g class="character">
+    <!-- Base Stem -->
+    <path d="M 50 96 Q 50 108, 47 110" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Stubby Legs -->
+    <path d="M 42 94 L 40 106 Q 37 106, 36 108 L 43 108 L 44 94" fill="#6C3A00"/>
+    <path d="M 58 94 L 60 106 Q 63 106, 64 108 L 57 108 L 56 94" fill="#6C3A00"/>
+
+    <!-- Rice Grain Body -->
+    <path d="M50 12 C65 35, 72 65, 68 90 C66 96, 34 96, 32 90 C28 65, 35 35, 50 12 Z" fill="#FFC000" stroke="#6C3A00" stroke-width="3.5" stroke-linejoin="round"/>
+    
+    <!-- Grain Highlight -->
+    <path d="M50 15.5 C38 36, 34 65, 36 88 C38 89.5, 42 89.5, 43.5 88 C40 65, 43 36, 50 15.5 Z" fill="#FFE066" opacity="0.7"/>
+
+    <!-- Ridges -->
+    <path d="M43 18 C37 42, 37 68, 41 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+    <path d="M57 18 C63 42, 63 68, 59 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+
+    <!-- Drooping Sprout -->
+    <g class="sprout">
+      <path d="M50 12 Q53 7, 51 0 Q48 6, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+      <path d="M50 12 Q43 8, 38 4 Q45 11, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+    </g>
+
+    <!-- Drooping Left Arm (Sobbing shake) -->
+    <g class="left-arm">
+      <path d="M 32 70 L 25 78 Q 23 80, 25 82 Q 28 80, 31 75" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Drooping Right Arm (Sobbing shake) -->
+    <g class="right-arm">
+      <path d="M 68 70 L 75 78 Q 77 80, 75 82 Q 72 80, 69 75" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Sad Eyes -->
+    <path d="M33 65 Q38 69, 43 65" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M53 65 Q58 69, 63 65" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Frown Mouth -->
+    <path d="M44 76 Q48 71, 52 76" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Falling Teardrop -->
+    <g class="tear">
+      <path d="M34 72 C32 72, 30 74, 30 76 C30 78, 32 80, 34 80 C36 80, 38 78, 38 76 C38 74, 36 72, 34 72 Z" fill="#60A5FA"/>
+    </g>
+  </g>
+</svg>
