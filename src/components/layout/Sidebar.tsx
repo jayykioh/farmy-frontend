@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, BookText, Bot, User, Sprout } from 'lucide-react';
+import { useGetPetStateQuery } from '../../store/api/farmApi';
 
 export const Sidebar: React.FC = () => {
+  const { data: petState } = useGetPetStateQuery();
+
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
@@ -55,17 +58,21 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer area inside sidebar */}
-      <div className="p-3 mb-2">
-        <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] hover:bg-black/[0.04] transition-colors duration-300 cursor-pointer active:scale-[0.96]">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-light to-primary border border-primary/20 flex items-center justify-center font-bold text-white text-[13px] shadow-sm">
+      <div className="p-6 border-t border-border-main/30 bg-bg-surface-1/50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
             H
           </div>
-          <div className="flex flex-col flex-1 overflow-hidden">
-            <span className="text-[13px] font-medium text-text-main truncate">Hải Nông Dân</span>
-            <span className="text-[11.5px] text-text-muted truncate mt-[1px]">Cấp độ 4</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-text-main">Hải Nông Dân</span>
+            <span className="text-xs text-text-main/50 font-medium">
+              Cấp độ {petState?.level ?? 1}
+            </span>
           </div>
         </div>
       </div>
     </aside>
   );
 };
+
+export default Sidebar;

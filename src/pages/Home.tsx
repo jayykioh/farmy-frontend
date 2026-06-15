@@ -7,9 +7,14 @@ import { SnapCard } from '../components/SnapCard';
 import { mockSnaps } from '../mocks/snapData';
 import { SnapFAB } from '../components/SnapFAB';
 import { Flame } from 'lucide-react';
+import { useGetPetStateQuery } from '../store/api/farmApi';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { data: petState } = useGetPetStateQuery();
+
+  const xpNeeded = (petState?.level ?? 1) * 100;
+  const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
 
   // Fetch authoritative pet status from backend
   const { data: petStatus } = usePetStatus();
@@ -104,8 +109,8 @@ export const Home: React.FC = () => {
                 style={{ width: `${Math.min(100, (xp / (level * 100)) * 100)}%` }}
               />
             </div>
-            <p className="relative z-10 text-sm font-medium text-slate-500">
-              Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.
+            <p className="text-sm font-medium text-text-main/50 mt-1">
+              {petState?.mood_reason || 'Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
             </p>
           </section>
 
