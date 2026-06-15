@@ -7,9 +7,14 @@ import { SnapCard } from '../components/SnapCard';
 import { mockSnaps } from '../mocks/snapData';
 import { SnapFAB } from '../components/SnapFAB';
 import { Flame } from 'lucide-react';
+import { useGetPetStateQuery } from '../store/api/farmApi';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { data: petState } = useGetPetStateQuery();
+
+  const xpNeeded = (petState?.level ?? 1) * 100;
+  const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
 
   // Fetch authoritative pet status from backend
   const { data: petStatus } = usePetStatus();
@@ -85,7 +90,9 @@ export const Home: React.FC = () => {
             <div className="w-full h-4 rounded-full bg-bg-surface-2 relative overflow-hidden border border-border-main/20">
               <div className="absolute top-0 left-0 h-full bg-primary rounded-full border-t border-primary-light shadow-sm" style={{ width: `${Math.min(100, (xp / (level * 100)) * 100)}%` }}></div>
             </div>
-            <p className="text-sm font-medium text-text-main/50 mt-1">Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.</p>
+            <p className="text-sm font-medium text-text-main/50 mt-1">
+              {petState?.mood_reason || 'Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
+            </p>
           </section>
 
           {/* Main CTA Button (Mobile only) */}

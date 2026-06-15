@@ -1,9 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { api } from '../api/client';
 
 export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1';
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleGoogleLogin = () => {
+    window.location.assign(`${apiBaseUrl}/auth/google`);
+  };
+
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const res = await api.post('/auth/login', {
+        email: 'user@farmy.com',
+        password: 'UserPassword123',
+      });
+      const token = res.data?.data?.accessToken;
+      if (token) {
+        localStorage.setItem('access_token', token);
+        navigate('/home');
+      } else {
+        setErrorMsg('Không lấy được token đăng nhập!');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.response?.data?.message || 'Đăng nhập thử nghiệm thất bại!');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-[100svh] flex flex-col relative overflow-hidden bg-bg-surface md:justify-center md:items-center">
@@ -68,6 +99,14 @@ export const WelcomeAuth: React.FC = () => {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
               Continue with Google
+            </button>
+            <button
+              onClick={handleDemoLogin}
+              type="button"
+              disabled={loading}
+              className="w-full bg-primary text-white font-bold py-3.5 px-6 rounded-full flex items-center justify-center gap-3 transition-all duration-100 ease-in-out shadow-md hover:bg-primary-dark active:scale-95 cursor-pointer disabled:opacity-50"
+            >
+              {loading ? 'Đang kết nối...' : 'Đăng nhập Demo (user@farmy.com)'}
             </button>
           </div>
           <p className="text-sm text-text-main/60 text-center mt-2">

@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, BookText, Bot, User, Sprout } from 'lucide-react';
+import { useGetPetStateQuery } from '../../store/api/farmApi';
 
 export const Sidebar: React.FC = () => {
+  const { data: petState } = useGetPetStateQuery();
+
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
@@ -52,7 +55,7 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* Footer area inside sidebar (optional) */}
+      {/* Footer area inside sidebar */}
       <div className="p-6 border-t border-border-main/30 bg-bg-surface-1/50">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
@@ -60,10 +63,14 @@ export const Sidebar: React.FC = () => {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-text-main">Hải Nông Dân</span>
-            <span className="text-xs text-text-main/50 font-medium">Cấp độ 4</span>
+            <span className="text-xs text-text-main/50 font-medium">
+              Cấp độ {petState?.level ?? 1}
+            </span>
           </div>
         </div>
       </div>
     </aside>
   );
 };
+
+export default Sidebar;
