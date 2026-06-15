@@ -11,16 +11,21 @@ export const OnboardingStep3: React.FC = () => {
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-blue-100 to-green-50 overflow-hidden font-sans">
-      
+
       {/* Top App Bar (Branding) */}
-      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-8 py-4 bg-white/10 backdrop-blur-sm max-w-[1024px] mx-auto right-0 left-0">
-        <div className="flex items-center gap-2">
-          <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+      <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
+        <button
+          onClick={() => navigate('/onboarding-2')}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-slate-200/50 text-slate-700 transition-transform active:scale-90"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          <h1 className="text-xl font-extrabold text-primary">FarmDiaries AI</h1>
+        </button>
+        <div className="flex h-10 items-center justify-center rounded-full bg-white/80 px-5 backdrop-blur-md shadow-sm border border-slate-200/50">
+          <span className="text-sm font-extrabold text-slate-800 tracking-tight">FarmDiaries</span>
         </div>
+        <div className="w-10 h-10" /> {/* Spacer */}
       </header>
 
       {/* Main Canvas */}
@@ -50,17 +55,17 @@ export const OnboardingStep3: React.FC = () => {
             <path d="M12 2C8.69 2 6 4.69 6 8c0 3.31 2.69 6 6 6s6-2.69 6-6c0-3.31-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" />
           </svg>
         </div>
-        
+
         {/* Bottom/Right Sheet UI */}
         <section className="w-full md:w-1/2 bg-white md:bg-white/90 md:backdrop-blur-xl z-50 rounded-t-[40px] md:rounded-3xl px-6 pt-8 pb-12 flex flex-col items-center gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.08),inset_0_-4px_8px_rgba(0,0,0,0.05)] md:shadow-xl md:border md:border-border-main/50 transition-transform self-end md:self-center md:mr-8 md:py-12 absolute md:relative bottom-0 md:bottom-auto">
-          
+
           {/* Progress Indicator */}
-          <div className="flex gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-primary/20"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-primary/20"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-primary-container"></div>
+          <div className="flex items-center gap-1.5 mb-2" aria-label="Onboarding progress: step 3 of 3">
+            <div className="h-1.5 w-1.5 rounded-full bg-slate-200" />
+            <div className="h-1.5 w-1.5 rounded-full bg-slate-200" />
+            <div className="h-1.5 w-6 rounded-full bg-slate-800" />
           </div>
-          
+
           {/* Content */}
           <div className="text-center space-y-4 px-4">
             <h2 className="text-2xl font-bold text-text-h leading-tight">
@@ -70,21 +75,23 @@ export const OnboardingStep3: React.FC = () => {
               Cho phép Bé Thóc gửi thông báo nhanh để cập nhật tình trạng sức khỏe cây trồng của bạn.
             </p>
           </div>
-          
+
           {/* Action Area */}
-          <div className="w-full flex flex-col items-center gap-4 mt-4">
-            <button 
+          <div className="w-full max-w-[340px] mt-6 space-y-4">
+            <button
               onClick={handleFinish}
-              className="w-full max-w-sm py-4 px-8 bg-primary-container text-white font-bold text-lg rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.08),inset_0_-4px_8px_rgba(0,0,0,0.05)] active:scale-95 transition-transform"
+              className="w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center bg-slate-900 hover:bg-slate-800 shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer"
             >
               Cho phép thông báo
             </button>
-            <button 
-              onClick={handleFinish}
-              className="py-2 text-border-main font-bold hover:text-primary transition-colors"
-            >
-              Để sau
-            </button>
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={handleFinish}
+                className="text-text-main/50 font-bold hover:text-text-main text-sm transition-colors cursor-pointer"
+              >
+                Để sau
+              </button>
+            </div>
           </div>
         </section>
       </main>

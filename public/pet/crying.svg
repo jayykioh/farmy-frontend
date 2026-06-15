@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <style>
+    @keyframes bawl-shake {
+      0%, 100% { transform: translateY(0px) scaleY(1) scaleX(1) rotate(-2deg); }
+      25% { transform: translateY(4px) scaleY(0.92) scaleX(1.08) rotate(1deg); }
+      50% { transform: translateY(-1px) scaleY(1.02) scaleX(0.98) rotate(-1deg); }
+      75% { transform: translateY(3px) scaleY(0.94) scaleX(1.06) rotate(2deg); }
+    }
+    @keyframes frantic-wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-8deg); }
+      75% { transform: rotate(8deg); }
+    }
+    @keyframes waterfall-tear-left {
+      0% { transform: translateY(0px) scale(0.5); opacity: 0; }
+      10% { transform: translateY(4px) scale(1.2); opacity: 1; }
+      70% { transform: translateY(30px) scale(0.8); opacity: 1; }
+      90% { transform: translateY(40px) scale(0); opacity: 0; }
+      100% { transform: translateY(40px) scale(0); opacity: 0; }
+    }
+    @keyframes waterfall-tear-right {
+      0% { transform: translateY(0px) scale(0.5); opacity: 0; }
+      15% { transform: translateY(4px) scale(1.3); opacity: 1; }
+      65% { transform: translateY(35px) scale(0.7); opacity: 1; }
+      85% { transform: translateY(45px) scale(0); opacity: 0; }
+      100% { transform: translateY(45px) scale(0); opacity: 0; }
+    }
+    @keyframes shadow-tremble {
+      0%, 100% { transform: scaleX(0.95) scaleY(0.95); opacity: 0.5; }
+      25%, 75% { transform: scaleX(1.08) scaleY(1.08); opacity: 0.7; }
+    }
+    @keyframes flail-arm-left {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      50% { transform: rotate(30deg) translateY(-8px) translateX(2px); }
+    }
+    @keyframes flail-arm-right {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      50% { transform: rotate(-30deg) translateY(-8px) translateX(-2px); }
+    }
+    
+    .character {
+      animation: bawl-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+      transform-origin: 50% 95px;
+    }
+    .sprout {
+      animation: frantic-wiggle 0.3s ease-in-out infinite;
+      transform-origin: 50% 12px;
+    }
+    .tear-l {
+      animation: waterfall-tear-left 0.7s linear infinite;
+      transform-origin: 35px 65px;
+    }
+    .tear-r {
+      animation: waterfall-tear-right 0.8s linear infinite;
+      animation-delay: 0.2s;
+      transform-origin: 65px 65px;
+    }
+    .shadow-el {
+      animation: shadow-tremble 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+      transform-origin: 50% 112px;
+    }
+    .left-arm {
+      animation: flail-arm-left 0.4s ease-in-out infinite;
+      transform-origin: 32px 70px;
+    }
+    .right-arm {
+      animation: flail-arm-right 0.45s ease-in-out infinite;
+      transform-origin: 68px 70px;
+    }
+  </style>
+  
+  <!-- Soft Shadow -->
+  <ellipse class="shadow-el" cx="50" cy="112" rx="23" ry="3.5" fill="#CBD5E1"/>
+  
+  <!-- Character Group -->
+  <g class="character">
+    <!-- Base Stem -->
+    <path d="M 50 96 Q 50 108, 47 110" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Stubby Legs -->
+    <path d="M 42 94 L 40 106 Q 37 106, 36 108 L 43 108 L 44 94" fill="#6C3A00"/>
+    <path d="M 58 94 L 60 106 Q 63 106, 64 108 L 57 108 L 56 94" fill="#6C3A00"/>
+
+    <!-- Rice Grain Body -->
+    <path d="M50 12 C65 35, 72 65, 68 90 C66 96, 34 96, 32 90 C28 65, 35 35, 50 12 Z" fill="#FFC000" stroke="#6C3A00" stroke-width="3.5" stroke-linejoin="round"/>
+    
+    <!-- Grain Highlight -->
+    <path d="M50 15.5 C38 36, 34 65, 36 88 C38 89.5, 42 89.5, 43.5 88 C40 65, 43 36, 50 15.5 Z" fill="#FFE066" opacity="0.7"/>
+
+    <!-- Ridges -->
+    <path d="M43 18 C37 42, 37 68, 41 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+    <path d="M57 18 C63 42, 63 68, 59 90" fill="none" stroke="#E0A000" stroke-width="2" opacity="0.6"/>
+
+    <!-- Sprout -->
+    <g class="sprout">
+      <path d="M50 12 Q53 7, 51 0 Q48 6, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+      <path d="M50 12 Q43 8, 38 4 Q45 11, 50 12 Z" fill="#2ECC71" stroke="#27AE60" stroke-width="1.5"/>
+    </g>
+
+    <!-- Left Arm -->
+    <g class="left-arm">
+      <path d="M 32 70 L 22 66 Q 19 65, 18 68 Q 17 71, 21 72" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Right Arm -->
+    <g class="right-arm">
+      <path d="M 68 70 L 78 66 Q 81 65, 82 68 Q 83 71, 79 72" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Bawling Eyes (> <) -->
+    <path d="M 32 63 L 38 66 L 32 69" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 64 63 L 58 66 L 64 69" fill="none" stroke="#6C3A00" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Open Wailing Mouth -->
+    <path d="M43 75 Q48 88, 53 75 Z" fill="#6C3A00" stroke="#6C3A00" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Tongue -->
+    <path d="M45 79 Q48 84, 51 79 Z" fill="#FF8A8A"/>
+
+    <!-- Left Tears -->
+    <g class="tear-l">
+      <path d="M37 66 C35 66, 33 68, 33 70 C33 72, 35 74, 37 74 C39 74, 41 72, 41 70 C41 68, 39 66, 37 66 Z" fill="#60A5FA" opacity="0.8"/>
+      <path d="M35 72 L35 85" fill="none" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    </g>
+    
+    <!-- Right Tears -->
+    <g class="tear-r">
+      <path d="M59 66 C57 66, 55 68, 55 70 C55 72, 57 74, 59 74 C61 74, 63 72, 63 70 C63 68, 61 66, 59 66 Z" fill="#60A5FA" opacity="0.8"/>
+      <path d="M61 72 L61 82" fill="none" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    </g>
+  </g>
+</svg>

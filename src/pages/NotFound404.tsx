@@ -10,34 +10,28 @@ export const NotFound404: React.FC = () => {
       <div className="flex-1" />
 
       {/* Error Container */}
-      <div className="w-full max-w-md flex flex-col items-center gap-8">
+      <div className="w-full max-w-md flex flex-col items-center gap-8 relative z-10">
         
-        {/* Animated Error Icon */}
-        <div className="relative w-32 h-32 flex items-center justify-center">
-          {/* Confused Bé Thóc Illustration */}
-          <div className="w-32 h-32 bg-gradient-to-br from-primary-container/30 to-primary/10 rounded-full flex items-center justify-center animate-pulse">
-            <svg className="w-24 h-24 text-primary" fill="currentColor" viewBox="0 0 24 24">
-              {/* Cute confused character */}
-              <circle cx="12" cy="10" r="3" />
-              <circle cx="8" cy="8" r="1.5" />
-              <circle cx="16" cy="8" r="1.5" />
-              <path d="M9 14c0 1.66 1.34 3 3 3s3-1.34 3-3" strokeWidth="1.5" stroke="currentColor" fill="none" />
-              <path d="M7 6c2-2 8-2 10 0" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" />
-            </svg>
-          </div>
+        {/* Animated Error Mascot */}
+        <div className="relative w-48 h-48 flex items-center justify-center -mb-4">
+          {/* Confused / Crying Bé Thóc Illustration */}
+          <div className="absolute inset-0 bg-gradient-to-br from-error-container/40 to-warning/10 rounded-[40px] blur-2xl animate-pulse"></div>
+          <img src="/pet/crying.svg" alt="Bé Thóc đang khóc" className="w-full h-full object-contain relative z-10 drop-shadow-xl" draggable={false} />
           
           {/* Question Mark Badge */}
-          <div className="absolute -top-2 -right-2 w-12 h-12 bg-warning rounded-full flex items-center justify-center shadow-md">
-            <span className="text-2xl font-bold text-white">?</span>
+          <div className="absolute top-2 -right-2 w-14 h-14 bg-error rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(186,26,26,0.3)] z-20 border-[3px] border-white animate-bounce" style={{ animationDuration: '2s' }}>
+            <span className="text-3xl font-black text-white leading-none mb-1">?</span>
           </div>
         </div>
 
         {/* Error Text */}
-        <div className="text-center space-y-3">
-          <h1 className="text-5xl font-black text-text-h">404</h1>
-          <p className="text-2xl font-bold text-text-main">Trang không tìm thấy</p>
-          <p className="text-base text-text-main/60 leading-relaxed">
-            Có vẻ như Bé Thóc không tìm thấy trang bạn đang tìm kiếm. Nó cũng bối rối như một cây mưa trong mùa hè lắm!
+        <div className="text-center space-y-4">
+          <h1 className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-error to-warning drop-shadow-sm tracking-tighter">
+            404
+          </h1>
+          <h2 className="text-2xl md:text-3xl font-black text-text-main tracking-tight">Ôi không! Lạc đường mất rồi</h2>
+          <p className="text-base md:text-lg text-text-main/70 leading-relaxed font-medium max-w-[85%] mx-auto">
+            Bé Thóc đang khóc nhè vì không tìm thấy trang bạn cần. Lối này có vẻ không dẫn đến nông trại của chúng ta đâu.
           </p>
         </div>
 

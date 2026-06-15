@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 
 export const OnboardingStep1: React.FC = () => {
   const navigate = useNavigate();
+  const [selectedCrop, setSelectedCrop] = useState<string>('lua-nuoc');
+
+  const crops = [
+    { id: 'lua-nuoc', label: '🌾 Lúa nước' },
+    { id: 'cay-an-trai', label: '🍎 Cây ăn trái' },
+    { id: 'ca-phe', label: '☕ Cà phê' },
+    { id: 'rau-mau', label: '🥬 Rau màu' },
+    { id: 'khac', label: '🌱 Khác' },
+  ];
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-x-hidden bg-gradient-to-b from-bg-surface via-bg-main to-primary-lightest/20 text-left font-sans">
@@ -11,22 +20,12 @@ export const OnboardingStep1: React.FC = () => {
       <div className="pointer-events-none absolute -right-24 bottom-24 h-80 w-80 rounded-full bg-secondary-light/35 blur-3xl" />
 
       {/* Responsive onboarding app bar */}
-      <header className="fixed left-4 right-4 top-4 z-50 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/60 bg-white/80 px-4 py-3 shadow-[0_12px_32px_rgba(20,30,23,0.08)] backdrop-blur-md md:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-primary-container shadow-sm">
-            <MascotLottie className="h-12 w-12 -mt-2" />
-          </div>
-          <div className="min-w-0">
-            <h1 className="truncate text-lg font-extrabold tracking-tight text-primary md:text-xl">FarmDiaries AI</h1>
-            <p className="hidden text-xs font-extrabold uppercase tracking-[0.18em] text-text-secondary/70 md:block">Farm setup</p>
-          </div>
+      <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
+        <div className="w-10 h-10" /> {/* Spacer */}
+        <div className="flex h-10 items-center justify-center rounded-full bg-white/80 px-5 backdrop-blur-md shadow-sm border border-slate-200/50">
+          <span className="text-sm font-extrabold text-slate-800 tracking-tight">FarmDiaries</span>
         </div>
-
-        <button aria-label="Notifications" className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-primary transition-colors duration-200 hover:bg-bg-surface-1 focus:outline-none focus:ring-2 focus:ring-primary-light active:scale-95">
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        </button>
+        <div className="w-10 h-10" /> {/* Spacer */}
       </header>
 
       <main className="relative z-10 mx-auto grid min-h-[100svh] w-full max-w-6xl grid-cols-1 items-end px-4 pb-0 pt-28 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(440px,520px)] lg:items-center lg:gap-12 lg:pb-8 lg:pt-28">
@@ -56,13 +55,13 @@ export const OnboardingStep1: React.FC = () => {
         </section>
 
         {/* Setup panel */}
-        <section className="z-20 flex w-full flex-col items-center gap-6 rounded-t-[40px] border-x border-t border-border-main/40 bg-white/90 px-6 pb-10 pt-8 shadow-[0_-20px_60px_rgba(0,0,0,0.05)] backdrop-blur-md md:mx-auto md:max-w-[520px] md:rounded-[32px] md:border md:shadow-[0_24px_70px_rgba(20,30,23,0.10)] lg:mx-0 lg:min-h-0 lg:p-8">
+        <section className="z-20 flex w-full flex-col items-center gap-6 rounded-t-[40px] border-x border-t border-border-main/40 bg-white/90 px-6 pb-10 pt-8 shadow-[0_-20px_60px_rgba(0,0,0,0.05)] backdrop-blur-md md:mx-auto md:max-w-[440px] md:rounded-[32px] md:border md:shadow-[0_24px_70px_rgba(20,30,23,0.10)] lg:mx-0 lg:min-h-0 lg:p-8">
           <div className="mb-2 h-1.5 w-12 rounded-full bg-text-main/10 lg:hidden" />
 
-          <div className="flex items-center gap-2" aria-label="Onboarding progress: step 1 of 3">
-            <div className="h-2.5 w-8 rounded-full bg-primary-container" />
-            <div className="h-2.5 w-2.5 rounded-full bg-border-main" />
-            <div className="h-2.5 w-2.5 rounded-full bg-border-main" />
+          <div className="flex items-center gap-1.5 mb-2" aria-label="Onboarding progress: step 1 of 3">
+            <div className="h-1.5 w-6 rounded-full bg-slate-800" />
+            <div className="h-1.5 w-1.5 rounded-full bg-slate-200" />
+            <div className="h-1.5 w-1.5 rounded-full bg-slate-200" />
           </div>
 
           <div className="w-full space-y-7">
@@ -72,46 +71,44 @@ export const OnboardingStep1: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-2">
+              <div className="space-y-2 w-full max-w-[340px] mx-auto text-left">
                 <label htmlFor="farm-name" className="ml-2 text-sm font-bold text-text-main/70">Tên nông trại của bạn</label>
                 <div className="relative">
-                  <input id="farm-name" className="h-14 w-full rounded-full border border-border-main/50 bg-bg-main px-6 text-base font-semibold transition-all placeholder:text-text-main/30 focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Ví dụ: Vườn Nhà Bé Thóc" type="text" />
+                  <input id="farm-name" className="h-13 w-full rounded-full border border-border-main/50 bg-bg-main px-6 text-base font-semibold transition-all placeholder:text-text-main/30 focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Ví dụ: Vườn Nhà Bé Thóc" type="text" />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <p className="ml-2 text-sm font-bold text-text-main/70">Loại cây trồng chính</p>
-                <div className="flex flex-wrap gap-3">
-                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full bg-primary-container px-5 py-3 font-bold text-white shadow-lg transition-colors duration-200 hover:bg-primary active:scale-95 flex items-center justify-center gap-2">
-                    🌾 Lúa nước
-                  </button>
-                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
-                    🍎 Cây ăn trái
-                  </button>
-                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
-                    ☕ Cà phê
-                  </button>
-                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
-                    🥬 Rau màu
-                  </button>
-                  <button type="button" className="min-h-12 flex-auto cursor-pointer rounded-full border border-border-main bg-white px-5 py-3 font-bold text-text-main/70 transition-colors duration-200 hover:bg-bg-surface active:scale-95 flex items-center justify-center gap-2">
-                    🌱 Khác
-                  </button>
+              <div className="space-y-2 w-full max-w-[340px] mx-auto text-left">
+                <label className="ml-2 text-xs font-black uppercase tracking-wider text-text-main/50">Loại cây trồng chính</label>
+                <div className="flex flex-wrap gap-2 w-full">
+                  {crops.map((crop) => {
+                    const isSelected = selectedCrop === crop.id;
+                    return (
+                      <button
+                        key={crop.id}
+                        type="button"
+                        onClick={() => setSelectedCrop(crop.id)}
+                        className={`inline-flex items-center justify-center px-4 h-10 rounded-full font-extrabold text-sm transition-all duration-100 cursor-pointer ${
+                          isSelected
+                            ? 'bg-slate-900 text-white shadow-sm scale-95'
+                            : 'bg-slate-100/90 hover:bg-slate-200/70 text-slate-800'
+                        } active:scale-90 focus:outline-none`}
+                      >
+                        {crop.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-2 w-full max-w-[340px] mx-auto mt-2 mb-4">
               <button
                 onClick={() => navigate('/onboarding-2')}
-                className="group flex h-16 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary-container text-lg font-bold text-white shadow-[0_10px_20px_rgba(0,109,53,0.2),inset_0_-4px_0_rgba(0,0,0,0.1)] transition-all duration-200 hover:bg-primary active:scale-95 active:shadow-[0_4px_10px_rgba(0,109,53,0.1),inset_0_-2px_0_rgba(0,0,0,0.05)] focus:outline-none focus:ring-4 focus:ring-primary-light/50"
+                className="w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center bg-slate-900 hover:bg-slate-800 shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer"
               >
                 Tiếp theo
-                <svg className="h-6 w-6 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
               </button>
-              <p className="mt-6 text-center text-sm font-bold text-border-main">Bước 1 trong 3</p>
             </div>
           </div>
         </section>

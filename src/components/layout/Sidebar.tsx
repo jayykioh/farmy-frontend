@@ -11,18 +11,18 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-[100svh] fixed left-0 top-0 bg-white border-r border-border-main/50 shadow-sm z-50">
+    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-bg-main border-r border-border-main/40 z-50">
       
       {/* Brand / Logo */}
-      <div className="h-16 flex items-center gap-3 px-6 border-b border-border-main/30">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
-          <Sprout size={20} />
+      <div className="h-14 flex items-center gap-2.5 px-6 mt-5 mb-3">
+        <div className="flex items-center justify-center text-primary">
+          <Sprout size={24} strokeWidth={2.5} />
         </div>
-        <span className="font-extrabold text-xl text-primary tracking-tight">FarmDiaries</span>
+        <span className="font-semibold text-[15px] text-text-main tracking-tight">FarmDiaries</span>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
+      <nav className="flex-1 px-3.5 flex flex-col gap-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -30,21 +30,23 @@ export const Sidebar: React.FC = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary font-bold' 
-                    : 'text-text-main/70 hover:bg-bg-surface-1 hover:text-text-main font-medium'
+                `group relative flex items-center gap-3 px-3 py-2 rounded-[10px] transition-all duration-300 ease-out outline-none select-none active:scale-[0.96] ${
+                  isActive
+                    ? 'bg-bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] text-primary-container font-medium'
+                    : 'text-text-muted hover:bg-black/[0.04] hover:text-text-main'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon 
-                    size={20} 
-                    strokeWidth={isActive ? 2.5 : 2} 
-                    className={isActive ? 'text-primary' : 'text-text-main/50 group-hover:text-text-main'} 
+                  <Icon
+                    size={18}
+                    strokeWidth={isActive ? 2.5 : 2}
+                    className={`transition-colors duration-300 ${
+                      isActive ? 'text-primary-container' : 'text-text-muted group-hover:text-text-main'
+                    }`}
                   />
-                  <span>{item.label}</span>
+                  <span className="text-[13.5px] leading-none mt-[1px]">{item.label}</span>
                 </>
               )}
             </NavLink>
@@ -52,15 +54,15 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* Footer area inside sidebar (optional) */}
-      <div className="p-6 border-t border-border-main/30 bg-bg-surface-1/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+      {/* Footer area inside sidebar */}
+      <div className="p-3 mb-2">
+        <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] hover:bg-black/[0.04] transition-colors duration-300 cursor-pointer active:scale-[0.96]">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-light to-primary border border-primary/20 flex items-center justify-center font-bold text-white text-[13px] shadow-sm">
             H
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-text-main">Hải Nông Dân</span>
-            <span className="text-xs text-text-main/50 font-medium">Cấp độ 4</span>
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <span className="text-[13px] font-medium text-text-main truncate">Hải Nông Dân</span>
+            <span className="text-[11.5px] text-text-muted truncate mt-[1px]">Cấp độ 4</span>
           </div>
         </div>
       </div>
