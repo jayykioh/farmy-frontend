@@ -50,7 +50,7 @@ export function App() {
               <Route path="/diary/history" element={<DiaryHistory />} />
               <Route path="/diary/create" element={<CreateDiary />} />
               <Route path="/chat/active" element={<ChatActive />} />
-              <Route path="/chat-list" element={<ChatList />} />
+              <Route path="/chat" element={<ChatList />} />
               <Route path="/scan" element={<PlantScan />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
@@ -62,13 +62,13 @@ export function App() {
               <Route path="/celebration" element={<Celebration />} />
               <Route path="/farm-feed" element={<FarmFeed />} />
               <Route path="/snap/:id" element={<SnapDetail />} />
-              
+
               {/* Error & Status Pages - Outside MainLayout */}
               <Route path="/loading" element={<LoadingScreen />} />
               <Route path="/network-error" element={<NetworkError />} />
               <Route path="/maintenance" element={<MaintenanceMode />} />
               <Route path="/404" element={<NotFound404 />} />
-              
+
               {/* Catch-all 404 */}
               <Route path="*" element={<NotFound404 />} />
             </Route>

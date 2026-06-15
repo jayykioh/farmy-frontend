@@ -46,7 +46,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       return (
         <button
           onClick={handleLeftClick}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-bg-surface active:scale-95 transition-all text-text-main"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/[0.04] active:scale-95 transition-all text-text-main"
           aria-label="Close"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,11 +60,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     return (
       <button
         onClick={handleLeftClick}
-        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-bg-surface active:scale-95 transition-all text-text-main"
+        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/[0.04] active:scale-95 transition-all text-text-main"
         aria-label="Go back"
       >
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
     );
@@ -79,7 +79,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       return (
         <button
           onClick={onRightClick}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-bg-surface active:scale-95 transition-all text-text-main"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/[0.04] active:scale-95 transition-all text-text-main"
           aria-label="Notifications"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +98,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       return (
         <button
           onClick={onRightClick}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-bg-surface active:scale-95 transition-all text-text-main"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/[0.04] active:scale-95 transition-all text-text-main"
           aria-label="Camera"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,16 +118,16 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   };
 
   const desktopClass = showOnDesktop ? 'md:flex' : 'hidden md:hidden';
-  const sidebarClass = hasSidebar ? 'md:ml-64' : '';
+  const sidebarClass = hasSidebar ? 'md:ml-[260px]' : '';
 
   return (
     <header
-      className={`bg-white/80 backdrop-blur-md border-b border-border-main/50 shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-8 py-3 max-w-3xl left-1/2 -translate-x-1/2 md:max-w-none md:left-0 md:-translate-x-0 ${sidebarClass} ${desktopClass} ${className}`}
+      className={`bg-bg-main/80 backdrop-blur-md border-b border-border-main/40 shadow-sm fixed top-0 w-full z-40 flex justify-between items-center px-2 md:px-8 py-2.5 max-w-3xl left-1/2 -translate-x-1/2 md:max-w-none md:left-0 md:-translate-x-0 ${sidebarClass} ${desktopClass} transition-all duration-300 ${className}`}
     >
       {renderLeftButton()}
       <div className="flex flex-col items-center justify-center flex-1">
-        <h1 className="text-xl font-extrabold text-primary">{title}</h1>
-        {subtitle && <p className="font-bold text-xs text-text-main/70">{subtitle}</p>}
+        <h1 className="text-[17px] font-bold text-text-main tracking-tight">{title}</h1>
+        {subtitle && <p className="font-medium text-[11.5px] text-text-muted mt-[1px]">{subtitle}</p>}
       </div>
       {renderRightButton()}
     </header>
