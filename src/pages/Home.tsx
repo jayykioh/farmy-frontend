@@ -13,9 +13,6 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { data: petState } = useGetPetStateQuery();
 
-  const xpNeeded = (petState?.level ?? 1) * 100;
-  const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
-
   // Fetch authoritative pet status from backend
   const { data: petStatus } = usePetStatus();
 

@@ -11,6 +11,7 @@ import {
 } from 'redux-persist';
 import authReducer from './slices/authSlice';
 import uiReducer from './slices/uiSlice';
+import { baseApi } from './api/baseApi';
 
 const createNoopStorage = () => {
   return {
@@ -47,6 +48,7 @@ const storage = typeof window !== 'undefined' ? createLocalStorage() : createNoo
 const rootReducer = combineReducers({
   auth: authReducer,
   ui: uiReducer,
+  [baseApi.reducerPath]: baseApi.reducer,
 });
 
 const persistConfig = {
@@ -65,7 +67,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(baseApi.middleware),
 });
 
 export const persistor = persistStore(store);

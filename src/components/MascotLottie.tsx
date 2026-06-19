@@ -16,6 +16,7 @@ interface MascotLottieProps extends Omit<LottieComponentProps, 'animationData'> 
  * Renders SVG assets from public/pet for main moods, falls back to Lottie for others.
  */
 export const MascotLottie: React.FC<MascotLottieProps> = ({ className, state = 'happy', ...props }) => {
+  const currentMood = state;
   const svgStates = ['happy', 'excited', 'neutral', 'sad', 'worried', 'hungry', 'sleepy', 'sleeping'];
 
   if (svgStates.includes(state)) {

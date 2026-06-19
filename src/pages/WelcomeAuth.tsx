@@ -5,13 +5,8 @@ import { api } from '../api/client';
 
 export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1';
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-
-  const handleGoogleLogin = () => {
-    window.location.assign(`${apiBaseUrl}/auth/google`);
-  };
 
   const handleDemoLogin = async () => {
     setLoading(true);
@@ -100,6 +95,13 @@ export const WelcomeAuth: React.FC = () => {
               </svg>
               Continue with Google
             </button>
+
+            {errorMsg && (
+              <p className="text-sm text-[#BA1A1A] text-center bg-[#FFDAD6] border border-[#BA1A1A]/20 rounded-full py-2 px-4 font-bold my-1">
+                {errorMsg}
+              </p>
+            )}
+
             <button
               onClick={handleDemoLogin}
               type="button"
