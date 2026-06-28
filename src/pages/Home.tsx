@@ -6,15 +6,13 @@ import { PET_MOOD_UI_MAP } from '../features/pet/constants/petMood.constants';
 import { SnapCard } from '../components/SnapCard';
 import { mockSnaps } from '../mocks/snapData';
 import { SnapFAB } from '../components/SnapFAB';
-import { Flame } from 'lucide-react';
+import { Flame, Droplets, ScanLine, MessageSquare, PenLine, Sprout, ChevronRight } from 'lucide-react';
 import { useGetPetStateQuery } from '../store/api/farmApi';
+import { Button } from '../components/ui/Button';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { data: petState } = useGetPetStateQuery();
-
-  const xpNeeded = (petState?.level ?? 1) * 100;
-  const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
 
   // Fetch authoritative pet status from backend
   const { data: petStatus } = usePetStatus();
@@ -63,18 +61,15 @@ export const Home: React.FC = () => {
 
           {/* Main CTA Button (Desktop prominent) */}
           <section className="w-full hidden md:block mt-2">
-            <button 
+            <Button 
               onClick={() => navigate('/diary/create')}
-              className="group relative w-full overflow-hidden bg-primary text-white font-bold text-lg md:text-xl py-4 md:py-5 px-6 rounded-[24px] shadow-[0_8px_20px_rgba(8,168,85,0.3)] hover:shadow-[0_12px_24px_rgba(8,168,85,0.4)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_4px_10px_rgba(8,168,85,0.3)] flex justify-center items-center gap-3 transition-all duration-300"
+              size="lg"
+              fullWidth
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none opacity-50"></div>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-              <svg className="w-6 h-6 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              <span className="relative z-10 tracking-wide">Ghi nhật ký hôm nay</span>
-              <span className="relative z-10 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-lg text-sm ml-1 font-semibold border border-white/10">+30XP</span>
-            </button>
+              <PenLine className="w-5 h-5" />
+              <span className="tracking-wide">Ghi nhật ký hôm nay</span>
+              <span className="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-md text-xs font-semibold border border-white/10">+30XP</span>
+            </Button>
           </section>
 
         </div>
@@ -116,17 +111,15 @@ export const Home: React.FC = () => {
 
           {/* Main CTA Button (Mobile only) */}
           <section className="w-full md:hidden">
-            <button 
+            <Button 
               onClick={() => navigate('/diary/create')}
-              className="group relative w-full overflow-hidden bg-primary text-white font-bold text-lg py-4 px-6 rounded-[20px] shadow-[0_8px_20px_rgba(8,168,85,0.3)] hover:shadow-[0_12px_24px_rgba(8,168,85,0.4)] active:scale-[0.98] active:shadow-[0_4px_10px_rgba(8,168,85,0.3)] flex justify-center items-center gap-3 transition-all duration-300"
+              size="lg"
+              fullWidth
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none opacity-50"></div>
-              <svg className="w-6 h-6 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              <span className="relative z-10 tracking-wide">Ghi nhật ký</span>
-              <span className="relative z-10 bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-lg text-sm ml-1 font-semibold border border-white/10">+30XP</span>
-            </button>
+              <PenLine className="w-5 h-5" />
+              <span className="tracking-wide">Ghi nhật ký</span>
+              <span className="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-md text-xs font-semibold border border-white/10">+30XP</span>
+            </Button>
           </section>
           
           {/* Quick Actions Grid */}
@@ -135,47 +128,34 @@ export const Home: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
               
               {/* Task 1 */}
-              <button 
+              <Button 
                 onClick={() => navigate('/reminders')}
-                className="group relative overflow-hidden bg-white p-4 md:p-5 rounded-[20px] md:rounded-[24px] flex flex-col md:flex-row items-center md:justify-start text-center md:text-left gap-3 md:gap-4 ring-1 ring-slate-100 hover:ring-blue-500/20 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] active:scale-[0.98] transition-all duration-300"
+                variant="outline"
+                className="justify-start gap-3 h-auto py-3 md:py-4 px-4 md:px-5 w-full bg-white text-slate-700 hover:text-slate-900"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-transparent transition-colors duration-300 pointer-events-none"></div>
-                <div className="w-12 h-12 shrink-0 rounded-[16px] bg-blue-50/80 text-blue-500 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-100/80 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                </div>
-                <span className="font-semibold text-slate-700 text-sm md:text-base group-hover:text-blue-700 transition-colors">Watering check</span>
-              </button>
+                <Droplets className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
+                <span className="font-medium">Watering check</span>
+              </Button>
               
               {/* Task 2 */}
-              <button 
+              <Button 
                 onClick={() => navigate('/scan')}
-                className="group relative overflow-hidden bg-white p-4 md:p-5 rounded-[20px] md:rounded-[24px] flex flex-col md:flex-row items-center md:justify-start text-center md:text-left gap-3 md:gap-4 ring-1 ring-slate-100 hover:ring-emerald-500/20 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] active:scale-[0.98] transition-all duration-300"
+                variant="outline"
+                className="justify-start gap-3 h-auto py-3 md:py-4 px-4 md:px-5 w-full bg-white text-slate-700 hover:text-slate-900"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-emerald-500/0 group-hover:from-emerald-500/5 group-hover:to-transparent transition-colors duration-300 pointer-events-none"></div>
-                <div className="w-12 h-12 shrink-0 rounded-[16px] bg-emerald-50/80 text-emerald-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-100/80 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <span className="font-semibold text-slate-700 text-sm md:text-base group-hover:text-emerald-700 transition-colors">Plant health scan</span>
-              </button>
+                <ScanLine className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
+                <span className="font-medium">Plant health scan</span>
+              </Button>
               
               {/* Task 3 */}
-              <button 
+              <Button 
                 onClick={() => navigate('/chat')}
-                className="col-span-2 md:col-span-1 group relative overflow-hidden bg-white p-4 md:p-5 rounded-[20px] md:rounded-[24px] flex flex-row items-center justify-center md:justify-start text-center md:text-left gap-3 md:gap-4 ring-1 ring-slate-100 hover:ring-purple-500/20 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] active:scale-[0.98] transition-all duration-300"
+                variant="outline"
+                className="col-span-2 md:col-span-1 justify-start gap-3 h-auto py-3 md:py-4 px-4 md:px-5 w-full bg-white text-slate-700 hover:text-slate-900"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-transparent transition-colors duration-300 pointer-events-none"></div>
-                <div className="w-12 h-12 shrink-0 rounded-[16px] bg-purple-50/80 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-100/80 transition-all duration-300">
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
-                </div>
-                <span className="font-semibold text-slate-700 text-sm md:text-base group-hover:text-purple-700 transition-colors">Ask AI assistant</span>
-              </button>
+                <MessageSquare className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
+                <span className="font-medium">Ask AI assistant</span>
+              </Button>
             </div>
           </section>
         </div>
@@ -187,16 +167,14 @@ export const Home: React.FC = () => {
         <div className="flex justify-between items-end mb-5 px-1">
           <h3 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
             Farm Feed gần đây 
-            <span className="text-2xl">🌱</span>
+            <Sprout className="w-6 h-6 text-primary" />
           </h3>
           <button 
             onClick={() => navigate('/farm-feed')}
             className="group text-primary font-bold text-sm hover:text-primary-dark flex items-center gap-1 active:scale-95 transition-all duration-200"
           >
             Xem tất cả
-            <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
         

@@ -49,14 +49,11 @@ export const PetMascot: React.FC<PetMascotProps> = ({
       className={`pet-mascot-wrapper ${className}`}
       style={{ position: 'relative', width: size, display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}
     >
-      {showBubble && message && (
-        <PetMoodBubble
-          mood={effectiveMood}
-          message={message}
-          className="pet-mascot-wrapper__bubble"
-        />
-      )}
-
+      {showBubble && message ? (<PetMoodBubble
+        mood={effectiveMood}
+        message={message}
+        className="pet-mascot-wrapper__bubble"
+      />) : null}
       <img
         src={src}
         alt={`Bé Thóc đang ${ui?.label ?? 'trung lập'}`}

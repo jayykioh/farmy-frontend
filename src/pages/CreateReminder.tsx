@@ -7,6 +7,8 @@ import {
   useGetDiariesQuery,
   useCreateReminderMutation,
 } from '../store/api/farmApi';
+import { Droplets, Sprout, FlaskConical, Wheat, MessageCircle, Bell } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 
 export const CreateReminder: React.FC = () => {
   const navigate = useNavigate();
@@ -90,13 +92,11 @@ export const CreateReminder: React.FC = () => {
 
   return (
     <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 relative text-left font-sans flex flex-col">
-      
       {/* Background Content Layer (Diorama effect) */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-50">
         <div className="absolute top-1/4 left-10 w-32 h-32 bg-primary-light/30 blur-[60px] rounded-full animate-pulse"></div>
         <div className="absolute top-1/2 right-0 w-48 h-48 bg-secondary-light/40 blur-[80px] rounded-full"></div>
       </div>
-
       {/* Main Content Simulation (Behind Sheet) */}
       <div className="w-full h-full p-6 pb-40 max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-8">
@@ -111,10 +111,8 @@ export const CreateReminder: React.FC = () => {
           </div>
         </div>
       </div>
-
       {/* Sheet Overlay */}
       <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40 transition-opacity" onClick={() => navigate(-1)}></div>
-
       {/* SCR-09B: Create Reminder Sheet / Modal */}
       <form onSubmit={handleSubmit} className="fixed bottom-0 top-[15%] md:top-auto md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full md:max-w-2xl md:w-[90vw] md:h-auto md:max-h-[85vh] bg-white rounded-t-[40px] md:rounded-[40px] z-50 flex flex-col shadow-2xl overflow-hidden border border-border-main/20">
         
@@ -168,10 +166,10 @@ export const CreateReminder: React.FC = () => {
                         : 'bg-bg-surface-1 border border-border-main/50 text-text-main/70 hover:bg-border-main/30'
                     }`}
                   >
-                    {option === 'Tưới nước' && '💧'}
-                    {option === 'Bón phân' && '🌱'}
-                    {option === 'Phun thuốc' && '🧪'}
-                    {option === 'Làm cỏ' && '🌾'}
+                    {option === 'Tưới nước' ? <Droplets className="w-4 h-4" /> : null}
+                    {option === 'Bón phân' ? <Sprout className="w-4 h-4" /> : null}
+                    {option === 'Phun thuốc' ? <FlaskConical className="w-4 h-4" /> : null}
+                    {option === 'Làm cỏ' ? <Wheat className="w-4 h-4" /> : null}
                     {option}
                   </button>
                 );
@@ -232,9 +230,9 @@ export const CreateReminder: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-white border border-border-main/50 rounded-2xl shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
-                    💧
+                    <MessageCircle className="w-5 h-5" />
                   </div>
-                  <span className="font-bold text-base text-text-main">💬 Nhận qua Zalo (Mock)</span>
+                  <span className="font-bold text-base text-text-main flex items-center gap-2">Nhận qua Zalo (Mock)</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" defaultChecked disabled className="sr-only peer" />
@@ -245,9 +243,9 @@ export const CreateReminder: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-white border border-border-main/50 rounded-2xl shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-primary-lightest/20 flex items-center justify-center text-primary border border-primary/20">
-                    🔔
+                    <Bell className="w-5 h-5" />
                   </div>
-                  <span className="font-bold text-base text-text-main">🔔 Thông báo đẩy thiết bị</span>
+                  <span className="font-bold text-base text-text-main flex items-center gap-2">Thông báo đẩy thiết bị</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" defaultChecked disabled className="sr-only peer" />
@@ -262,15 +260,15 @@ export const CreateReminder: React.FC = () => {
 
         {/* Footer */}
         <div className="px-6 md:px-8 py-4 bg-white/90 backdrop-blur-md border-t border-border-main/30 flex flex-col items-center gap-3 absolute bottom-0 w-full z-10 md:rounded-b-[40px]">
-          <button 
+          <Button 
             type="submit"
             disabled={loading}
-            className={`w-full py-4 bg-primary text-white font-bold text-lg rounded-full shadow-[0_10px_20px_rgba(8,168,85,0.2)] hover:scale-[1.02] active:scale-95 active:shadow-sm transition-all cursor-pointer ${
+            className={`w-full py-4 text-lg rounded-full shadow-[0_10px_20px_rgba(8,168,85,0.2)] hover:scale-[1.02] active:scale-95 active:shadow-sm transition-all cursor-pointer ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             {loading ? 'Đang đặt...' : 'Đặt nhắc nhở'}
-          </button>
+          </Button>
           <button 
             type="button"
             onClick={() => navigate(-1)}

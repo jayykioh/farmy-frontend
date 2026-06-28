@@ -2,16 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { useGetPetStateQuery } from '../store/api/farmApi';
+import { MapPin, Award, Flame, Droplets, Clock, Target, LogOut, PenLine, Medal, ShieldAlert } from 'lucide-react';
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { data: petState, isLoading: loading } = useGetPetStateQuery();
 
   const getLevelTitle = (level: number) => {
-    if (level < 5) return 'Làm Vườn Tập Sự (Novice Farmer) 🪴';
-    if (level < 10) return 'Nông Dân Thực Thụ (Active Farmer) 🚜';
-    if (level < 15) return 'Chuyên Gia Trồng Trọt (Crop Cultivator) 🌾';
-    return 'Vua Nông Trại (Master Farmer) 👑';
+    if (level < 5) return 'Làm Vườn Tập Sự (Novice Farmer)';
+    if (level < 10) return 'Nông Dân Thực Thụ (Active Farmer)';
+    if (level < 15) return 'Chuyên Gia Trồng Trọt (Crop Cultivator)';
+    return 'Vua Nông Trại (Master Farmer)';
   };
 
   const xpNeeded = (petState?.level ?? 1) * 100;
@@ -29,18 +30,13 @@ export const Profile: React.FC = () => {
         <div className="flex-1 z-10">
           <h2 className="text-2xl font-extrabold text-text-h mb-1">Nguyen Van A</h2>
           <p className="text-base text-text-main/70 flex items-center gap-1 font-semibold">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <MapPin className="w-4 h-4" />
             Mekong Delta, Vietnam
           </p>
         </div>
         {/* Badge overlay */}
         <div className="absolute right-4 top-4 bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full font-bold text-xs border border-yellow-200 flex items-center gap-1 z-10 shadow-sm rotate-3">
-          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
-          </svg>
+          <Award className="w-4 h-4" />
           {petState?.level && petState.level >= 15 ? 'Vua Nông Trại' : petState?.level && petState.level >= 10 ? 'Chuyên Gia' : 'Tập Sự'}
         </div>
         {/* Decorative background pattern */}
@@ -83,7 +79,7 @@ export const Profile: React.FC = () => {
       {/* Bảng quy định điểm tích lũy (XP rules table) */}
       <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
         <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
-          🎯 Bảng Quy Đổi Điểm (XP Rules)
+          <Target className="w-5 h-5 text-primary" /> Bảng Quy Đổi Điểm (XP Rules)
         </h3>
         <p className="text-sm text-text-main/70">
           Hãy tích cực thực hiện các hoạt động làm vườn để giúp Bé Thóc mau lớn và thăng cấp!
@@ -99,22 +95,22 @@ export const Profile: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-border-main/20 text-text-main/80 font-medium">
               <tr className="hover:bg-bg-surface-1/50 transition-colors">
-                <td className="p-3">📝 Ghi nhật ký vụ mùa (mỗi ngày)</td>
+                <td className="p-3 flex items-center gap-2"><PenLine className="w-4 h-4" /> Ghi nhật ký vụ mùa (mỗi ngày)</td>
                 <td className="p-3 text-center text-primary font-bold font-mono">+30 XP</td>
                 <td className="p-3 text-xs text-green-600">Vui vẻ / Hào hứng (Excited)</td>
               </tr>
               <tr className="hover:bg-bg-surface-1/50 transition-colors">
-                <td className="p-3">💧 Hoàn thành nhắc nhở sớm</td>
+                <td className="p-3 flex items-center gap-2"><Droplets className="w-4 h-4 text-blue-500" /> Hoàn thành nhắc nhở sớm</td>
                 <td className="p-3 text-center text-primary font-bold font-mono">+10 XP</td>
                 <td className="p-3 text-xs text-green-600">Vui vẻ (Happy)</td>
               </tr>
               <tr className="hover:bg-bg-surface-1/50 transition-colors bg-red-50/10">
-                <td className="p-3 text-error">⏰ Bỏ lỡ nhắc nhở quá giờ</td>
+                <td className="p-3 text-error flex items-center gap-2"><Clock className="w-4 h-4" /> Bỏ lỡ nhắc nhở quá giờ</td>
                 <td className="p-3 text-center text-error font-bold font-mono">0 XP</td>
                 <td className="p-3 text-xs text-error">Buồn bã (Sad)</td>
               </tr>
               <tr className="hover:bg-bg-surface-1/50 transition-colors bg-orange-50/10">
-                <td className="p-3 text-orange-600">⚠️ Báo động sâu bệnh vườn</td>
+                <td className="p-3 text-orange-600 flex items-center gap-2"><ShieldAlert className="w-4 h-4" /> Báo động sâu bệnh vườn</td>
                 <td className="p-3 text-center text-orange-600 font-bold font-mono">0 XP</td>
                 <td className="p-3 text-xs text-orange-600">Lo lắng (Worried)</td>
               </tr>
@@ -127,9 +123,7 @@ export const Profile: React.FC = () => {
       <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
-            <svg className="w-6 h-6 text-orange-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M11.64 5.93h1.43v4.28h-1.43zM11.64 12.36h1.43v1.43h-1.43zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-            </svg>
+            <Flame className="w-6 h-6 text-orange-500 drop-shadow-sm" />
             Chuỗi {petState?.streak_count ?? 0} ngày chăm chỉ liên tiếp!
           </h3>
           <span className="font-bold text-sm bg-bg-surface-1 text-text-main/70 px-3 py-1 rounded-full border border-border-main/30">
@@ -171,19 +165,19 @@ export const Profile: React.FC = () => {
         <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x">
           <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
             <div className="w-14 h-14 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shadow-sm">
-              <svg className="w-7 h-7 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              <Medal className="w-7 h-7 text-yellow-500" />
             </div>
             <span className="font-bold text-sm text-text-main text-center">First Harvest</span>
           </div>
           <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
             <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shadow-sm">
-              <svg className="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              <Droplets className="w-7 h-7 text-blue-500" />
             </div>
             <span className="font-bold text-sm text-text-main text-center">Water Saver</span>
           </div>
           <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
             <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center shadow-sm">
-              <svg className="w-7 h-7 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <ShieldAlert className="w-7 h-7 text-error" />
             </div>
             <span className="font-bold text-sm text-text-main text-center">Pest Hunter</span>
           </div>
@@ -235,7 +229,7 @@ export const Profile: React.FC = () => {
           onClick={() => navigate('/')} 
           className="w-full mt-6 bg-white text-error font-bold text-base py-4 rounded-[20px] border border-error-container hover:bg-error-container/20 active:bg-error-container/40 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <LogOut className="w-5 h-5" />
           Sign Out
         </button>
       </section>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
@@ -7,7 +8,8 @@ import { MascotLottie } from '../components/MascotLottie';
 import { mockSnaps } from '../mocks/snapData';
 import type { FarmSnap } from '../types/farmSnap';
 import { SnapFAB } from '../components/SnapFAB';
-
+import { Camera, Sprout, Leaf, AlertTriangle, Wheat, User } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 export const FarmFeed: React.FC = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'healthy' | 'issue' | 'harvest' | 'mine'>('all');
@@ -28,13 +30,15 @@ export const FarmFeed: React.FC = () => {
 
   return (
     <div className="w-full min-h-[100svh] bg-bg-surface-1 font-sans flex flex-col relative pb-[100px]">
-      
       <PageHeader 
-        title="Farm Feed 🌱" 
+        title={
+          <span className="flex items-center gap-2">
+            Farm Feed <Sprout className="w-6 h-6 text-primary" />
+          </span>
+        } 
         leftButton="back" 
         rightButton="none"
       />
-
       <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-[88px] flex flex-col">
         
         {/* Header Actions & Filters */}
@@ -43,26 +47,23 @@ export const FarmFeed: React.FC = () => {
             <p className="text-text-main/70 font-medium text-sm">
               Chia sẻ câu chuyện vườn nhà bạn
             </p>
-            <button 
+            <Button 
               onClick={() => setIsCaptureOpen(true)}
-              className="bg-primary text-white font-bold text-sm px-4 py-2 rounded-full flex items-center gap-2 active:scale-95 transition-transform shadow-[0_4px_12px_rgba(8,168,85,0.3)]"
+              className="text-sm px-4 py-2"
+              icon={<Camera className="w-4 h-4" />}
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
               Chụp ngay
-            </button>
+            </Button>
           </div>
 
           {/* Filter Chips */}
           <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-2">
             {[
               { id: 'all', label: 'Tất cả' },
-              { id: 'healthy', label: '🌿 Khỏe' },
-              { id: 'issue', label: '⚠️ Vấn đề' },
-              { id: 'harvest', label: '🌾 Thu hoạch' },
-              { id: 'mine', label: '👤 Của tôi' },
+              { id: 'healthy', label: <span className="flex items-center gap-1"><Leaf className="w-3.5 h-3.5" /> Khỏe</span> },
+              { id: 'issue', label: <span className="flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Vấn đề</span> },
+              { id: 'harvest', label: <span className="flex items-center gap-1"><Wheat className="w-3.5 h-3.5" /> Thu hoạch</span> },
+              { id: 'mine', label: <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Của tôi</span> },
             ].map(f => (
               <button
                 key={f.id}
@@ -93,38 +94,33 @@ export const FarmFeed: React.FC = () => {
           </div>
         ) : (
           /* Empty State */
-          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+          (<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
               <MascotLottie className="w-full h-full" />
             </div>
             <h3 className="text-xl font-bold text-text-h mb-2">Chưa có snap nào!</h3>
-            <p className="text-text-main/70 mb-6 max-w-sm">
-              Hãy là người đầu tiên chia sẻ hình ảnh vườn ruộng của bạn 🌾
+            <p className="text-text-main/70 mb-6 max-w-sm flex items-center justify-center gap-1">
+              Hãy là người đầu tiên chia sẻ hình ảnh vườn ruộng của bạn <Wheat className="w-4 h-4" />
             </p>
-            <button 
+            <Button 
               onClick={() => setIsCaptureOpen(true)}
-              className="bg-primary text-white font-bold text-lg px-8 py-3 rounded-full active:scale-95 transition-transform shadow-[0_4px_12px_rgba(8,168,85,0.3)]"
+              size="lg"
             >
               Chụp Farm Snap đầu tiên
-            </button>
-          </div>
+            </Button>
+          </div>)
         )}
         
         {/* Infinite Scroll Shimmer Mock */}
-        {filteredSnaps.length > 0 && (
-          <div className="py-8 text-center text-text-main/50 font-bold text-sm">
-            Đã xem hết feed
-          </div>
-        )}
+        {filteredSnaps.length > 0 ? (<div className="py-8 text-center text-text-main/50 font-bold text-sm">Đã xem hết feed
+                    </div>) : null}
 
       </main>
-
       <SnapCaptureModal 
         isOpen={isCaptureOpen} 
         onClose={() => setIsCaptureOpen(false)}
         onSuccess={() => {
           // In a real app, we would fetch the latest feed or optimistic update
-          console.log('Snap published!');
         }}
       />
       <SnapFAB />

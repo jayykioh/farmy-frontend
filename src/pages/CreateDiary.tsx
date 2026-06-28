@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery, useCreateDiaryLogMutation } from '../store/api/farmApi';
+import { Sprout, ChevronDown, Thermometer, Droplets, FlaskConical, BugOff, Camera, X, Save } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ export const CreateDiary: React.FC = () => {
 
   useEffect(() => {
     if (diaries.length > 0 && !selectedDiaryId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedDiaryId(diaries[0]._id);
     }
   }, [diaries, selectedDiaryId]);
@@ -70,13 +73,11 @@ export const CreateDiary: React.FC = () => {
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-bg-main overflow-x-hidden font-sans">
-      
       <PageHeader 
         title="Nhật ký mới"
         leftButton="close"
         rightButton="none"
       />
-
       {/* Background Decoration */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-32 h-32 bg-primary-light/20 rounded-full blur-3xl"></div>
@@ -84,7 +85,6 @@ export const CreateDiary: React.FC = () => {
         {/* Wavy grass decoration at bottom */}
         <div className="absolute bottom-0 w-full h-[60px] bg-gradient-to-t from-primary/10 to-transparent"></div>
       </div>
-
       {/* Main Bottom Sheet Simulation */}
       <div className="relative w-full max-w-2xl mx-auto md:mt-8 bg-white rounded-t-[40px] md:rounded-[40px] shadow-[0_-20px_50px_rgba(0,0,0,0.05)] md:shadow-xl md:border md:border-border-main/50 z-10 flex flex-col min-h-[100svh] md:min-h-0 md:h-auto">
         
@@ -97,7 +97,7 @@ export const CreateDiary: React.FC = () => {
             <div className="py-20 text-center font-bold text-text-main/70">Đang tải danh sách cây trồng...</div>
           ) : diaries.length === 0 ? (
             <div className="py-20 text-center flex flex-col gap-4 items-center">
-              <span className="text-4xl">🌱</span>
+              <Sprout className="w-12 h-12 text-primary/50" />
               <p className="font-bold text-text-main/70">Bạn chưa bắt đầu vụ mùa nào để ghi nhật ký!</p>
               <button 
                 onClick={() => navigate('/home')}
@@ -125,9 +125,7 @@ export const CreateDiary: React.FC = () => {
                         </option>
                       ))}
                     </select>
-                    <svg className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-main/70 w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-main/70 w-5 h-5" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -144,7 +142,7 @@ export const CreateDiary: React.FC = () => {
               
               {/* Weather Chip */}
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-bg-surface-1 border border-primary/20 rounded-full shadow-sm">
-                <span className="text-[18px]">🌡️</span>
+                <Thermometer className="w-5 h-5 text-orange-500" />
                 <span className="font-bold text-sm text-primary">32°C - Nắng ráo - Độ ẩm 74% (Từ GPS)</span>
               </div>
               
@@ -169,9 +167,7 @@ export const CreateDiary: React.FC = () => {
                     className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold shadow-sm transition-all border ${activeActivities.includes('water') ? 'bg-primary text-white border-primary shadow-[0_4px_10px_rgba(8,168,85,0.3)] scale-105' : 'bg-white text-text-main/70 border-border-main/50 hover:bg-bg-surface active:scale-95'}`}
                     type="button"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
+                    <Droplets className="w-5 h-5" />
                     <span>Đã tưới nước</span>
                   </button>
                   <button 
@@ -179,9 +175,7 @@ export const CreateDiary: React.FC = () => {
                     className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold shadow-sm transition-all border ${activeActivities.includes('fertilizer') ? 'bg-primary text-white border-primary shadow-[0_4px_10px_rgba(8,168,85,0.3)] scale-105' : 'bg-white text-text-main/70 border-border-main/50 hover:bg-bg-surface active:scale-95'}`}
                     type="button"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 13h1M20 13h1m-9-9v1m0 16v1m-5.636-2.364l.707-.707m11.314-11.314l.707-.707M5.636 5.636l.707.707m11.314 11.314l.707.707M12 18a6 6 0 100-12 6 6 0 000 12z" />
-                    </svg>
+                    <FlaskConical className="w-5 h-5" />
                     <span>Đã bón phân</span>
                   </button>
                   <button 
@@ -189,9 +183,7 @@ export const CreateDiary: React.FC = () => {
                     className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold shadow-sm transition-all border ${activeActivities.includes('pest') ? 'bg-primary text-white border-primary shadow-[0_4px_10px_rgba(8,168,85,0.3)] scale-105' : 'bg-white text-text-main/70 border-border-main/50 hover:bg-bg-surface active:scale-95'}`}
                     type="button"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l-7-7m7 7l-2 2m2-2l2-2" />
-                    </svg>
+                    <BugOff className="w-5 h-5" />
                     <span>Phun thuốc</span>
                   </button>
                 </div>
@@ -215,25 +207,20 @@ export const CreateDiary: React.FC = () => {
                         setImageUrl(randomImages[Math.floor(Math.random() * randomImages.length)]);
                       }}
                     />
-                    <svg className="w-6 h-6 text-text-main/30 group-hover:text-primary transition-colors group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                    <Camera className="w-6 h-6 text-text-main/30 group-hover:text-primary transition-colors group-hover:scale-110" />
                     <span className="text-[10px] font-bold text-text-main/50 mt-1">Thêm ảnh</span>
                   </label>
                   {/* Photo preview */}
-                  {imageUrl && (
-                    <div className="aspect-square bg-bg-surface-1 rounded-2xl overflow-hidden shadow-sm border border-border-main/30 relative group">
-                      <img className="w-full h-full object-cover opacity-90" alt="Preview" src={imageUrl} />
-                      <button 
-                        type="button" 
-                        onClick={() => setImageUrl('')} 
-                        className="absolute top-1 right-1 w-5 h-5 bg-black/50 text-white rounded-full flex items-center justify-center text-[10px] font-bold"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
+                  {imageUrl ? (<div className="aspect-square bg-bg-surface-1 rounded-2xl overflow-hidden shadow-sm border border-border-main/30 relative group">
+                    <img className="w-full h-full object-cover opacity-90" alt="Preview" src={imageUrl} />
+                    <button 
+                      type="button" 
+                      onClick={() => setImageUrl('')} 
+                      className="absolute top-1 right-1 w-5 h-5 bg-black/50 text-white rounded-full flex items-center justify-center text-[10px] font-bold"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>) : null}
                 </div>
               </div>
               
@@ -243,8 +230,8 @@ export const CreateDiary: React.FC = () => {
                   <MascotLottie className="w-full h-full drop-shadow-md" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text-main/80 leading-tight">
-                    "Bạn ơi, ghi lại sự thay đổi của cây trồng mỗi ngày giúp AI của mình chẩn đoán và khuyến nghị tốt hơn nhé! 🌱"
+                  <p className="text-sm font-medium text-text-main/80 leading-tight flex flex-col gap-1">
+                    <span>"Bạn ơi, ghi lại sự thay đổi của cây trồng mỗi ngày giúp AI của mình chẩn đoán và khuyến nghị tốt hơn nhé! <Sprout className="w-4 h-4 inline" />"</span>
                   </p>
                 </div>
               </div>
@@ -254,26 +241,22 @@ export const CreateDiary: React.FC = () => {
         </main>
         
         {/* Fixed Footer Actions */}
-        {diaries.length > 0 && !fetching && (
-          <footer className="fixed md:static bottom-0 left-0 right-0 w-full max-w-2xl mx-auto p-6 bg-white/90 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-border-main/30 md:border-t-0 space-y-3 z-50 rounded-b-[40px]">
-            <button 
-              onClick={handleSave}
-              disabled={loading}
-              className="w-full py-4 bg-primary text-white font-bold text-lg rounded-full shadow-[0_10px_20px_rgba(8,168,85,0.2)] active:shadow-[0_4px_10px_rgba(8,168,85,0.1)] active:translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
-              {loading ? 'Đang lưu nhật ký...' : 'Lưu nhật ký'}
-            </button>
-            <button 
-              onClick={() => navigate(-1)}
-              className="w-full py-2 text-text-main/50 font-bold hover:text-text-main transition-colors cursor-pointer"
-            >
-              Hủy bỏ
-            </button>
-          </footer>
-        )}
+        {diaries.length > 0 && !fetching ? (<footer className="fixed md:static bottom-0 left-0 right-0 w-full max-w-2xl mx-auto p-6 bg-white/90 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-border-main/30 md:border-t-0 space-y-3 z-50 rounded-b-[40px]">
+          <Button 
+            onClick={handleSave}
+            disabled={loading}
+            className="w-full shadow-[0_10px_20px_rgba(8,168,85,0.2)] active:shadow-[0_4px_10px_rgba(8,168,85,0.1)] active:translate-y-0.5 active:scale-95 transition-all text-lg py-4 rounded-full"
+            icon={<Save className="w-5 h-5" />}
+          >
+            {loading ? 'Đang lưu nhật ký...' : 'Lưu nhật ký'}
+          </Button>
+          <button 
+            onClick={() => navigate(-1)}
+            className="w-full py-2 text-text-main/50 font-bold hover:text-text-main transition-colors cursor-pointer"
+          >
+            Hủy bỏ
+          </button>
+        </footer>) : null}
         
       </div>
     </div>

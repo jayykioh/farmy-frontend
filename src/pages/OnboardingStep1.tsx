@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { Wheat, Apple, Coffee, Leaf, Sprout } from 'lucide-react';
 
 export const OnboardingStep1: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCrop, setSelectedCrop] = useState<string>('lua-nuoc');
 
   const crops = [
-    { id: 'lua-nuoc', label: '🌾 Lúa nước' },
-    { id: 'cay-an-trai', label: '🍎 Cây ăn trái' },
-    { id: 'ca-phe', label: '☕ Cà phê' },
-    { id: 'rau-mau', label: '🥬 Rau màu' },
-    { id: 'khac', label: '🌱 Khác' },
+    { id: 'lua-nuoc', label: <span className="flex items-center gap-1"><Wheat className="w-4 h-4" /> Lúa nước</span> },
+    { id: 'cay-an-trai', label: <span className="flex items-center gap-1"><Apple className="w-4 h-4" /> Cây ăn trái</span> },
+    { id: 'ca-phe', label: <span className="flex items-center gap-1"><Coffee className="w-4 h-4" /> Cà phê</span> },
+    { id: 'rau-mau', label: <span className="flex items-center gap-1"><Leaf className="w-4 h-4" /> Rau màu</span> },
+    { id: 'khac', label: <span className="flex items-center gap-1"><Sprout className="w-4 h-4" /> Khác</span> },
   ];
 
   return (

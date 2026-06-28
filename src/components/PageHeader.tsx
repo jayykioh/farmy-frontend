@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { usePageHeader } from '../contexts/PageHeaderContext';
 
 export interface PageHeaderProps {
-  title: string;
-  subtitle?: string;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
   leftButton?: 'back' | 'close' | 'none';
   rightButton?: 'notification' | 'camera' | 'none';
   onRightClick?: () => void;
@@ -127,7 +127,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       {renderLeftButton()}
       <div className="flex flex-col items-center justify-center flex-1">
         <h1 className="text-[17px] font-bold text-text-main tracking-tight">{title}</h1>
-        {subtitle && <p className="font-medium text-[11.5px] text-text-muted mt-[1px]">{subtitle}</p>}
+        {subtitle ? <p className="font-medium text-[11.5px] text-text-muted mt-[1px]">{subtitle}</p> : null}
       </div>
       {renderRightButton()}
     </header>
