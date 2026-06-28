@@ -4,7 +4,10 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+let API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+if (API_BASE_URL && !API_BASE_URL.endsWith('/api/v1')) {
+  API_BASE_URL = `${API_BASE_URL.replace(/\/$/, '')}/api/v1`;
+}
 
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
