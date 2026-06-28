@@ -87,13 +87,11 @@ export const HelpSupport: React.FC = () => {
 
   return (
     <div className="w-full min-h-[100svh] bg-bg-surface-1 text-left font-sans pb-24 md:pb-8">
-      
       <PageHeader 
         title="Help & Support"
         subtitle="Trợ giúp và hỗ trợ"
         leftButton="back"
       />
-
       {/* Main Content */}
       <main className="w-full max-w-3xl mx-auto pt-24 md:pt-20 px-4 md:px-8 flex flex-col gap-4">
         
@@ -170,11 +168,9 @@ export const HelpSupport: React.FC = () => {
                     <p className="font-bold text-base text-text-main group-hover:text-primary transition-colors">
                       {faq.question}
                     </p>
-                    {expandedId === faq.id && (
-                      <p className="text-sm text-text-main/70 mt-3">
-                        {faq.answer}
-                      </p>
-                    )}
+                    {expandedId === faq.id ? (<p className="text-sm text-text-main/70 mt-3">
+                      {faq.answer}
+                    </p>) : null}
                   </div>
                   <svg 
                     className={`w-5 h-5 text-primary shrink-0 transition-transform ${expandedId === faq.id ? 'rotate-180' : ''}`} 

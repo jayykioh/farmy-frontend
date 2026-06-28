@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Leaf, AlertTriangle, Wheat } from 'lucide-react';
 import { MascotLottie } from './MascotLottie';
 import type { SnapCondition } from '../types/farmSnap';
 
@@ -12,7 +13,7 @@ type CaptureState = 'idle' | 'camera' | 'preview' | 'uploading' | 'success' | 'e
 
 export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [state, setState] = useState<CaptureState>('idle');
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [, setStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -26,18 +27,16 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize camera when opened
-  useEffect(() => {
-    if (isOpen) {
-      startCamera();
-    } else {
-      stopCamera();
-    }
-    
-    return () => stopCamera();
-  }, [isOpen, facingMode]);
+  const stopCamera = useCallback(() => {
+    setStream(prevStream => {
+      if (prevStream) {
+        prevStream.getTracks().forEach(track => track.stop());
+      }
+      return null;
+    });
+  }, []);
 
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     stopCamera(); // Stop any existing stream first
     setState('idle');
     try {
@@ -55,14 +54,19 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
       setState('error');
       setErrorMessage('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
     }
-  };
+  }, [facingMode, stopCamera]);
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
+  // Initialize camera when opened
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      startCamera();
+    } else {
+      stopCamera();
     }
-  };
+    
+    return () => stopCamera();
+  }, [isOpen, startCamera, stopCamera]);
 
   const toggleCamera = () => {
     setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
@@ -137,7 +141,6 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 text-white animate-in fade-in duration-200">
-      
       {/* Hidden canvas for taking photos */}
       <canvas ref={canvasRef} className="hidden" />
       <input 
@@ -147,7 +150,6 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
         accept="image/jpeg,image/png,image/webp"
         className="hidden" 
       />
-
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/60 to-transparent">
         <button 
@@ -166,187 +168,167 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
           <span className="font-bold text-sm">Farm Snap</span>
         </div>
       </div>
-
       {/* Content Area */}
       <div className="w-full h-full md:max-w-[480px] relative flex flex-col justify-between">
         
         {/* Camera Feed or Preview */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          {state === 'camera' && (
-            <video 
-              ref={videoRef}
-              autoPlay 
-              playsInline 
-              muted 
-              className="w-full h-full object-cover"
-            />
-          )}
+          {state === 'camera' ? (<video 
+            ref={videoRef}
+            autoPlay 
+            playsInline 
+            muted 
+            className="w-full h-full object-cover"
+          />) : null}
           
-          {state === 'idle' && (
-            <div className="animate-pulse flex flex-col items-center">
-              <svg className="w-12 h-12 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p className="text-gray-400 font-medium">Đang mở camera...</p>
-            </div>
-          )}
+          {state === 'idle' ? (<div className="animate-pulse flex flex-col items-center">
+            <svg className="w-12 h-12 text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <p className="text-gray-400 font-medium">Đang mở camera...</p>
+          </div>) : null}
 
-          {state === 'preview' && photoUrl && (
-            <img src={photoUrl} alt="Preview" className="w-full h-full object-cover" />
-          )}
+          {state === 'preview' && photoUrl ? (<img src={photoUrl} alt="Preview" className="w-full h-full object-cover" />) : null}
 
-          {state === 'error' && (
-            <div className="text-center p-6">
-              <div className="bg-red-500/20 text-red-400 p-4 rounded-2xl mb-4 border border-red-500/30">
-                <p className="font-bold">{errorMessage}</p>
-              </div>
-              <button 
-                onClick={startCamera}
-                className="bg-white/10 px-6 py-3 rounded-full font-bold active:scale-95"
-              >
-                Thử lại
-              </button>
+          {state === 'error' ? (<div className="text-center p-6">
+            <div className="bg-red-500/20 text-red-400 p-4 rounded-2xl mb-4 border border-red-500/30">
+              <p className="font-bold">{errorMessage}</p>
             </div>
-          )}
+            <button 
+              onClick={startCamera}
+              className="bg-white/10 px-6 py-3 rounded-full font-bold active:scale-95"
+            >
+              Thử lại
+            </button>
+          </div>) : null}
         </div>
 
         {/* Overlay Over Camera/Preview */}
         <div className="relative z-10 flex flex-col h-full justify-end pb-8 pt-20 px-4 pointer-events-none">
           
           {/* Controls - Only show in camera or preview states */}
-          {(state === 'camera' || state === 'preview') && (
-            <div className="pointer-events-auto bg-gradient-to-t from-black/90 via-black/50 to-transparent -mx-4 px-4 pt-12 pb-4 flex flex-col gap-4">
+          {(state === 'camera' || state === 'preview') ? (<div className="pointer-events-auto bg-gradient-to-t from-black/90 via-black/50 to-transparent -mx-4 px-4 pt-12 pb-4 flex flex-col gap-4">
+            {/* Form Controls */}
+            <div className="flex flex-col gap-3 mb-2">
               
-              {/* Form Controls */}
-              <div className="flex flex-col gap-3 mb-2">
-                
-                {/* Crop Type & Condition */}
-                <div className="flex flex-wrap gap-2 items-center justify-center">
-                  <select 
-                    value={cropType}
-                    onChange={(e) => setCropType(e.target.value)}
-                    className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-bold rounded-full px-4 py-2 outline-none appearance-none cursor-pointer text-center"
+              {/* Crop Type & Condition */}
+              <div className="flex flex-wrap gap-2 items-center justify-center">
+                <select 
+                  value={cropType}
+                  onChange={(e) => setCropType(e.target.value)}
+                  className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-bold rounded-full px-4 py-2 outline-none appearance-none cursor-pointer text-center"
+                >
+                  <option value="Lúa" className="text-black">Lúa</option>
+                  <option value="Bưởi" className="text-black">Bưởi</option>
+                  <option value="Cà phê" className="text-black">Cà phê</option>
+                  <option value="Rau màu" className="text-black">Rau màu</option>
+                  <option value="Khác" className="text-black">Khác</option>
+                </select>
+
+                <div className="flex bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/20">
+                  <button 
+                    onClick={() => setCondition('healthy')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'healthy' ? 'bg-green-500 text-white' : 'text-white/70'}`}
                   >
-                    <option value="Lúa" className="text-black">🌾 Lúa</option>
-                    <option value="Bưởi" className="text-black">🍊 Bưởi</option>
-                    <option value="Cà phê" className="text-black">☕ Cà phê</option>
-                    <option value="Rau màu" className="text-black">🥬 Rau màu</option>
-                    <option value="Khác" className="text-black">🌱 Khác</option>
-                  </select>
-
-                  <div className="flex bg-white/10 backdrop-blur-md rounded-full p-1 border border-white/20">
-                    <button 
-                      onClick={() => setCondition('healthy')}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'healthy' ? 'bg-green-500 text-white' : 'text-white/70'}`}
-                    >
-                      🌿 Khỏe
-                    </button>
-                    <button 
-                      onClick={() => setCondition('issue')}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'issue' ? 'bg-yellow-500 text-white' : 'text-white/70'}`}
-                    >
-                      ⚠️ Có vấn đề
-                    </button>
-                    <button 
-                      onClick={() => setCondition('harvest')}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'harvest' ? 'bg-amber-600 text-white' : 'text-white/70'}`}
-                    >
-                      🌾 Thu hoạch
-                    </button>
-                  </div>
+                    <span className="flex items-center gap-1"><Leaf className="w-3.5 h-3.5" /> Khỏe</span>
+                  </button>
+                  <button 
+                    onClick={() => setCondition('issue')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'issue' ? 'bg-yellow-500 text-white' : 'text-white/70'}`}
+                  >
+                    <span className="flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Có vấn đề</span>
+                  </button>
+                  <button 
+                    onClick={() => setCondition('harvest')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'harvest' ? 'bg-amber-600 text-white' : 'text-white/70'}`}
+                  >
+                    <span className="flex items-center gap-1"><Wheat className="w-3.5 h-3.5" /> Thu hoạch</span>
+                  </button>
                 </div>
-
-                {/* Caption Input (only in preview) */}
-                {state === 'preview' && (
-                  <div className="mt-2 animate-in slide-in-from-bottom-2 fade-in duration-300">
-                    <input 
-                      type="text" 
-                      value={caption}
-                      onChange={(e) => setCaption(e.target.value)}
-                      placeholder="Thêm mô tả ngắn... (tùy chọn)" 
-                      maxLength={100}
-                      className="w-full bg-black/40 border border-white/30 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium"
-                    />
-                  </div>
-                )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-between items-center mt-2 px-2">
-                
-                {state === 'camera' ? (
-                  <>
-                    <button 
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-12 h-12 flex justify-center items-center rounded-full bg-white/10 backdrop-blur-md active:scale-95"
-                    >
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                    
-                    <button 
-                      onClick={handleCapture}
-                      className="w-20 h-20 rounded-full border-4 border-white flex justify-center items-center active:scale-90 transition-transform"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-white"></div>
-                    </button>
-
-                    <button 
-                      onClick={toggleCamera}
-                      className="w-12 h-12 flex justify-center items-center rounded-full bg-white/10 backdrop-blur-md active:scale-95"
-                    >
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button 
-                      onClick={handleRetake}
-                      className="px-6 py-4 font-bold text-white/80 active:scale-95"
-                    >
-                      Chụp lại
-                    </button>
-                    
-                    <button 
-                      onClick={handleSubmit}
-                      className="flex-1 bg-primary text-white font-bold py-4 rounded-full ml-4 active:scale-95 transition-transform flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(8,168,85,0.4)]"
-                    >
-                      Đăng lên Feed
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
-                    </button>
-                  </>
-                )}
-              </div>
-              
+              {/* Caption Input (only in preview) */}
+              {state === 'preview' ? (<div className="mt-2 animate-in slide-in-from-bottom-2 fade-in duration-300">
+                <input 
+                  type="text" 
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  placeholder="Thêm mô tả ngắn... (tùy chọn)" 
+                  maxLength={100}
+                  className="w-full bg-black/40 border border-white/30 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium"
+                />
+              </div>) : null}
             </div>
-          )}
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center mt-2 px-2">
+              
+              {state === 'camera' ? (
+                <>
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-12 h-12 flex justify-center items-center rounded-full bg-white/10 backdrop-blur-md active:scale-95"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                  
+                  <button 
+                    onClick={handleCapture}
+                    className="w-20 h-20 rounded-full border-4 border-white flex justify-center items-center active:scale-90 transition-transform"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white"></div>
+                  </button>
+
+                  <button 
+                    onClick={toggleCamera}
+                    className="w-12 h-12 flex justify-center items-center rounded-full bg-white/10 backdrop-blur-md active:scale-95"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleRetake}
+                    className="px-6 py-4 font-bold text-white/80 active:scale-95"
+                  >
+                    Chụp lại
+                  </button>
+                  
+                  <button 
+                    onClick={handleSubmit}
+                    className="flex-1 bg-primary text-white font-bold py-4 rounded-full ml-4 active:scale-95 transition-transform flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(8,168,85,0.4)]"
+                  >
+                    Đăng lên Feed
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>) : null}
 
           {/* Uploading State */}
-          {state === 'uploading' && (
-            <div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center pointer-events-auto">
-              <div className="w-16 h-16 border-4 border-white/20 border-t-primary rounded-full animate-spin mb-4"></div>
-              <p className="font-bold text-xl">Đang đăng...</p>
-            </div>
-          )}
+          {state === 'uploading' ? (<div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center pointer-events-auto">
+            <div className="w-16 h-16 border-4 border-white/20 border-t-primary rounded-full animate-spin mb-4"></div>
+            <p className="font-bold text-xl">Đang đăng...</p>
+          </div>) : null}
 
           {/* Success State */}
-          {state === 'success' && (
-            <div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center pointer-events-auto animate-in zoom-in-95 fade-in">
-              <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(8,168,85,0.6)]">
-                <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-black mb-2 text-primary">+10 XP</h2>
-              <p className="font-bold text-xl">Đã đăng thành công!</p>
+          {state === 'success' ? (<div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center pointer-events-auto animate-in zoom-in-95 fade-in">
+            <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(8,168,85,0.6)]">
+              <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-          )}
+            <h2 className="text-3xl font-black mb-2 text-primary">+10 XP</h2>
+            <p className="font-bold text-xl">Đã đăng thành công!</p>
+          </div>) : null}
 
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FarmSnap } from '../types/farmSnap';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ThumbsUp, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Heart, ThumbsUp, AlertTriangle, MessageSquare, Leaf, Wheat, Sprout } from 'lucide-react';
 
 interface SnapCardProps {
   snap: FarmSnap;
@@ -29,16 +29,18 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
 
   const getConditionLabel = () => {
     switch (snap.condition) {
-      case 'healthy': return '🌿 Khỏe';
-      case 'issue': return '⚠️ Vấn đề';
-      case 'harvest': return '🌾 Thu hoạch';
-      default: return '🌱 Khác';
+      case 'healthy': return <span className="flex items-center gap-1"><Leaf className="w-3 h-3" /> Khỏe</span>;
+      case 'issue': return <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Vấn đề</span>;
+      case 'harvest': return <span className="flex items-center gap-1"><Wheat className="w-3 h-3" /> Thu hoạch</span>;
+      default: return <span className="flex items-center gap-1"><Sprout className="w-3 h-3" /> Khác</span>;
     }
   };
 
+  const [now] = React.useState(() => Date.now());
+
   // Format relative time (mock logic)
   const getRelativeTime = () => {
-    const hours = Math.round((Date.now() - new Date(snap.capturedAt).getTime()) / (1000 * 60 * 60));
+    const hours = Math.round((now - new Date(snap.capturedAt).getTime()) / (1000 * 60 * 60));
     if (hours < 1) return 'Vừa xong';
     if (hours < 24) return `${hours} giờ trước`;
     return `${Math.floor(hours / 24)} ngày trước`;
@@ -83,28 +85,24 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
       className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative cursor-pointer shadow-sm border border-border-main/20 mb-4 hover:shadow-md transition-shadow group"
     >
       <img src={snap.imageUrl} alt={snap.cropType} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-      
       {/* Top Overlay */}
       <div className="absolute top-0 left-0 right-0 p-4 pt-4 flex gap-2 justify-between items-start bg-gradient-to-b from-black/60 to-transparent">
         <div className="flex gap-2">
-          <span className="bg-black/50 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-bold border border-white/20">
-            🌾 {snap.cropType}
+          <span className="flex items-center gap-1 bg-black/50 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-bold border border-white/20">
+            <Wheat className="w-3.5 h-3.5" /> {snap.cropType}
           </span>
           <span className={`px-3 py-1.5 rounded-full text-xs font-bold border border-white/20 ${getConditionColor()}`}>
             {getConditionLabel()}
           </span>
         </div>
       </div>
-
       {/* Bottom Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 pt-16 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
         
         {/* Caption */}
-        {snap.caption && (
-          <p className="text-white text-sm md:text-base font-bold line-clamp-2 mb-2 leading-snug drop-shadow-md">
-            {snap.caption}
-          </p>
-        )}
+        {snap.caption ? (<p className="text-white text-sm md:text-base font-bold line-clamp-2 mb-2 leading-snug drop-shadow-md">
+          {snap.caption}
+        </p>) : null}
 
         {/* User & Meta */}
         <div className="flex items-center mb-3">
@@ -142,18 +140,16 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
                 {snap.reactions.find(r => r.type === 'helpful')?.count || 0}
               </span>
             </button>
-            {snap.condition === 'issue' && (
-              <button 
-                onClick={(e) => e.stopPropagation()} 
-                className="flex items-center gap-1.5 text-white/95 hover:text-white active:scale-90 transition-transform"
-                aria-label="Worry about issue"
-              >
-                <AlertTriangle className={`w-4 h-4 ${snap.reactions.find(r => r.type === 'worry')?.userReacted ? 'fill-amber-500 text-amber-500' : 'text-white'}`} />
-                <span className="text-xs font-extrabold">
-                  {snap.reactions.find(r => r.type === 'worry')?.count || 0}
-                </span>
-              </button>
-            )}
+            {snap.condition === 'issue' ? (<button 
+              onClick={(e) => e.stopPropagation()} 
+              className="flex items-center gap-1.5 text-white/95 hover:text-white active:scale-90 transition-transform"
+              aria-label="Worry about issue"
+            >
+              <AlertTriangle className={`w-4 h-4 ${snap.reactions.find(r => r.type === 'worry')?.userReacted ? 'fill-amber-500 text-amber-500' : 'text-white'}`} />
+              <span className="text-xs font-extrabold">
+                {snap.reactions.find(r => r.type === 'worry')?.count || 0}
+              </span>
+            </button>) : null}
           </div>
 
           <button 

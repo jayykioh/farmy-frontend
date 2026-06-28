@@ -183,8 +183,10 @@ This document defines component families conceptually. Implementation details be
 ### 5.3 Interaction Components
 
 | Component | Responsibility |
+| Component | Responsibility |
 |---|---|
-| **PressableButton** | Primary/secondary actions with tactile bottom offset |
+| **Button** (PressableButton) | Standard button with tactile bottom offset (`bg-primary text-white` for primary). *Rule: No black buttons or non-standard rainbow colors (blue/emerald) for actions to avoid AI-generated aesthetic.* |
+| **Icons** | Use `lucide-react` exclusively. *Rule: Do not use inline raw SVG paths or OS emojis for structural UI icons. (Exception: OS emojis are allowed inside user-generated content like diary posts).* |
 | **ActionChip** | Small quick actions such as save, reminder, tips |
 | **ChatInputBar** | Fixed AI input with attachment button, text input and send action |
 | **ProgressBar** | XP, confidence and completion visualization |

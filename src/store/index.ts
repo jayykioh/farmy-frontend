@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
 import { 
   persistStore, 
   persistReducer,
@@ -11,6 +13,7 @@ import {
 } from 'redux-persist';
 import authReducer from './slices/authSlice';
 import uiReducer from './slices/uiSlice';
+import { baseApi } from './api/baseApi';
 
 const createNoopStorage = () => {
   return {
@@ -47,6 +50,7 @@ const storage = typeof window !== 'undefined' ? createLocalStorage() : createNoo
 const rootReducer = combineReducers({
   auth: authReducer,
   ui: uiReducer,
+  [baseApi.reducerPath]: baseApi.reducer,
 });
 
 const persistConfig = {
@@ -65,10 +69,11 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }),
+    }).concat(baseApi.middleware),
 });
 
 export const persistor = persistStore(store);
+setupListeners(store.dispatch);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
