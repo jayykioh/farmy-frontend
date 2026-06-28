@@ -142,5 +142,9 @@ We enforce **100% Security & Observability** requirements before launch:
 
 ---
 
+## Deploy
+
+---
+
 ### 📝 Course Grading Notes
 This codebase features clean abstractions, robust error boundaries, strict type interfaces, and exhaustive test coverage (Jest integration tests). It demonstrates high architectural proficiency in modern Node.js and full-stack software development workflows suitable for a grade-A capstone standard.
