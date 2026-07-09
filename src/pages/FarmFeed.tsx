@@ -1,32 +1,43 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { SnapCard } from '../components/SnapCard';
 import { SnapCaptureModal } from '../components/SnapCaptureModal';
 import { MascotLottie } from '../components/MascotLottie';
-import { mockSnaps } from '../mocks/snapData';
-import type { FarmSnap } from '../types/farmSnap';
+import { fetchSnapFeed, reactToSnap } from '../api/snaps';
+import type { SnapCondition, SnapReactionType } from '../types/farmSnap';
 import { SnapFAB } from '../components/SnapFAB';
 import { Camera, Sprout, Leaf, AlertTriangle, Wheat, User } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+
+type FeedFilter = 'all' | SnapCondition | 'mine';
+
 export const FarmFeed: React.FC = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<'all' | 'healthy' | 'issue' | 'harvest' | 'mine'>('all');
+  const queryClient = useQueryClient();
+  const [filter, setFilter] = useState<FeedFilter>('all');
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
-  const [snaps] = useState<FarmSnap[]>(mockSnaps);
 
-  const getFilteredSnaps = () => {
-    switch (filter) {
-      case 'healthy': return snaps.filter(s => s.condition === 'healthy');
-      case 'issue': return snaps.filter(s => s.condition === 'issue');
-      case 'harvest': return snaps.filter(s => s.condition === 'harvest');
-      case 'mine': return snaps.filter(s => s.userId === 'user-1'); // Mock current user
-      default: return snaps;
-    }
-  };
+  const feedQuery = useQuery({
+    queryKey: ['snaps', 'feed', filter],
+    queryFn: () =>
+      fetchSnapFeed({
+        limit: 20,
+        condition: filter === 'mine' || filter === 'all' ? undefined : filter,
+        mine: filter === 'mine',
+      }),
+  });
 
-  const filteredSnaps = getFilteredSnaps();
+  const reactionMutation = useMutation({
+    mutationFn: ({ snapId, type }: { snapId: string; type: SnapReactionType }) =>
+      reactToSnap(snapId, type),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['snaps'] });
+    },
+  });
+
+  const snaps = feedQuery.data?.data ?? [];
 
   return (
     <div className="w-full min-h-[100svh] bg-bg-surface-1 font-sans flex flex-col relative pb-[100px]">
@@ -67,7 +78,7 @@ export const FarmFeed: React.FC = () => {
             ].map(f => (
               <button
                 key={f.id}
-                onClick={() => setFilter(f.id as any)}
+                onClick={() => setFilter(f.id as FeedFilter)}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-bold transition-all border ${
                   filter === f.id 
                     ? 'bg-text-main text-white border-text-main shadow-md' 
@@ -81,18 +92,47 @@ export const FarmFeed: React.FC = () => {
         </div>
 
         {/* Feed Grid */}
-        {filteredSnaps.length > 0 ? (
+        {feedQuery.isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="aspect-[4/5] rounded-[24px] bg-white/70 border border-border-main/30 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {feedQuery.isError ? (
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
+              <MascotLottie className="w-full h-full" />
+            </div>
+            <h3 className="text-xl font-bold text-text-h mb-2">Chưa tải được Farm Feed</h3>
+            <p className="text-text-main/70 mb-6 max-w-sm">
+              Kiểm tra kết nối rồi thử lại.
+            </p>
+            <Button onClick={() => feedQuery.refetch()} size="lg">
+              Tải lại
+            </Button>
+          </div>
+        ) : null}
+
+        {!feedQuery.isLoading && !feedQuery.isError && snaps.length > 0 ? (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-4 md:gap-6 space-y-4 md:space-y-6">
-            {filteredSnaps.map(snap => (
+            {snaps.map(snap => (
               <div key={snap.id} className="break-inside-avoid">
                 <SnapCard 
                   snap={snap} 
                   onClick={() => navigate(`/snap/${snap.id}`)}
+                  onReact={(type) => reactionMutation.mutate({ snapId: snap.id, type })}
                 />
               </div>
             ))}
           </div>
-        ) : (
+        ) : null}
+
+        {!feedQuery.isLoading && !feedQuery.isError && snaps.length === 0 ? (
           /* Empty State */
           (<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
@@ -109,18 +149,20 @@ export const FarmFeed: React.FC = () => {
               Chụp Farm Snap đầu tiên
             </Button>
           </div>)
-        )}
+        ) : null}
         
-        {/* Infinite Scroll Shimmer Mock */}
-        {filteredSnaps.length > 0 ? (<div className="py-8 text-center text-text-main/50 font-bold text-sm">Đã xem hết feed
-                    </div>) : null}
+        {snaps.length > 0 ? (
+          <div className="py-8 text-center text-text-main/50 font-bold text-sm">
+            Đã xem hết feed
+          </div>
+        ) : null}
 
       </main>
       <SnapCaptureModal 
         isOpen={isCaptureOpen} 
         onClose={() => setIsCaptureOpen(false)}
         onSuccess={() => {
-          // In a real app, we would fetch the latest feed or optimistic update
+          void queryClient.invalidateQueries({ queryKey: ['snaps', 'feed'] });
         }}
       />
       <SnapFAB />

@@ -31,9 +31,14 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+type CsrfTokenResponse = ApiResponse<{
+  csrfToken: string;
+}>;
+
 let accessToken: string | null = null;
 let isRefreshing = false;
 let refreshQueue: TokenRefreshSubscriber[] = [];
+let csrfToken: string | null = null;
 
 export const getAccessToken = () => accessToken;
 
@@ -58,6 +63,29 @@ const processRefreshQueue = (error: unknown, accessToken?: string) => {
   refreshQueue = [];
 };
 
+const isUnsafeMethod = (method?: string) =>
+  ['post', 'put', 'patch', 'delete'].includes(method?.toLowerCase() ?? '');
+
+const isCsrfExemptUrl = (url?: string) =>
+  Boolean(
+    url?.includes('/auth/login') ||
+      url?.includes('/auth/register') ||
+      url?.includes('/auth/refresh') ||
+      url?.includes('/csrf-token'),
+  );
+
+const getCsrfToken = async () => {
+  if (csrfToken) return csrfToken;
+
+  const response = await axios.get<CsrfTokenResponse>(
+    `${API_BASE_URL}/csrf-token`,
+    { withCredentials: true },
+  );
+
+  csrfToken = response.data.data.csrfToken;
+  return csrfToken;
+};
+
 export const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -67,11 +95,19 @@ export const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   const accessToken = getAccessToken();
 
   if (accessToken && config.headers) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  if (
+    config.headers &&
+    isUnsafeMethod(config.method) &&
+    !isCsrfExemptUrl(config.url)
+  ) {
+    config.headers['X-XSRF-TOKEN'] = await getCsrfToken();
   }
 
   return config;

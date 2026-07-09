@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Leaf, AlertTriangle, Wheat } from 'lucide-react';
 import { MascotLottie } from './MascotLottie';
 import type { SnapCondition } from '../types/farmSnap';
+import { createSnap } from '../api/snaps';
 
 interface SnapCaptureModalProps {
   isOpen: boolean;
@@ -118,11 +119,20 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!photoUrl) return;
+
     setState('uploading');
-    
-    // Simulate upload and create
-    setTimeout(() => {
+
+    try {
+      await createSnap({
+        imageUrl: photoUrl,
+        cropType,
+        condition,
+        caption: caption.trim() || undefined,
+        capturedAt: new Date().toISOString(),
+      });
+
       setState('success');
       setTimeout(() => {
         onClose();
@@ -134,7 +144,11 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
           setCaption('');
         }, 300);
       }, 1500);
-    }, 1500);
+    } catch (err) {
+      console.error('Create snap error:', err);
+      setState('error');
+      setErrorMessage('Không thể đăng snap. Vui lòng thử lại.');
+    }
   };
 
   if (!isOpen) return null;

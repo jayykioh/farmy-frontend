@@ -31,8 +31,18 @@ export interface FarmSnap {
   createdAt: string;
 }
 
+export interface FarmSnapComment {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  content: string;
+  createdAt: string;
+}
+
 export interface CreateSnapPayload {
-  imageFile: File;
+  imageFile?: File;
+  imageUrl?: string;
   cropType: string;
   condition: SnapCondition;
   conditionNote?: string;
