@@ -81,37 +81,30 @@ const getApiUrl = (path: string) => {
   return `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
 };
 
-const parseSseBlock = (block: string) => {
-  let event = 'message';
-  const dataLines: string[] = [];
-
-  for (const line of block.split('\n')) {
-    if (line.startsWith('event:')) {
-      event = line.slice(6).trim();
-      continue;
-    }
-
-    if (line.startsWith('data:')) {
-      dataLines.push(line.slice(5).trimStart());
-    }
-  }
-
-  if (dataLines.length === 0) {
-    return null;
-  }
-
-  return {
-    event,
-    data: JSON.parse(dataLines.join('\n')) as unknown,
-  };
-};
-
 const createClientMessageId = () => {
   if ('randomUUID' in crypto) {
     return crypto.randomUUID();
   }
 
   return `client-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
+const createEventSourceStreamUrl = (message: string, sessionId?: string) => {
+  const params = new URLSearchParams({
+    message,
+    client_message_id: createClientMessageId(),
+  });
+  const accessToken = getAccessToken();
+
+  if (sessionId) {
+    params.set('session_id', sessionId);
+  }
+
+  if (accessToken) {
+    params.set('access_token', accessToken);
+  }
+
+  return `${getApiUrl('/chat/stream/events')}?${params.toString()}`;
 };
 
 export const fetchChatSessions = async (page = 1, limit = 20) => {
@@ -136,61 +129,54 @@ export const streamChatMessage = async (
   sessionId: string | undefined,
   handlers: StreamChatHandlers,
 ) => {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Accept: 'text/event-stream',
-  };
-  const accessToken = getAccessToken();
+  await new Promise<void>((resolve, reject) => {
+    const eventSource = new EventSource(createEventSourceStreamUrl(message, sessionId), {
+      withCredentials: true,
+    });
+    let settled = false;
 
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
+    const close = () => {
+      eventSource.close();
+      handlers.signal?.removeEventListener('abort', handleAbort);
+    };
 
-  const response = await fetch(getApiUrl('/chat/stream'), {
-    method: 'POST',
-    headers,
-    credentials: 'include',
-    signal: handlers.signal,
-    body: JSON.stringify({
-      message,
-      client_message_id: createClientMessageId(),
-      session_id: sessionId,
-    }),
-  });
+    const finish = (callback: () => void) => {
+      if (settled) return;
+      settled = true;
+      close();
+      callback();
+    };
 
-  if (!response.ok || !response.body) {
-    throw new Error('Không thể kết nối Chat API.');
-  }
+    const parseEvent = <T,>(event: MessageEvent<string>) => JSON.parse(event.data) as T;
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
+    const handleAbort = () => {
+      finish(() => reject(new DOMException('Chat stream aborted', 'AbortError')));
+    };
 
-  while (true) {
-    const { value, done } = await reader.read();
-    buffer += decoder.decode(value, { stream: !done });
-    const blocks = buffer.split('\n\n');
-    buffer = blocks.pop() ?? '';
+    handlers.signal?.addEventListener('abort', handleAbort, { once: true });
 
-    for (const block of blocks) {
-      const parsed = parseSseBlock(block.trim());
-      if (!parsed) continue;
+    eventSource.addEventListener('meta', (event) => {
+      handlers.onMeta?.(parseEvent<StreamMeta>(event as MessageEvent<string>));
+    });
 
-      if (parsed.event === 'meta') {
-        handlers.onMeta?.(parsed.data as StreamMeta);
-      } else if (parsed.event === 'token') {
-        const payload = parsed.data as { delta?: string };
-        handlers.onToken?.(payload.delta ?? '');
-      } else if (parsed.event === 'done') {
-        handlers.onDone?.(parsed.data as StreamDone);
-      } else if (parsed.event === 'error') {
-        const payload = parsed.data as StreamError;
-        throw new Error(payload.message || 'Không thể tạo phản hồi AI.');
+    eventSource.addEventListener('token', (event) => {
+      const payload = parseEvent<{ delta?: string }>(event as MessageEvent<string>);
+      handlers.onToken?.(payload.delta ?? '');
+    });
+
+    eventSource.addEventListener('done', (event) => {
+      handlers.onDone?.(parseEvent<StreamDone>(event as MessageEvent<string>));
+      finish(resolve);
+    });
+
+    eventSource.addEventListener('error', (event) => {
+      if ('data' in event && typeof event.data === 'string' && event.data) {
+        const payload = parseEvent<StreamError>(event as MessageEvent<string>);
+        finish(() => reject(new Error(payload.message || 'Không thể tạo phản hồi AI.')));
+        return;
       }
-    }
 
-    if (done) {
-      break;
-    }
-  }
+      finish(() => reject(new Error('Không thể kết nối Chat SSE.')));
+    });
+  });
 };
