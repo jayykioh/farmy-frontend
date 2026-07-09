@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
 import { register } from '../api/auth';
 
-type RegisterFormValues = {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
+const registerSchema = z.object({
+  name: z.string().trim().min(1, 'Vui lòng nhập họ tên.'),
+  email: z.string().trim().min(1, 'Vui lòng nhập email.').email('Email không hợp lệ.'),
+  password: z.string().min(1, 'Vui lòng nhập mật khẩu.'),
+  confirmPassword: z.string().min(1, 'Vui lòng nhập lại mật khẩu.'),
+}).refine((values) => values.password === values.confirmPassword, {
+  message: 'Mật khẩu nhập lại không khớp.',
+  path: ['confirmPassword'],
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError<{ message?: string }>(error)) {
@@ -30,9 +37,9 @@ export const Register: React.FC = () => {
   const {
     register: registerField,
     handleSubmit,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -86,10 +93,7 @@ export const Register: React.FC = () => {
                 placeholder="Nhập họ và tên"
                 disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
-                {...registerField('name', {
-                  required: 'Vui lòng nhập họ tên.',
-                  setValueAs: (value) => typeof value === 'string' ? value.trim() : value,
-                })}
+                {...registerField('name')}
               />
               {errors.name ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.name.message}</p> : null}
             </div>
@@ -103,10 +107,7 @@ export const Register: React.FC = () => {
                 placeholder="farmer@example.com"
                 disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
-                {...registerField('email', {
-                  required: 'Vui lòng nhập email.',
-                  setValueAs: (value) => typeof value === 'string' ? value.trim() : value,
-                })}
+                {...registerField('email')}
               />
               {errors.email ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.email.message}</p> : null}
             </div>
@@ -120,9 +121,7 @@ export const Register: React.FC = () => {
                 placeholder="Tạo mật khẩu"
                 disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
-                {...registerField('password', {
-                  required: 'Vui lòng nhập mật khẩu.',
-                })}
+                {...registerField('password')}
               />
               {errors.password ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.password.message}</p> : null}
             </div>
@@ -136,10 +135,7 @@ export const Register: React.FC = () => {
                 placeholder="Nhập lại mật khẩu"
                 disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
-                {...registerField('confirmPassword', {
-                  required: 'Vui lòng nhập lại mật khẩu.',
-                  validate: (value) => value === getValues('password') || 'Mật khẩu nhập lại không khớp.',
-                })}
+                {...registerField('confirmPassword')}
               />
               {errors.confirmPassword ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.confirmPassword.message}</p> : null}
             </div>

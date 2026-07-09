@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
 import { login } from '../api/auth';
 
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
+const loginSchema = z.object({
+  email: z.string().trim().min(1, 'Vui lòng nhập email.').email('Email không hợp lệ.'),
+  password: z.string().min(1, 'Vui lòng nhập mật khẩu.'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError<{ message?: string }>(error)) {
@@ -30,6 +34,7 @@ export const WelcomeAuth: React.FC = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -88,10 +93,7 @@ export const WelcomeAuth: React.FC = () => {
                 placeholder="farmer@example.com"
                 disabled={isBusy}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
-                {...registerField('email', {
-                  required: 'Vui lòng nhập email.',
-                  setValueAs: (value) => typeof value === 'string' ? value.trim() : value,
-                })}
+                {...registerField('email')}
               />
               {errors.email ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.email.message}</p> : null}
             </div>
@@ -105,9 +107,7 @@ export const WelcomeAuth: React.FC = () => {
                 placeholder="Nhập mật khẩu"
                 disabled={isBusy}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
-                {...registerField('password', {
-                  required: 'Vui lòng nhập mật khẩu.',
-                })}
+                {...registerField('password')}
               />
               {errors.password ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.password.message}</p> : null}
             </div>
