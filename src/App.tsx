@@ -52,6 +52,7 @@ export function App() {
                 <Route path="/diary/history" element={<DiaryHistory />} />
                 <Route path="/diary/create" element={<CreateDiary />} />
                 <Route path="/chat/active" element={<ChatActive />} />
+                <Route path="/chat/active/:sessionId" element={<ChatActive />} />
                 <Route path="/chat" element={<ChatList />} />
                 <Route path="/scan" element={<PlantScan />} />
                 <Route path="/profile" element={<Profile />} />
