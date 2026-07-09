@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 
 export const OnboardingStep2: React.FC = () => {
   const navigate = useNavigate();
+  const { checkingAuth } = useRequireAuth();
   const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  if (checkingAuth) {
+    return null;
+  }
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-blue-100 via-bg-surface to-green-100 overflow-hidden font-sans">

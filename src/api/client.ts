@@ -21,7 +21,8 @@ type TokenRefreshSubscriber = {
 type RefreshTokenResponse = {
   success: true;
   data: {
-    accessToken: string;
+    access_token?: string;
+    accessToken?: string;
   };
 };
 
@@ -111,10 +112,10 @@ api.interceptors.response.use(
         { withCredentials: true },
       );
 
-      const { accessToken } = response.data.data;
+      const accessToken = response.data.data.access_token ?? response.data.data.accessToken;
 
       if (!accessToken) {
-        throw new Error('Refresh response did not include accessToken');
+        throw new Error('Refresh response did not include access token');
       }
 
       setAccessToken(accessToken);
