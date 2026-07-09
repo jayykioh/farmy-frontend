@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
 import { login } from '../api/auth';
+
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError<{ message?: string }>(error)) {
@@ -18,34 +24,30 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const {
+    register: registerField,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const submitLogin = async (credentials: { email: string; password: string }) => {
-    setLoading(true);
+  const submitLogin = async (credentials: LoginFormValues) => {
     setErrorMsg('');
 
     try {
-      await login(credentials);
+      await login({
+        email: credentials.email.trim(),
+        password: credentials.password,
+      });
       navigate('/onboarding-1');
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!email.trim() || !password) {
-      setErrorMsg('Vui lòng nhập email và mật khẩu.');
-      return;
-    }
-
-    void submitLogin({ email: email.trim(), password });
   };
 
   const handleDemoLogin = () => {
@@ -54,6 +56,8 @@ export const WelcomeAuth: React.FC = () => {
       password: 'UserPassword123',
     });
   };
+
+  const isBusy = isSubmitting;
 
   return (
     <div className="w-full min-h-[100svh] flex flex-col relative overflow-hidden bg-bg-surface md:justify-center md:items-center">
@@ -71,7 +75,7 @@ export const WelcomeAuth: React.FC = () => {
         </main>
 
         <div className="w-full bg-bg-main rounded-t-[32px] md:rounded-none border-t-2 md:border-t border-border-main pt-6 pb-8 px-6 flex flex-col gap-4 shadow-2xl md:shadow-none">
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-3" onSubmit={handleSubmit(submitLogin)}>
             {errorMsg ? (<div className="bg-red-500/10 text-red-600 border border-red-500/20 text-xs font-semibold rounded-full px-4 py-2 text-center mb-2">
               {errorMsg}
             </div>) : null}
@@ -81,12 +85,15 @@ export const WelcomeAuth: React.FC = () => {
                 id="email"
                 type="email"
                 autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
                 placeholder="farmer@example.com"
-                disabled={loading}
+                disabled={isBusy}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
+                {...registerField('email', {
+                  required: 'Vui lòng nhập email.',
+                  setValueAs: (value) => typeof value === 'string' ? value.trim() : value,
+                })}
               />
+              {errors.email ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.email.message}</p> : null}
             </div>
 
             <div className="space-y-1">
@@ -95,20 +102,22 @@ export const WelcomeAuth: React.FC = () => {
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
                 placeholder="Nhập mật khẩu"
-                disabled={loading}
+                disabled={isBusy}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
+                {...registerField('password', {
+                  required: 'Vui lòng nhập mật khẩu.',
+                })}
               />
+              {errors.password ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.password.message}</p> : null}
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isBusy}
               className="w-full bg-primary text-white font-bold py-3 px-6 rounded-full shadow-[0_4px_14px_rgba(8,168,85,0.25)] hover:bg-primary-container active:scale-95 transition-all cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {isBusy ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </button>
 
             <div className="relative flex items-center justify-center my-1">
@@ -121,7 +130,7 @@ export const WelcomeAuth: React.FC = () => {
             <button
               type="button"
               onClick={() => setErrorMsg('Đăng nhập Google chưa có API backend. Vui lòng dùng email và mật khẩu.')}
-              disabled={loading}
+              disabled={isBusy}
               className="w-full bg-transparent text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 font-bold py-2.5 px-5 rounded-[20px] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -136,10 +145,10 @@ export const WelcomeAuth: React.FC = () => {
             <button
               onClick={handleDemoLogin}
               type="button"
-              disabled={loading}
+              disabled={isBusy}
               className="w-full bg-primary text-white font-bold py-3 px-6 rounded-full shadow-[0_4px_14px_rgba(8,168,85,0.25)] hover:bg-primary-container active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Đang kết nối...' : 'Đăng nhập Demo (user@farmy.com)'}
+              {isBusy ? 'Đang kết nối...' : 'Đăng nhập Demo (user@farmy.com)'}
             </button>
           </form>
           <p className="text-sm text-text-main/60 text-center mt-2">

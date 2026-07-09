@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
 import { register } from '../api/auth';
+
+type RegisterFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError<{ message?: string }>(error)) {
@@ -18,36 +26,33 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const {
+    register: registerField,
+    handleSubmit,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitRegister = async (values: RegisterFormValues) => {
     setErrorMsg('');
 
-    if (!name.trim() || !email.trim() || !password) {
-      setErrorMsg('Vui lòng nhập đầy đủ họ tên, email và mật khẩu.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorMsg('Mật khẩu nhập lại không khớp.');
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      await register({ name: name.trim(), email: email.trim(), password });
+      await register({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        password: values.password,
+      });
       navigate('/onboarding-1');
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng ký thất bại. Vui lòng thử lại.'));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -68,7 +73,7 @@ export const Register: React.FC = () => {
         </main>
 
         <div className="w-full bg-bg-main rounded-t-[32px] md:rounded-none border-t-2 md:border-t border-border-main pt-6 pb-8 px-6 flex flex-col gap-4 shadow-2xl md:shadow-none">
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-3" onSubmit={handleSubmit(submitRegister)}>
             {errorMsg ? (<div className="bg-red-500/10 text-red-600 border border-red-500/20 text-xs font-semibold rounded-full px-4 py-2 text-center mb-2">
               {errorMsg}
             </div>) : null}
@@ -78,12 +83,15 @@ export const Register: React.FC = () => {
                 id="fullname"
                 type="text"
                 autoComplete="name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
                 placeholder="Nhập họ và tên"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
+                {...registerField('name', {
+                  required: 'Vui lòng nhập họ tên.',
+                  setValueAs: (value) => typeof value === 'string' ? value.trim() : value,
+                })}
               />
+              {errors.name ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.name.message}</p> : null}
             </div>
 
             <div className="space-y-1">
@@ -92,12 +100,15 @@ export const Register: React.FC = () => {
                 id="register-email"
                 type="email"
                 autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
                 placeholder="farmer@example.com"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
+                {...registerField('email', {
+                  required: 'Vui lòng nhập email.',
+                  setValueAs: (value) => typeof value === 'string' ? value.trim() : value,
+                })}
               />
+              {errors.email ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.email.message}</p> : null}
             </div>
 
             <div className="space-y-1">
@@ -106,12 +117,14 @@ export const Register: React.FC = () => {
                 id="register-password"
                 type="password"
                 autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
                 placeholder="Tạo mật khẩu"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
+                {...registerField('password', {
+                  required: 'Vui lòng nhập mật khẩu.',
+                })}
               />
+              {errors.password ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.password.message}</p> : null}
             </div>
 
             <div className="space-y-1">
@@ -120,20 +133,23 @@ export const Register: React.FC = () => {
                 id="confirm-password"
                 type="password"
                 autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Nhập lại mật khẩu"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary focus:ring-1 focus:ring-primary shadow-sm transition-all outline-none disabled:opacity-60"
+                {...registerField('confirmPassword', {
+                  required: 'Vui lòng nhập lại mật khẩu.',
+                  validate: (value) => value === getValues('password') || 'Mật khẩu nhập lại không khớp.',
+                })}
               />
+              {errors.confirmPassword ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.confirmPassword.message}</p> : null}
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-primary text-white font-bold py-3 px-6 rounded-full shadow-[0_4px_14px_rgba(8,168,85,0.25)] hover:bg-primary-container active:scale-95 transition-all cursor-pointer mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+              {isSubmitting ? 'Đang đăng ký...' : 'Đăng ký'}
             </button>
           </form>
           <p className="text-sm text-text-main/60 text-center mt-2">
