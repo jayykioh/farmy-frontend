@@ -1,5 +1,5 @@
 import React from 'react';
-import type { FarmSnap } from '../types/farmSnap';
+import type { FarmSnap, SnapReactionType } from '../types/farmSnap';
 import { useNavigate } from 'react-router-dom';
 import { Heart, ThumbsUp, AlertTriangle, MessageSquare, Leaf, Wheat, Sprout } from 'lucide-react';
 
@@ -7,9 +7,10 @@ interface SnapCardProps {
   snap: FarmSnap;
   onClick?: () => void;
   mini?: boolean;
+  onReact?: (type: SnapReactionType) => void;
 }
 
-export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false }) => {
+export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false, onReact }) => {
   const navigate = useNavigate();
 
   const handleAiClick = (e: React.MouseEvent) => {
@@ -44,6 +45,11 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
     if (hours < 1) return 'Vừa xong';
     if (hours < 24) return `${hours} giờ trước`;
     return `${Math.floor(hours / 24)} ngày trước`;
+  };
+
+  const handleReact = (e: React.MouseEvent, type: SnapReactionType) => {
+    e.stopPropagation();
+    onReact?.(type);
   };
 
   if (mini) {
@@ -121,7 +127,7 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
         <div className="flex items-center justify-between border-t border-white/10 pt-3">
           <div className="flex items-center gap-3">
             <button 
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => handleReact(e, 'like')} 
               className="flex items-center gap-1.5 text-white/95 hover:text-white active:scale-90 transition-transform"
               aria-label="Like Snap"
             >
@@ -131,7 +137,7 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
               </span>
             </button>
             <button 
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => handleReact(e, 'helpful')} 
               className="flex items-center gap-1.5 text-white/95 hover:text-white active:scale-90 transition-transform"
               aria-label="Mark helpful"
             >
@@ -141,7 +147,7 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false 
               </span>
             </button>
             {snap.condition === 'issue' ? (<button 
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => handleReact(e, 'worry')} 
               className="flex items-center gap-1.5 text-white/95 hover:text-white active:scale-90 transition-transform"
               aria-label="Worry about issue"
             >
