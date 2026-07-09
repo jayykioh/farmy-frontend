@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
-import { register } from '../api/auth';
+import { useAuthStore } from '../store/authStore';
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, 'Vui lòng nhập họ tên.'),
@@ -33,6 +33,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
+  const register = useAuthStore((state) => state.register);
   const [errorMsg, setErrorMsg] = useState('');
   const {
     register: registerField,
@@ -53,8 +54,8 @@ export const Register: React.FC = () => {
 
     try {
       await register({
-        name: values.name.trim(),
-        email: values.email.trim(),
+        name: values.name,
+        email: values.email,
         password: values.password,
       });
       navigate('/onboarding-1');

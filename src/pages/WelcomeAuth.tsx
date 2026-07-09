@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
-import { login } from '../api/auth';
+import { useAuthStore } from '../store/authStore';
 
 const loginSchema = z.object({
   email: z.string().trim().min(1, 'Vui lòng nhập email.').email('Email không hợp lệ.'),
@@ -28,6 +28,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
   const [errorMsg, setErrorMsg] = useState('');
   const {
     register: registerField,
@@ -45,10 +46,7 @@ export const WelcomeAuth: React.FC = () => {
     setErrorMsg('');
 
     try {
-      await login({
-        email: credentials.email.trim(),
-        password: credentials.password,
-      });
+      await login(credentials);
       navigate('/onboarding-1');
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));

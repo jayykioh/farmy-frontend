@@ -1,30 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser } from '../api/auth';
+import { useAuthStore } from '../store/authStore';
 
 export const useRequireAuth = () => {
   const navigate = useNavigate();
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const initialize = useAuthStore((state) => state.initialize);
+  const status = useAuthStore((state) => state.status);
 
   useEffect(() => {
-    let isMounted = true;
+    if (status === 'idle') {
+      void initialize();
+      return;
+    }
 
-    getCurrentUser()
-      .catch(() => {
-        if (isMounted) {
-          navigate('/', { replace: true });
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setCheckingAuth(false);
-        }
-      });
+    if (status === 'unauthenticated') {
+      navigate('/', { replace: true });
+    }
+  }, [initialize, navigate, status]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [navigate]);
-
-  return { checkingAuth };
+  return { checkingAuth: status === 'idle' || status === 'checking' };
 };
