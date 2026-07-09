@@ -19,6 +19,18 @@ export type SnapFeedResponse = {
   nextCursor: string | null;
 };
 
+export type SnapUploadUrlResponse = {
+  key: string;
+  uploadUrl: string;
+  publicUrl: string;
+  expiresIn: number;
+};
+
+export type SnapPhotoUploadResponse = {
+  key: string;
+  publicUrl: string;
+};
+
 const toCreateSnapBody = (payload: CreateSnapPayload) => ({
   imageUrl: payload.imageUrl,
   cropType: payload.cropType,
@@ -38,9 +50,9 @@ export const fetchSnapFeed = async (params: SnapFeedParams = {}) => {
 };
 
 export const fetchSnap = async (id: string) => {
-  const { data } = await api.get<ApiResponse<FarmSnap & { comments?: FarmSnapComment[] }>>(
-    `/snaps/${id}`,
-  );
+  const { data } = await api.get<
+    ApiResponse<FarmSnap & { comments?: FarmSnapComment[] }>
+  >(`/snaps/${id}`);
   return data.data;
 };
 
@@ -50,6 +62,56 @@ export const createSnap = async (payload: CreateSnapPayload) => {
     toCreateSnapBody(payload),
   );
   return data.data;
+};
+
+export const createSnapUploadUrl = async (file: File) => {
+  const { data } = await api.post<ApiResponse<SnapUploadUrlResponse>>(
+    '/snaps/upload-url',
+    {
+      contentType: file.type,
+      fileName: file.name,
+    },
+  );
+  return data.data;
+};
+
+export const uploadSnapPhoto = async (file: File) => {
+  const upload = await createSnapUploadUrl(file);
+
+  try {
+    const response = await fetch(upload.uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!response.ok) {
+      throw new Error(`R2 upload failed with status ${response.status}`);
+    }
+
+    return upload;
+  } catch (error) {
+    if (!(error instanceof TypeError)) {
+      throw error;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post<ApiResponse<SnapPhotoUploadResponse>>(
+      '/snaps/upload',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+
+    return data.data;
+  }
 };
 
 export const reactToSnap = async (id: string, type: SnapReactionType) => {
