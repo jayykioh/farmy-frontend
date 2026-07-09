@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Leaf, AlertTriangle, Wheat } from 'lucide-react';
 import { MascotLottie } from './MascotLottie';
 import type { SnapCondition } from '../types/farmSnap';
-import { createSnap } from '../api/snaps';
+import { createSnap, dataUrlToImageFile, uploadImageToR2, validateImageFile } from '../api/uploads';
 
 interface SnapCaptureModalProps {
   isOpen: boolean;
@@ -17,6 +17,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
   const [, setStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   
   // Form state
@@ -90,6 +91,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
         // Get image data URL
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         setPhotoUrl(dataUrl);
+        setPhotoFile(null);
         stopCamera();
         setState('preview');
       }
@@ -98,35 +100,51 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
 
   const handleRetake = () => {
     setPhotoUrl(null);
+    setPhotoFile(null);
     setCaption('');
     startCamera();
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
+
     if (file) {
-      // Very basic validation
-      if (file.size > 10 * 1024 * 1024) {
+      try {
+        validateImageFile(file);
+      } catch (err) {
         setState('error');
-        setErrorMessage('Ảnh quá lớn, tối đa 10MB.');
+        setErrorMessage(err instanceof Error ? err.message : 'Ảnh không hợp lệ.');
         return;
       }
-      
+
       const url = URL.createObjectURL(file);
       setPhotoUrl(url);
+      setPhotoFile(file);
       stopCamera();
       setState('preview');
     }
   };
 
   const handleSubmit = async () => {
-    if (!photoUrl) return;
+    if (!photoUrl) {
+      setState('error');
+      setErrorMessage('Vui lòng chụp hoặc chọn một ảnh trước khi đăng.');
+      return;
+    }
 
     setState('uploading');
 
     try {
+      const file = photoFile ?? await dataUrlToImageFile(
+        photoUrl,
+        `farm-snap-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`,
+      );
+      const upload = await uploadImageToR2('snap', file);
+
       await createSnap({
-        imageUrl: photoUrl,
+        imageUrl: upload.publicUrl,
+        imageKey: upload.imageKey ?? upload.publicUrl,
         cropType,
         condition,
         caption: caption.trim() || undefined,
@@ -141,13 +159,14 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({ isOpen, onCl
         setTimeout(() => {
           setState('idle');
           setPhotoUrl(null);
+          setPhotoFile(null);
           setCaption('');
         }, 300);
       }, 1500);
     } catch (err) {
-      console.error('Create snap error:', err);
+      console.error(err);
       setState('error');
-      setErrorMessage('Không thể đăng snap. Vui lòng thử lại.');
+      setErrorMessage(err instanceof Error ? err.message : 'Không thể đăng ảnh, vui lòng thử lại.');
     }
   };
 

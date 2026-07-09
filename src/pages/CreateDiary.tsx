@@ -5,6 +5,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery, useCreateDiaryLogMutation } from '../store/api/farmApi';
 import { Sprout, ChevronDown, Thermometer, Droplets, FlaskConical, BugOff, Camera, X, Save } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { uploadImageToR2 } from '../api/uploads';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
@@ -13,7 +14,9 @@ export const CreateDiary: React.FC = () => {
   const [selectedDiaryId, setSelectedDiaryId] = useState<string>('');
   const [growthStage, setGrowthStage] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
-  const [imageUrl, setImageUrl] = useState<string>('https://lh3.googleusercontent.com/aida-public/AB6AXuBBsDRgI1pvIo50IOk1rW3XMKV7rFhTt9_s8aTQNkN_WywF7AIGqdVhXjoHALtZprcHrXKjLhttsRZCpjA4uvk_Um24WBesbsE838pimS7ZoudphdnkPFClv9WTTHUkJeYPc4xmdfViit333Cz9CIlJOwN1Q3vb7F72FPHvJMjnyqxQTdgnBBr2O-MnyEgAEIaPO1Dm6D_LT6RC8NAcso7A3hw9dfbzxz58X2roER3BslU56C5sb_vWdPjtLft7MqmLlOGLkEQso-ij'); // default placeholder image
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState<string>('');
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
 
   useEffect(() => {
@@ -27,6 +30,28 @@ export const CreateDiary: React.FC = () => {
     setActiveActivities(prev => 
       prev.includes(activity) ? prev.filter(a => a !== activity) : [...prev, activity]
     );
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+
+    if (!file || isUploadingPhoto || photoUrls.length >= 4) {
+      return;
+    }
+
+    setPhotoUploadError('');
+    setIsUploadingPhoto(true);
+
+    try {
+      const upload = await uploadImageToR2('diary', file);
+      setPhotoUrls(prev => [...prev, upload.publicUrl].slice(0, 4));
+    } catch (err) {
+      console.error(err);
+      setPhotoUploadError(err instanceof Error ? err.message : 'Tải ảnh thất bại, thử lại.');
+    } finally {
+      setIsUploadingPhoto(false);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -60,7 +85,8 @@ export const CreateDiary: React.FC = () => {
         log: {
           activity_type: activityType,
           content,
-          image_url: imageUrl || undefined,
+          image_url: photoUrls[0],
+          photo_urls: photoUrls,
         }
       }).unwrap();
 
@@ -193,35 +219,34 @@ export const CreateDiary: React.FC = () => {
               <div className="space-y-3">
                 <label className="font-bold text-sm text-text-main ml-2">Hình ảnh thực tế (Tối đa 4)</label>
                 <div className="grid grid-cols-4 gap-4">
-                  <label className="aspect-square border border-dashed border-border-main rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-bg-surface-1 transition-colors group">
+                  {photoUrls.length < 4 ? (<label className={`aspect-square border border-dashed border-border-main rounded-2xl flex flex-col items-center justify-center transition-colors group ${isUploadingPhoto ? 'cursor-wait bg-bg-surface-1' : 'cursor-pointer hover:bg-bg-surface-1'}`}>
                     <input 
-                      accept="image/*" 
+                      accept="image/jpeg,image/png,image/webp" 
                       className="hidden" 
                       type="file" 
-                      onChange={() => {
-                        // In demo, we just use a random stock image when user selects file
-                        const randomImages = [
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuCzBjvc2DnHkU5kbDFMSwtv8BlsaiWbQudALcZbuYhJy8SPHAFmGOkRmm-l4KC5VSOUk3atkwm00nuuz6Z2ZTKRVAhQjwV3GoTebXZfy1o2eAujMFFziKt-smBZYu6Z5Y1OVRnyLwO5JVfFyoo6FbCJJv1cckKZSMi83YrGWZ_7RpHiVKx2k0l6Z-YKvzETxUD2sLP4FyEfy0ttKsrdDJkHT2IBS62yJLWXk_d0dEaJPZWKTLQH6XjW6IIrIL0y_y0AlbCNPcThctr7',
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuCJ98QwVUaI-DYbws4DExxqd5xte7Qsvnb_b1pfuim31P1em64_rv8k8mhv-ekc8vTVSDCAXyl2iszSTYAk-UGVNY3DAuFbnqmHK8vvkA1kl7Gk7g-MyndBvWKCjfG5eYPNiCsJ8ETcmdNgkjOpGqEEiDgdWh1ZZD1LInCVY4-RDhT6EnOkcQmqqNP5aKuHqDgJcqbw1aU03xTwIeAgj44GBwbORCJUR6IuOK5-Q3P17hzsLuTXZvHOCZNDXU4HrHFK_jc3FcLYK9Lc'
-                        ];
-                        setImageUrl(randomImages[Math.floor(Math.random() * randomImages.length)]);
-                      }}
+                      disabled={isUploadingPhoto}
+                      onChange={handlePhotoUpload}
                     />
-                    <Camera className="w-6 h-6 text-text-main/30 group-hover:text-primary transition-colors group-hover:scale-110" />
-                    <span className="text-[10px] font-bold text-text-main/50 mt-1">Thêm ảnh</span>
-                  </label>
+                    {isUploadingPhoto ? (
+                      <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-text-main/30 group-hover:text-primary transition-colors group-hover:scale-110" />
+                    )}
+                    <span className="text-[10px] font-bold text-text-main/50 mt-1">{isUploadingPhoto ? 'Đang tải' : 'Thêm ảnh'}</span>
+                  </label>) : null}
                   {/* Photo preview */}
-                  {imageUrl ? (<div className="aspect-square bg-bg-surface-1 rounded-2xl overflow-hidden shadow-sm border border-border-main/30 relative group">
-                    <img className="w-full h-full object-cover opacity-90" alt="Preview" src={imageUrl} />
+                  {photoUrls.map((photoUrl, index) => (<div key={photoUrl} className="aspect-square bg-bg-surface-1 rounded-2xl overflow-hidden shadow-sm border border-border-main/30 relative group">
+                    <img className="w-full h-full object-cover opacity-90" alt={`Preview ${index + 1}`} src={photoUrl} />
                     <button 
                       type="button" 
-                      onClick={() => setImageUrl('')} 
+                      onClick={() => setPhotoUrls(prev => prev.filter((_, photoIndex) => photoIndex !== index))} 
                       className="absolute top-1 right-1 w-5 h-5 bg-black/50 text-white rounded-full flex items-center justify-center text-[10px] font-bold"
                     >
                       <X className="w-3 h-3" />
                     </button>
-                  </div>) : null}
+                  </div>))}
                 </div>
+                {photoUploadError ? (<p className="text-sm font-bold text-red-500 ml-2">{photoUploadError}</p>) : null}
               </div>
               
               {/* Mascot Tip */}
@@ -244,11 +269,11 @@ export const CreateDiary: React.FC = () => {
         {diaries.length > 0 && !fetching ? (<footer className="fixed md:static bottom-0 left-0 right-0 w-full max-w-2xl mx-auto p-6 bg-white/90 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t border-border-main/30 md:border-t-0 space-y-3 z-50 rounded-b-[40px]">
           <Button 
             onClick={handleSave}
-            disabled={loading}
+            disabled={loading || isUploadingPhoto}
             className="w-full shadow-[0_10px_20px_rgba(8,168,85,0.2)] active:shadow-[0_4px_10px_rgba(8,168,85,0.1)] active:translate-y-0.5 active:scale-95 transition-all text-lg py-4 rounded-full"
             icon={<Save className="w-5 h-5" />}
           >
-            {loading ? 'Đang lưu nhật ký...' : 'Lưu nhật ký'}
+            {loading ? 'Đang lưu nhật ký...' : isUploadingPhoto ? 'Đang tải ảnh...' : 'Lưu nhật ký'}
           </Button>
           <button 
             onClick={() => navigate(-1)}

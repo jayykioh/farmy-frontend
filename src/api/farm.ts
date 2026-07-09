@@ -25,6 +25,7 @@ export interface DiaryLog {
   activity_type: string;
   content: string;
   image_url?: string;
+  photo_urls?: string[];
   created_at: string;
 }
 
@@ -73,7 +74,7 @@ export const getDiaryLogs = async (diaryId: string): Promise<DiaryLog[]> => {
 
 export const createDiaryLog = async (
   diaryId: string,
-  log: { activity_type: string; content: string; image_url?: string }
+  log: { activity_type: string; content: string; image_url?: string; photo_urls?: string[] }
 ): Promise<DiaryLog> => {
   const { data } = await api.post<{ data: DiaryLog }>(`/diaries/${diaryId}/logs`, log);
   return data.data;
