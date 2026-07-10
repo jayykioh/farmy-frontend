@@ -1,12 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
-import { useGetPetStateQuery } from '../store/api/farmApi';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { MapPin, Award, Flame, Droplets, Clock, Target, LogOut, PenLine, Medal, ShieldAlert } from 'lucide-react';
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
-  const { data: petState, isLoading: loading } = useGetPetStateQuery();
+  const { data: petStatusRaw, isLoading: loading } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const getLevelTitle = (level: number) => {
     if (level < 5) return 'Làm Vườn Tập Sự (Novice Farmer)';
@@ -15,8 +17,8 @@ export const Profile: React.FC = () => {
     return 'Vua Nông Trại (Master Farmer)';
   };
 
-  const xpNeeded = (petState?.level ?? 1) * 100;
-  const progressPercent = Math.min(100, Math.max(0, ((petState?.xp ?? 0) / xpNeeded) * 100));
+  const xpNeeded = petStatus.level * 100;
+  const progressPercent = Math.min(100, Math.max(0, (petStatus.exp / xpNeeded) * 100));
 
   return (
     <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-[100px] max-w-3xl mx-auto bg-bg-main min-h-screen">
@@ -37,7 +39,7 @@ export const Profile: React.FC = () => {
         {/* Badge overlay */}
         <div className="absolute right-4 top-4 bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full font-bold text-xs border border-yellow-200 flex items-center gap-1 z-10 shadow-sm rotate-3">
           <Award className="w-4 h-4" />
-          {petState?.level && petState.level >= 15 ? 'Vua Nông Trại' : petState?.level && petState.level >= 10 ? 'Chuyên Gia' : 'Tập Sự'}
+          {petStatus.level >= 15 ? 'Vua Nông Trại' : petStatus.level >= 10 ? 'Chuyên Gia' : 'Tập Sự'}
         </div>
         {/* Decorative background pattern */}
         <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-primary-lightest/30 rounded-full pointer-events-none"></div>
@@ -51,17 +53,17 @@ export const Profile: React.FC = () => {
           <>
             <div className="flex justify-between items-end mb-4">
               <div>
-                <h3 className="text-xl font-bold text-text-h">Cấp độ {petState?.level ?? 1}</h3>
+                <h3 className="text-xl font-bold text-text-h">Cấp độ {petStatus.level}</h3>
                 <p className="text-base font-semibold text-text-main/70">
-                  {getLevelTitle(petState?.level ?? 1)}
+                  {getLevelTitle(petStatus.level)}
                 </p>
               </div>
               <div className="text-right flex flex-col items-end">
                 <span className="font-extrabold text-primary text-lg font-mono">
-                  {petState?.xp ?? 0} XP
+                  {petStatus.exp} XP
                 </span>
                 <p className="text-xs font-bold text-text-main/50 uppercase tracking-wide">
-                  / {xpNeeded} XP lên cấp {(petState?.level ?? 1) + 1}
+                  / {xpNeeded} XP lên cấp {petStatus.level + 1}
                 </p>
               </div>
             </div>
@@ -124,7 +126,7 @@ export const Profile: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
             <Flame className="w-6 h-6 text-orange-500 drop-shadow-sm" />
-            Chuỗi {petState?.streak_count ?? 0} ngày chăm chỉ liên tiếp!
+            Chuỗi {petStatus.streakCount} ngày chăm chỉ liên tiếp!
           </h3>
           <span className="font-bold text-sm bg-bg-surface-1 text-text-main/70 px-3 py-1 rounded-full border border-border-main/30">
             {new Date().toLocaleString('vi-VN', { month: 'long' })}
@@ -136,8 +138,8 @@ export const Profile: React.FC = () => {
           ))}
         </div>
         <div className="grid grid-cols-7 gap-2 gap-y-3">
-          {Array.from({ length: Math.max(7, Math.min(30, (petState?.streak_count ?? 0) + 3)) }).map((_, i) => {
-            const isCompleted = i < (petState?.streak_count ?? 0);
+          {Array.from({ length: Math.max(7, Math.min(30, petStatus.streakCount + 3)) }).map((_, i) => {
+            const isCompleted = i < petStatus.streakCount;
             return (
               <div key={i} className="flex flex-col items-center gap-1">
                 <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${

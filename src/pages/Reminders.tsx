@@ -4,23 +4,28 @@ import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
 import {
   useGetPendingRemindersQuery,
-  useGetPetStateQuery,
   useCompleteReminderMutation,
 } from '../store/api/farmApi';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { useInvalidatePetStatus } from '../features/pet/hooks/useInvalidatePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Droplets, Clock, Repeat, Plus } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export const Reminders: React.FC = () => {
   const navigate = useNavigate();
   const { data: reminders = [], isLoading: remindersLoading } = useGetPendingRemindersQuery();
-  const { data: petState, isLoading: petLoading } = useGetPetStateQuery();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
+  const invalidatePetStatus = useInvalidatePetStatus();
   const [completeReminder] = useCompleteReminderMutation();
 
-  const loading = remindersLoading || petLoading;
+  const loading = remindersLoading;
 
   const handleComplete = async (id: string) => {
     try {
       await completeReminder(id).unwrap();
+      invalidatePetStatus();
     } catch (err) {
       console.error(err);
       alert('Không thể hoàn thành nhắc nhở!');
@@ -43,7 +48,7 @@ export const Reminders: React.FC = () => {
         
         <div className="bg-white border border-primary/20 shadow-sm rounded-[24px] p-4 mb-6 flex items-center gap-4 relative">
           <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-primary/20 shadow-sm relative flex-shrink-0 p-1">
-            <MascotLottie className="w-full h-full -mt-1" state={petState?.mood || 'happy'} />
+            <MascotLottie className="w-full h-full -mt-1" state={petStatus.mood} />
           </div>
           <div className="flex-1">
             <p className="font-medium text-base text-text-main">

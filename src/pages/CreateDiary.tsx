@@ -3,21 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery, useCreateDiaryLogMutation } from '../store/api/farmApi';
+import { useInvalidatePetStatus } from '../features/pet/hooks/useInvalidatePetStatus';
+import { uploadImageToR2 } from '../api/uploads';
 import { Sprout, ChevronDown, Thermometer, Droplets, FlaskConical, BugOff, Camera, X, Save } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { uploadImageToR2 } from '../api/uploads';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
   const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
   const [createDiaryLog, { isLoading: loading }] = useCreateDiaryLogMutation();
+  const invalidatePetStatus = useInvalidatePetStatus();
   const [selectedDiaryId, setSelectedDiaryId] = useState<string>('');
   const [growthStage, setGrowthStage] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
+  const [activeActivities, setActiveActivities] = useState<string[]>([]);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const [photoUploadError, setPhotoUploadError] = useState<string>('');
-  const [activeActivities, setActiveActivities] = useState<string[]>([]);
+  const [photoUploadError, setPhotoUploadError] = useState('');
 
   useEffect(() => {
     if (diaries.length > 0 && !selectedDiaryId) {
@@ -89,6 +91,8 @@ export const CreateDiary: React.FC = () => {
           photo_urls: photoUrls,
         }
       }).unwrap();
+
+      invalidatePetStatus();
 
       navigate('/diary');
     } catch (err) {

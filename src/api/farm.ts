@@ -97,6 +97,7 @@ export const createReminder = async (reminder: { title: string; remind_at: strin
 };
 
 // 5. Pet API
+/** @deprecated — use PetStatus from features/pet/types instead */
 export interface PetState {
   mood: 'happy' | 'neutral' | 'sad' | 'worried' | 'excited';
   streak_count: number;
@@ -106,6 +107,7 @@ export interface PetState {
   mood_reason?: string;
 }
 
+/** @deprecated — use fetchPetStatus from features/pet/services instead */
 export const getPetState = async (): Promise<PetState> => {
   const { data } = await api.get<{ data: PetState }>('/pet/state');
   return data.data;

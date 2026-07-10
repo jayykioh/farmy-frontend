@@ -1,4 +1,5 @@
 import { api, type ApiResponse } from './client';
+import type { PetStatus } from '../features/pet/types/pet.types';
 
 export type PetMood = 'happy' | 'excited' | 'neutral' | 'sad' | 'worried' | 'hungry' | 'sleepy';
 
@@ -22,21 +23,8 @@ export const fetchPetState = async () => {
   return data.data;
 };
 
-export type PetStatusResponse = {
-  mood: PetMood;
-  previousMood?: PetMood;
-  streakCount: number;
-  level: number;
-  exp: number;
-  lastDiaryDate?: string;
-  missedDays: number;
-  moodReason: string;
-  bubbleMessage: string;
-  updatedAt?: string;
-};
-
-/** Primary endpoint — returns full PetStatusResponse with recalculated mood. */
+/** Primary endpoint — returns full PetStatus with recalculated mood. */
 export const fetchPetStatus = async () => {
-  const { data } = await api.get<ApiResponse<PetStatusResponse>>('/pet/status');
+  const { data } = await api.get<ApiResponse<PetStatus>>('/pet/status');
   return data.data;
 };
