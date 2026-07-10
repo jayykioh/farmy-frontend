@@ -1,0 +1,1767 @@
+
+Farm Diaries
+Enterprise-Grade Smart Agriculture & Vision-Powered Farming Platform
+Software Requirements Specification
+Version 1.0
+
+
+Mục lục
+1.LỊCH SỬ TÀI LIỆU.. 4
+2.TÀI LIỆU THAM KHẢO.. 4
+3.DISTRIBUTION LIST AND APPROVALS. 4
+4.GIỚI THIỆU.. 4
+4.1  Mục tiêu của hệ thống. 4
+4.2  Phạm vi 5
+5.TỔNG QUAN.. 5
+5.1  Tác nhân. 5
+5.2  Biểu đồ Use Case. 6
+5.2.1   Biểu đồ Use Case  - Bán lẻ. 7
+5.2.2   Biểu đồ Use Case  - Bán theo đơn thuốc. 8
+5.2.3   Biểu đồ Use Case  - Bán sỉ 8
+5.2.4   Biểu đồ Use Case  - Khách hoàn trả. 8
+5.2.5   Biểu đồ Use Case  - Nhập kho. 9
+5.2.6   Biểu đồ Use Case  - Xuất hủy. 9
+5.2.7   Biểu đồ Use Case  - Xuất hoàn trả. 9
+5.2.8   Biểu đồ Use Case  - Quản lí khách hàng. 10
+5.2.9   Biểu đồ Use Case  - Quản lí nhà cung cấp. 10
+5.2.10 Biểu đồ Use Case  - Quản lí nhóm thuốc. 10
+5.2.11 Biểu đồ Use Case  - Quản lí thuốc. 11
+5.2.12 Biểu đồ Use Case  - Quản nhân viên. 11
+5.2.13 Biểu đồ Use Case  - Quản lí toa thuốc. 11
+5.2.14 Biểu đồ Use Case  - Quản lí  tài khoản. 12
+5.3  Hệ thống Pages Flow.. 12
+6.MÔ TẢ CHỨC NĂNG.. 13
+6.1  Login. 13
+6.2  Quản lý bán hàng. 13
+6.2.1   Screen Design. 14
+6.3  Quản lý bán hàng – Bán lẻ. 16
+6.3.1   Screen Design: 17
+6.4  Quản lý bán hàng – Bán theo đơn. 24
+6.4.1   Screen Design: 25
+6.5  Quản lý bán hàng – Bán sỉ 28
+6.5.1   Screen Design: 29
+6.6  Quản lý bán hàng – Khách hoàn trả. 31
+6.6.1   Screen Design: 32
+6.7  Quản lý kho - Nhập kho. 34
+6.7.1   Screen Design. 35
+6.8  Quản lý kho - Xuất kho. 41
+6.8.1   Screen Design. 41
+6.9  Quản lý kho - Xuất hoàn trả. 43
+6.9.1   Screen Design. 44
+6.10Quản lý kho - Xuất hủy. 47
+6.10.1 Screen Design. 47
+6.11Quản lý thông tin. 50
+6.11.1 Quản lý nhóm thuốc. 50
+6.11.2 Quản lý thông tin thuốc. 52
+6.11.3 Quản lý khách hàng. 58
+6.11.4 Quản lý nhà cung cấp. 66
+6.11.5 Quản lý nhân viên. 74
+6.11.6 Quản lý thông tin toa thuốc. 80
+6.12Tra cứu. 87
+6.12.1 Screen Design. 87
+6.13Báo cáo. 95
+6.13.1 Screen Design. 95
+6.14Quản lý tài khoản. 102
+6.14.1 Screen Design. 102
+6.15Thay đổi mật khẩu. 105
+6.15.1 Screen Design. 105
+7.YẾU CẦU PHI CHỨC NĂNG VÀ YÊU CẦU KHÁC.. 107
+7.1  Yêu cầu phi chức năng: 107
+7.2  Yêu cầu môi trường phát triển. 107
+8.PHỤ LỤC.. 107
+ 
+
+ 
+1.      LỊCH SỬ TÀI LIỆU
+
+--- TABLE ---
+Date | Summary of Changes | Version
+19/05/2026 | Software Requirements Specification | 1.0
+ |  | 
+ |  | 
+-------------
+
+2.      TÀI LIỆU THAM KHẢO
+
+--- TABLE ---
+Document Name | Description
+  |  
+  |  
+  |  
+  |  
+-------------
+
+3.  DISTRIBUTION LIST AND APPROVALS
+
+--- TABLE ---
+Name | Title
+  |  
+  |  
+  |  
+  |  
+  |  
+-------------
+
+4.      GIỚI THIỆU
+4.1      Mục tiêu của hệ thống
+·      Giải quyết nỗi đau thực tế:
+Thiếu công cụ theo dõi thời gian thực: Nông dân không có công cụ số hóa để giám sát quá trình canh tác một cách trực quan và liên tục theo thời gian thực.
+Hay quên lịch trình chăm sóc: Việc quản lý lịch trình bằng trí nhớ hoặc sổ tay truyền thống dễ dẫn đến tình trạng bỏ sót các giai đoạn bón phân, tưới nước hoặc phun thuốc quan trọng.
+Chậm trễ trong phát hiện dịch bệnh: Thiếu cơ chế cảnh báo sớm khiến sâu bệnh không được phát hiện kịp thời, dẫn đến thiệt hại lớn về năng suất khi dịch bùng phát.
+Thiếu dữ liệu đối chiếu giữa các vụ mùa: Không có hệ thống lưu trữ dữ liệu lịch sử canh tác, khiến nông dân gặp khó khăn trong việc phân tích, rút kinh nghiệm và tối ưu hóa quy trình cho các vụ mùa tiếp theo.
+·      Mục tiêu giải pháp: Trợ lý ảo cá nhân hóa:
+Xây dựng Nhật ký nông trại thông minh: Phát triển ứng dụng di động cho phép ghi chép, số hóa và lưu trữ toàn bộ biên niên ký của nông trại một cách tự động và khoa học.
+Tích hợp Trợ lý ảo AI Assistant: Cung cấp một trợ lý trí tuệ nhân tạo hoạt động như một chuyên gia nông nghiệp ảo đồng hành cùng người nông dân.
+Cá nhân hóa lịch trình nhắc nhở: AI tự động phân tích lịch sử canh tác, đặc tính loại cây và điều kiện hiện tại của từng nông hộ để đưa ra các thông báo nhắc nhở chăm sóc chính xác.
+Cơ chế tự học hỏi và tối ưu (Machine Learning): Hệ thống liên tục thu thập và học hỏi từ dữ liệu thực tế thu được qua các vụ mùa, từ đó nâng cao độ chính xác của các đề xuất tư vấn theo thời gian.
+4.2      Phạm vi
+Về đối tượng và địa lý: Hệ thống giới hạn phạm vi phục vụ hoàn toàn tại thị trường Việt Nam, hướng tới tập khách hàng cụ thể là nông dân nhỏ lẻ . 
+
+Về lĩnh vực canh tác: Hệ thống được thiết kế chuyên biệt cho việc trồng trọt thực vật. Toàn bộ cơ sở dữ liệu và tính năng đều xoay quanh cây trồng, bao gồm: ghi chú loại cây (crop type), giai đoạn sinh trưởng, lịch sử tưới nước, bón phân, hướng dẫn phòng ngừa dịch bệnh, và khả năng AI quét ảnh lá cây để chẩn đoán bệnh
+5.      TỔNG QUAN
+5.1      Tác nhân
+
+--- TABLE ---
+Tác nhân | Mô tả
+Người dùng (Nông dân) | Là tập khách hàng cụ thể của hệ thống (nông dân nhỏ lẻ). Thực hiện các chức năng cốt lõi như ghi chép nhật ký canh tác (CRUD), trò chuyện với Trợ lý AI, theo dõi trạng thái Thú cưng ảo, xem báo cáo tóm tắt tuần, và đánh giá chất lượng AI.
+Trợ lý ảo AI Assistant | Là chuyên gia nông nghiệp ảo tích hợp trong ứng dụng di động. Chức năng bao gồm cá nhân hóa lịch trình nhắc nhở chăm sóc và cung cấp các đề xuất tư vấn thông qua cơ chế tự học hỏi (Machine Learning).
+Quản trị viên Hệ thống | Đảm nhiệm việc quản lý và duy trì toàn bộ nền tảng Farm Diaries, bao gồm quản lý người dùng, cơ sở dữ liệu cây trồng, và đảm bảo tính năng hệ thống hoạt động ổn định.
+-------------
+
+ 
+
+ 
+5.2      Biểu đồ Use Case
+ 5.2.1     Biểu đồ Use Case  - Ghi chép nhật ký canh tác (CRUD) 
+
+5.2.2     Biểu đồ Use Case  - Trò chuyện với Trợ lý AI
+
+5.2.3     Biểu đồ Use Case  - Theo dõi trạng thái Thú cưng ảo
+
+5.2.4     Biểu đồ Use Case  - Xem báo cáo tóm tắt tuần5.2.5     Biểu đồ Use Case  - Đánh giá chất lượng AI
+5.3      Hệ thống Pages Flow
+ 
+6.   MÔ TẢ CHỨC NĂNG
+6.1  Login
+Người dùng phải đăng nhập tài khoản để truy cập vào hệ thống.
+Hệ thống sẽ cho cung cấp cho người dùng đăng nhập bằng một tên tài khoản và mật khẩu. Hệ thống sẽ xác minh tài khoản, tài khoản hợp lệ đã được đăng kí thì mới có thể đăng nhập hệ thống.
+Nếu tài khoản của người dùng là không hợp lệ hệ thống sẽ thông báo lỗi “Sai tên đăng nhập hoặc mật khẩu. Nhập lại” .
+6.2      Quản lý bán hàng
+
+--- TABLE ---
+Use Case Name | Quản lý bán hàng
+Use Case ID | SE160001
+High Level Requirement Ref |  
+Actor | Quản lý, Nhân viên
+Description | Quản lý các hóa đơn bán hàng. Cho phép xóa đối với người đăng nhập là quản lý.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công
+Post-processing |  
+-------------
+
+ 
+6.2.1     Screen Design
+6.2.1.1    Quản lý bán hàng - Bộ lọc
+
+--- TABLE ---
+Screen | QL Bán hàng - Bộ lọc
+Description | Ở giao diện này ta có thể tùy chọn việc hiển thị danh sách hóa đơn bán hàng, lọc các kết quả.
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng
+Screen Content
+Item | Type | Data | Description
+Từ ngày(dd/mm/yyyy) | Text field – Date (Date Picker) |   | Lọc từ ngày hóa đơn được lậpTrường này là bắt buộc
+Đến ngày(dd/mm/yyyy) | Text field – Date (Date Picker) |   | Lọc đến ngày hóa đơn được lậpTrường này là bắt buộc
+Từ giờ | Text field |   | Lọc từ giờ hóa đơn được lậpTrường này là bắt buộc
+Đến giờ | Text field |   | Lọc đến giờ hóa đơn được lậpTrường này là bắt buộc
+Hiển thị | ComboBox |   | Hiển thị loại hóa đơn được chọn trong comboBox
+Sắp xếp theo | ComboBox |   | Sắp xếp hiển thị hóa đơn theo kiểu đã được lựa chọn trong comboBox
+Xem | Button |   | Hiển thị danh sách hóa đơn
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Chức năng hiển thị danh sách hóa đơn theo tùy chọn. | Danh sách hóa đơn hiển thị những hóa đơn được lọc | Thông báo: “Chọn sai thời gian cần tra cứu”
+-------------
+
+6.2.1.2    Quản lý bán hàng – Danh sách
+
+--- TABLE ---
+Screen | QL Bán hàng – Danh sách
+Description | Hiển thị danh sách thông tin các hóa đơn bán hàng.
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng
+Screen Content
+Item | Type | Data | Description
+Mã hóa đơn | Text(9) |   | Mã của hóa đơn, để phân biệt các hóa đơn với nhau
+Tên khách hàng | Text(25) |   | Tên khách hàng đã bán ứng với hóa đơn
+Ngày lập | Date/Time(dd/mm/yyyy) |   | Ngày hóa đơn được lập
+Giờ lập | Date/Time |   | Giờ hóa đơn được lập
+Người lập | Text(25) |   | Tên của nhân viên lập hóa đơn
+Tổng tiền | Text (15) |   | Tổng tiền của hóa đơn
+Ghi chú | Text(50) |   | Ghi chú thêm của các hóa đơn
+Thêm | Button |   | Thêm một hóa đơn mới
+Xóa | Button |   | Xóa hóa đơn (chức năng này chỉ cho phép khi người dùng đăng nhập bằng tài khoản người quản lý)
+In phiếu | Button |   | In hóa đơn đã chọn trong bảng
+Trở về | Button |   | Thoát khỏi màn hình hiện tại, quay về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm một hóa đơn bán hàng mới. | Hiển thị màn hình “Bán hàng” |  
+Xóa | Nếu người truy cập hệ thống đang ở quyền “Quản lý” được phép xóa hóa đơn đang được chọn trong danh sách. | Hóa đơn được chọn trong danh sách sẽ bị xóa | Thông báo:“Chưa chọn hóa đơn”
+In phiếu | In ra thông tin chi tiết hóa đơn đang được chọn | Thông tin hóa đơn đang được chọn sẽ được in ra. | Thông báo:“Chưa chọn hóa đơn”
+Trở về | Thoát khỏi màn hình hiện tại | Màn hình “QL Bán hàng” sẽ bị ẩn đi, không xuất hiện trong tab xử lý chương trình. |  
+-------------
+
+6.3  Quản lý bán hàng – Bán lẻ
+
+--- TABLE ---
+Use Case Name | Bán lẻ
+Use Case ID | SE160002
+High Level Requirement Ref |  
+Actor | Quản lý, Nhân viên
+Description | Cho phép quản lí bán lẻ, thêm hóa đơn bán lẻ.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công
+Post-processing |  
+-------------
+
+6.3.1     Screen Design:
+6.3.1.1    Quản lý bán hàng – Bán lẻ
+
+--- TABLE ---
+Screen | Quản lý bán hàng – Bán lẻ
+Description | Tùy chọn các thông tin cho hóa đơn “bán lẻ”. Bao gồm chức năng về nhập thuốc từ toa có sẵn của hệ thống để giảm thiểu quá trình nhập liệu bằng tay đối với các đơn thuốc hay sử dụng.
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “1. Bán lẻ”
+Screen Content
+Item | Type | Data | Description
+Số phiếu | Text field |   | Số phiếu của hóa đơn. Được hệ thống cấp tự động, luôn là duy nhất để phân biệt các hóa đơn(hay còn gọi là mã hóa đơn)
+Nhân viên | Text field |   | Cho biết nhân viên lập hóa đơn.Trường này không cho phép sửa đổi, mà được tự động điền khi nhân viên hoặc người quản lý đăng nhập bằng tài khoản của mình
+Ngày lập | Text field – Date (Date Picker) |   | Nhập ngày lập hóa đơnLuôn đặt mặc định là ngày hiện tại
+Khách hàng | Text field |   | Đối với bán lẻ trường khách hàng luôn được lập mặc định là “khách lẻ” không cho phép sửa đổi
+Ghi chú | Text field |   | Ghi chú thêm thông tin của khách hàng nếu có
+Tham khảo toa thuốc | ComboBox |   | Khi bán lẻ nhân viên có thể tham khảo các toa thuốc có sẵn điều trị những bệnh thường gặp như: viêm họng, cảm cúm… Giúp công việc bán lẻ hiệu quả hơn.Người dùng có thể chọn các toa thuốc có sẵn được liệt kê trong comboBox
+Icon – Search | Icon |   | Tìm kiếm toa thuốc hoặc các triệu chứng của toa thuốc có sẵn trong CSDL
+Nhập thuốc từ toa có sẵn | Button |   | Hiện thị toa thuốc có sẵn để người dùng có thể chọn, thông tin thuốc được chọn sẽ được cập nhật vào Danh sách thuốc sau khi hoàn tất
+Tên thuốc | Text(25) |   | Tên thuốc
+Đơn vị tính | Text(6) |   | Đơn vị tính của thuốc đã quy đổi. VD: hộp, vỉ, lọ, viên…
+Số lượng | Number |   | Số lượng của tên thuốc được bán
+Đơn giá | Number |   | Giá bán lẻ của thuốc
+Thành tiền | Number |   | Tổng tiền của thuốc tương ứngĐược tính bằng công thức:Thành tiền = (Đơn giá) *Số lượng
+Tổng tiền | Text fieldEnable = false |   | Tổng tiền của hóa đơnBằng tổng thành tiền của mỗi loại thuốc trong hóa đơn
+Dropdown list – Icon mũi tên | Dropdown list |   | Thêm thông tin thuốcDropdown list sẽ sổ ra danh sách cho người dùng lựa chọn thuốc để thêm vào danh sách thuốc
+Thanh toán | Button |   | Hoàn tất công việc lập hóa đơn bán hàng, dữ liệu vừa lập sẽ được lưu trữ vào CSDL
+Xóa thuốc | Button |   | Xóa thuốc đã chọn trong bảng
+In phiếu | Button |   | In hóa đơn bán hàng vừa lập
+Trở về | Button |   | Thoát khỏi màn hình hiện tại, quay về màn hình trước đó.
+Screen Actions
+Action Name | Description | Success | Failure
+Icon - Search | Hỗ trợ việc tìm kiếm toa thuốc phù hợp với triệu chứng, thông tin người bệnh. Thực hiện việc hiển thị danh sách toa thuốc để người dùng tìm kiếm. | Hiển thị màn hình “Danh sách toa thuốc kê sẵn” |  
+Nhập thuốc từ toa sẵn | Thực hiện việc hiển thị toa thuốc tùy theo ComboBox tham khảo toa. | Hiển thị màn hình “Thông tin toa thuốc” | Thông báo: “Chưa chọn toa thuốc cần tham khảo”
+Thanh toán  | Thực hiện việc thanh toán hóa đơn. Hoạt động này sẽ được nhân viên thực hiện sau khi khách hàng thanh toán hóa đơn cho cừa hàng. Chức năng này sẽ thêm hóa đơn đang thao tác vào cơ sở dữ liệu. | Hóa đơn đang thao tác sẽ được lưu trữ vào cơ sở dữ liệu của chương trình. Đồng thời màn hình hiện tại sẽ bị thoát khỏi. | Thông báo: “Nhập sai số lượng thuốc. Quá số lượng tồn kho”
+Xóa thuốc | Thực hiện việc xóa loại thuốc đang được lựa chọn trong danh sách thuốc. Thuốc này sẽ không còn trong hóa đơn khi in hóa đơn cho khách hàng | Thuốc đang lựa chọn trong danh sách sẽ bị xóa. | Thông báo: “Chưa chọn thuốc!”
+In phiếu | Thực hiện việc in hóa đơn bán hàng cho khách hàng. Hóa đơn bán hàng sẽ được in vào file excel để nhân viên xem xét lần cuối trước khi in cho khách hàng. | Hóa đơn sẽ được in ra. | Thông báo: “Chưa hoàn tất thông tin hóa đơn”
+Trở về | Hủy hóa đơn đang thao tác. Hệ thống sẽ không lưu hóa đơn này và hệ thống sẽ thoát khỏi trang màn hình hiện tại. | Thoát khỏi trang màn hình hiện tại. |  
+-------------
+
+6.3.1.2Quản lý bán hàng – Bán lẻ - Danh sách toa thuốc kê sẵn
+
+--- TABLE ---
+Screen | Quản lý bàn hàng – Bán lẻ - Danh sách toa thuốc kê sẵn
+Description | Hiển thị danh sách toa thuốc kê sẵn. Các toa thuốc sẽ được hiển thị vào danh sách toa thuốc tùy theo tùy chọn trong thông tin tìm kiếm. Ngoài ra ta có thể truy cập xem chi tiết đơn thuốc để đưa vào hóa đơn bán hàng.
+Screen Access | Người dùng click vào menu Chức năng→QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “1. Bán lẻ”. Click vào biểu tượng “Icon - Search” trong tab Bán lẻ.
+Screen Content
+Item | Type | Data | Description
+Tìm kiếm theo | ComboBox |   | Liệt kê các thuộc tính của toa thuốc có sẵn cho người dùng lựa chọn để tìm kiếm
+Text field – Nhập | Text field |   | Nhập thông tin cần tìm kiếm
+Xem | Button |   | Hiển thị kết quả tìm kiếm xuống danh sách
+Mã toa thuốc | Text(6) |   | Mã của toa thuốc có sẵn là duy nhất để phân biệt các toa thuốc
+Tên toa thuốc | Text(25) |   | Tên của toa thuốc
+Đối tượng | Text(12) |   | Đối tượng điều trị của toa thuốc
+Triệu chứng | Text(50) |   | Triệu chứng của bênh mà toa thuốc có thể điều trị
+Ghi chú | Text(50) |   | Ghi chú thêm thông tin của toa thuốc nếu có
+Chi tiết toa thuốc | Button |   | Xem chi tiết của toa thuốc
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Thực hiện việc hiển thị danh sách toa thuốc theo điều kiện tìm kiếm (ComboBox tìm kiếm theo và TextBox tìm kiếm) . Nếu để trường TextBox tìm kiếm là trống thì hệ thống sẽ hiển thị tất cả các toa thuốc có sẵn trong hệ thống. | Danh sách toa thuốc phù hợp với điều kiện tìm kiếm ( triệu chứng, tên toa ) sẽ được hiển thị vào bảng danh sách toa thuốc. |      
+Chi tiết toa thuốc | Thực hiện việc hiển thị màn hình thể hiện chi tiết về toa thuốc. | Hiển thị màn hình “Thông tin toa thuốc” | Thông báo: “Chưa chọn toa thuốc”
+Trở về | Thoát khỏi màn hình hiện tại | Thoát màn hình “Danh sách toa thuốc kê sẵn” |  
+-------------
+
+6.3.1.3Quản lý bán hàng – Bán lẻ - Thông tin toa thuốc
+
+--- TABLE ---
+Screen | Bán hàng – Bán lẻ - Thông tin toa thuốc
+Description | Hiển thị thông tin của toa thuốc. Tại màn hình này nhân viên có thể tùy chọn lại toa thuốc phù hợp với tình trạng của khách hàng. Bao gồm việc kê toa uống trong vòng bao nhiêu ngày và in ra toa thuốc cho khách hàng. Đồng thời đưa số lượng thuốc cần bán vào trong hóa đơn bán hàng.
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “1. Bán lẻ”. Chọn button “Nhập thuốc từ toa sẵn”. Hoặc có thể truy cập bằng cách Click vào button “Chi tiết toa thuốc” trong màn hình “Danh sách toa thuốc kê sẵn”
+Screen Content
+Item | Type | Data | Description
+Tên đơn thuốc | Text field |   | Tên của đơn thuốcBắt buộc phải nhập trường này
+Triệu chứng | Text field |   | Mô tả các triệu chứng của bệnh nhân trong đơn thuốc.
+Đối tượng | ComboBox |   | Đối tượng sử dụng đơn thuốc
+Số ngày uống | Text field |   | Đơn kê cho mấy ngày uống
+1-ComboBox thuốc | ComboBox |   | Chọn thuốc, có sản trong ComboBox
+1-Text field- Viên | Text field |   | Tổng số viên của loại thuốc đang chọn= số ngày uống*mỗi lần uống
+Icon - Delete | Icon |   | Xóa thuốc ở hàng có Icon xóa tương ứng
+Ngày uống | Text field |   | Số lần uống trong  ngày
+Mỗi lần | Text field |   | Số viên thuốc uông trong mỗi lần uống
+Thêm vào hóa đơn | Button |   | Thực hiện việc thêm các thuốc có trong toa vào trong hóa đơn bán hàng. Hệ thống sẽ tự động tính toán số lượng thuốc cần mua tùy theo số ngày uống và liệu lượng mỗi ngày.
+Hủy | Button |   | Thực hiện việc hủy tùy chọn thông tin về toa thuốc.
+In toa | Button |   | Thực hiện việc in ra toa thuốc hiện tại cho khách hàng. Toa thuốc được in ra sẽ bao gồm tất cả thông tin cần thiết về liều dùng và số ngày uống.
+Screen Actions
+Action Name | Description | Success | Failure
+Icon - Delete | Xóa trắng các thông tin về 1 loại thuốc trong toa thuốc tương ứng theo từng vị trí Icon – delete (Loại bỏ thuốc khỏi toa). | Thuốc sẽ được loại bỏ khỏi toa. Các thông tin về số lần uống, số lượng,... sẽ bị xóa trắng. |  
+Thêm vào hóa đơn | Thực hiện việc thêm các thuốc có trong toa vào trong hóa đơn bán hàng. Hệ thống sẽ tự động tính toán số lượng thuốc cần mua tùy theo số ngày uống và liệu lượng mỗi ngày. | Tất cả các thuốc trong toa sẽ được thêm vào hóa đơn bán hàng. Màn hình “Thông tin toa thuốc”  sẽ bị ẩn đi. | Thông báo: “Chưa chọn số ngày uống”Thông báo: “Chưa in toa thuốc. Bạn có muốn in toa thuốc không”Thông báo: “Nhập sai số lượng thuốc”Thông báo: “Không đủ số lượng thuốc xx để cung cấp”Thông báo: “Chọn tối thiểu 1 loại thuốc”
+In toa | Thực hiện việc in ra toa thuốc hiện tại cho khách hàng. Toa thuốc được in ra sẽ bao gồm tất cả thông tin cần thiết về liều dùng và số ngày uống. | Thông tin về toa thuốc sẽ được in ra. | Thông báo: “Chưa chọn số ngày uống”Thông báo: “Chưa in toa thuốc. Bạn có muốn in toa thuốc không”Thông báo: “Nhập sai số lượng thuốc”Thông báo: “Không đủ số lượng thuốc xx để cung cấp”Thông báo: “Chọn tối thiểu 1 loại thuốc”
+Hủy | Thực hiện việc hủy tùy chọn thông tin về toa thuốc. | Màn hình “Thông tin toa thuốc” sẽ bị ẩn đi |  
+ |  |  |  |  | 
+-------------
+
+6.4  Quản lý bán hàng – Bán theo đơn
+
+--- TABLE ---
+Use Case Name | Bán theo đơn
+Use Case ID | SE160003
+High Level Requirement Ref |  
+Actor | Quản lý, Nhân viên
+Description | Cho phép tạo dựng hóa đơn bán theo đơn. Xử lý các công việc liên quan đến việc bán theo đơn.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công
+Post-processing |  
+-------------
+
+6.4.1     Screen Design:
+6.4.1.1    Quản bán hàng – Bán theo đơn
+
+--- TABLE ---
+Screen | Quản lý bán hàng – Bán theo đơn
+Description | Tùy chọn các thông tin cho hóa đơn “bán theo đơn”. Bao gồm việc thêm các thông tin về đơn thuốc để tiện cho việc tra cứu và xử lý các vấn đề liên quan đến toa thuốc từ khách hàng.
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “2. Bán theo đơn”
+Screen Content
+Item | Type | Data | Description
+Số phiếu | Text field |   | Số phiếu của hóa đơn. Được hệ thống cấp tự động, luôn là duy nhất để phân biệt các hóa đơn(hay còn gọi là mã hóa đơn)
+Nhân viên | Text field |   | Cho biết nhân viên lập hóa đơn.Trường này không cho phép sửa đổi, mà được tự động điền khi nhân viên hoặc người quản lý đăng nhập bằng tài khoản của mình
+Ngày lập | Text field – Date (Date Picker) |   | Nhập ngày lập hóa đơnLuôn đặt mặc định là ngày hiện tại
+Khách hàng | ComboBox |   | Liệt kê danh sách khách hàng đã được lưu trữ trong CSDL của hệ thống cho dùng người có thể lựa chọn đối với khách hàng quên đã mua nhiều lần tại cửa hàng.
+Icon “dấu cộng” | Icon |   | Thêm mới thông tin khách hàng đối với khách hàng mua lần đầu
+Triệu chứng | Text field |   | Triệu chứng của bệnh được ghi trên toa thuốc của bác sĩ đã kê
+Bác sĩ | Text field |   | Nhập tên bác sĩ đã kê đon thuốc mà khách hàng mang đến đê mua thuốc
+Địa chỉ BS | Text field |   | Nhập địa chỉ của bác sĩ
+Chuẩn đoán | Text field |   | Chuẩn đoán của bác sĩ
+Tên thuốc | Text(25) |   | Tên thuốc
+Đơn vị tính | Text(6) |   | Đơn vị tính của thuốc. VD: hộp, vỉ, lọ…
+Số lượng | Number |   | Số lượng của tên thuốc được bán
+Đơn giá | Number |   | Giá bán lẻ của thuốc
+Thành tiền | Number |   | Tổng tiền của thuốc tương ứngĐược tính bằng công thức:Thành tiền = (Đơn giá) *Số lượng
+Tổng tiền | Text fieldEnable = false |   | Tổng tiền của hóa đơnBằng tổng thành tiền của mỗi loại thuốc trong hóa đơn
+Dropdown list – Icon mũi tên | Dropdown list |   | Thêm thông tin thuốcDropdown list sẽ sổ ra danh sách cho người dùng lựa chọn thuốc để thêm vào bảng
+Thanh toán | Button |   | Hoàn tất công việc lập hóa đơn bán hàng, dữ liệu vừa lập sẽ được lưu trữ vào CSDL
+Xóa thuốc | Button |   | Xóa thuốc đã chọn trong bảng
+In phiếu | Button |   | In hóa đơn bán hàng vừa lập
+Trở về | Button |   | Thoát khỏi màn hình hiện tại, quay về màn hình trước đó.
+Screen Actions
+Action Name | Description | Success | Failure
+Icon “Dấu cộng” | Thêm khách hàng mới nếu khách hàng này chưa có trong cơ sở dữ liệu. | Hiển thị màn hỉnh “Thông tin khách hàng” |  
+Thanh toán  | Thực hiện việc thanh toán hóa đơn. Hoạt động này sẽ được nhân viên thực hiện sau khi khách hàng thanh toán hóa đơn cho cừa hàng. Chức năng này sẽ thêm hóa đơn đang thao tác vào cơ sở dữ liệu. | Hóa đơn đang thao tác sẽ được lưu trữ vào cơ sở dữ liệu của chương trình. Đồng thời màn hình hiện tại sẽ bị thoát khỏi. | Thông báo: “Nhập sai số lượng thuốc. Quá số lượng tồn kho”
+Xóa thuốc | Thực hiện việc xóa loại thuốc đang được lựa chọn trong danh sách thuốc. Thuốc này sẽ không còn trong hóa đơn khi in hóa đơn cho khách hàng | Thuốc đang lựa chọn trong danh sách sẽ bị xóa. | Thông báo: “Chưa chọn thuốc!”
+In phiếu | Thực hiện việc in hóa đơn bán hàng cho khách hàng. Hóa đơn bán hàng sẽ được in vào file excel để nhân viên xem xét lần cuối trước khi in cho khách hàng. | Hóa đơn sẽ được in ra. | Thông báo: “Chưa hoàn tất thông tin hóa đơn”
+Trở về | Hủy hóa đơn đang thao tác. Hệ thống sẽ không lưu hóa đơn này và hệ thống sẽ thoát khỏi trang màn hình hiện tại. | Thoát khỏi trang màn hình hiện tại. |  
+-------------
+
+6.4.1.2    Quản bán hàng - Bán theo đơn – Thông tin khách hàng
+
+--- TABLE ---
+Screen | Quản lý bán hàng – Bán theo đơn – Thông tin khách hàng.
+Description | Thêm thông tin khách hàng mới vào hệ thống.      
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “2. Bán theo đơn”. Click vào biểu tượng “dấu cộng”
+Screen Content
+Item | Type | Data | Description
+Nhóm khách hàng | ComboBox |   | Liêt kê danh sách nhóm khách hàng để người dùng lựa học.Trường bắt buộc phải nhập
+Mã khách hàng | Text field |   | Mã số của khách hàng, là duy nhất phân biệt giữa các khách hàng, mã được cấp phát tự động.
+Tên khách hàng | Text field |   | Trường bắt buộc phải nhậpNội dung nhập là tên của khách hàng
+Địa chỉ | Text field |   | Địa chỉ của khách hàng
+Tuổi | Text field – number |   | Tuổi của khách hàng
+Điện thoại | Text field – number |   | Số điện thoại của khách hàng
+Thêm | Button |   | Hoàn tất việc thêm khách hàng, thông tin khách hàng được lưu trũ vào CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm khách hàng mới nếu khách hàng này chưa có trong cơ sở dữ liệu. | Khách hàng được thêm vào cơ sở dữ liệu và màn hình “Thông tin khách hàng” sẽ bị ẩn đi. | Thông báo: “Chưa nhập đủ thông tin cần thiết”Thông báo: “Nhập sai định dạng tuổi”Thông báo: “Nhập sai định dạng số điện thoại”
+Trở về | Thoát khỏi màn hình hiện tài | Màn hình hiện tại đang thao tác sẽ bị ẩn đi. |  
+-------------
+
+6.5  Quản lý bán hàng – Bán sỉ
+
+--- TABLE ---
+Use Case Name | Quản lý bán hàng - Bán sỉ
+Use Case ID | SE160004
+High Level Requirement Ref |  
+Actor | Quản lý, Nhân viên
+Description | Cho phép tạo dựng hóa đơn bán sỉ. Xử lý các công việc liên quan đến việc bán sỉ
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công
+Post-processing |  
+-------------
+
+6.5.1     Screen Design:
+6.5.1.1    Quản lý bán hàng – Bán sỉ
+
+--- TABLE ---
+Screen | Bán hàng – Bán sỉ                 
+Description | Tùy chọn thông tin cho hóa đơn “bán sỉ”
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “3. Bán sỉ”.
+Screen Content
+Item | Type | Data | Description
+Số phiếu | Text field |   | Số phiếu của hóa đơn. Được hệ thống cấp tự động, luôn là duy nhất để phân biệt các hóa đơn(hay còn gọi là mã hóa đơn)
+Nhân viên | Text field |   | Cho biết nhân viên lập hóa đơn.Trường này không cho phép sửa đổi, mà được tự động điền khi nhân viên hoặc người quản lý đăng nhập bằng tài khoản của mình
+Ngày lập | Text field – Date (Date Picker) |   | Nhập ngày lập hóa đơnLuôn đặt mặc định là ngày hiện tại
+Khách hàng | ComboBox |   | Liệt kê danh sách khách hàng đã được lưu trữ trong CSDL của hệ thống cho dùng người có thể lựa chọn đối với khách hàng quên đã mua nhiều lần tại cửa hàng.
+Icon “dấu cộng” | Icon |   | Thêm mới thông tin khách hàng đối với khách hàng mua lần đầu
+Ghi chú | Text field |   | Ghi chú thêm thông tin của hóa đơn nếu có
+Tên thuốc | Text(25) |   | Tên thuốc
+Đơn vị tính | Text(6) |   | Đơn vị tính của thuốc. VD: hộp, vỉ, lọ…
+Số lượng | Number |   | Số lượng của tên thuốc được bán
+Đơn giá | Number |   | Giá bán lẻ của thuốc
+Thành tiền | Number |   | Tổng tiền của thuốc tương ứngĐược tính bằng công thức:Thành tiền = (Đơn giá) *Số lượng
+Tổng tiền | Text fieldEnable = false |   | Tổng tiền của hóa đơnBằng tổng thành tiền của mỗi loại thuốc trong hóa đơn
+Dropdown list – Icon mũi tên | Dropdown list |   | Thêm thông tin thuốcDropdown list sẽ sổ ra danh sách cho người dùng lựa chọn thuốc để thêm vào bảng
+Thanh toán | Button |   | Hoàn tất công việc lập hóa đơn bán hàng, dữ liệu vừa lập sẽ được lưu trữ vào CSDL
+Xóa thuốc | Button |   | Xóa thuốc đã chọn trong bảng
+In phiếu | Button |   | In hóa đơn bán hàng vừa lập
+Trở về | Button |   | Thoát khỏi màn hình hiện tại, quay về màn hình trước đó.
+Screen Actions
+Action Name | Description | Success | Failure
+Icon “Dấu cộng” | Thêm khách hàng mới nếu khách hàng này chưa có trong cơ sở dữ liệu. | Hiển thị màn hỉnh “Thông tin khách hàng” |  
+Thanh toán  | Thực hiện việc thanh toán hóa đơn. Hoạt động này sẽ được nhân viên thực hiện sau khi khách hàng thanh toán hóa đơn cho cừa hàng. Chức năng này sẽ thêm hóa đơn đang thao tác vào cơ sở dữ liệu. | Hóa đơn đang thao tác sẽ được lưu trữ vào cơ sở dữ liệu của chương trình. Đồng thời màn hình hiện tại sẽ bị thoát khỏi. | Thông báo: “Nhập sai số lượng thuốc. Quá số lượng tồn kho”
+Xóa thuốc | Thực hiện việc xóa loại thuốc đang được lựa chọn trong danh sách thuốc. Thuốc này sẽ không còn trong hóa đơn khi in hóa đơn cho khách hàng | Thuốc đang lựa chọn trong danh sách sẽ bị xóa. | Thông báo: “Chưa chọn thuốc!”
+In phiếu | Thực hiện việc in hóa đơn bán hàng cho khách hàng. Hóa đơn bán hàng sẽ được in vào file excel để nhân viên xem xét lần cuối trước khi in cho khách hàng. | Hóa đơn sẽ được in ra. | Thông báo: “Chưa hoàn tất thông tin hóa đơn”
+Trở về | Hủy hóa đơn đang thao tác. Hệ thống sẽ không lưu hóa đơn này và hệ thống sẽ thoát khỏi trang màn hình hiện tại. | Thoát khỏi trang màn hình hiện tại. |  
+-------------
+
+6.6  Quản lý bán hàng – Khách hoàn trả
+
+--- TABLE ---
+Use Case Name | Quản lý bán hàng - Khách hoàn trả
+Use Case ID | SE160005
+High Level Requirement Ref |  
+Actor | Quản lý, Nhân viên
+Description | Cho phép tạo dựng hóa đơn khách hoàn trả thuốc. Xử lý các công việc liên quan đến việc hoàn trả thuốc
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công
+Post-processing |  
+-------------
+
+6.6.1     Screen Design:
+6.6.1.1    Quản lý bán hàng – Khách hoàn trả
+
+--- TABLE ---
+Screen | Quản lý bán hàng – Khách hoàn trả       
+Description | Tùy chọn thông tin cho hóa đơn “khách hoàn trả”. Màn hình này sẽ tùy chọn các thông tin phục vụ cho việc hoàn trả thuốc, hóa đơn của khách hàng. Ta có thể kiểm tra hóa đơn có tồn tại trong hệ thống hay không và xuất ra thông tin của hóa đơn từ đó có thể tùy chỉnh hóa đơn phù hợp với các loại thuốc mà khách đem hoàn trả lại.
+Screen Access | Người dùng click vào menu Chức năng → QL Bán hàng. Tại màn hình này người dùng click vào button Thêm. Chọn tab “4. Khách hoàn trả”.
+Screen Content
+Item | Type | Data | Description
+Mã hóa đơn | Text field |   | Cho phép người dùng nhập mã hóa đơn mà khách hàng mang đến trả để kiểm tra
+Kiểm tra | Button |   | Kiểm tra xem hóa đơn khách mang đến có phải do hiệu thốc bán ra không phải thì liệt kê ra tất cả các thuốc đã bán có trong hóa đơn, và điền tên khách hàng đã mua ngày mua và nhân viên bán vào các ô Khách hàng  Ngày lập và Nhân viên bán. Nếu không có thì báo lỗi “Không tìm thấy hóa đơn theo yêu cầu”Mã hóa đơn được nhập vào sẽ được tìm kiếm trong bảng CSDL HOADON.
+Ngày lập | Text field |   | Ngày mà khách hàng đến mua, dữ liệu sẻ được tự động cập nhật khi nhấn button kiểm tra
+Khách hàng | Text field |   | Tên khách hàng đã mua, dữ liệu sẻ được tự động cập nhật khi nhấn button kiểm tra
+Nhân viên | Text field |   | Nhân viên đã bán hàng, dữ liệu sẻ được tự động cập nhật khi nhấn button kiểm tra
+Loại hóa đơn | Text field |   | Loại hóa đơn của hóa đơn khách hàng mang đến trả, dữ liệu sẽ được tự động hiển thị khi nhấn button kiểm tra.
+Tên thuốc | Text(25) |   | Tên thuốc
+Đơn vị tính | Text(6) |   | Đơn vị tính của thuốc. VD: hộp, vỉ, lọ…
+Số lượng | Number |   | Số lượng của tên thuốc được bán
+Đơn giá | Number |   | Giá bán lẻ của thuốc
+Thành tiền | Number |   | Tổng tiền của thuốc tương ứngĐược tính bằng công thức:Thành tiền = (Đơn giá) *Số lượng
+Tổng tiền | Text fieldEnable = false |   | Tổng tiền của hóa đơnBằng tổng thành tiền của mỗi loại thuốc trong hóa đơn
+Thanh toán | Button |   | Hoàn tất công việc lập hóa đơn bán hàng, dữ liệu vừa lập sẽ được lưu trữ vào CSDL
+Xóa thuốc | Button |   | Xóa thuốc đã chọn trong bảng
+In phiếu | Button |   | In hóa đơn bán hàng vừa lập
+Trở về | Button |   | Thoát khỏi màn hình hiện tại, quay về màn hình trước đó.
+Screen Actions
+Action Name | Description | Success | Failure
+Kiểm tra | Thực hiện việc kiểm tra đơn thuốc có trong hệ thống hay không, nếu có thì load tất cả thông tin của hóa đơn đó vào màn hình “Khách hoàn trả”. | Các thông tin về hóa đơn khách đã thanh toán sẽ được load trở lại màn hình. | Thông báo: “Không tìm thấy hóa đơn”Thông báo: “Không được để trống khung mã hóa đơn”
+Thanh toán  | Thực hiện việc thanh toán hóa đơn. Hoạt động này sẽ được nhân viên thực hiện sau khi khách hàng thanh toán hóa đơn cho cừa hàng. Chức năng này sẽ thêm hóa đơn đang thao tác vào cơ sở dữ liệu. | Hóa đơn đang thao tác sẽ được lưu trữ vào cơ sở dữ liệu của chương trình. Đồng thời màn hình hiện tại sẽ bị thoát khỏi. | Thông báo: “Nhập sai số lượng thuốc. Quá số lượng tồn kho”
+Xóa thuốc | Thực hiện việc xóa loại thuốc đang được lựa chọn trong danh sách thuốc. Thuốc này sẽ không còn trong hóa đơn khi in hóa đơn cho khách hàng | Thuốc đang lựa chọn trong danh sách sẽ bị xóa. | Thông báo: “Chưa chọn thuốc!”
+In phiếu | Thực hiện việc in hóa đơn bán hàng cho khách hàng. Hóa đơn bán hàng sẽ được in vào file excel để nhân viên xem xét lần cuối trước khi in cho khách hàng. | Hóa đơn sẽ được in ra. | Thông báo: “Chưa hoàn tất thông tin hóa đơn”
+Trở về | Hủy hóa đơn đang thao tác. Hệ thống sẽ không lưu hóa đơn này và hệ thống sẽ thoát khỏi trang màn hình hiện tại. | Thoát khỏi trang màn hình hiện tại. |  
+-------------
+
+6.7  Quản lý kho - Nhập kho
+
+--- TABLE ---
+Use Case Name | Nhập kho
+Use Case ID | SE160006
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Cho phép quản lý việc nhập hàng theo từng hóa đơn nhập ứng với từng nhà cung cấp. Hiển thị các hóa đơn theo thời gian lập bằng chức năng lọc thời gian, Cho phép người quản lý lập mới hóa đơn nhập và xóa hóa đơn khi cần thiết.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.7.1     Screen Design
+6.7.1.1    Nhập kho -  Bộ lọc
+
+--- TABLE ---
+Screen | Quản lý kho - Nhập kho – Bộ lọc
+Description | Cho phép lọc các hóa đơn nhập theo gian lập của các hóa đơn. Hiển thị các hóa đơn theo các tùy chọn sắp xếp khác nhau như: sắp xếp theo Mã HĐ, Số CT, Giờ lập. Tổng Tiên…
+Screen Access | Người dùng click vào menu Chức năng → QL Nhập kho. Ngoài ra cũng có thể click mục Nhập kho trong Panel Chọn nhanh.
+Screen Content
+Item | Type | Data | Description
+Từ ngày | Text field |   | Nhập ngày bắt đầu xem
+Icon “Tờ lịch” | Icon |   | Cho phép chọn ngày cụ thể
+Đến ngày | Text field |   | Ngày kết thúc
+Từ giờ | Text field |   | Giờ bắt đầu
+Đến giờ | Text field |   | Giờ kết thúc
+Sắp xếp theo | ComboBox |   | Chon cách sắp xếp theo các giá trị định sẳn
+Xem | Button |   | Hiển thị danh sách hóa đơn theo các tiêu chí được người dùng lựa chọn
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Xem các hóa đơn thoả mãn thông tin tìm kiếm trong bộ lọc | Hiển thị danh sách các hóa đơn thoả mãn điều kiện của bộ lọc | Thông báo: “Sai thời gian tìm kiếm”
+ |  |  |  |  | 
+-------------
+
+6.7.1.2    Nhập kho -  Danh sách hóa đơn nhập kho
+
+--- TABLE ---
+Screen | Nhập kho – Danh sách hóa đơn nhập kho
+Description | Hiển thị thông tin danh sách các hóa đơn nhập kho.Cho phép người dùng có thể thêm mới hóa đơn và xóa hóa đơn khi cần.
+Screen Access | Người dùng click vào menu Chức năng → QL Nhập kho. Ngoài ra cũng có thể click mục Nhập kho trong Panel Chọn nhanh.
+Screen Content
+Item | Type | Data | Description
+Mã HĐ | Text |   | Mã hóa đơn nhập hàng
+Số CT | Number |   | Số Chứng từ
+Ngày lập | Date/time |   | Ngày lập hóa đơn
+Gời lập | Time |   | Giờ lập
+Tổng tiền | Number |   | Tổng tiền phải trả
+Nợ hóa đơn | Number |   | Số tiền còn nợ của hoa đơn
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Hiển thị nên một trang màn hình có chức năng thêm một hóa đơn nhập kho | Hiển thị màn hình hóa đơn nhập kho. |  
+Xóa | Xóa hóa đơn đang được chọn trong danh sách hóa đơn | Hóa đơn đang được chọn trong danh sách hóa đơn sẽ bị xóa | Thông báo: Chưa chọn hóa đơn cần xóa.
+-------------
+
+6.7.1.3Nhập kho – Hóa đơn nhập kho
+
+ 
+6.7.1.3.1   Nhập kho – Hóa đơn nhập kho – Thông tin hóa đơn, thanh toán
+
+--- TABLE ---
+Screen | Nhập kho – Hóa đơn nhập kho – Thông tin hóa đơn, thanh toán
+Description | Nhập các thông tin của hóa đơn nhập kho như: nhập thông tin của nhà cung cấp, ngày lập, ghi chú của hóa đơn, thông tin thanh toán...
+Screen Access | Người dùng click vào menu Chức năng→QL Nhập kho. Tại màn hình này người dùng click vào button Thêm.
+Screen Content
+Item | Type | Data | Description
+Mã nhà cung cấp | ComboBox |   | Liệt kê mã nhà cung cấp để người dùng lựa chọn, đối với nhà cung cấp đã được lưu trữ trong CSDLĐối với nhà cung cấp mới chưa được lưu trữ trong CSDL người dùng phải nhập thông tin nhà cung cấp mới bằng cách nhấn vào icon “dấu cộng”
+Tên nhà cung cấp | Text field |   | Tên nhà cung cấp sẻ được tự động hiển thị nếu ngươì dùng lựa chọn mã nhà cung cấp được liệt kê trong comboBox hoặc thêm mới thông tin nhà cung cấp
+Icon thêm | Icon |   | Nếu nhà cung cấp chưa có thì người dùng có thể bấm vào nút này để thêm nhà cung cấp vào hệ thống
+Địa chỉ | Text field |   | Địa chỉ nhà cung cấp, giá trị này sẻ được hệ thống tự động cung cấp
+Ghi chú | Text field |   | Người dùng có thể ghi chú thêm thông tin của hóa đơn nếu có
+Số HĐ | Text field |   | Chính là mã hóa đơn, giá trị này do hệ thống tự đông cung cấp, người dùng không thể thay đổi giá trị của trường này
+Số CT | Text field |   | Số chứng từ của hoa đơn
+Ngày lập | Text field - Date/time |   | Ngày lập hóa đơn, Giá trị này cũng do hệ thống điền vào, mặc định là ngày hiện tại của hệ thống
+Icon “tờ lịch” | Button |   | Người dùng có thể chọn ngày cụ thể
+Nhân viên | Text field |   | Nhân viên đang thực hiện việc nhập hàng, thường thì là quản lý, giá trị này sẻ được hệ thống điền vào và người dùng  không thể thay đổi
+Tiền thuốc | Number |   | Tổng tiền thuốc phải trả chưa tính chiết khấu
+Tổng tiền | Number |   | Tổng tiền = Tiền thuốc- tiền thuốc*chiết khấu
+Chiết khấu | Number |   | Giá trị này do người dùng nhập vào, giá trị này sẻ được sự thống nhất giữa hiệu thuốc với nhà cung ứng trước đó
+Thanh toán | Number |   | Số tiền mà hiệu thuốc đã trả cho nhà cung ứng
+Còn lại | Number |   | Số tiền mà hiệu thuốc đang nợ nhà cung ứng Tiền nơ = Tổng tiền – thanh toán
+Icon “dấu cộng” | Icon |   | Thêm mới nhà cung cấp
+Screen Actions
+Action Name | Description | Success | Failure
+Icon “dấu cộng” | Thêm mới thông của nhà cung cấp vào CSDL | Xuất hiện màn hình “Thêm nhà cung ứng” |  
+-------------
+
+6.7.1.3.2   Nhập kho – Hóa đơn nhập kho – Danh sách thuốc nhập kho
+
+--- TABLE ---
+Screen | Nhập kho – Hóa đơn nhập kho – Danh sách thuốc nhập kho
+Description | Hiển thị danh sách thông tin thuốc được nhận thêm vào hệ thống, Cho phép thêm thuốc mới và xóa thuốc khi cần.
+Screen Access | Người dùng click vào menu Chức năng → QL Nhập kho. Tại màn hình này người dùng click vào button Thêm.
+Screen Content
+Item | Type | Data | Description
+Tên thuốc | Text |   | Tên thuốc của nhà cung cấp
+Đơ vị tính | Text |   | Đơn vị tính của thuốc
+Số lượng | Numuber |   | Số lượng nhập vào
+Đơn giá | Number |   | Giá nhập của thuốc
+%CK | Number |   | Phần trăm chiết khấu của loại thuốc tương ứng
+VAT | Number |   | Thuế giá trị gia tăng
+Thành tiền | Number |   | Tổng tiền thuốc
+Số lô | Number |   | Số lô của nhà sản xuất, dùng để kiểm soát hạn dụng của thuốc
+Hạn dùng | Date/time |   | Hạn sử dụng của thuốc
+Icon “mũi tên” | Dropdown list |   | Thêm mới thuốc vào bảng
+Hoàn tất | Button |   | Hoàn tất công việc nhập hoa đơn nhập với nhà cung ứng, thông tin của hóa đơn sẽ được lưu trữ vào CSDL
+Xóa thuốc | Button |   | Xóa thuốc đã được chọn trong danh sách
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tất | Hoàn tất hóa đơn nhập kho | Dữ liệu hóa đơn nhập kho sẽ được lưu vào hệ thống, Trở về màng hình QL Nhập  kho | Thông báo: Chưa nhập đầy đủ thông tin
+Xóa thuốc | Xóa thông tin thuốc đang được lựa chọn trong bảng danh sách thuốc nhập kho | Thuốc đã được chọn sẽ bị xóa khỏi danh sách | Thông báo: Chưa lựa chọn thuốc
+Icon “Mũi tên sổ xuống” | Khi Icon được chọn hệ thống sẽ sổ danh sách thuốc cho người dùng lựa chọn để thêm vào danh sách. | Thông tin thuốc lựa chọn sẽ được thêm vào danh sách. | Thông báo:Chưa lựa chọn thuốc.
+Trở về | Khi button được chọn hệ thống sẽ hiển thị thông báo: Bạn có muốn hủy hóa đơn đang lâp không? Nếu người dùng đồng ý thì sẽ hệ thống sẽ hủy hóa đơn nhập kho đang lập và quay về màng hình QL Nhập kho. Ngược lại vẫn giữa nguyên màng hình hiện tại. | Quay về màng hình nhập kho |  
+-------------
+
+6.8      Quản lý kho - Xuất kho
+6.8.1     Screen Design
+6.8.1.1Xuất kho - Bộ lọc
+
+--- TABLE ---
+Screen | Xuất kho – Hóa đơn xuất kho – Danh sách thuốc
+Description | Cho phép lựa chọn loại hình xuất hoàn trả và xuất hủy. Tìm kiếm hóa đơn theo thời gian lập hóa đơn.
+Screen Access | Người dùng click vào menu Chức năng → QL Xuất kho. Cũng có thể click mục Xuất hoàn trả trong Panel Chọn nhanh.
+Screen Content
+Item | Type | Data | Description
+Từ ngày | Text field |   | Nhập ngày bắt đầu xem
+Icon “Tờ lịch” | Button |   | Cho phép chọn ngày cụ thể
+Đến ngày | Text field |   | Ngày kết thúc
+Từ giờ | Text field |   | Giờ bắt đầu
+Đến giờ | Text field |   | Giờ kết thúc
+Loại hóa đơn | ComboBox |   | Khi bấm nút này sẻ lọc hóa đơn theo loại hóa đơn
+Xem | Button |   | Hiển thị danh sách hóa đơn theo các tiêu chí được người dùng lựa chọn
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Xem các hóa đơn xuất có thời gian lập thỏa mãn với bộ lọ | Hiện thị danh các hóa đơn xuất thỏa mãn điều kiện bộ lọc | Thông báo: Thơi gian không lỗi.
+-------------
+
+6.8.1.2Xuất kho - Danh sách hóa đơn xuất kho
+
+--- TABLE ---
+Screen | Quản lý xuất
+Description | Quản lý các hóa đơn xuất thuốc bao gồm hóa đơn xuất hủy và xuất hoàn trả. Danh sách sẽ hiển thị các hóa đơn tùy theo cài đặt bộ lọc. Chỉ hiển thị các hóa đơn xuất hủy hoặc xuất thanh lý hay cả hai.
+Screen Access | Người dùng click vào menu Chức năng →QL Xuất Kho.  Sau đó chọn mục Xuất hoàn trả trong Combo box Loại hóa đơn.
+Screen Content
+Item | Type | Data | Description
+Mã HĐ | Text |   | Mã hóa đơn hoàn trả. Mã hóa đơn là duy nhất
+Ngày lập | Date/time |   | Ngày lập hóa đơn trả
+Giờ lập | Time |   | Giờ lập hóa đơn
+Người lập | Text |   | Người lập hóa đơn
+Tổng tiền | Number |   | Tổng tiền của hóa đơn
+Tên nhà cung cấp | Text |   | Tên nhà cung cấp có hóa đơn bị hoàn trả
+Lí do hoàn trả | Text |   | Cho phép người dùng nhập lý do xuất kho.
+Thêm | Button |   | Thêm hóa đơn xuất mới
+Xóa | Button |   | Xóa hóa đơn đã chọn trong danh sách
+In phiếu | Button |   | In hóa đơn được chọn trong danh sách
+Trở về | Button |   | Thoát khỏi màn hinh hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm một hóa đơn xuất hoàn trả | Hiển thị màn hình Hóa đơn xuất kho |  
+Xóa | Xóa hóa đơn xuất hoàn trả hiện tại đang được chọn trong danh sách | Hóa đơn hoàn trả được chọn trong danh sách sẽ bị xóa khỏi danh sách và trong cơ sở dư liệu. | Thông báo:Chưa lựa chọn hóa đơn
+In phiếu | In hóa đơn đang được chọn trong danh sách. | In hóa đơn. | Thông báo: Chưa chọn hóa đơn.
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.9  Quản lý kho - Xuất hoàn trả
+
+--- TABLE ---
+Use Case Name | Xuất hoàn trả
+Use Case ID | SE160007
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Cho phép thực hiện việc thêm và xử lý hóa đơn xuất hoàn trả.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.9.1     Screen Design
+6.9.1.1    Xuất hoàn trả – Thông tin hóa đơn, thanh toán
+
+--- TABLE ---
+Screen | Xuất kho - Xuất hoàn trả – Hóa đơn xuất hoàn trả – Thông tin hóa đơn, thanh toán
+Description | Nhập thông tin của hóa đơn hoàn trả như: thông tin của nhà cung cấp, ngày lập, và thông tin thanh toán…
+Screen Access | Người dùng click vào menu Chức năng → QL Xuất Kho.  Sau đó chọn mục Xuất hoàn trả trong Combo box Loại hóa đơn. Tại màn hình này người dùng click vào button Thêm.
+Screen Content
+Item | Type | Data | Description
+Loại hóa đơn | ComboBox |   | Cho phép người dùng lựa chọn loại hóa đơn xuất kho
+Tên nhà cung cấp | ComboBox |   | Tên nhà cung cấp sẻ được liệt kê ra cho phép người dùng lựa chọn
+Địa chỉ | Text field |   | Địa chỉ nhà cung cấp, giá trị này sẻ được hệ thống tự động cung cấp, hoặc người dùng có thể bổ sung thêm
+Lý do | Text field |   | Người dung nhập lý do xuất hoàn trả
+Số HĐ | Text field |   | Chính là mã hóa đơn, giá trị này do hệ thống tự đông cung cấp, người dùng không thể thay đổi giá trị của trường này
+Ngày lập | Text field- Date/time |   | Ngày lập hóa đơn, Giá trị này cũng do hệ thống điền vào, mặc định là ngày hiện tại của hệ thống
+Icon “tờ lịch” | Button |   | Người dùng có thể chọn ngày cụ thể
+Nhân viên | Text field |   | Nhân viên đang thực hiện việc nhập hàng, thường thì là quản lý, giá trị này sẻ được hệ thống điền vào và người dùng  không thể thay đổi
+Screen Actions
+Action Name | Description | Success | Failure
+-------------
+
+ 
+6.9.1.2    Xuất hoàn trả – Danh sách thuốc hoàn trả
+
+--- TABLE ---
+Screen | Xuất kho - Xuất hủy – Hóa đơn xuất hủy – Danh sách thuốc xuất hủy
+Description | Hiển thị danh cách thuốc trong hóa đơn xuất, cho phép thêm thuốc, xóa thuốc, in hóa đơn đang lập.
+Screen Access | Người dùng click vào menu Chức năng → QL Xuất Kho.  Sau đó chọn mục Xuất hủy trong Combo box Loại hóa đơn. Tại màn hình này người dùng click vào button Thêm.
+Screen Content
+Item | Type | Data | Description
+Tên thuốc | Text |   | Tên thuốc đang xuất trả
+Đơn vị tính | Text |   | Đơn vị tính, theo hôp, gói,chai,viên….
+Số lượng | Number |   | Số lượng theo đơn vị tính
+Đơn giá | Number |   | Đơn giá
+Thành tiền | Number |   | Tổng tiền của loại thuốc đó
+Hạn dụng | Date/time |   | Hạn sử dụng của thuốc
+Tổng tiền | Text Field |   | Tổng tiền = tổng thành tiền các loại thuốc trong hóa đơn
+Icon “Mũi tên sổ xuống” | Dropdown list |   | Thêm mới thuốc vào dánh sách thuốc
+Hoàn tất | Button |   | Hoàn tất công việc lập hóa đơn xuất hoàn trả
+Xóa thuốc | Button |   | Xóa thuốc đã chọn trong bảng
+In phiếu | Button |   | In hóa đơn đã chọn trong bảng
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tẩt | Hoàn tất công việc lập hóa đơn xuất hủy | Hóa đơn sẽ được lưu vào CSDL, Trở về màng hình QL Xuất kho | Thông báo: Phải nhập đầy đủ thông tin.
+Xóa thuốc | Xóa thuốc đang được chọn trong danh sách | Thuốc bị xóa khỏi danh sách. | Thông báo:Chưa lựa chọn thuốc
+In phiếu | In hóa đơn xuất xuất đang lập | In hóa đơn | Thông bao: Phải nhập đầy đủ thông tin
+Icon “Mũi tên sổ xuống” | Khi chọn hệ thống sẽ sổ danh sách thuốc để người dùng lựa chọn. | Thuốc được lựa chọn sẽ được thêm vào danh sách | Thông báo: Chưa lựa chọn thuốc
+Trở về | Khi button được chọn hệ thống sẽ hiển thị thông báo: Bạn có muốn hủy hóa đơn đang lâp không? Nếu người dùng đồng ý thì sẽ hệ thống sẽ hủy hóa đơn đang lập và quay về màng hình QL Xuất kho. Ngược lại vẫn giữa nguyên màng hình hiện tại. | Quay về màng mình QL Xuất kho. |  
+ |  |  |  |  | 
+-------------
+
+6.10   Quản lý kho - Xuất hủy
+
+--- TABLE ---
+Use Case Name | Xuất hủy
+Use Case ID | SE160008
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Xử lý hóa đơn xuất hủy các loại thuốc đã hết hạn sử dụng hoặc thuốc có vấn đề về chất lượng.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.10.1  Screen Design
+6.10.1.1 Xuất hủy – Hóa đơn xuất huỷ – Thông tin hóa đơn, thanh toán
+
+--- TABLE ---
+Screen | Xuất kho - Xuất hủy – Hóa đơn xuất hủy – Thông tin hóa đơn, thanh toán
+Description | Nhập thông tin hóa đơn xuất hoàn trả.
+Screen Access | Người dùng click vào menu Chức năng → QL Xuất Kho.  Sau đó chọn mục Xuất hủy trong Combo box Loại hóa đơn. Tại màn hình này người dùng click vào button Thêm.
+Screen Content
+Item | Type | Data | Description
+Loại hóa đơn | ComboBox |   | Cho phép người dùng lựa chọn loại hóa đơn xuất kho
+Tên nhà cung cấp | ComboBox |   | Tên nhà cung cấp sẻ bị bỏ qua
+Địa chỉ | Text field |   | Địa chỉ nhà cung cấp, giá trị này sẻ được hệ thống tự động cung cấp, hoặc người dùng có thể bổ sung thêm
+Lý do | Text field |   | Người dung nhập lý do xuất hoàn trả
+Số HĐ | Text field |   | Chính là mã hóa đơn, giá trị này do hệ thống tự đông cung cấp, người dùng không thể thay đổi giá trị của trường này
+Ngày lập | Text field- Date/time |   | Ngày lập hóa đơn, Giá trị này cũng do hệ thống điền vào, mặc định là ngày hiện tại của hệ thống
+Icon “tờ lịch” | Button |   | Người dùng có thể chọn ngày cụ thể
+Nhân viên | Text field |   | Nhân viên đang thực hiện việc nhập hàng, thường thì là quản lý, giá trị này sẻ được hệ thống điền vào và người dùng  không thể thay đổi
+Screen Actions
+Action Name | Description | Success | Failure
+  |   |   |  
+-------------
+
+ 
+ 
+6.10.1.2 Xuất hủy – Hóa đơn xuất huỷ – Danh sách thuốc xuất hủy
+
+--- TABLE ---
+Screen | Xuất kho - Xuất hủy – Hóa đơn xuất hủy – Danh sách thuốc xuất hủy
+Description | Hiển thị danh cách thuốc trong hóa đơn xuất, cho phép thêm thuốc, xóa thuốc, in hóa đơn đang lập.
+Screen Access | Người dùng click vào menu Chức năng → QL Xuất Kho.  Sau đó chọn mục Xuất hủy trong Combo box Loại hóa đơn. Tại màn hình này người dùng click vào button Thêm.
+Screen Content
+Item | Type | Data | Description
+Tên thuốc | Text |   | Tên thuốc đang xuất trả
+Đơn vị tính | Text |   | Đơn vị tính, theo hôp, gói,chai,viên….
+Số lượng | Number |   | Số lượng theo đơn vị tính
+Đơn giá | Number |   | Đơn giá
+Thành tiền | Number |   | Tổng tiền của loại thuốc đó
+Tổng tiền | Text Field |   | Tổng thành tiền các loại thuốc trong hóa đơn
+Hạn dụng | Date/time |   | Hạn sử dụng
+Icon “Mũi tên sổ xuống” | Dropdown list |   | Thêm mới thuốc vào dánh sách thuốc
+Hoàn tất | Button |   | Hoàn tất công việc lập hóa đơn xuất hủy
+Xóa thuốc | Button |   | Xóa thuốc đã chọn trong bảng
+In phiếu | Button |   | In hóa đơn đã chọn trong bảng
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tẩt | Hoàn tất công việc lập hóa đơn xuất hủy | Hóa đơn sẽ được lưu vào CSDL, Trở về màng hình QL Xuất kho | Thông báo: Phải nhập đầy đủ thông tin.
+Xóa thuốc | Xóa thuốc đang được chọn trong danh sách | Thuốc bị xóa khỏi danh sách. | Thông báo:Chưa lựa chọn thuốc
+In phiếu | In hóa đơn xuất xuất đang lập | In hóa đơn | Thông bao: Phải nhập đầy đủ thông tin
+Icon “Mũi tên sổ xuống” | Khi chọn hệ thống sẽ sổ danh sách thuốc để người dùng lựa chọn. | Thuốc được lựa chọn sẽ được thêm vào danh sách | Thông báo: Chưa lựa chọn thuốc
+Trở về | Khi button được chọn hệ thống sẽ hiển thị thông báo: Bạn có muốn hủy hóa đơn đang lâp không? Nếu người dùng đồng ý thì sẽ hệ thống sẽ hủy hóa đơn đang lập và quay về màng hình QL Xuất kho. Ngược lại vẫn giữa nguyên màng hình hiện tại. | Quay về màng mình QL Xuất kho. |  
+-------------
+
+6.11   Quản lý thông tin
+6.11.1  Quản lý nhóm thuốc
+
+--- TABLE ---
+Use Case Name | Quản lý nhóm thuốc
+Use Case ID | SE160009
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Chức năng này sẽ cho phép người sử dụng quản lý các nhóm thuốc, có thể thêm mới, sửa đổi, xóa khi cần.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công, và đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.11.1.1 Screen design
+ 
+
+--- TABLE ---
+Screen | Quản lý nhóm thuốc                      
+Description | Tại đây ta có thể quản lý các thông tin về nhóm thuốc trong hệ thống. Cụ thể ta có thể thêm, sửa, xóa các thông tin này. Những thông tin về nhóm thuốc này sẽ được sử dụng trong việc tạo và phân nhóm các loại thuốc trong cửa hàng.
+Screen Access | Người dùng click vào menu Quản lý thông tin → Nhóm thuốc.
+Screen Content
+Item | Type | Data | Description
+Mã nhóm thuốc | Text(5) |   | Mã số nhóm thuốc
+Tên nhóm thuốc | Text(25) |   | Tên của nhóm thuốc
+Mã nhóm thuốc | Text field |   | Sửa đổi mã nhóm thuốc
+Tên nhóm thuốc | Text field |   | Sửa đổi tên nhóm thuốc
+Thêm | Button |   | Thêm một nhóm thuốc mới
+Sửa | Button |   | Sửa đổi thông tin thuốc
+Xóa | Button |   | Xóa nhóm thuốc đã chọn trong bảng
+Trở về | Button |   | Thoát khỏi màn hình hiện tại, quay về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm mới một nhóm thuốc vào hệ thống. Sau khi click vào Button “Thêm”. Button “Thêm” sẽ chuyển thành Button “Hoàn thành”. Ô TextBox tên nhóm thuốc sẽ được Enable cho người dùng tự nhập vào, ô TextBox mã nhóm thuốc sẽ được hệ thống tăng tự động. Sau khi chỉnh xong. Người dùng phải bấm lại Button “Hoàn thành” | Nhóm thuốc mới sẽ được thêm vào hệ thống | Thông báo: “Tên nhóm thuốc không được để trống”
+Sửa | Sửa thông tin về nhóm thuốc đang được chọn trong danh sách. Cụ thể ta có thể sửa thông tin về tên nhóm thuốc. | Nhóm thuốc được chọn sẽ được sửa đổi theo thông tin trong 2 ô TextBox | Thông báo: “Tên nhóm thuốc không được để trống”Thông báo: “Chưa chọn nhóm thuốc”
+Xóa | Xóa nhóm thuốc đang chọn trong danh sách khỏi danh sách và cơ sở dữ liệu. | Nhóm thuốc được chọn sẽ được xóa khỏi cơ sở dư liệu. Cập nhật lại danh sách nhóm thuốc | Thông báo : “Chưa chọn nhóm thuốc”
+Trở về | Thoát khỏi màn hình hiện tại. | Thoát khỏi màn hình hiện tại. Trở về màn hình trước đó |  
+-------------
+
+6.11.2  Quản lý thông tin thuốc
+
+--- TABLE ---
+Use Case Name | Quản lý thuốc
+Use Case ID | SE1600010
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Chức năng này sẽ cho phép người sử dụng quản lý thông tin của thuốc, cỏ thể thêm mới, sủa đổi, xóa thuốc..
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công, đăng nhập bằng tài khoản người quản lý.
+Post-processing |  
+-------------
+
+6.11.2.1 Screen design
+6.11.2.1.1            Quản lý thông tin thuốc – Bộ lọc
+
+--- TABLE ---
+Screen | Quản lý thông tin thuốc – Bộ lọc
+Description | Tìm kiếm thuốc theo các thuộc tính như: mã thuốc, nhóm thuốc, tên thuốc, hoạt chất, giá nhập, giá bán sỉ, giá bán lẻ. Và các điều kiện ứng với từng thuộc tính tìm kiếm
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Danh sách thuốc
+Screen Content
+Item | Type | Data | Description
+Lọc theo | ComboBox |   | Lựa chọn tìm kiếm theo các thuộc tínhBắt buộc phải chọn thuộc tính để tìm kiếm
+Điều kiện | ComboBox |   | Điều kiên ứng với từng thuộc tính.
+Nhập | Text field |   | Nhập thông cần tìm kiếmPhải bắt buộc nhập trường này
+Lọc kết quả | Button |   | Hiển thị kết quả tìm kiếm là danh sách thuốc
+Screen Actions
+Action Name | Description | Success | Failure
+Lọc kết quả | Lọc kết quả hiển thị trong danh sách thuốc. Tùy theoNếu để trống thì hệ thống sẽ hiển thị tất cả thuốc có trong cơ sở dữ liệu. | Hiển thị danh sách thuốc là kết quả của bộ lọc. | Thông báo: Không thể tìm kiếm
+-------------
+
+6.11.2.1.2            Quản lý thông tin thuốc – Danh sách thuốc
+
+--- TABLE ---
+Screen | Quản lý thông tin thuốc – Danh sách thuốc
+Description | Quản lý các thông tin về các loại thuốc có trong cửa hàng. Tiện lợi cho việc nhập, xuất, bán thuốc. Tại đây quy định về giá bán thuốc. Các thông tin về thuốc như Giá nhập, % lợi nhuận xuất lẻ, % lợi nhuận xuất sỉ ,% chiết khấu, VAT.- Đơn vị: Là đơn vị nhập từ nhà sản xuất, đơn vị tính lớn (HỘP, THÙNG, VỈ, BỊCH).- Đơn vị QĐ: Là đơn vị quy đổi, phục vụ cho việc tính đơn giá bán lẻ. ( GÓI, VIÊN, LỌ, ... )- Tỷ lệ quy đổi: Thể hiện tỉ lệ quy đổi giữa Đơn vị và Đơn vị QĐ. (1 Vỉ có 10 viên thuốc → Tỷ lệ quy đổi = 10)- Giá bán lẻ (được tính theo công thức: giá lẻ = giá gốc * % lợi nhuận xuất lẻ * tỉ lệ quy đổi giữa bán lẻ và bán sỉ) ,- Giá bán sỉ (theo công thức: giá sỉ = giá gốc * % lợi nhuận xuất sỉ)
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Danh sách thuốc
+Screen Content
+Item | Type | Data | Description
+Mã thuốc | Text(6) |   | Mã của thuốc dùng để phân biệt các thuốc với nhau. Mã thuốc là duy nhất
+Nhóm thuóc | Text(25) |   | Nhóm của thuốc
+Tên thuốc | Text(25) |   | Tên của thuốc
+Hoạt chất | Text(50) |   | Hoạt chất có trong thuốc
+ĐVT | Text(12) |   | Đơn vị tính của thuốc. VD: hộp, vỉ, viên…
+ĐV QĐ | Text(12) |   | Đơn vị quy đổi của thuốc
+Số lượng | Number |   | Số lượng hiện tại của thuốc có trong quán
+Giá nhập | Number |   | Giá nhập của thuốc từ nhà cung ứng
+Giá sĩ | Number |   | Giá bán sĩ của thuốc
+Giá lẻ | Number |   | Giá bán lẻ của thuốc
+% CK | Number |   | % Chiết khấu của nhà cung ứng
+% LN XC | Number |   | % Lợi nhuận xuất chẵn của thuốc
+% LN XL | Number |   | % Lợi nhuận xuất lẻ của thuốc
+VAT | Number |   | % Giá trị gia tăng
+Thêm | Button |   | Thêm thuốc mới
+Xóa | Button |   | Xóa thuốc
+Sửa | Button |   | Sửa thông tin thuốc
+Trở về | Button |   | Thoát khỏi màn hình hiện tại. Trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm thuốc mới vào hệ thống. | Hiển thị màn hình “thông tin thuốc” |  
+Sửa | Thay đổi thông tin về thuốc đang được chọn trong danh sách thuốc | Hiển thị màn hình sửa đổi “thông tin thuốc” | Thông báo: “Chưa chọn thuốc trong danh sách”
+Xóa | Xóa thuốc đang được chọn trong danh sách thuốc | Thuốc được chọn trong danh sách sẽ bị xóa | Thông báo: “Chưa chọn thuốc trong danh sách”
+Trở về | Thoát khỏi màn hình hiện tại. | Thoát khỏi màn hình hiện tại. |  
+-------------
+
+6.11.2.1.3            Quản lý thông tin thuốc – Thông tin thuốc
+
+--- TABLE ---
+Screen | Quản lý thông tin thuốc – Thông tin thuốc
+Description | Quản lý các thông tin về các loại thuốc có trong cửa hàng. Tiện lợi cho việc nhập, xuất, bán thuốc. Tại đây quy định về giá bán thuốc. Các thông tin về thuốc như Giá nhập, % lợi nhuận xuất lẻ, % lợi nhuận xuất sỉ ,% chiết khấu, VAT.- Đơn vị: Là đơn vị nhập từ nhà sản xuất, đơn vị tính lớn (HỘP, THÙNG, VỈ, BỊCH).- Đơn vị QĐ: Là đơn vị quy đổi, phục vụ cho việc tính đơn giá bán lẻ. ( GÓI, VIÊN, LỌ, ... )- Tỷ lệ quy đổi: Thể hiện tỉ lệ quy đổi giữa Đơn vị và Đơn vị QĐ. (1 Vỉ có 10 viên thuốc → Tỷ lệ quy đổi = 10)- Giá bán lẻ (được tính theo công thức: giá lẻ = giá gốc * % lợi nhuận xuất lẻ * tỉ lệ quy đổi giữa bán lẻ và bán sỉ) ,- Giá bán sỉ (theo công thức: giá sỉ = giá gốc * % lợi nhuận xuất sỉ)
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Danh sách thuốc. Tại màng hình này lick vào button Thêm
+Screen Content
+Item | Type | Data | Description
+Mã thuốc | Text field |   | Mã thuốc sẽ được chương trình cấp tự động, mã thuốc là duy nhất để phân biệt giữa các thuốc
+Tên thuốc | Text field |   | Bắt buộc phải nhập thông tin ở trường nàyThôn tin nhập chính là tên thuốc
+Hoạt chất | Text field |   | Bắt buộc phải nhật thông tin ở trường nàyThông tin cần nhập là hoạt chất có trong thuốc
+Nhóm thuốc | ComboBox |   | Hiển thị danh sách nhóm thuốc để người dùng lựa chọnTrường này buộc phải chọn
+Đơn vị tính | ComboBox |   | Đơn vị tính của thuốc, comboBox sẽ liệt kê các đơn vị tính, người nhập sẽ chọn đơn vị tính tương ứng của thuốc. Bắt buộc phải chọn đơn vị tính cho thuốc
+Đơn vị quy đổi | ComboBox |   | Đơn vị quy đổi khi bán thuốc phục vụ cho việc bán lẻ. Người nhập bắt buộc phải chọn đợn vị được liệt kê trong comboBox
+Tỷ lệ quy đổi | Text field |   | Tỷ lệ quy đổi: Thể hiện tỉ lệ quy đổi giữa Đơn vị và Đơn vị QĐ. (1 Vỉ có 10 viên thuốc → Tỷ lệ quy đổi = 10)
+Giá nhập | Text field |   | Nhập giá nhập thuốc từ nhà cung ứngTrường bắt buộc phải nhập
+Giá nhập QĐ | Text field |   | Giá nhập quy đổi = Giá nhập / tỷ lệ quy đổi
+Tỷ lệ CK | Text field |   | Tỷ lệ chiết khấu ứng với thuốc do nhà cung cấp quy địnhBắt buộc phải nhập trường này
+VAT | Text field |   | Giá trị gia tăng của thuốcBắt buộc phải nhập trường này
+Nhập có VAT | Text field |   | Nhập có VAT = Giá nhập + Giá nhập*VAT
+% Lợi nhuận XC | Text field |   | % Lợi nhuận của thuốc khi bán sĩBắt buộc phải nhập.
+% Lợi nhuận XL | Text field |   | % Lợi nhuận của thuốc khi bán lẻBắt buộc phải nhập.
+Giá bán lẻ | Text field |   | Giá bán lẻ (được tính theo công thức: giá lẻ = giá gốc * % lợi nhuận xuất lẻ * tỉ lệ quy đổi giữa bán lẻ và bán sỉ) ,
+Giá bán sĩ | Text field |   | Giá bán sỉ (theo công thức: giá sỉ = giá gốc * % lợi nhuận xuất sỉ)
+Nhà sản xuất | Text field |   | Nhà sản xuất
+Xuất xứ | ComboBox |   | Nước sản xuất
+Ghi chú | Text field |   | Ghi chú thêm thông tin cho thuốc
+Thêm | Button |   | Hoàn tất việc nhập thông tin của thuốc, thông tin của thuốc sẽ được lưu vào CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại. Trở lại màn  hình trước đó.
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm thuốc mới đang nhập vào hệ thống. | Thông tin của thuốc mới nhập được lưu vào CSDL. Trở về màng hình Danh sách thuốc | Thông báo: Phải nhập đầy đủ thông tin
+Trở về | Thoát khỏi màn hình hiện tại. | Thoát khỏi màn hình hiện tại. |  
+-------------
+
+6.11.3  Quản lý khách hàng
+
+--- TABLE ---
+Use Case Name | Quản lý khách hàng
+Use Case ID | SE1600011
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Chức năng này sẽ cho phép người sử dụng quản lý các thông tin của khách hàng. Bao gồm chi tiết về hóa đơn mua thuốc của từng khách hàng. Thêm, sửa, xóa, tìm kiếm thông tin về khách hàng đó.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công, và đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.11.3.1 Screen design
+6.11.3.1.1            Quản lý khách hàng – Bộc lọc
+
+--- TABLE ---
+Screen | Quản lý nhà cung cấp – Bộ lọc
+Description | Hiển thị truy vấn để lọc kết quả, mặc định là mã nhà khách hàng, sẻ hiển thị tất cả khách hàng nếu như không nhập gì vào ô lọc. Sau đó người dùng có thể lọc khách hàng theo theo các giá trị trong danh sách xổ và nhập nôi dung tương ứng vào ô lọc để lọc
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Khách hàng
+Screen Content
+Item | Type | Data | Description
+Loc theo | ComboBox |   | Hiển thị liêt kê danh sách tìm kiếm theo các thuộc tính của khách hàng
+Nhập – Text field | Text field |   | Nhập nội dung cần tìm kiếm
+Sắp xếp | ComboBox |   | Sắp xếp danh sách khách hàng theo các thuộc được liệt kê trong comboBox
+Lọc kết quả | Button |   | Hiển thị danh sách khách hàng thỏa mãn bộ lọc
+Screen Actions
+Action Name | Description | Success | Failure
+Lọc kết quả | Lọc kết quả theo các thông tin được chọn ở danh sách xổ và nội dung nhập vào trong ô lọc | Lọc kết quả và đem kết quả lọc hiển thị lên bảng | Thông báo lỗi : “không có kết quả nào phù hợp”
+Sắp xếp | Sắp xếp lại danh sách khách hang theo các tiêu chí có trongdanh sách xổ | Sắp xếp lại danh sách nhà khách hàng theo các tiêu chí có trongdanh sách xổ |  
+ |  |  |  |  | 
+-------------
+
+6.11.3.1.2            Quản lý khách hàng – Danh sách khách hàng
+
+--- TABLE ---
+Screen | Quản lý khách hàng – Danh sách khách hàng
+Description | Tại đây người dùng có thể hiển thị danh sách khách hàng, lọc khách hàng, thêm khách hàng mới bao gồm các khách hàng mua sỉ hay khách hàng mua thuốc theo toa. Tiện cho việc quản lý bán hàng.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Khách hàng
+Screen Content
+Item | Type | Data | Description
+Mã khách hàng | Text(8) |   | Mã của khách hàng dùng để phân biệt khách hang. Mã khách hàng là duy nhất
+Tên khách hàng | Text(9) |   | Tên khách hàng (Nếu khách hàng thuộc nhóm khách lẻ thì tên khách hàng được đặt mặc định là “khách lẻ”…)
+Tuổi | Number(3) |   | Tuổi của khách hàng.
+Địa chỉ | Text(50) |   | Địa chỉ của khách hàng
+Số điện thoại | Text(11) |   | Số điện thoại của khách hàng
+Nhóm khách hàng | Text(25) |   | Nhóm khách hàng (có 3 nhóm chính: nhóm khách lẻ, nhóm khách sỉ, nhóm khách theo đơn)
+Ghi chú | Text(50) |   | Ghi chú thêm nếu có
+Thông tin chi tiết | Button |   | Hiển thị danh sách hóa đơn của khách hàng
+Thêm | Button |   | Thêm mới khách hàng
+Sửa | Button |   | Sửa thông tin khách hàng
+Xóa | Button |   | Xóa thông tin khách hàng
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Thông tin chi tiết | Xem thông tin hóa đơn của khách hàng | Hiển thị màng hình chi tiết khách hàng | Thông báo: Phải chọn khách hàng
+Thêm | Thêm khách hàng mới vào hệ thống | Hiển thị màn hình nhập thông tin khách hàng |  
+Sửa | Thay đổi thông tin về khách hàng | Hiển thị màn hình sửa đổi thông tin khách hàng | Thông báo: Chưa chọn khách hàng
+Xóa | Xóa khách hàng đang được chọn trong danh sách thuốc | Khách hàng được chọn trong danh sách sẽ bị xóa | Thông báo: Chưa chọn khách hàng
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.11.3.1.3            Quản lý khách hàng – Thêm khách hàng
+
+--- TABLE ---
+Screen | Thông tin khách hàng – Thêm khách hàng
+Description | Màn hình thêm khách hàng mới vào hệ thống.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Khách hàng. Sau đó chọn button Thêm
+Screen Content
+Item | Type | Data | Description
+Nhóm khách hàng | ComboBox |   | Liêt kê danh sách nhóm khách hàng để người dùng lựa học.Trường bắt buộc phải nhập
+Mã khách hàng | Text field |   | Mã số của khách hàng, là duy nhất phân biệt giữa các khách hàng, mã được cấp phát tự động.
+Tên khách hàng | Text field |   | Trường bắt buộc phải nhậpNội dung nhập là tên của khách hàng
+Địa chỉ | Text field |   | Địa chỉ của khách hàng
+Tuổi | Text field – number |   | Tuổi của khách hàng
+Điện thoại | Text field – number |   | Số điện thoại của khách hàng
+Thêm | Button |   | Hoàn tất việc thêm khách hàng, thông tin khách hàng được lưu trũ vào CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thực hiện việc thêm thông tin khách hàng vào hệ thống. | Thông tin khách hàng sẻ được thêm vào hệ thống. |  
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin khách hàng. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.3.1.4            Quản lý khách hang – Sửa thông tin khách hàng
+
+--- TABLE ---
+Screen | Thông tin nhà khách hàng – Sửa thông tin khách hàng
+Description | Màn hình sửa thông tin nhà cung cấp
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Khách hàng. Sau đó chọn button Sửa
+Screen Content
+Item | Type | Data | Description
+Nhóm khách hàng | ComboBox |   | Liêt kê danh sách nhóm khách hàng để người dùng lựa học.Trường bắt buộc phải nhập
+Mã khách hàng | Text field |   | Mã số của khách hàng, là duy nhất phân biệt giữa các khách hàng, mã được cấp phát tự động.
+Tên khách hàng | Text field |   | Trường bắt buộc phải nhậpNội dung nhập là tên của khách hàng
+Địa chỉ | Text field |   | Địa chỉ của khách hàng
+Tuổi | Text field – number |   | Tuổi của khách hàng
+Hoàn tất | Button |   | Hoàn tất việc sủa thông tin khách hàng, thông tin khách hàng được lưu trũ vào CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tất | Cập nhật việc sửa đổi thông tin khách hàng vào hệ thống | Cập nhật các thông tin mới của khách hàng vào hệ thống. Đồng thời thoát khỏi màn hình hiện tại. | Thông báo: Phải nhâp đầy đủ thông tin
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin khách hàng. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.3.1.5            Quản lý khách hàng – Chi tiết khách hàng
+·   Thông tin khách hàng – Thông tin chi tiết – Thông tin khách hàng
+
+--- TABLE ---
+Screen | Thông tin nhà khách hàng –Chi tiết khách hàng – Thông tin khách hàng
+Description | Hiển thị thông tin khách hàng, không cho phép chỉnh sửa
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Khách hàng. Sau đó chọn button Thông tin chi tiết
+Screen Content
+Item | Type | Data | Description
+Nhóm khách hàng | Text field |   | Hiển thị thông tin nhóm khách hàngKhông cho phép chỉnh sửa
+Mã khách hàng | Text field |   | Hiển thị mã số của khách hàngKhông cho phép chỉnh sửa
+Tên khách hàng | Text field |   | Hiển thị tên của khách hàngKhông cho phép chỉnh sửa
+Địa chỉ | Text field |   | Hiển thị địa chỉ của khách hàngKhông cho phép chỉnh sửa
+Tuổi | Text field – number |   | Hiển thị tuổi của khách hàngKhông cho phép chỉnh sửa
+Ghi chú | Text field |   | Hiển thị ghi chú thêm của khách hàngKhông cho phép chỉnh sửa
+Screen Actions
+Action Name | Description | Success | Failure
+  |   |   |  
+-------------
+
+·   Quản lý khách hàng – Thông tin chi tiết – Danh sách hóa đơn
+
+--- TABLE ---
+Screen | Thông tin nhà khách hàng – Chi tiết khách hàng – Danh sách hóa đơn
+Description | Hiển thị danh sách các hóa đơn của khách hàng, thỏa mãn điền kiện của bộ lọc thời gian
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Khách hàng. Sau đó chọn button Thông tin chi tiết
+Screen Content
+Item | Type | Data | Description
+Từ ngày(dd/mm/yyyy) | Text field – Date (Date Picker) |   | Lọc từ ngày hóa đơn được lậpTrường này là bắt buộc
+Đến ngày(dd/mm/yyyy) | Text field – Date (Date Picker) |   | Lọc đến ngày hóa đơn được lậpTrường này là bắt buộc
+Từ giờ | Text field |   | Lọc từ giờ hóa đơn được lậpTrường này là bắt buộc
+Đến giờ | Text field |   | Lọc đến giờ hóa đơn được lậpTrường này là bắt buộc
+Xem | Button |   | Xem kết quả tìm kiếm của bộ lọc là danh sách hóa đơn
+Mã hóa đơn | Text(9) |   | Mã của hóa đơn, để phân biệt các hóa đơn với nhau. Mã hóa đơn là duy nhất
+Ngày lập | Date/Time (dd/mm/yyyy) |   | Ngày hóa đơn được lập
+Giờ lập | Date/Time |   | Giờ hóa đơn được lập
+Người lập | Text(25) |   | Tên của nhân viên lập hóa đơn
+Tổng tiền | Number |   | Tổng tiền của hóa đơn
+Xem hóa đơn | Button |   | Xem chi tiết của hóa đơn
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.Trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Hiển thị danh sách hóa đơn thỏa mãn điều kiện của bộ lọc thời gian | Hiển thị danh sách hóa đơn của khách hàng | Thông báo: Thời gian không hợp lệ
+Xem hóa đơn | Xem thông tin chi tiết của hóa đơn trong danh sách | Hiển thị màng hình Chi tiết hóa đơn | Thông báo: Phải chọn hóa đơn
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin nhân viên. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.4  Quản lý nhà cung cấp
+
+--- TABLE ---
+Use Case Name | Quản lý nhà cung cấp
+Use Case ID | SE160012
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Chức năng này sẽ cho phép người sử dụng quản lý các thông tin về nhà cung cấp cũng như công nợ của nhà cung cấp
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công, và đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.11.4.1 Screen design
+6.11.4.1.1            Quản lý nhà cung cấp – Bộ lọc
+
+--- TABLE ---
+Screen | Quản lý nhà cung cấp – Bộ lọc
+Description | Hiển thị truy vấn để lọc kết quả, mặc định là mã nhà cung cấp, sẻ hiển thị tất cả nhà cung cấp nếu như không nhập gì vào ô lọc. Sau đó người dùng có thể lọc nhà cung cấp theo theo các giá trị trong danh sách xổ và nhập nôi dung tương ứng vào ô lọc để lọc
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhà cung cấp
+Screen Content
+Item | Type | Data | Description
+Lọc theo | ComboBox |   | Liệt kê các thuộc tính tìm kiếm để người dùng lựa chọn. Trường này là bắt buộc
+Text field – Nhập | Text field |   | Nhập thông tin cần tìm kiếmBắt buộc phải nhập trường này
+Lọc kết quả | Button |   | Hiển thị kết quả tìm kiếm
+Sắp xếp theo | ComboBox |   | Liệt kê các thuộc tính để người dùng lựa chọn, kết quả tìm kiếm sẽ được hiển thị theo thứ tự theo thuộc tính được chọn
+Screen Actions
+Action Name | Description | Success | Failure
+Lọc kết quả | Lọc kết quả theo các thông tin được chọn ở danh sách xổ và nội dung nhập vào trong ô lọc | Lọc kết quả và đem kết quả lọc hiển thị lên bảng | Thông báo lỗi : “không có kết quả nào phù hợp”
+Sắp xếp | Sắp xếp lại danh sách nhà cung cấp  theo các tiêu chí có trongdanh sách xổ | Sắp xếp lại danh sách nhà cung cấp theo các tiêu chí có trong danh sách xổ |  
+-------------
+
+6.11.4.1.2            Quản lý nhà cung cấp – Danh sách nhà cung cấp
+
+--- TABLE ---
+Screen | Quản lý nhà cung cấp – Danh sách nhà cung cấp
+Description | Quản lý nhà cung cấp thuốc.Thể hiện các thông tin liên hệ nhà cung cấp, ghi chú.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhà cung cấp
+Screen Content
+Item | Type | Data | Description
+Mã nhà cung cấp | Text(25) |   | Mã của nhà cung cấp, để phân biệt giữa các nhà cung cấp. Mã là duy nhất.
+Tên nhà cung cấp | Text(25) |   | Tên của nhà cung cấp
+Địa chỉ | Text(50) |   | Địa chỉ của nhà cung cấp
+Số điện thoại | Text(11) |   | Số điện thoại của nhà cung cấp
+Công nợ | Number |   | Công nợ ứng với nhà cung cấp (bằng tổng công nợ của các hóa đơn nhập với nhà cung cấp)
+Ghi chú | Text(25) |   | Ghi chú thêm về nhà cung cấp
+Thông tin chi tiết | Button |   | Xem thông tin chi tiết hóa đơn ứng với nhà cung cấp được chọn trong bảng
+Thêm | Button |   | Thêm mới nhà cung cấp
+Sửa | Button |   | Sửa thông tin nhà cung cấp, thông tin sửa đổi được cập nhật vào CSDL
+Xóa | Button |   | Xóa thông tin nhà cung cấp. Thông tin của nhà cung cấp sẽ được xóa khỏi CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.Trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm nhà cung cấp mới vào hệ thống | Hiển thị màn hình nhập thông tin nhà cung cấp |  
+Sửa | Thay đổi thông tin về nhà cung cấp | Hiển thị màn hình sửa đổi thông tin nhà cung cấp | Thông báo: phải chọn nhà cung cấp
+Xóa | Xóa nhà cung cấp đang được chọn trong danh sách thuốc | Nhà cung cấp được chọn trong danh sách sẽ bị xóa | Thông báo: phải chọn nhà cung cấp
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.11.4.1.3            Quản lý thông tin nhà cung cấp – Thêm nhà cung cấp
+
+--- TABLE ---
+Screen | Thông tin nhà cung cấp – Thêm nhà cung cấp
+Description | Màn hình thêm nhà cung cấp mới vào hệ thống.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhà cung cấp. Sau đó chọn button Thêm
+Screen Content
+Item | Type | Data | Description
+Mã nhà cung cấp | Text(25) |   | Mã của nhà cung cấp, để phân biệt giữa các nhà cung cấp. Mã là duy nhất.Trường bắt buộc phải nhập
+Tên nhà cung cấp | Text(25) |   | Tên của nhà cung cấpTrường bắt buộc phải nhập
+Địa chỉ | Text(50) |   | Địa chỉ của nhà cung cấp
+Số điện thoại | Text(11) |   | Số điện thoại của nhà cung cấp
+Email | Text(25) |   | Email của nhà cung cấp
+Ghi chú | Text(50) |   | Ghi chú thêm về nhà cung cấp
+Thêm | Button |   | Hoàn tất thông tin của nhà cung cấp. Thông tin về nhà cung cấp sẽ được lưu trữ vào CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thực hiện việc thêm thông tin nhà cung cấp vào hệ thống. | Thông tin nhà cung cấp sẻ được thêm vào hệ thống. | Thông báo:Phải nhập thông tin các trường bắt buộc
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin nhân viên. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.4.1.4            Quản lý nhà cung cấp – Sửa thông tin nhà cung cấp
+
+--- TABLE ---
+Screen | Thông tin nhà cung cấp – Sửa thông tin nhà cung cấp
+Description | Màn hình sửa thông tin nhà cung cấp
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhà cung cấp. Sau đó chọn button Sửa
+Screen Content
+Item | Type | Data | Description
+Mã nhà cung cấp | Text(25) |   | Mã của nhà cung cấp, để phân biệt giữa các nhà cung cấp. Mã là duy nhất.Trường bắt buộc phải nhập
+Tên nhà cung cấp | Text(25) |   | Tên của nhà cung cấpTrường bắt buộc phải nhập
+Địa chỉ | Text(50) |   | Địa chỉ của nhà cung cấp
+Số điện thoại | Text(11) |   | Số điện thoại của nhà cung cấp
+Email | Text(25) |   | Email của nhà cung cấp
+Ghi chú | Text(50) |   | Ghi chú thêm về nhà cung cấp
+Hoàn tất | Button |   | Hoàn tất việc thay đổi thông tin của nhà cung cấp. Thông tin về nhà cung cấp sẽ được cập nhật vào CSDL
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tất | Cập nhật việc sửa đổi thông tin nhà cung cấp vào hệ thống | Cập nhật các thông tin mới của nhà cung cấp vào hệ thống. Đồng thời thoát khỏi màn hình hiện tại. |  
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin nhân viên. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.4.1.5            Quản lý nhà cung cấp – Chi tiết nhà cung cấp
+·   Quản lý nhà cung cấp – Chi tiết nhà cung cấp – Thông tin nhà cung cấp
+
+--- TABLE ---
+Screen | Thông tin nhà cung cấp – Chi tiết nhà cung cấp – thông tin nhà cung cấp
+Description | Hiển thị thông tin nhà cung cấp, không cho phép sửa đổi
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhà cung cấp. Sau đó chọn button Thông tin chi tiết
+Screen Content
+Item | Type | Data | Description
+Mã nhà cung cấp | Text(25) |   | Mã của nhà cung cấp, để phân biệt giữa các nhà cung cấp. Mã là duy nhất.Trường bắt buộc phải nhập
+Tên nhà cung cấp | Text(25) |   | Tên của nhà cung cấpTrường bắt buộc phải nhập
+Địa chỉ | Text(50) |   | Địa chỉ của nhà cung cấp
+Số điện thoại | Text(11) |   | Số điện thoại của nhà cung cấp
+Email | Text(25) |   | Email của nhà cung cấp
+Ghi chú | Text(50) |   | Ghi chú thêm về nhà cung cấp
+Screen Actions
+Action Name | Description | Success | Failure
+  |   |   |  
+-------------
+
+·   Quản lý nhà cung cấp – Chi tiết nhà cung cấp – Danh sách hóa đơn
+
+--- TABLE ---
+Screen | Thông tin nhà khách hàng – Chi tiết nhà cung cấp – Danh sách hóa đơn
+Description | Hiển thị danh sách các hóa đơn của nhà cung cấp, thỏa mãn điền kiện của bộ lọc thời gian
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhà cung cấp. Sau đó chọn button Thông tin chi tiết
+Screen Content
+Item | Type | Data | Description
+Từ ngày(dd/mm/yyyy) | Text field – Date (Date Picker) |   | Lọc từ ngày hóa đơn được lậpTrường này là bắt buộc
+Đến ngày(dd/mm/yyyy) | Text field – Date (Date Picker) |   | Lọc đến ngày hóa đơn được lậpTrường này là bắt buộc
+Từ giờ | Text field |   | Lọc từ giờ hóa đơn được lậpTrường này là bắt buộc
+Đến giờ | Text field |   | Lọc đến giờ hóa đơn được lậpTrường này là bắt buộc
+Xem | Button |   | Xem kết quả tìm kiếm của bộ lọc là danh sách hóa đơn
+Mã hóa đơn | Text(9) |   | Mã của hóa đơn, để phân biệt các hóa đơn với nhau. Mã hóa đơn là duy nhất
+Số CT | Number |   | Số chứng từ của hóa đơn nhập
+Ngày lập | Date/Time (dd/mm/yyyy) |   | Ngày hóa đơn được lập
+Giờ lập | Date/Time |   | Giờ hóa đơn được lập
+Tổng tiền | Number |   | Tổng tiền của hóa đơn
+Nợ hóa đơn | Number |   | Số tiền nợ của hóa đơn nhập ứng với nhà cung cấp (công nợ của hóa đơn)
+Xem | Button |   | Hiển thị danh sách hóa đơn thỏa mãn điều kiện của bộ lọc thời gian
+Xem hóa đơn | Button |   | Xem chi tiết của hóa đơn
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.Trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Hiển thị danh sách hóa đơn thỏa mãn điều kiện của bộ lọc thời gian | Hiển thị danh sách hóa đơn của khách hàng | Thông báo: Thời gian không hợp lệ
+Xem hóa đơn | Xem thông tin chi tiết của hóa đơn trong danh sách | Hiển thị màn hình Chi tiết hóa đơn | Thông báo: Phải chọn hóa đơn
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin nhân viên. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.5  Quản lý nhân viên
+
+--- TABLE ---
+Use Case Name | Quản lý nhân viên
+Use Case ID | SE160013
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Chức năng này sẽ cho phép người sử dụng quản lý các thông tin về nhân viên. Thêm, sửa, xóa nhân viên.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công, và đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.11.5.1 Screen design
+6.11.5.1.1            Quản lý nhân viên  - Bộ lọc
+
+--- TABLE ---
+Screen | Quản lý nhân viên
+Description | Hiển thị truy vấn để lọc kết quả, mặc định là mã nhân viên, sẻ hiển thị tất cả nhân viên nến như không nhập gì vào ô lọc. Sau đó người dùng có thể lọc nhân viên theo theo các giá trị trong danh sách xổ và nhập nôi dung tương ứng vào ô lọc để lọc 
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhân viên
+Screen Content
+Item | Type | Data | Description
+Lọc theo-ComboBox | ComboBox |   | Cho phép người dùng chọn lựa cách lọc dữ liệu theo các giá trị có sản được liệt kê
+Lọc theo-Text Field | Text Field |   | Cho phép người dùng nhập các thông tin vào để lọc giá trị
+Lọc kết quả | Button |   | Lọc kết quả theo các thông tin được chọn ở danh sách xổ và nội dung nhập vào trong ô lọc
+Sắp xếp | ComboBox |   | Sắp xếp lại danh sách theo các tiêu chí có trong danh sách xổ
+Screen Actions
+Action Name | Description | Success | Failure
+Lọc kết quả | Lọc kết quả theo các thông tin được chọn ở danh sách xổ và nội dung nhập vào trong ô lọc | Lọc kết quả và đem kết quả lọc hiển thị lên bảng | Thông báo lỗi : “không có kết quả nào phù hợp”
+Sắp xếp | Sắp xếp lại danh sách nhân viên theo các tiêu chí có trongdanh sách xổ | Sắp xếp lại danh sách nhân viên theo các tiêu chí có trongdanh sách xổ |  
+-------------
+
+6.11.5.1.2            Quản lý nhân viên – Danh sách nhân viên
+
+--- TABLE ---
+Screen | Quản lý nhà nhân viên – Danh sách nhân viên
+Description | Quản lý nhân viên trong cửa hàng. Quản lý các thông tin cá nhân của nhân viên, ngày vào làm, tài khoản, chức vụ.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhân viên
+Screen Content
+Item | Type | Data | Description
+Mã nhân viên | Text(5) |   | Mã nhân viên là duy nhất, để phân biệt giữa các nhân viên
+Tên nhân viên | Text(25) |   | Tên của nhân viên
+Địa chỉ | Text(50) |   | Địa chỉ của nhân viên
+Điện thoại | Text(11) |   | Số điện thoại liên lạc của nhân viên
+Ngày vào làm | Date/Time(dd/mm/yyyy) |   | Ngày vào làm chính thức của nhân viên
+Tên tài khoản | Text (25) |   | Tên tài khoản của nhân viên trong hệ thống
+Chức vụ | Text(15) |   | Chức vụ mà nhân viên đó đảm nhiệm trong cửa hiệu
+Ghi chú | Text(50) |   | Ghi chú thêm về nhân viên
+Thêm | Button |   | Thêm mới nhân viên
+Sửa | Button |   | Sửa thông tin nhân viên được chọn trong danh sách
+Xóa | Button |   | Xóa thông tin nhân viên được chọn trong danh sách
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.Trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm nhân viên mới vào hệ thống | Hiển thị màn hình nhập “thông tin nhân viên” |  
+Sửa | Thay đổi thông tin về nhân viên | Hiển thị màn hình “thay  đổi thông tin nhân viên” |  
+Xóa | Xóa nhân viên đang được chọn trong danh sách thuốc | Nhân viên được chọn trong danh sách sẽ bị xóa |  
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.11.5.1.3            Quản lý nhân viên – Thêm nhân viên
+
+--- TABLE ---
+Screen | Quản lý nhân viên - Thêm nhân viên
+Description | Màn hình thêm nhân viên mới vào hệ thống.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhân viên. Sau đó chọn button Thêm
+Screen Content
+Item | Type | Data | Description
+Mã nhân viên | Text field |   | Mã của nhân viên là duy nhất, hệ thống sẽ cấp tự động
+Tên nhân viên | Text field |   | Nhập tên của nhân viênPhải bắt buộc nhập trường này
+Địa chỉ | Text field |   | Địa chỉ của nhân viênPhải bắt buộc nhập trường này
+Điện thoại | Number |   | Số điện thoại liên lạc của nhân viênPhải bắt buộc nhập trường này
+Ngày vào làm | Text field – Date (Date Picker) |   | Ngày vào làm chính thức của nhân viên mới
+Tên tài khoản | Text field |   | Tên tài khoản được cấp cho nhân viên trong hệ thốngPhải bắt buộc nhập trường này
+Chức vụ | ComboBox |   | Chức vụ mà nhân viên đó đảm nhiệm trong cửa hiệuPhải bắt buộc nhập trường này
+Thêm | Button |   | Thực hiện việc thêm thông tin nhân viên vào hệ thống. Nhân viên có thể sử dụng tài khoản của mình để đăng nhập vào hệ thống. Mật khẩu sẽ được tạo mặc định và nhân viên có thể thay đổi mật khẩu sau khi đăng nhập vào chương trình
+Reset | Button |   | Xóa trắng các thông tin đã được nhập vào các trường dữ liệu
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thực hiện việc thêm thông tin nhân viên vào hệ thống. Nhân viên có thể sử dụng tài khoản của mình để đăng nhập vào hệ thống. Mật khẩu sẽ được tạo mặc định và nhân viên có thể thay đổi mật khẩu sau khi đăng nhập vào chương trình | Thông tin nhân viên sẽ được cập nhật vào hệ thống. | Thông báo:Phải thêm đầy đủ các thông tin
+Reset | Xóa trắng các thông tin đã được nhập vào các trường dữ liệu |   |  
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin nhân viên. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.5.1.4            Quản lý nhân viên – Sửa nhân viên
+
+--- TABLE ---
+Screen | Quản lý nhân viên - Sửa nhân viên
+Description | Màn hình sửa thông tin nhân viên.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Nhân viên. Sau đó chọn button Sửa
+Screen Content
+Item | Type | Data | Description
+Mã nhân viên | Text field |   | Hiển thị mã nhân viên đang được thay đổi thông tin
+Tên nhân viên | Text field |   | Hiển thị tên nhân viên đang được thay đổi thông tin
+Địa chỉ | Text field |   | Địa chỉ của nhân viên
+Điện thoại | Number |   | Số điện thoại lien lạc của nhân viên
+Ngày vào làm | Text field – Date (Date Picker) |   | Ngày vào làm chính thức
+Tên tài khoản | Text field |   | Tên tài khoản của nhân viên trong hệ thống
+Chức vụ | ComboBox |   | Chức vụ mà nhân viên đó đảm nhiệm trong cửa hiệu
+Hoàn tất | Button |   | Cập nhật việc sửa đổi thông tin nhân viên vào hệ thống
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tất | Cập nhật việc sửa đổi thông tin nhân viên vào hệ thống | Cập nhật các thông tin mới của nhân viên vào hệ thống. Đồng thời thoát khỏi màn hình hiện tại. |  
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin nhân viên. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.6  Quản lý thông tin toa thuốc
+
+--- TABLE ---
+Use Case Name | Quản lý toa thuốc
+Use Case ID | SE160014
+High Level Requirement Ref |  
+Actor | Quản lý
+Description | Cho phép quản lý các thông tin về toa thuốc có sẵn trong hệ thống. Toa thuốc này được nhập từ người quản lý. Người có chuyên môn. Dữ liệu gồm những toa thuốc thường hay được sử dụng giúp giảm thời gian thao tác lấy thuốc với hệ thống.
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập vào hệ thống thành công, và đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.11.6.1 Screen design
+6.11.6.1.1            Quản lý toa thuốc – Bộ lọc
+
+--- TABLE ---
+Screen | Quản lý nhân viên
+Description | Hiển thị truy vấn để lọc kết quả, mặc định là mã toa thuốc, sẻ hiển thị tất cả toa thuốc nến như không nhập gì vào ô lọc. Sau đó người dùng có thể lọc toa thuốc theo theo các giá trị trong danh sách xổ và nhập nôi dung tương ứng vào ô lọc để lọc.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Toa thuốc
+Screen Content
+Item | Type | Data | Description
+Lọc theo-ComboBox | ComboBox |   | Cho phép người dùng chọn lựa cách lọc dữ liệu theo các giá trị có sản được liệt kê
+Lọc theo-Text Field | Text Field |   | Cho phép người dùng nhập các thông tin vào để lọc giá trị
+Lọc kết quả | Button |   | Lọc kết quả theo các thông tin được chọn ở danh sách xổ và nội dung nhập vào trong ô lọc
+Sắp xếp | ComboBox |   | Sắp xếp lại danh sách theo các tiêu chí có trong danh sách xổ
+Screen Actions
+Action Name | Description | Success | Failure
+Lọc kết quả | Lọc kết quả theo các thông tin được chọn ở danh sách xổ và nội dung nhập vào trong ô lọc | Lọc kết quả và đem kết quả lọc hiển thị lên bảng | Thông báo lỗi : “không có kết quả nào phù hợp”
+Sắp xếp | Sắp xếp lại danh sách nhân viên theo các tiêu chí có trongdanh sách xổ | Sắp xếp lại danh sách theo các tiêu chí có trong danh sách xổ |  
+-------------
+
+6.11.6.1.2            Quản lý toa thuốc – Danh sách toa thuốc
+
+--- TABLE ---
+Screen | Quản lý toa thuốc
+Description | Quản lý toa thuốc trong cửa hàng. Quản lý các thông tin các toa thuốc có sẳn hoặc được thêm mới vào như là, tên toa thuốc , đối tượng sử dụng, triệu chứng, ghi chú thêm.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Toa thuốc
+Screen Content
+Item | Type | Data | Description
+Mã toa thuốc | Text(6) |   | Mã của toa thuốc là duy nhất để phân biệt các toa thuốc
+Tên toa thuốc | Text(25) |   | Tên của toa thuốc
+Đối tượng | Text(15) |   | Đối tượng sử dụng của toa thuốc
+Triệu chứng | Text(50) |   | Triệu chứng của bệnh
+Ghi chú | Text(50) |   | Ghi chú thêm về đơn thuốc
+Thêm | Button |   | Thêm đơn thuốc mới
+Sửa | Button |   | Sửa đổi thông tin đơn thuốc
+Xóa | Button |   | Xóa thông tin đơn thuốc, thông tin đơn thuốc sẽ bị xóa khỏi CSDL của hệ thống
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thêm nhân viên mới vào hệ thống | Hiển thị màn hình nhập “thông tin đơn thuốc” |  
+Sửa | Thay đổi thông tin về đơn thuốc | Hiển thị màn hình thay  đổi “thông tin đơn thuốc” | Thông báo: Phải chọn toa thuốc
+Xóa | Xóa đơn thuốc đang được chọn trong danh sách thuốc | Đơn thuốc được chọn trong danh sách sẽ bị xóa | Thông báo: Phải chọn toa thuốc
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.11.6.1.3            Quản lý toa thuốc – Thêm toa thuốc
+
+--- TABLE ---
+Screen | Quản lý toa thuốc – Thêm toa thuốc
+Description | Màn hình thêm đơn thuốc mới vào hệ thống.
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Toa thuốc. Sau đó chọn button Thêm
+Screen Content
+Item | Type | Data | Description
+Tên đơn thuốc | Text field |   | Tên của đơn thuốcBắt buộc phải nhập trường này
+Triệu chứng | Text field |   | Mô tả các triệu chứng của bệnh nhân trong đơn thuốc.
+Đối tượng | ComboBox |   | Đối tượng sử dụng đơn thuốc
+Số ngày uống | Text field |   | Đơn kê cho mấy ngày uống
+1-ComboBox thuốc | ComboBox |   | Chọn thuốc, có sản trong ComboBox
+1-Text field- Viên | Text field |   | Tổng số viên của loại thuốc đang chọn= số ngày uống*mỗi lần uống
+Icon - Delete | Icon |   | Xóa thuốc ở hàng có Icon xóa tương ứng
+Ngày uống | Text field |   | Số lần uống trong  ngày
+Mỗi lần | Text field |   | Số viên thuốc uông trong mỗi lần uống
+Thêm | Button |   | Hoàn tất việc thêm đơn thuốc mới, thông tin đơn thuốc sẽ được lưu trữ vào CSDL của hệ thống
+Hủy | Button |   | Hủy bỏ việc thêm đơn thuốc mới. Thoát khỏi màn hình hiện tại, trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Thêm | Thực hiện việc thêm toa thuốc mới vào hệ thống. | Thông tin toa thuốc sẽ được cập nhật vào hệ thống. | Thông báo: Phải nhậ đầy đủ thông tin
+Hủy | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin toa thuốc. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.11.6.1.4            Quản lý toa thuốc – Sửa toa thuốc
+
+--- TABLE ---
+Screen | Quản lý toa thuốc – Sửa toa thuốc
+Description | Màn hình sửa thông tin toa thuốc
+Screen Access | Người dùng truy cập vào menu Quản lý thông tin → Toa thuốc. Sau đó chọn button Sửa
+Screen Content
+Item | Type | Data | Description
+Tên đơn thuốc | Text field |   | Tên của đơn thuốc
+Triệu chứng | Text field |   | Mô tả các triệu chứng của bệnh nhân trong đơn thuốc.
+Đối tượng | ComboBox |   | Đối tượng sử dụng đơn thuốc
+Số ngày uống | Text field |   | Đơn kê cho mấy ngày uống
+1-ComboBox thuốc | ComboBox |   | Chọn thuốc, có sản trong ComboBox
+1-Text field- Viên | Text field |   | Tổng số viên của loại thuốc đang chọn= số ngày uống*mỗi lần uống
+Icon - Delete | Icon |   | Xóa thuốc ở hàng có Icon xóa tương ứng
+Ngày uống | Text field |   | Số lần uống trong  ngày
+Mỗi lần | Text field |   | Số viên thuốc uông trong mỗi lần uống
+Hoàn tất | Button |   | Hoàn tất việc sửa đơn thuốc, thông tin đơn thuốc sẽ được lưu trữ vào CSDL của hệ thống
+Hủy | Button |   | Hủy bỏ việc sửa đơn thuốc. Thoát khỏi màn hình hiện tại, trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Hoàn tất | Cập nhật việc sửa đổi thông tin toa thuốc vào hệ thống | Cập nhật các thông tin mới của toa thuốc vào hệ thống. Đồng thời thoát khỏi màn hình hiện tại. |  
+Trở về | Thoát khỏi màn hình hiện tại | Thoát khỏi màn hình thông tin toa thuốc. Và hiển thị màn hình trước đó. |  
+-------------
+
+6.12   Tra cứu
+6.12.1  Screen Design
+6.12.1.1 Tra cứu – Thông tin thuốc
+
+--- TABLE ---
+Screen | Tra cứu – Thông tin thuốc
+Description | Hiển thị bảng thông tin chi tiết từng loại thuốc có thông tin tim kiếm tương đương với thông tin người dùng cần tìm kiếm như: Mã thuốc, Nhóm thuốc, Tên thuốc, Hoạt chất
+Screen Access | Người dùng click vào menu Tra cứu  trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Tra cứu nhanh
+Screen Content
+Item | Type | Data | Description
+Tra cứu theo | ComboBox |   | Liệt kê các thuộc tính của thuốc cho người dùng tìm kiếm
+Text field - nhập | Text field |   | Nhập thông tin tìm kiếm
+Mã thuốc | Text |   | Dùng để phân biệt giữa các thuốc với nhau. (Mã thuốc là duy nhất)
+Tên thuốc | Text(25) |   | Tên của thuốc
+Hoạt chất | Text(50) |   | Các hoạt chất có trong thuốc
+Đơn vị | Text(5) |   | Đơn vị tính của thuốc
+Số lượng | Number |   | Số lượng thuốc đang có
+Nhóm thuốc | Text |   | Nhóm thuốc
+Giá sỉ | Number |   | Giá bán sỉ của thuốc
+Giá lẻ | Nmber |   | Giá bán lẻ của thuốc
+%CK | Number |   | Chiết khấu khi nhập vào, do nhà cung ứng quy định
+Nhà sản xuất | Text |   | Tên nhà sản xuất của thuốc
+Xuất xứ | Text |   | Xuất xứ của thuốc (nước sản xuất)
+Ghi chú | Text(50) |   | Ghi chú thêm thông tin của thuốc nếu có
+Tra cứu | Button |   | Hiển thị kết quả tìm kiếm là danh sách thuốc
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Tra cứu | Thực hiện truy vấn hiển thị danh sách kêt quả vào bảng | Kết quả tra cứu sẽ được hiển thị ở bảng dữ liệu bên dưới | Thông báo: không tìm thấy kết quả
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.12.1.2  Tra cứu – Thông tin toa thuốc
+
+--- TABLE ---
+Screen | Tra cứu – Thông tin toa thuốc
+Description | Hiển thị bảng thông tin toa thuốc có thông tin tim kiếm tương đương với thông tin người dùng cần tìm kiếm.
+Screen Access | Người dùng click vào menu Tra cứu  trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Tra cứu nhanh
+Screen Content
+Item | Type | Data | Description
+Tra cứu theo | ComboBox |   | Liệt kê các thuộc tính của toa thuốc cho phép người dùng tìm kiếm
+Text field - nhập | Text field |   | Nhập thông tin tìm kiếm
+Mã toa thuốc | Text |   | Dùng để phân biệt giữa các loại toa thuốc với nhau. (Mã toa thuốc là duy nhất)
+Tên toa thuốc | Text(25) |   | Tên của toa thuốc
+Đối tượng | Text |   | Đối tượng sử dụng thuốc(trẻ em ,người lớn)
+Triệu chứng | Text |   | Triệu chứng của bệnh mà toa thuốc có thể điều trị
+Ngày dùng | number |   | Số ngày dùng của thuốc (liều dùng)
+Ghi chú | Text |   | Ghi chú thêm thông tin của toa thuốc nếu có
+Tra cứu | Button |   | Hiển thị kết quả tìm kiếm là danh sách toa thuốc
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Tra cứu | Thực hiện truy vấn hiển thị danh sách kêt quả vào bảng | Kết quả tra cứu sẽ được hiển thị ở bảng dữ liệu bên dưới | Thông báo: không tìm thấy kết quả
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.12.1.3  Tra cứu – Thông tin nhân viên
+
+--- TABLE ---
+Screen | Tra cứu – Thông tin nhân viên
+Description | Hiển thị bảng thông tin toa thuốc có thông tin tim kiếm tương đương với thông tin người dùng cần tìm kiếm.
+Screen Access | Người dùng click vào menu Tra cứu  trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Tra cứu nhanh
+Screen Content
+Item | Type | Data | Description
+Tra cứu theo | ComboBox |   | Liệt kê các thuộc tính của nhân viên cho phép người dùng tìm kiếm
+Text field - nhập | Text field |   | Nhập thông tin tìm kiếm
+Mã nhân viên | Text(6) |   | Dùng để phân biệt giữa các nhân viên với nha với nhau. (Mã nhân viên là duy nhất)
+Tên nhân viên | Text(25) |   | Tên của nhân viên
+Địa chỉ | Text(50) |   | Địa chỉ của nhân viên
+Số điện thoại | Number |   | Số điện thoạt của nhân viên
+Ngày vào làm | Date/Time |   | Ngày vào làm chính thúc của nhân viên đó
+Chức vụ | Text |   | Chức vụ của nhân viên đảm nhận
+Ghi chú | Text |   | Ghi chú thêm thông tin của nhân viên nếu có
+Tra cứu | Button |   | Hiển thị kết quả tìm kiếm là danh sách nhân viên
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Tra cứu | Thực hiện truy vấn hiển thị danh sách kêt quả vào bảng | Kết quả tra cứu sẽ được hiển thị ở bảng dữ liệu bên dưới | Thông báo: không tìm thấy kết quả
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.12.1.4  Tra cứu – Hóa đơn
+
+--- TABLE ---
+Screen | Tra cứu – Hóa đơn
+Description | Hiển thị bảng hóa đơn có mã hóa đơn tương đương với mã hóa đơn người dùng cần tìm kiếm.
+Screen Access | Người dùng click vào menu Tra cứu  trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Tra cứu nhanh
+Screen Content
+Item | Type | Data | Description
+Tra cứu theo | ComboBox |   | Liệt kê các thuộc tính của hóa đơn cho phép người dùng tìm kiếm (Chỉ tìm kiếm theo mã hóa đơn)
+Text field - nhập | Text field |   | Nhập mã hóa đơn cần tìm kiếm
+Mã hóa đơn | Text(9) |   | Dùng để phân biệt giữa các loại hóa đơn với nhau. (Mã hóa đơn là duy nhất)
+Khách hàng | Text(25) |   | Tên khách hàng ứng với hóa đơn đó
+Ngày lập | Date/Time |   | Ngày lập của hóa đơn
+Giờ lâp | Date/Time |   | Giờ lập của hóa đơn
+Tổng tiền | Number |   | Tổng tiền tương ứng của hóa đơn đó
+Ghi chú | Text(50) |   | Ghi chú thêm thông tin của hóa đơn nếu có
+Tra cứu | Button |   | Hiển thị kết quả tìm kiếm là danh sách hóa đơn
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Tra cứu | Thực hiện truy vấn hiển thị danh sách kêt quả vào bảng | Kết quả tra cứu sẽ được hiển thị ở bảng dữ liệu bên dưới | Thông báo: không tìm thấy kết quả
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.12.1.5  Tra cứu – Thông tin nhà cung cấp
+
+--- TABLE ---
+Screen | Tra cứu – Thông tin nhà cung cấp
+Description | Hiển thị bảng danh sách nhà cung cấp có thông tin tương đương với thông tin người dùng cần tìm kiếm.
+Screen Access | Người dùng click vào menu Tra cứu  trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Tra cứu nhanh
+Screen Content
+Item | Type | Data | Description
+Tra cứu theo | ComboBox |   | Liệt kê các thuộc tính của nhà cung cấp cho phép người dùng tìm kiếm.
+Text field - nhập | Text field |   | Nhập mã hóa đơn cần tìm kiếm
+Mã nhà cung cấp | Text(25) |   | Dùng để phân biệt giữa các nhà cung cấp với nhau. (Mã nhà cung cấp là duy nhất)
+Tên nhà cung cấp | Text(25) |   | Tên của nhà cung cấp
+Địa chỉ | Text(50) |   | Địa chỉ của nhà cung cấp
+Số điện thoại | Number |   | Số điện thoại liên lạc của nhà cung cấp
+Ghi chú | Text(50) |   | Ghi chú thêm thông tin của nhà cung cấp nếu có
+Tra cứu | Button |   | Hiển thị kết quả tìm kiếm là danh sách hóa đơn
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Tra cứu | Thực hiện truy vấn hiển thị danh sách kêt quả vào bảng | Kết quả tra cứu sẽ được hiển thị ở bảng dữ liệu bên dưới | Thông báo: không tìm thấy kết quả
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.12.1.6  Tra cứu – Thông tin khách hàng
+
+--- TABLE ---
+Screen | Tra cứu – Thông tin khách hàng
+Description | Hiển thị bảng danh sách khách hàng có thông tin tương đương với thông tin người dùng cần tìm kiếm.
+Screen Access | Người dùng click vào menu Tra cứu  trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Tra cứu nhanh
+Screen Content
+Item | Type | Data | Description
+Tra cứu theo | ComboBox |   | Liệt kê các thuộc tính của khách hàng cho phép người dùng tìm kiếm.
+Text field - nhập | Text field |   | Nhập mã hóa đơn cần tìm kiếm
+Mã khách hàng | Text(6) |   | Dùng để phân biệt giữa các nhà cung cấp với nhau. (Mã nhà cung cấp là duy nhất)
+Tên khách hàng | Text(25) |   | Tên của khách hàng
+Địa chỉ | Text(50) |   | Địa chỉ của khách hàng
+Tuổi | Number |   | Tuổi của khách hàng
+Số điện thoại | Number |   | Số điện thoại của khách hàng
+Nhóm khách hàng | Text(25) |   | Khách hàng được tìm thuộc nhóm khách nào(khách sỉ, khách lẻ, khách theo đơn)
+Ghi chú | Text(50) |   | Ghi chú thêm thông tin của khách hàng nếu có
+Tra cứu | Button |   | Hiển thị kết quả tìm kiếm là danh sách hóa đơn
+Trở về | Button |   | Thoát khỏi màn hình hiện tại.
+Screen Actions
+Action Name | Description | Success | Failure
+Tra cứu | Thực hiện truy vấn hiển thị danh sách kêt quả vào bảng | Kết quả tra cứu sẽ được hiển thị ở bảng dữ liệu bên dưới | Thông báo: không tìm thấy kết quả
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+6.13   Báo cáo
+6.13.1  Screen Design
+6.13.1.1 Báo cáo
+
+--- TABLE ---
+Screen | Báo cáo
+Description | Hệ thống báo cáo thông tin, kết quả hoạt động của cửa hàng. Cho phép báo cáo một cách chi tiết về nhập xuất tồn kho, doanh thu, công nợ, hay danh sách các loại thuốc bán chạy, các loại thuốc sắp hết hạn, sắp hết số lượng quá đó có phương án nhập thêm, hay xuất hủy, hoàn trả,... . Ngoài ra, còn có báo cáo về về bán hàng của nhân viên để cho việc khen thưởng,...
+Screen Access | Người dùng click vào menu Báo cáo → Báo cáo trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Hệ thống báo cáo
+Screen Content
+Item | Type | Data | Description
+Từ ngày | Text Field – DateTime Picker |   | Ngày bắt đầu báo cáo
+Đến ngày | Text Field – DateTime Picker |   | Ngày kết thúc báo cáo
+Từ giờ | TextField |   | Giờ bắt đầu của một ngày. Mặc định sẽ là 0h00p
+Đến giờ | TextField |   | Giờ kết thúc của 1 ngày. Mặc định sẽ là 23h59p
+Báo cáo chi tiết nhập kho | RadioButton |   | Hệ thống sẽ tự động liệt kê tất cả các hóa đơn nhập kho(các hóa đơn có mã hóa đơn bắt đầu “HDNH”) thành 1 danh sách các hóa đơn bao gồm mã hóa đơn, khách hàng, ngày lập , giờ lập, tổng tiền, và ghi chú.Dữ liệu về các hóa đơn sẽ được lấy từ bảng HOADONNHAPXUATKHO. Hệ thống sẽ tạo câu lệnh select bảng HOADONNHAPXUATKHO với điều kiện MAHD có 4 kí tự đầu là “HDNH”.
+Báo cáo chi tiết xuất hủy | RadioButton |   | Với lựa chọn này thì file Excel xuất ra có nội dung là báo cáo chi tiết về các hóa đơn xuất hủy, tổng giá trị thuốc hủy, …  tùy theo khoảng thời gian lựa chọn. Nội dung sẽ được lấy từ bảng HOADONNHAPXUATKHO. Hệ thống sẽ lựa chọn các hóa đơn có MAHD chưa 4 kí tự đầu là “HDXH”.
+Báo cáo chi tiết xuất hoàn trả | RadioButton |   | Lựa chọn này sẽ xuất ra thông tin các hóa đơn xuất hoàn trả. Dữ liệu cũng đc lấy từ bảng HOADONNHAPXUATKHO. Chọn các hóa đơn có MAHD chứa 4 kí tự bắt đầu là “HDXT”
+Báo cáo chi tiết bán lẻ | RadioButton |   | Lựa chọn này sẽ định dạng dữ liệu file excel xuất ra bao gồm thông tin các hóa đơn bán lẻ, tổng tiền bán lẻ,….Truy xuất vào bảng HOADONBANHANG, với trường MAHD có 4 kí tự đầu là “HDBL”
+Báo cáo chi tiết bán sỉ | RadioButton |   | Lựa chọn này sẽ định dạng dữ liệu file excel xuất ra bao gồm thông tin các hóa đơn bán sỉ, tên khách hàng bán sỉ, tổng tiền bán sỉ trong khoảng thời gian tùy chọn … Truy xuất vào bảng HOADONBANHANG, với trường MAHD có 4 kí tự đầu là “HDBS”
+Báo cáo chi tiết bán theo đơn | RadioButton |   | Lựa chọn này sẽ định dạng dữ liệu file excel xuất ra bao gồm thông tin các hóa đơn bán theo đơn, tên khách hàng, tổng tiền bán theo đơn trong khoảng thời gian tùy chọn … Có thể sắp xếp danh sách các thông tin xuất ra file excel theo tên khách hang để dễ dàng theo dõi. Truy xuất vào bảng HOADONBANHANG, với trường MAHD có 4 kí tự đầu là “HDBD”
+Danh sách nhà cung cấp | RadioButton |   | Tùy chọn xuất ra thông tin tất cả các nhà cung cấp thuốc cho cửa hang bao gồm Tên nhà cung cấp, các thông tin khác địa chỉ, số điện thoại, ghi chú,… Danh sách sẽ ưu tiên sắp xếp theo tên nhà cung cấp.Truy vấn đến bảng NHACUNGCAP, dùng câu lệnh select liệt kê tất cả danh sách nhà cung cấp.
+Báo cáo doanh thu | RadioButton |   | Tùy chọn này sẽ liệt kê báo cáo doanh thu theo từng ngày. Tùy theo khoảng thời gian tùy chọn của người dùng. Thông tin về doanh thu mỗi ngày sẽ được lấy từ bảng HOADONBANHANG. Tính tổng thành tiền các hóa đơn bán hàng (có MAHD với 4 kí tự đầu là “HDBL”, “HDBS”, HDBD”) trừ cho tổng giá trị các hóa đơn khách hàng trả lại (có MAHD với 4 kí tự đầu là “HDNT”) trong ngày. Tổng doanh thu trong khoảng thời gian sẽ cộng doanh thu các ngày.
+Báo cáo công nợ | RadioButton |   | Tùy chọn này sẽ xuất ra thông tin công nợ của các nhà cung cấp. Những nhà cung cấp không có công nợ sẽ không được liệt kê. Và danh sách sẽ sắp xếp ưu tiên theo số tiền công nợ.Thông tin sẽ được tổng hợp lấy từ bảng HOADONNHAPXUATKHO, và bảng NHACUNGCAP. Duyệt các hóa đơn trong bảng HOADONNHAPXUATKHO và tính tổng công nợ của mỗi nhà cung cấp trong các hóa hóa đơn nhập hàng (mã bắt đầu “HDNH”) sau đó trừ đi cho số tiền thuốc trả lại nhà cung cấp từ các hóa đơn xuất trả (mã bắt đầu “HDXT). Từ các MANCC từ bảng HOADONNHAPXUATKHO ta có thể truy vấn được các thông tin của nhà cung cấp.
+Báo cáo lợi nhuận | RadioButton |   | Lựa chọn này hệ thống sẽ tính và xuất ra file excel thông tin về lợi nhuận của cửa hàng theo từng ngày. Và con số doanh thu tổng cộng theo khoảng thời gian do người dùng lựa chọn.Thông tin về lợi nhuận từng ngày sẽ được tính bằng cách lấy dữ liệu từ bảng HOADONBANHANG, tìm kiếm các hóa đơn theo ngày, lấy trường LOINHUAN của các hóa đơn bán hàng ra (mã bắt đầu “HDBL”, “HDBS”, “HDBD”) trừ đi LOINHUAN từ các hóa đơn khách hàng trả lại (mã bắt đầu “HDNT”).
+Nhật ký bán hàng | RadioButton |   | Xuất ra nhật kí bán hàng của các nhân viên trong cửa hàng. Bao gồm thông tin các hóa đơn của nhân viên khi bán hàng, ngày bán, tổng tiền của các hóa đơn. Danh sách xuất ra sẽ được sắp xếp theo tên nhân viên để dễ cho việc kiểm tra xem thông tin của người quản lý. Thông tin xuất ra sẽ được truy cập từ bảng HOADONBANHANG và bảng NHANVIEN. Dựa vào trường MANV trong bảng HOADONBANHANG ta có thể lấy được thông tin của nhân viên (Tên,...)
+Báo cáo danh sách thuốc cần nhập thêm | RadioButton |   | Xuất ra danh sách các thuốc từng được nhập vào cửa hàng mà có số lượng thấp ( < 5 đơn vị). Ta duyệt thông tin trong bảng THUOCNHAP. Tính số lượng từng loại thuốc nếu thỏa điều kiện trên trên sẽ xuất ra.
+Báo cáo thuốc sắp hết hạn | RadioButton |   | Xuất ra danh sách thuốc trong cửa hàng sắp hết hạng. Thực hiện truy vấn đến bảng THUOCNHAP. Dựa vào trường HSD để kiểm tra xem thuốc sắp hết hạn hay chưa. Thuốc sắp hết hạn là thuốc có số ngày đến hạn < = 10 ngày).                                                                     
+100 thuốc bán chạy nhất | RadioButton |   | Duyệt các thuốc bán chạy nhất của cửa hàng trong khoảng thời gian tùy chọn người dùng. Thông tin được lấy ra từ bảng HOADONBANHANG và CHITIETHOADONBAN. Tại đây ta có được danh sách các thuốc được bán trong 1 khoảng thời gian, sau đó ta group danh sách thuốc này lại theo MATHUOC, tính tổng số lượng thuốc theo MATHUOC, rồi xuất ra danh sách 100 thuốc có số lượng bán cao → thấp.
+Báo cáo thuốc đang cung cấp | RadioButton |   | Xuất ra danh sách thông tin các thuốcthuốc cửa hàng đang cung cấp. Các thuốc sẽ được xuất ra group theo các nhóm thuốc. Thông tin được lấy ra từ bảng THUOCNHAP và bảng THUOC.
+Xuất Excel | Button |   | Button này có chức năng thực hiện việc xuất kết quả báo cáo vào file excel tùy vào việc lựa chọn các Radio Button ở phía trên
+Trở về | Button |   | Có chức năng thực hiện lệnh thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó.
+Biểu đồ thống kê | Button |   | Thực hiện việc mở màn hình “ biểu đồ thống kê” Màn hình này sẽ chưa thông tin biểu đồ về doanh thu – lợi nhuận của cửa hàng.
+Screen Actions
+Action Name | Description | Success | Failure
+Xuất Excel | Tùy vào việc lựa chọn các Radio Button ở phía trên. Chương trình sẽ xuất kết quả báo cáo vào file excel, để tiện việc quản lý, xem, in ấn. | File excel danh sách báo cáo được tạo ra. Chương trình sẽ tự động mở file này. Người dùng có thể sử dụng để thống kê thêm hoặc in ra. | Thông báo: “Nhập sai thời gian báo cáo”Thông báo: “Chưa chọn mục cần báo cáo”
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+Biểu đồ thống kê | Mở màn hình “ biểu đồ thống kê” Màn hình này sẽ chưa thông tin biểu đồ về doanh thu – lợi nhuận của cửa hàng. | Mở tab mới, tab này sẽ chứa màn hình” biểu đồ thống kê” |  
+-------------
+
+ 
+6.13.1.2 Báo cáo – Biểu đồ
+
+--- TABLE ---
+Screen | Biểu đồ thống kê
+Description | Hiển thị chi tiết doanh thu và lợi nhuận của hiệu thuốc dưới dạng biểu đồ và số liệu cụ thể
+Screen Access | Người dùng click vào menu Báo cáo → Báo cáo →Biểu đồ thống kê trên thanh công cụ . hoặc truy cập trực tiếp bằng menu Chọn nhanh → Hệ thống báo cáo →Biểu đồ thống kê
+Screen Content
+Item | Type | Data | Description
+Xem | Button |   | Cho phép cả quản lý và nhân viên sử dụng.Làm thay đổi kiểu hiển thị biểu đồ tương ứng theo móc thời gian được chọn(theo tuần tháng năm)   
+ComboBox-theo1 | ComboBox |   | Lựa chọn cách xem biểu đồ theo tuần, tháng hay năm
+ComboBox-theo2 | ComboBox |   | Theo cách chọn ở ComboBox1 – theo1 thì ComboBox này sẽ xuất hiện các giá trị tương ứng cho người dùng lựa chọn
+ComboBox-theo3 | ComboBox |   | Theo cách chọn ở ComboBox1 – theo1 và ComboBox -theo2 thì ComboBox này sẽ xuất hiện các giá trị tương ứng cho người dùng lựa chọn
+Doanh thu | Text Field |   | Hiển thị Doanh thu theo cách lựa chọn của người dùng từ ComboBox-theo1, ComboBox-theo2 và ComboBox-theo3
+Lợi nhuận | Text Field |   | Hiển thị Lợi nhuận theo cách lựa chọn của người dùng từ ComboBox-theo1, ComboBox-theo2 và ComboBox-theo3
+Doanh thu TB | Text Field |   | Hiển thị Doanh thu trung bình theo cách lựa chọn của người dùng từ ComboBox-theo1, ComboBox-theo2 và ComboBox-theo3
+Lợi nhuận TB | Text Field |   | Hiển thị lợi nhuận trung bình theo cách lựa chọn của người dùng từ ComboBox-theo1, ComboBox-theo2 và ComboBox-theo3
+Biểu đồ | Chart |   | Biểu đồ doanh thu vào lợi nhuận
+Trở về | Button |   | Thoát khỏi màn hình hiện tại
+Screen Actions
+Action Name | Description | Success | Failure
+Xem | Cho phép thay đổi kiểu hiển thị biểu đồ tương ứng theo móc thời gian được chọn(theo tuần tháng năm)   | Hiển thị biểu đồ tương ứng theo móc thời gian được chọn(theo tuần tháng năm)  |  
+Trở về | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó | Thoát khỏi màn hình hiện tại và trở về màn hình thao tác trước đó |  
+-------------
+
+ 
+ 
+6.14   Quản lý tài khoản
+
+--- TABLE ---
+Use Case Name | Quản lý tài khoản
+Use Case ID | SE160015
+High Level Requirement Ref | Hiển thị tất cả các thông tin của tài khoản lên màng hình. Người quản lý xem thông tin và sửa đổi thông tin tài khoản ứng với từng nhân viên…
+Actor | Quản lý
+Description | Cho phép người quản lý xem và sửa đổi thông tin tài khoản
+Trigger |  
+Pre-condition | Người dùng phải đăng nhập bằng tài khoản quản lý.
+Post-processing |  
+-------------
+
+6.14.1  Screen Design
+6.14.1.1 Quản lý tài khoản – Tìm kiếm
+
+--- TABLE ---
+Screen | Quản lý tài khoản – Tìm kiếm
+Description | Hiển thị trên màn hình truy vấn để lọc hiển thị kết quả thông tin tài khoản. Tìm kiếm tài khoản theo “Tên tài khoản”, “Tên nhân viên”, “Mã nhân viên”, “Loại tài khoản”.Từ đó người dùng có thể tìm kiếm được thông tin của tài khoản bằng cách chọn giá trị trong danh sách thả xuống của mục “Tìm kiếm”.
+Screen Access | Người dùng click vào menu Hệ thống → Quản lý tài khoản
+Screen Content
+Item | Type | Data | Description
+Tìm kiến | Text field |   | Cho phép người dùng nhập thông tin vào để tìm kiếm
+Tìm kiếm - ComboBox | ComboBox |   | Lựa chọn cách tìm kiếm theo giá trị có sản được liệt kê trong comboBox
+Screen Actions
+Action Name | Description | Success | Failure
+Tìm kiếm | Danh sách các tài khoản được sắp xếp theo :Tên tài khoản, Tên nhân viên, Mã nhân viên, Loại tài khoản. Khi chọn 1 trong các cách tìm kiếm trên thì hệ thông sẽ trả về dữ liệu tài khoản theo cách đã chọn. | Hiển thị kết quả tìm kiếm. | Hiển thị thông báo “Không tìm thấy dữ liệu”
+ |  |  |  |  | 
+-------------
+
+6.14.1.2 Quản lý tài khoản – Danh sách tài khoản
+
+--- TABLE ---
+Screen | Quản lý tài khoản – Danh sách
+Description | Hiển thị thông tin của tài khoản ứng với từng nhân viên, tên tài khoản, loại tài khoản. Người dùng có thể sửa đổi thông tin của tài khoản bất kì trong danh sách bằng cách chọn tài khoản vào click vào Sửa tài khoản
+Screen Access | Người dùng click vào menu Hệ thống → Quản lý tài khoản
+Screen Content
+Item | Type | Data | Description
+Mã nhân viên | Text(6) |   | Mã nhân viên
+Tên nhân viên | Text(25) |   | Tên của nhân viên được cấp tài khoản
+Tài khoản | Text(25) |   | Tên tài khoản được cấp cho nhân viên truy cập hệ thống
+Loại tài khoản | Text(12) |   | Loại tài khoản được cấp. Cho biết tài khoản này là quản lý hay nhân viên
+Sửa tài khoản | Button |   | Chuyển sang màn hình “Thay đổi thông tin tài khoản” để sửa đổi tài khoản của nhân viên
+Trở về | Button |   | Trơ về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Sửa tài khoản | Khi bấm nút này hệ thống sẻ chuển sang màn hình “Thay đổi thông tin tài khoản” | Hệ thống sẻ chuển sang màn hình “Thay đổi thông tin tài khoản” | Thông báo:Phải chọn tài khoản cần chỉnh sửa
+Trở về | Trở về nàm hình trước đó | Trở về nàm hình trước đó |  
+-------------
+
+ 
+ 
+6.14.1.3  Quản lý tài khoản – Sửa tài khoản
+
+--- TABLE ---
+Screen | Quản lý tài khoản – Sửa tài khoản
+Description | Hiển thị thông tin cần sủa của 1 nhân viên
+Screen Access | Người dùng click vào menu Hệ thống → Quản lý tài khoản → Sửa tài khoản
+Screen Content
+Item | Type | Data | Description
+Mã nhân viên | Text fieldEnable = “false” |   | Hiển thị mã nhân viên hoặc quản lý đang được chỉnh sửa
+Tên nhân viên | Text fieldEnable = “false” |   | Hiển thị tên nhân viên hoặc quản lý đang được chỉnh sửa
+Tên tài khoản | Text field |   | Tên tài khoản của nhân viên hoặc quản lý, được sử dụng trong hệ thống
+Chức vụ | Combobox |   | Lựa chon chức vụ cho tài khoản đang sửa
+Chất nhận | Button |   | Khi người dùng bấm nút này thì thông tin tài khỏan sẻ được thay đổi
+Reset | Button |   | Khi người dùng bấm nút này thì thông tin tài khỏan sẻ được thay đổi
+Trở về | Button |   | Trở về màn hình trước đó
+Screen Actions
+Action Name | Description | Success | Failure
+Chất nhận | Khi người dùng bấm nút này thì thông tin tài khỏan sẻ được thay đổi | Thay đổi thông tin tài khoản. | Thông báo: Phải nhập đầy đủ thông tin
+Reset | Xóa trắng “tên tài khoan” và đặt lại chức vụ là nhân viên | Xóa trắng “tên tài khoan” và đặt lại chức vụ là nhân viên |  
+Trở về | Trở về màn hình trước đó | Trở về màn hình trước đó |  
+-------------
+
+6.15   Thay đổi mật khẩu
+6.15.1  Screen Design
+
+--- TABLE ---
+Screen | Đổi mật khẩu
+Description | Hiển thị thông tin cần thay đổi của nhân viên
+Screen Access | Người dùng click vào menu Hệ thống → Quản lý tài khoản → Đổi mật khẩu
+Screen Content
+Item | Type | Data | Description
+Mã nhân viên | Text field  Enable = false |   | Hiển thị mã nhân viên đang cần sửa đổi mật khẩu
+Tên nhân viên | Text fieldEnable = false |   | Hiển thị tên nhân viên đang cần thay đổi mật khẩu
+Mật khẩu củ | Text field |   | Cho phép nhập mật khẩu hiện tại
+Mật khẩu mới | Text field |   | Cho phép nhập mật khẩu mới
+Nhập lại mật khẩu | Text field |   | Cho phép nhập lại mật khẩu mới
+Chất nhận | Button |   | Khi người dùng bấm vào nút “chấp nhận” thì mật khẩu của người dùng sẻ được kiểm tra nếu như thỏa mản các rằng buộc thì sẻ được thay đổi thành “Mật khẩu mới”
+Reset | Button |   | Bấm vào nút này sẻ xóa trắng các trường “mật khẩu củ”,”mật khẩu mới” và “nhập lại mật khẩu”
+Trở về | Button |   | Quay lại màn hình trước
+Screen Actions
+Action Name | Description | Success | Failure
+Chất nhận | Khi người dùng bấm vào nút “chấp nhận” thì mật khẩu của người dùng sẻ được kiểm tra nếu như thỏa mản các rằng buộc thì sẻ được thay đổi thành “Mật khẩu mới” | Làm thay đổi mật khẩu người dùng trong hệ thống từ “Mật khẩu củ” thành “Mật khẩu mới” | Thông báo lổi: “Mật khẩu phải có ít nhất 6 ký tự, bao gổm cả ký tự, số, và các ký tự đặc biệt ”Hoặc “sai mật khẩu”,Hoặc “nhập lại mật khẩu” phải trung khớp với “mật khẩu mới”Hoặc “Mật khẩu mới phải bắt đầu bằng 1 kí tự chử cái”
+Reset | Bấm vào nút này sẻ xóa trắng các trường “mật khẩu củ”,”mật khẩu mới” và “nhập lại mật khẩu” | xóa trắng các trường “mật khẩu củ”,”mật khẩu mới” và “nhập lại mật khẩu” |  
+Trở về |   | Quay lại màn hình trước |  
+-------------
+
+7.  YẾU CẦU PHI CHỨC NĂNG VÀ YÊU CẦU KHÁC
+7.1      Yêu cầu phi chức năng:
+-       Giao diện: Dễ sử dụng, rõ ràng, thân thiện
+-       Hiệu suất: Tốc độ xử lý, kết quả trả về nhanh, chính xác.
+-       Bảo mật: Có hệ thống phân quyền rõ ràng, sử dụng cơ sở dữ liệu có tính bảo mật cao.
+-       Linh hoạt: Cài đặt dễ dàng, hỗ trợ đa nền tảng, sử dụng trên nhiều thiết bị khác nhau
+-       Đa ngôn ngữ: Không hỗ trợ đa ngôn ngữ
+7.2      Yêu cầu môi trường phát triển
+-       Phần cứng: Máy in, Yêu cầu tối thiểu: CPU Pentium, Ổ cứng 1GB, RAM 512MB
+-       Phần mềm: Cài đặt trên môi trường Linux, Windows, Mac OS, ...
+-   Mạng: Kết nối nhiều máy với nhau sử dụng Client – Server.
+8.      PHỤ LỤC
+ 
