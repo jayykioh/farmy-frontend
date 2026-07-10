@@ -1,68 +1,130 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockSnaps } from '../mocks/snapData';
-import { Heart, ThumbsUp, AlertTriangle, MessageSquare, ArrowLeft, MoreVertical, Leaf, Sprout, Wheat } from 'lucide-react';
+import {
+  Heart,
+  ThumbsUp,
+  AlertTriangle,
+  MessageSquare,
+  ArrowLeft,
+  MoreVertical,
+  Leaf,
+  Sprout,
+  Wheat,
+  Send,
+} from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { createSnapComment, fetchSnap, reactToSnap } from '../api/snaps';
+import type { SnapReactionType } from '../types/farmSnap';
+
+const getReaction = (
+  reactions: Awaited<ReturnType<typeof fetchSnap>>['reactions'],
+  type: SnapReactionType,
+) => reactions.find((reaction) => reaction.type === type);
 
 export const SnapDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [now] = React.useState(() => Date.now());
-  
-  const snap = mockSnaps.find(s => s.id === id);
+  const [comment, setComment] = useState('');
+
+  const snapQuery = useQuery({
+    queryKey: ['snaps', 'detail', id],
+    enabled: Boolean(id),
+    queryFn: () => fetchSnap(id as string),
+  });
+
+  const reactionMutation = useMutation({
+    mutationFn: (type: SnapReactionType) => reactToSnap(id as string, type),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['snaps'] });
+    },
+  });
+
+  const commentMutation = useMutation({
+    mutationFn: (content: string) => createSnapComment(id as string, content),
+    onSuccess: () => {
+      setComment('');
+      void queryClient.invalidateQueries({ queryKey: ['snaps'] });
+    },
+  });
+
+  const snap = snapQuery.data;
+
+  if (snapQuery.isLoading) {
+    return (
+      <div className="w-full h-[100svh] bg-black text-white flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-white/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!snap) {
     return (
       <div className="w-full h-[100svh] bg-black text-white flex flex-col items-center justify-center p-4">
         <h2 className="text-2xl font-bold mb-4">Không tìm thấy Snap</h2>
-        <Button onClick={() => navigate('/farm-feed')}>
-          Quay lại Feed
-        </Button>
+        <Button onClick={() => navigate('/farm-feed')}>Quay lại Feed</Button>
       </div>
     );
   }
 
   const getConditionColor = () => {
     switch (snap.condition) {
-      case 'healthy': return 'bg-green-500 text-white';
-      case 'issue': return 'bg-yellow-500 text-white';
-      case 'harvest': return 'bg-amber-600 text-white';
-      default: return 'bg-gray-500 text-white';
+      case 'healthy':
+        return 'bg-green-500 text-white';
+      case 'issue':
+        return 'bg-yellow-500 text-white';
+      case 'harvest':
+        return 'bg-amber-600 text-white';
+      default:
+        return 'bg-gray-500 text-white';
     }
   };
 
   const getConditionLabel = () => {
     switch (snap.condition) {
-      case 'healthy': return <><Leaf className="w-3 h-3" /> Khỏe</>;
-      case 'issue': return <><AlertTriangle className="w-3 h-3" /> Vấn đề</>;
-      case 'harvest': return <><Wheat className="w-3 h-3" /> Thu hoạch</>;
-      default: return <><Sprout className="w-3 h-3" /> Khác</>;
+      case 'healthy':
+        return <><Leaf className="w-3 h-3" /> Khỏe</>;
+      case 'issue':
+        return <><AlertTriangle className="w-3 h-3" /> Vấn đề</>;
+      case 'harvest':
+        return <><Wheat className="w-3 h-3" /> Thu hoạch</>;
+      default:
+        return <><Sprout className="w-3 h-3" /> Khác</>;
     }
   };
 
-  const getRelativeTime = () => {
-    const hours = Math.round((now - new Date(snap.capturedAt).getTime()) / (1000 * 60 * 60));
+  const getRelativeTime = (value: string) => {
+    const hours = Math.round((now - new Date(value).getTime()) / (1000 * 60 * 60));
     if (hours < 1) return 'Vừa xong';
     if (hours < 24) return `${hours} giờ trước`;
     return `${Math.floor(hours / 24)} ngày trước`;
   };
 
+  const submitComment = (event: React.FormEvent) => {
+    event.preventDefault();
+    const content = comment.trim();
+    if (!content || commentMutation.isPending) return;
+    commentMutation.mutate(content);
+  };
+
   return (
     <div className="w-full h-[100svh] bg-black text-white flex flex-col relative overflow-hidden">
-      {/* Background Image (Blurred for aesthetics if aspect ratio doesn't fill) */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-110"
         style={{ backgroundImage: `url(${snap.imageUrl})` }}
-      ></div>
-      {/* Header Controls */}
+      />
+
       <div className="absolute top-0 left-0 right-0 p-4 pt-6 z-20 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="p-2 bg-black/40 rounded-full backdrop-blur-sm active:scale-95 transition-transform"
+          aria-label="Quay lại"
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
-        
+
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/20">
             <Wheat className="w-3 h-3" /> {snap.cropType}
@@ -72,63 +134,107 @@ export const SnapDetail: React.FC = () => {
           </span>
         </div>
 
-        <button className="p-2 text-white/80 active:scale-95">
+        <button className="p-2 text-white/80 active:scale-95" aria-label="Tùy chọn">
           <MoreVertical className="w-6 h-6" />
         </button>
       </div>
-      {/* Main Image */}
+
       <div className="flex-1 w-full flex items-center justify-center z-10 relative">
-        <img 
-          src={snap.imageUrl} 
-          alt={snap.caption || 'Farm Snap'} 
+        <img
+          src={snap.imageUrl}
+          alt={snap.caption || 'Farm Snap'}
           className="w-full max-h-[80svh] object-contain"
         />
       </div>
-      {/* Bottom Info Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 pt-20 z-20 bg-gradient-to-t from-black/95 via-black/80 to-transparent">
-        
-        {/* Caption */}
-        {snap.caption ? (<p className="text-white text-base md:text-lg font-bold mb-4 drop-shadow-md">
-          {snap.caption}
-        </p>) : null}
 
-        {/* User Info */}
-        <div className="flex items-center gap-3 mb-4">
-          <img src={snap.userAvatar} alt={snap.userName} className="w-10 h-10 rounded-full border border-white/30" />
+      <div className="absolute bottom-0 left-0 right-0 p-4 pt-20 z-20 bg-gradient-to-t from-black/95 via-black/80 to-transparent">
+        {snap.caption ? (
+          <p className="text-white text-base md:text-lg font-bold mb-4 drop-shadow-md">
+            {snap.caption}
+          </p>
+        ) : null}
+
+        <div className="flex items-center gap-3 mb-3">
+          <img
+            src={snap.userAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${snap.userId}`}
+            alt={snap.userName}
+            className="w-10 h-10 rounded-full border border-white/30"
+          />
           <div className="flex flex-col flex-1">
             <span className="text-white text-sm font-bold">{snap.userName}</span>
             <span className="text-white/60 text-xs font-medium">
-              {snap.location?.province} • {getRelativeTime()}
+              {snap.location?.province || 'Farmy'} • {getRelativeTime(snap.capturedAt)}
             </span>
           </div>
         </div>
 
-        {/* Action Bar */}
+        <div className="max-h-28 overflow-y-auto space-y-2 mb-3 pr-1">
+          {(snap.comments ?? []).map((item) => (
+            <div key={item.id} className="bg-white/10 border border-white/10 rounded-lg px-3 py-2">
+              <div className="flex justify-between gap-3">
+                <span className="text-xs font-bold">{item.userName}</span>
+                <span className="text-[10px] text-white/50">{getRelativeTime(item.createdAt)}</span>
+              </div>
+              <p className="text-sm text-white/85">{item.content}</p>
+            </div>
+          ))}
+        </div>
+
+        <form onSubmit={submitComment} className="flex items-center gap-2 mb-3">
+          <input
+            value={comment}
+            onChange={(event) => setComment(event.target.value)}
+            placeholder="Viết bình luận..."
+            maxLength={500}
+            className="min-w-0 flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm text-white placeholder:text-white/50 outline-none focus:border-primary"
+          />
+          <button
+            type="submit"
+            disabled={!comment.trim() || commentMutation.isPending}
+            className="w-10 h-10 rounded-full bg-primary disabled:bg-white/15 disabled:text-white/40 flex items-center justify-center active:scale-95 transition-transform"
+            aria-label="Gửi bình luận"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </form>
+
         <div className="flex items-center justify-between border-t border-white/10 pt-4 pb-2">
-          
           <div className="flex gap-5">
-            <button className="flex flex-col items-center gap-1 active:scale-95 transition-transform" aria-label="Like Snap">
-              <Heart className={`w-6 h-6 ${snap.reactions.find(r => r.type === 'like')?.userReacted ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-              <span className="text-[11px] font-extrabold text-white/80">{snap.reactions.find(r => r.type === 'like')?.count || 0}</span>
+            <button
+              onClick={() => reactionMutation.mutate('like')}
+              className="flex flex-col items-center gap-1 active:scale-95 transition-transform"
+              aria-label="Like Snap"
+            >
+              <Heart className={`w-6 h-6 ${getReaction(snap.reactions, 'like')?.userReacted ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+              <span className="text-[11px] font-extrabold text-white/80">{getReaction(snap.reactions, 'like')?.count || 0}</span>
             </button>
-            <button className="flex flex-col items-center gap-1 active:scale-95 transition-transform" aria-label="Mark helpful">
-              <ThumbsUp className={`w-6 h-6 ${snap.reactions.find(r => r.type === 'helpful')?.userReacted ? 'fill-primary-light text-primary-light' : 'text-white'}`} />
-              <span className="text-[11px] font-extrabold text-white/80">{snap.reactions.find(r => r.type === 'helpful')?.count || 0}</span>
+            <button
+              onClick={() => reactionMutation.mutate('helpful')}
+              className="flex flex-col items-center gap-1 active:scale-95 transition-transform"
+              aria-label="Mark helpful"
+            >
+              <ThumbsUp className={`w-6 h-6 ${getReaction(snap.reactions, 'helpful')?.userReacted ? 'fill-primary-light text-primary-light' : 'text-white'}`} />
+              <span className="text-[11px] font-extrabold text-white/80">{getReaction(snap.reactions, 'helpful')?.count || 0}</span>
             </button>
-            {snap.condition === 'issue' ? (<button className="flex flex-col items-center gap-1 active:scale-95 transition-transform" aria-label="Worry about issue">
-              <AlertTriangle className={`w-6 h-6 ${snap.reactions.find(r => r.type === 'worry')?.userReacted ? 'fill-amber-500 text-amber-500' : 'text-white'}`} />
-              <span className="text-[11px] font-extrabold text-white/80">{snap.reactions.find(r => r.type === 'worry')?.count || 0}</span>
-            </button>) : null}
+            {snap.condition === 'issue' ? (
+              <button
+                onClick={() => reactionMutation.mutate('worry')}
+                className="flex flex-col items-center gap-1 active:scale-95 transition-transform"
+                aria-label="Worry about issue"
+              >
+                <AlertTriangle className={`w-6 h-6 ${getReaction(snap.reactions, 'worry')?.userReacted ? 'fill-amber-500 text-amber-500' : 'text-white'}`} />
+                <span className="text-[11px] font-extrabold text-white/80">{getReaction(snap.reactions, 'worry')?.count || 0}</span>
+              </button>
+            ) : null}
           </div>
 
-          <Button 
+          <Button
             onClick={() => navigate('/chat/active')}
             icon={<MessageSquare className="w-4 h-4 text-white fill-white/10" />}
             className="text-sm shadow-[0_0_15px_rgba(8,168,85,0.4)]"
           >
             Hỏi AI
           </Button>
-
         </div>
       </div>
     </div>

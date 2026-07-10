@@ -1,13 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 
 export const OnboardingStep3: React.FC = () => {
   const navigate = useNavigate();
+  const { checkingAuth } = useRequireAuth();
 
   const handleFinish = () => {
     navigate('/home');
   };
+
+  if (checkingAuth) {
+    return null;
+  }
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-blue-100 to-green-50 overflow-hidden font-sans">
