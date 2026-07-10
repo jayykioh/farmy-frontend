@@ -2,26 +2,24 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PetMascot } from '../features/pet/components/PetMascot';
-import { PET_MOOD_UI_MAP } from '../features/pet/constants/petMood.constants';
 import { SnapCard } from '../components/SnapCard';
 import { mockSnaps } from '../mocks/snapData';
 import { SnapFAB } from '../components/SnapFAB';
 import { Flame, Droplets, ScanLine, MessageSquare, PenLine, Sprout, ChevronRight } from 'lucide-react';
-import { useGetPetStateQuery } from '../store/api/farmApi';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Button } from '../components/ui/Button';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { data: petState } = useGetPetStateQuery();
 
   // Fetch authoritative pet status from backend
-  const { data: petStatus } = usePetStatus();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
-  const mood   = petStatus?.mood ?? 'neutral';
-  const streak = petStatus?.streakCount ?? 0;
-  const level  = petStatus?.level ?? 1;
-  const xp     = petStatus?.exp ?? 0;
-  const bubbleMessage = petStatus?.bubbleMessage ?? PET_MOOD_UI_MAP[mood]?.description ?? 'Chào chủ vườn!';
+  const streak = petStatus.streakCount;
+  const level  = petStatus.level;
+  const xp     = petStatus.exp;
+  const bubbleMessage = petStatus.bubbleMessage;
 
   return (
     <div className="w-full flex flex-col gap-6 md:gap-8 px-4 md:px-8 py-6 md:py-10 max-w-7xl mx-auto min-h-screen">
@@ -105,7 +103,7 @@ export const Home: React.FC = () => {
               />
             </div>
             <p className="text-sm font-medium text-text-main/50 mt-1">
-              {petState?.mood_reason || 'Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
+              {petStatus.moodReason || 'Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
             </p>
           </section>
 

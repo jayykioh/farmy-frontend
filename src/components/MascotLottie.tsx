@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { Suspense } from 'react';
 import type { LottieComponentProps } from 'lottie-react';
+import type { PetMood } from '../features/pet/types/pet.types';
 
 const LottiePlayer = React.lazy(async () => {
   const [LottiePackage, animationData] = await Promise.all([
@@ -15,9 +16,12 @@ const LottiePlayer = React.lazy(async () => {
   };
 });
 
+/** Display-only states extend PetMood with 'sleeping' (alias for sleepy.svg in static contexts) */
+type MascotState = PetMood | 'sleeping';
+
 interface MascotLottieProps extends Omit<LottieComponentProps, 'animationData'> {
   className?: string;
-  state?: 'happy' | 'worried' | 'excited' | 'analytical' | 'celebrating' | 'sleeping' | 'neutral' | 'sad' | 'hungry' | 'sleepy';
+  state?: MascotState;
 }
 
 /**

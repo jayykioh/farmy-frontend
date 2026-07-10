@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi';
-import type { FarmPlot, Diary, DiaryLog, Reminder, PetState } from '../../api/farm';
+import type { FarmPlot, Diary, DiaryLog, Reminder } from '../../api/farm';
 
 export const farmApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -76,7 +76,6 @@ export const farmApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: DiaryLog }) => response.data,
       invalidatesTags: (_result, _error, { diaryId }) => [
         { type: 'DiaryLog', id: `LIST_${diaryId}` },
-        { type: 'Pet' },
       ],
     }),
 
@@ -101,7 +100,6 @@ export const farmApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, id) => [
         { type: 'Reminder', id },
         { type: 'Reminder', id: 'LIST' },
-        { type: 'Pet' },
       ],
     }),
     createReminder: builder.mutation<
@@ -117,12 +115,7 @@ export const farmApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Reminder', id: 'LIST' }],
     }),
 
-    // 5. Pet State
-    getPetState: builder.query<PetState, void>({
-      query: () => ({ url: '/pet/state' }),
-      transformResponse: (response: { data: PetState }) => response.data,
-      providesTags: ['Pet'],
-    }),
+
   }),
   overrideExisting: false,
 });
@@ -138,5 +131,4 @@ export const {
   useGetPendingRemindersQuery,
   useCompleteReminderMutation,
   useCreateReminderMutation,
-  useGetPetStateQuery,
 } = farmApi;

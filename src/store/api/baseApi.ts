@@ -40,6 +40,6 @@ const axiosBaseQuery = (
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery(),
-  tagTypes: ['Plot', 'Diary', 'DiaryLog', 'Reminder', 'Pet'],
+  tagTypes: ['Plot', 'Diary', 'DiaryLog', 'Reminder'],
   endpoints: () => ({}),
 });

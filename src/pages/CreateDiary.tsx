@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery, useCreateDiaryLogMutation } from '../store/api/farmApi';
+import { useInvalidatePetStatus } from '../features/pet/hooks/useInvalidatePetStatus';
 import { Sprout, ChevronDown, Thermometer, Droplets, FlaskConical, BugOff, Camera, X, Save } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
@@ -10,6 +11,7 @@ export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
   const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
   const [createDiaryLog, { isLoading: loading }] = useCreateDiaryLogMutation();
+  const invalidatePetStatus = useInvalidatePetStatus();
   const [selectedDiaryId, setSelectedDiaryId] = useState<string>('');
   const [growthStage, setGrowthStage] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
@@ -63,6 +65,8 @@ export const CreateDiary: React.FC = () => {
           image_url: imageUrl || undefined,
         }
       }).unwrap();
+
+      invalidatePetStatus();
 
       navigate('/diary');
     } catch (err) {

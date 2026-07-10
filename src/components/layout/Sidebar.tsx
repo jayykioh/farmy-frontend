@@ -1,10 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, BookText, Bot, User, Sprout } from 'lucide-react';
-import { useGetPetStateQuery } from '../../store/api/farmApi';
+import { usePetStatus } from '../../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../../features/pet/types/pet.types';
 
 export const Sidebar: React.FC = () => {
-  const { data: petState } = useGetPetStateQuery();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
@@ -66,7 +68,7 @@ export const Sidebar: React.FC = () => {
           <div className="flex flex-col">
             <span className="text-sm font-bold text-text-main">Hải Nông Dân</span>
             <span className="text-xs text-text-main/50 font-medium">
-              Cấp độ {petState?.level ?? 1}
+              Cấp độ {petStatus.level}
             </span>
           </div>
         </div>

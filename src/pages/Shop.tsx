@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
-import { useGetPetStateQuery } from '../store/api/farmApi';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 
 export const Shop: React.FC = () => {
   const navigate = useNavigate();
-  const { data: petState } = useGetPetStateQuery();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   return (
     <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-[#d0e5fa] to-[#79fc9e] bg-fixed overflow-x-hidden font-sans">
@@ -49,11 +51,11 @@ export const Shop: React.FC = () => {
           
           {/* Dynamic Currency / XP Badge */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-full px-3 py-1.5 md:px-4 md:py-2 flex items-center gap-1.5 shadow-sm hover:scale-105 transition-transform">
-            <span className="font-extrabold text-yellow-800 md:text-sm text-xs bg-yellow-100/50 px-2 py-0.5 rounded-full font-mono">Lv.{petState?.level ?? 1}</span>
+            <span className="font-extrabold text-yellow-800 md:text-sm text-xs bg-yellow-100/50 px-2 py-0.5 rounded-full font-mono">Lv.{petStatus.level}</span>
             <svg className="w-4 h-4 md:w-5 md:h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
             </svg>
-            <span className="font-extrabold text-yellow-800 md:text-lg font-mono">{petState?.xp ?? 0} XP</span>
+            <span className="font-extrabold text-yellow-800 md:text-lg font-mono">{petStatus.exp} XP</span>
           </div>
         </div>
 
@@ -89,7 +91,7 @@ export const Shop: React.FC = () => {
               {/* Mascot (Bé Thóc) */}
               <div className="relative z-10 animate-[bounce_4s_ease-in-out_infinite] flex flex-col items-center">
                 <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full shadow-lg bg-white border-4 border-white overflow-hidden p-2">
-                  <MascotLottie className="w-full h-full -mt-2 drop-shadow-md" state={petState?.mood || 'happy'} />
+                  <MascotLottie className="w-full h-full -mt-2 drop-shadow-md" state={petStatus.mood} />
                 </div>
                 {/* Equipped Accessory Indicator */}
                 <div className="absolute -top-4 right-0 lg:-top-2 lg:right-2 bg-secondary rounded-full p-1 lg:p-2 shadow-md border-2 border-white">
@@ -152,7 +154,7 @@ export const Shop: React.FC = () => {
             {/* Item Card 4 (Locked under Level 5) */}
             <div className="bg-white border border-border-main/50 shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-shadow">
               <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border border-border-main/30 mb-3 flex items-center justify-center relative overflow-hidden group-hover:bg-primary-lightest/20 transition-colors">
-                {(petState?.level ?? 1) >= 5 ? (
+                {petStatus.level >= 5 ? (
                   <img alt="Mũ Ảo Thuật" className="w-3/4 h-3/4 object-contain animate-[bounce_4s_ease-in-out_infinite]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzSmV6cdrTVHzXBG0N7bXXKN3XoZOzRMPXfVSxi0cvLV86eZCvMCQUZfvsIwGmGFQCrdkVZZ0fPQlcFxA7lT7026GIQqk5q37hMvRuTScXcwmvL2MxEFkY_EjgDBSeSHb7xTRqUPbj1MRY_BqwkhLCcAZ36PrGji9H9EPDb67uNr4UmWBqmiirxAhuuidfFZvbiQYTWZytovpLIpFDBOt949vcQkwFPZijhl9qeWhHM_-dZdg6jkw_Rc8N5-0j2r42RYKLnkeCUeC1" />
                 ) : (
                   <div className="text-text-main/30 flex flex-col items-center">
@@ -168,7 +170,7 @@ export const Shop: React.FC = () => {
                 <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                 <span className="font-bold text-text-main/70 text-sm font-mono">800</span>
               </div>
-              {(petState?.level ?? 1) >= 5 ? (
+              {petStatus.level >= 5 ? (
                 <button className="w-full py-2 bg-white border border-border-main/50 text-text-main rounded-full font-bold active:scale-95 transition-transform hover:bg-bg-surface-1 shadow-sm">
                   Mua ngay
                 </button>

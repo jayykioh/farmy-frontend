@@ -33,6 +33,18 @@ export interface PetStatus {
   updatedAt?: string;
 }
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+export const PET_STATUS_FALLBACK: PetStatus = {
+  mood: 'neutral',
+  streakCount: 0,
+  level: 1,
+  exp: 0,
+  missedDays: 0,
+  moodReason: 'DEFAULT_STATE',
+  bubbleMessage: 'Chào chủ vườn!',
+};
+
 // ─── UI Transition State ──────────────────────────────────────────────────────
 
 export interface PetTransitionState {

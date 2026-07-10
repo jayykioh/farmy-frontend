@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchPetStatus } from '../services/pet.api';
 import type { PetStatus } from '../types/pet.types';
 
-export const PET_STATUS_QUERY_KEY = ['pet-status'] as const;
+export const PET_STATUS_QUERY_KEY = ['pet', 'status'] as const;
 
 /**
  * Fetches the current pet status from the backend.
