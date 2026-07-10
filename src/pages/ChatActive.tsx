@@ -1,45 +1,61 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { BookOpen, Camera, Clock, Loader2, Send } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
-import { PageHeader } from '../components/PageHeader';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  BookOpen,
+  Camera,
+  Clock,
+  Loader2,
+  Send,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
+import { MascotLottie } from "../components/MascotLottie";
+import { PageHeader } from "../components/PageHeader";
 import {
   fetchChatMessages,
   streamChatMessage,
+  submitChatFeedback,
   type ChatMessage,
-} from '../api/chat';
+} from "../api/chat";
+
+type FeedbackValue = "positive" | "negative";
 
 type UiMessage = ChatMessage & {
+  feedback?: FeedbackValue;
+  feedbackSubmitting?: boolean;
   localId?: string;
   streaming?: boolean;
 };
 
-const createLocalId = () => `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const createLocalId = () =>
+  `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 const formatMessageDate = (value?: string) => {
-  if (!value) return 'Hôm nay';
+  if (!value) return "Hôm nay";
 
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   }).format(new Date(value));
 };
 
 export const ChatActive: React.FC = () => {
   const navigate = useNavigate();
   const { sessionId: routeSessionId } = useParams<{ sessionId?: string }>();
-  const [sessionId, setSessionId] = useState<string | undefined>(routeSessionId);
+  const [sessionId, setSessionId] = useState<string | undefined>(
+    routeSessionId,
+  );
   const [messages, setMessages] = useState<UiMessage[]>([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(Boolean(routeSessionId));
   const [isStreaming, setIsStreaming] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const dateLabel = useMemo(() => {
-    const firstMessage = messages.find(message => message.created_at);
+    const firstMessage = messages.find((message) => message.created_at);
     return formatMessageDate(firstMessage?.created_at);
   }, [messages]);
 
@@ -55,17 +71,17 @@ export const ChatActive: React.FC = () => {
 
     let cancelled = false;
     setIsLoading(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
     fetchChatMessages(routeSessionId)
-      .then(response => {
+      .then((response) => {
         if (cancelled) return;
         setMessages(response.items);
       })
-      .catch(err => {
+      .catch((err) => {
         if (cancelled) return;
         console.error(err);
-        setErrorMessage('Không thể tải lịch sử trò chuyện.');
+        setErrorMessage("Không thể tải lịch sử trò chuyện.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -79,16 +95,66 @@ export const ChatActive: React.FC = () => {
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   }, [messages, isStreaming]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  const updateMessage = (messageId: string, updater: (message: UiMessage) => UiMessage) => {
-    setMessages(prev => prev.map(message => (
-      message._id === messageId || message.localId === messageId ? updater(message) : message
-    )));
+  const updateMessage = (
+    messageId: string,
+    updater: (message: UiMessage) => UiMessage,
+  ) => {
+    setMessages((prev) =>
+      prev.map((message) =>
+        message._id === messageId || message.localId === messageId
+          ? updater(message)
+          : message,
+      ),
+    );
+  };
+
+  const handleFeedback = async (
+    message: UiMessage,
+    feedback: FeedbackValue,
+  ) => {
+    if (
+      !sessionId ||
+      message.feedbackSubmitting ||
+      message._id.startsWith("local-")
+    ) {
+      return;
+    }
+
+    const previousFeedback = message.feedback;
+    updateMessage(message._id, (current) => ({
+      ...current,
+      feedback,
+      feedbackSubmitting: true,
+    }));
+    setErrorMessage("");
+
+    try {
+      await submitChatFeedback({
+        session_id: sessionId,
+        message_id: message._id,
+        rating: feedback === "positive" ? 1 : -1,
+        helpful: feedback === "positive",
+      });
+      updateMessage(message._id, (current) => ({
+        ...current,
+        feedback,
+        feedbackSubmitting: false,
+      }));
+    } catch (err) {
+      console.error(err);
+      updateMessage(message._id, (current) => ({
+        ...current,
+        feedback: previousFeedback,
+        feedbackSubmitting: false,
+      }));
+      setErrorMessage("Không thể gửi phản hồi. Bạn thử lại sau nhé.");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,25 +172,25 @@ export const ChatActive: React.FC = () => {
 
     abortRef.current?.abort();
     abortRef.current = controller;
-    setInputValue('');
-    setErrorMessage('');
+    setInputValue("");
+    setErrorMessage("");
     setIsStreaming(true);
-    setMessages(prev => [
+    setMessages((prev) => [
       ...prev,
       {
         _id: userLocalId,
         localId: userLocalId,
-        role: 'user',
+        role: "user",
         content,
-        status: 'completed',
+        status: "completed",
         created_at: now,
       },
       {
         _id: assistantLocalId,
         localId: assistantLocalId,
-        role: 'assistant',
-        content: '',
-        status: 'pending',
+        role: "assistant",
+        content: "",
+        status: "pending",
         created_at: now,
         streaming: true,
       },
@@ -133,24 +199,28 @@ export const ChatActive: React.FC = () => {
     try {
       await streamChatMessage(content, sessionId, {
         signal: controller.signal,
-        onMeta: meta => {
+        onMeta: (meta) => {
           setSessionId(meta.session_id);
           if (!routeSessionId) {
-            window.history.replaceState(null, '', `/chat/active/${meta.session_id}`);
+            window.history.replaceState(
+              null,
+              "",
+              `/chat/active/${meta.session_id}`,
+            );
           }
         },
-        onToken: delta => {
+        onToken: (delta) => {
           if (!delta) return;
-          updateMessage(assistantLocalId, message => ({
+          updateMessage(assistantLocalId, (message) => ({
             ...message,
             content: `${message.content}${delta}`,
           }));
         },
-        onDone: done => {
-          updateMessage(assistantLocalId, message => ({
+        onDone: (done) => {
+          updateMessage(assistantLocalId, (message) => ({
             ...message,
             _id: done.assistant_message_id,
-            status: 'completed',
+            status: "completed",
             streaming: false,
           }));
         },
@@ -161,11 +231,15 @@ export const ChatActive: React.FC = () => {
       }
 
       console.error(err);
-      setErrorMessage(err instanceof Error ? err.message : 'Không thể gửi tin nhắn.');
-      updateMessage(assistantLocalId, message => ({
+      setErrorMessage(
+        err instanceof Error ? err.message : "Không thể gửi tin nhắn.",
+      );
+      updateMessage(assistantLocalId, (message) => ({
         ...message,
-        content: message.content || 'Không thể tạo phản hồi lúc này. Bạn thử lại sau nhé.',
-        status: 'failed',
+        content:
+          message.content ||
+          "Không thể tạo phản hồi lúc này. Bạn thử lại sau nhé.",
+        status: "failed",
         streaming: false,
       }));
     } finally {
@@ -177,12 +251,12 @@ export const ChatActive: React.FC = () => {
 
   return (
     <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 text-left font-sans flex flex-col overflow-hidden">
-      <PageHeader 
+      <PageHeader
         title="FarmDiaries AI"
-        subtitle={isStreaming ? 'Bé Thóc đang trả lời' : 'Tri Kỷ AI'}
+        subtitle={isStreaming ? "Bé Thóc đang trả lời" : "Tri Kỷ AI"}
         leftButton="back"
         rightButton="camera"
-        onRightClick={() => navigate('/scan')}
+        onRightClick={() => navigate("/scan")}
       />
 
       <main
@@ -205,42 +279,91 @@ export const ChatActive: React.FC = () => {
             <div className="w-28 h-28 mb-4">
               <MascotLottie className="w-full h-full drop-shadow-md" />
             </div>
-            <h2 className="text-2xl font-black text-text-main mb-2">Hỏi Bé Thóc về ruộng vườn</h2>
+            <h2 className="text-2xl font-black text-text-main mb-2">
+              Hỏi Bé Thóc về ruộng vườn
+            </h2>
             <p className="text-text-main/70 font-medium max-w-sm">
-              Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý tình huống ngoài đồng.
+              Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý
+              tình huống ngoài đồng.
             </p>
           </div>
         ) : (
-          messages.map(message => (
+          messages.map((message) => (
             <div
               key={message.localId ?? message._id}
-              className={`flex flex-col w-full ${message.role === 'user' ? 'items-end' : 'items-start'}`}
+              className={`flex flex-col w-full ${message.role === "user" ? "items-end" : "items-start"}`}
             >
-              {message.role === 'assistant' ? (
+              {message.role === "assistant" ? (
                 <div className="flex items-end gap-2 mb-1">
                   <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
-                    <MascotLottie className={`w-full h-full -mt-1 ${message.streaming ? 'animate-pulse' : ''}`} />
+                    <MascotLottie
+                      className={`w-full h-full -mt-1 ${message.streaming ? "animate-pulse" : ""}`}
+                    />
                   </div>
-                  <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">Bé Thóc</span>
+                  <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">
+                    Bé Thóc
+                  </span>
                 </div>
               ) : null}
 
-              <div className={`${message.role === 'user' ? 'bg-primary-container text-white rounded-br-sm border-primary' : 'bg-white text-text-main rounded-bl-sm border-border-main/50 ml-12'} p-4 rounded-[24px] shadow-sm max-w-[85%] border`}>
+              <div
+                className={`${message.role === "user" ? "bg-primary-container text-white rounded-br-sm border-primary" : "bg-white text-text-main rounded-bl-sm border-border-main/50 ml-12"} p-4 rounded-[24px] shadow-sm max-w-[85%] border`}
+              >
                 <p className="font-medium text-base whitespace-pre-wrap">
-                  {message.content || (message.streaming ? 'Đang suy nghĩ...' : '')}
+                  {message.content ||
+                    (message.streaming ? "Đang suy nghĩ..." : "")}
                 </p>
 
-                {message.role === 'assistant' && message.status === 'completed' ? (
+                {message.role === "assistant" &&
+                message.status === "completed" ? (
                   <div className="flex flex-wrap gap-2 mt-4">
                     <button
-                      onClick={() => navigate('/diary/create')}
+                      type="button"
+                      onClick={() => void handleFeedback(message, "positive")}
+                      disabled={message.feedbackSubmitting}
+                      aria-pressed={message.feedback === "positive"}
+                      aria-label="Đánh giá phản hồi hữu ích"
+                      className={`bg-white border px-3 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                        message.feedback === "positive"
+                          ? "text-primary border-primary/40 bg-primary/5"
+                          : "text-text-main border-border-main/50"
+                      }`}
+                    >
+                      {message.feedbackSubmitting &&
+                      message.feedback === "positive" ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ThumbsUp className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleFeedback(message, "negative")}
+                      disabled={message.feedbackSubmitting}
+                      aria-pressed={message.feedback === "negative"}
+                      aria-label="Đánh giá phản hồi chưa hữu ích"
+                      className={`bg-white border px-3 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                        message.feedback === "negative"
+                          ? "text-red-600 border-red-200 bg-red-50"
+                          : "text-text-main border-border-main/50"
+                      }`}
+                    >
+                      {message.feedbackSubmitting &&
+                      message.feedback === "negative" ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ThumbsDown className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => navigate("/diary/create")}
                       className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
                     >
                       <BookOpen className="w-4 h-4 text-primary" />
                       Ghi nhật ký
                     </button>
                     <button
-                      onClick={() => navigate('/reminder/create')}
+                      onClick={() => navigate("/reminder/create")}
                       className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
                     >
                       <Clock className="w-4 h-4 text-secondary" />
@@ -267,15 +390,15 @@ export const ChatActive: React.FC = () => {
           onSubmit={handleSubmit}
           className="w-full max-w-3xl flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-lg focus-within:shadow-xl focus-within:-translate-y-[2px] transition-all pointer-events-auto"
         >
-          <button 
+          <button
             type="button"
-            onClick={() => navigate('/scan')}
+            onClick={() => navigate("/scan")}
             className="p-3 text-text-main/50 hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 cursor-pointer"
           >
             <Camera className="w-6 h-6" />
           </button>
 
-          <input 
+          <input
             className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-base text-text-main placeholder:text-border-main h-full py-3 outline-none min-w-0"
             placeholder="Nhắn tin Bé Thóc..."
             type="text"
@@ -289,7 +412,11 @@ export const ChatActive: React.FC = () => {
             disabled={!inputValue.trim() || isStreaming}
             className="p-3 text-white bg-primary rounded-full hover:bg-primary-container transition-colors flex items-center justify-center mr-1 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isStreaming ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+            {isStreaming ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
           </button>
         </form>
       </div>
