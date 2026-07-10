@@ -83,3 +83,8 @@ export const logout = async () => {
     clearAccessToken();
   }
 };
+
+export const updatePushSubscription = async (payload: { endpoint: string; keys: { p256dh: string; auth: string } }) => {
+  const { data } = await api.post('/auth/push-subscription', payload);
+  return data;
+};
