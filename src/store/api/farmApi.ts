@@ -102,6 +102,17 @@ export const farmApi = baseApi.injectEndpoints({
         { type: 'Reminder', id: 'LIST' },
       ],
     }),
+    cancelReminder: builder.mutation<Reminder, string>({
+      query: (id) => ({
+        url: `/reminders/${id}/cancel`,
+        method: 'PATCH',
+      }),
+      transformResponse: (response: { data: Reminder }) => response.data,
+      invalidatesTags: (_result, _error, id) => [
+        { type: 'Reminder', id },
+        { type: 'Reminder', id: 'LIST' },
+      ],
+    }),
     createReminder: builder.mutation<
       Reminder,
       { title: string; remind_at: string; diary_id?: string; repeat?: 'none' | 'daily' | 'weekly' }
@@ -130,5 +141,6 @@ export const {
   useCreateDiaryLogMutation,
   useGetPendingRemindersQuery,
   useCompleteReminderMutation,
+  useCancelReminderMutation,
   useCreateReminderMutation,
 } = farmApi;
