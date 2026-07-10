@@ -83,3 +83,18 @@ export const logout = async () => {
     clearAccessToken();
   }
 };
+
+export const updatePushSubscription = async (payload: { endpoint: string; keys: { p256dh: string; auth: string } }) => {
+  const { data } = await api.post('/auth/push-subscription', payload);
+  return data;
+};
+
+export const deleteAccount = async () => {
+  const { data } = await api.delete('/users/me');
+  return data;
+};
+
+export const exportUserData = async () => {
+  const response = await api.get('/users/me/export', { responseType: 'blob' });
+  return response.data;
+};
