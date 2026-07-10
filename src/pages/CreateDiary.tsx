@@ -4,6 +4,7 @@ import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery, useCreateDiaryLogMutation } from '../store/api/farmApi';
 import { useInvalidatePetStatus } from '../features/pet/hooks/useInvalidatePetStatus';
+import { uploadImageToR2 } from '../api/uploads';
 import { Sprout, ChevronDown, Thermometer, Droplets, FlaskConical, BugOff, Camera, X, Save } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
@@ -15,8 +16,10 @@ export const CreateDiary: React.FC = () => {
   const [selectedDiaryId, setSelectedDiaryId] = useState<string>('');
   const [growthStage, setGrowthStage] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
-  const [imageUrl, setImageUrl] = useState<string>('https://lh3.googleusercontent.com/aida-public/AB6AXuBBsDRgI1pvIo50IOk1rW3XMKV7rFhTt9_s8aTQNkN_WywF7AIGqdVhXjoHALtZprcHrXKjLhttsRZCpjA4uvk_Um24WBesbsE838pimS7ZoudphdnkPFClv9WTTHUkJeYPc4xmdfViit333Cz9CIlJOwN1Q3vb7F72FPHvJMjnyqxQTdgnBBr2O-MnyEgAEIaPO1Dm6D_LT6RC8NAcso7A3hw9dfbzxz58X2roER3BslU56C5sb_vWdPjtLft7MqmLlOGLkEQso-ij'); // default placeholder image
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState('');
 
   useEffect(() => {
     if (diaries.length > 0 && !selectedDiaryId) {
