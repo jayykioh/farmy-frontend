@@ -1,11 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
+import { updatePushSubscription } from '../api/auth';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
   const [zaloNotifications, setZaloNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(false);
+  const [isPushLoading, setIsPushLoading] = useState(false);
+
+  const handlePushToggle = async () => {
+    if (pushNotifications) {
+      // Logic to unsubscribe would go here
+      setPushNotifications(false);
+      return;
+    }
+
+    setIsPushLoading(true);
+    try {
+      // In a real app, this would use navigator.serviceWorker and pushManager.subscribe()
+      // with a VAPID public key. For this integration, we mock the subscription payload.
+      const mockSubscription = {
+        endpoint: 'https://fcm.googleapis.com/fcm/send/mock-endpoint-id',
+        keys: {
+          p256dh: 'mock-p256dh-key',
+          auth: 'mock-auth-key'
+        }
+      };
+
+      await updatePushSubscription(mockSubscription);
+      setPushNotifications(true);
+      alert('Đã đăng ký nhận thông báo Push thành công!');
+    } catch (err) {
+      console.error('Failed to subscribe to push notifications:', err);
+      alert('Lỗi đăng ký thông báo Push. Vui lòng thử lại!');
+    } finally {
+      setIsPushLoading(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-[100svh] bg-bg-surface-1 text-left font-sans pb-24 md:pb-8">
@@ -50,10 +82,11 @@ export const Settings: React.FC = () => {
               <p className="text-sm text-text-main/60 mt-1">Nhận thông báo trên thiết bị</p>
             </div>
             <button 
-              onClick={() => setPushNotifications(!pushNotifications)}
+              onClick={handlePushToggle}
+              disabled={isPushLoading}
               className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors cursor-pointer ${
                 pushNotifications ? 'bg-primary-container' : 'bg-border-main/20'
-              }`}
+              } ${isPushLoading ? 'opacity-50 cursor-wait' : ''}`}
             >
               <span
                 className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
