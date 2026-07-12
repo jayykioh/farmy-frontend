@@ -6,8 +6,10 @@ import {
   useGetDiaryDetailQuery,
   useGetDiaryLogsQuery,
   useGetDiariesQuery,
+  useUpdateDiaryMutation,
+  useDeleteDiaryMutation,
 } from '../store/api/farmApi';
-import { Droplets, Leaf, Shield, Sprout, Clock, Activity, CheckCircle2 } from 'lucide-react';
+import { Droplets, Leaf, Shield, Sprout, Clock, Activity, CheckCircle2, Archive, Trash2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export const DiaryHistory: React.FC = () => {
@@ -25,6 +27,36 @@ export const DiaryHistory: React.FC = () => {
   const { data: logs = [], isLoading: logsLoading } = useGetDiaryLogsQuery(activeDiaryId || '', {
     skip: !activeDiaryId,
   });
+
+  const [updateDiary] = useUpdateDiaryMutation();
+  const [deleteDiary] = useDeleteDiaryMutation();
+
+  const handleArchive = async () => {
+    if (!activeDiaryId || !diary) return;
+    if (window.confirm('Bạn có chắc muốn lưu trữ vụ mùa này?')) {
+      try {
+        await updateDiary({ id: activeDiaryId, data: { status: 'archived' } }).unwrap();
+        alert('Đã lưu trữ vụ mùa!');
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi khi lưu trữ!');
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!activeDiaryId) return;
+    if (window.confirm('Bạn có chắc muốn xóa vụ mùa này? Không thể hoàn tác!')) {
+      try {
+        await deleteDiary(activeDiaryId).unwrap();
+        alert('Đã xóa vụ mùa!');
+        navigate('/diary');
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi khi xóa!');
+      }
+    }
+  };
 
   const loading = diariesLoading || diaryLoading || logsLoading;
 
@@ -50,9 +82,22 @@ export const DiaryHistory: React.FC = () => {
       <PageHeader 
         title={diary ? `Lịch sử: ${diary.crop_type}` : 'Nhật ký canh tác'} 
         subtitle="Chi tiết các hoạt động chăm sóc cây trồng" 
-        leftButton="back" 
+        leftButton="back"
+        rightButton="none"
       />
       <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
+        {diary && (
+          <div className="flex justify-end gap-2">
+            {diary.status === 'active' && (
+              <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
+                <Archive className="w-4 h-4" /> Lưu trữ
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
+              <Trash2 className="w-4 h-4" /> Xóa vụ mùa
+            </Button>
+          </div>
+        )}
 
         {/* Bé Thóc Encouragement */}
         <section className="flex items-end gap-4 w-full">

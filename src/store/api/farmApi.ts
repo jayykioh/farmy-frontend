@@ -51,6 +51,28 @@ export const farmApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: Diary }) => response.data,
       invalidatesTags: [{ type: 'Diary', id: 'LIST' }],
     }),
+    updateDiary: builder.mutation<Diary, { id: string; data: Partial<{ plot_id: string; crop_type: string; start_date: string; status: string }> }>({
+      query: ({ id, data }) => ({
+        url: `/diaries/${id}`,
+        method: 'PUT',
+        data,
+      }),
+      transformResponse: (response: { data: Diary }) => response.data,
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'Diary', id },
+        { type: 'Diary', id: 'LIST' },
+      ],
+    }),
+    deleteDiary: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/diaries/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, id) => [
+        { type: 'Diary', id },
+        { type: 'Diary', id: 'LIST' },
+      ],
+    }),
 
     // 3. Diary Logs
     getDiaryLogs: builder.query<DiaryLog[], string>({
@@ -74,6 +96,15 @@ export const farmApi = baseApi.injectEndpoints({
         data: log,
       }),
       transformResponse: (response: { data: DiaryLog }) => response.data,
+      invalidatesTags: (_result, _error, { diaryId }) => [
+        { type: 'DiaryLog', id: `LIST_${diaryId}` },
+      ],
+    }),
+    deleteDiaryLog: builder.mutation<void, { diaryId: string; logId: string }>({
+      query: ({ logId }) => ({
+        url: `/diaries/logs/${logId}`,
+        method: 'DELETE',
+      }),
       invalidatesTags: (_result, _error, { diaryId }) => [
         { type: 'DiaryLog', id: `LIST_${diaryId}` },
       ],
@@ -128,7 +159,10 @@ export const {
   useCreateDiaryMutation,
   useGetDiaryLogsQuery,
   useCreateDiaryLogMutation,
+  useDeleteDiaryLogMutation,
   useGetPendingRemindersQuery,
   useCompleteReminderMutation,
   useCreateReminderMutation,
+  useUpdateDiaryMutation,
+  useDeleteDiaryMutation,
 } = farmApi;

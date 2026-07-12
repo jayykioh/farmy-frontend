@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SnapFAB } from '../components/SnapFAB';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery } from '../store/api/farmApi';
+import { CreateDiaryModal } from '../components/CreateDiaryModal';
 
 export const DiaryList: React.FC = () => {
   const navigate = useNavigate();
   const { data: diaries = [], isLoading: loading } = useGetDiariesQuery();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getCropImage = (cropType: string) => {
     const typeLower = cropType.toLowerCase();
@@ -25,12 +27,20 @@ export const DiaryList: React.FC = () => {
       <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-8 flex flex-col gap-6">
 
         {/* Filter Chips */}
-        <section className="flex gap-2 overflow-x-auto scrollbar-hide py-2">
+        <section className="flex gap-2 overflow-x-auto scrollbar-hide py-2 items-center">
           <button className="px-5 py-2 bg-primary text-white rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-primary-dark cursor-pointer">Tất cả</button>
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Lúa</button>
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Bưởi</button>
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Cà chua</button>
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Khác</button>
+          
+          <div className="w-px h-6 bg-border-main/50 mx-1 flex-shrink-0"></div>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="px-5 py-2 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-primary/20 cursor-pointer flex items-center gap-1"
+          >
+            <span>+</span> Thêm vụ mùa
+          </button>
         </section>
 
         {/* Diary Timeline / Grid */}
@@ -41,7 +51,7 @@ export const DiaryList: React.FC = () => {
             <span className="text-4xl">📔</span>
             <p className="font-bold text-text-main/70 text-lg">Chưa có nhật ký vụ mùa nào.</p>
             <button 
-              onClick={() => navigate('/diary/create')}
+              onClick={() => setIsModalOpen(true)}
               className="px-6 py-3 bg-primary text-white font-bold rounded-full hover:bg-primary-dark cursor-pointer shadow-md"
             >
               Bắt đầu Nhật ký Mới
@@ -111,6 +121,11 @@ export const DiaryList: React.FC = () => {
       </button>
 
       <SnapFAB />
+
+      <CreateDiaryModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };
