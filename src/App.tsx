@@ -27,6 +27,7 @@ import HelpSupport from './pages/HelpSupport';
 import AccountSettings from './pages/AccountSettings';
 import FarmFeed from './pages/FarmFeed';
 import SnapDetail from './pages/SnapDetail';
+import Insights from './pages/Insights';
 
 // Error & Status Pages
 import NotFound404 from './pages/NotFound404';
@@ -61,6 +62,7 @@ export function App() {
                 <Route path="/account-settings" element={<AccountSettings />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/reminders" element={<Reminders />} />
+                <Route path="/insights" element={<Insights />} />
                 <Route path="/reminder/create" element={<CreateReminder />} />
                 <Route path="/celebration" element={<Celebration />} />
                 <Route path="/farm-feed" element={<FarmFeed />} />

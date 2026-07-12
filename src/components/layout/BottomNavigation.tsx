@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { Home, BookText, Bot, User } from 'lucide-react';
+import { Home, BookText, Bot, User, Lightbulb } from 'lucide-react';
 
 export const BottomNavigation = () => {
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
     { to: '/chat', icon: Bot, label: 'AI Pet' },
+    { to: '/insights', icon: Lightbulb, label: 'Insights' },
     { to: '/profile', icon: User, label: 'Hồ sơ' }
   ];
 
