@@ -1,4 +1,4 @@
-import { PlantScanErrorCode } from '../types/plantScan';
+import type { PlantScanErrorCode } from '../types/plantScan';
 
 export function extractPlantScanErrorCode(error: unknown): PlantScanErrorCode {
   if (!error) return 'UNKNOWN';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PlantScan from './PlantScan';
@@ -6,7 +5,6 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter } from 'react-router-dom';
 import { farmApi } from '../store/api/farmApi';
-import userEvent from '@testing-library/user-event';
 import { PageHeaderProvider } from '../contexts/PageHeaderContext';
 import { api } from '../api/client';
 
@@ -23,8 +21,8 @@ vi.mock('../api/client', () => ({
 // Mock URL
 const mockCreateObjectURL = vi.fn();
 const mockRevokeObjectURL = vi.fn();
-global.URL.createObjectURL = mockCreateObjectURL;
-global.URL.revokeObjectURL = mockRevokeObjectURL;
+window.URL.createObjectURL = mockCreateObjectURL;
+window.URL.revokeObjectURL = mockRevokeObjectURL;
 
 describe('PlantScan Component', () => {
   let store: ReturnType<typeof configureStore>;
@@ -65,7 +63,6 @@ describe('PlantScan Component', () => {
   });
 
   it('appends FormData correctly and changes to analyzing state on file select', async () => {
-    const user = userEvent.setup();
     renderComponent();
     
     const mockResponse = {
