@@ -21,6 +21,8 @@ export interface Diary {
 
 export interface DiaryLog {
   _id: string;
+  logId?: string;
+  idempotencyKey?: string;
   diary_id: string;
   activity_type: string;
   content: string;

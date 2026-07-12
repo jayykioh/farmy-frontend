@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PageHeaderProvider } from './contexts/PageHeaderContext';
+import { useDiaryOfflineSync } from './hooks/useDiaryOfflineSync';
 
 // Pages
 import WelcomeAuth from './pages/WelcomeAuth';
@@ -34,6 +35,8 @@ import NetworkError from './pages/NetworkError';
 import MaintenanceMode from './pages/MaintenanceMode';
 
 export function App() {
+  useDiaryOfflineSync();
+
   return (
     <ErrorBoundary>
       <PageHeaderProvider>

@@ -67,12 +67,21 @@ export const farmApi = baseApi.injectEndpoints({
     }),
     createDiaryLog: builder.mutation<
       DiaryLog,
-      { diaryId: string; log: { activity_type: string; content: string; image_url?: string } }
+      {
+        diaryId: string;
+        log: { activity_type: string; content: string; image_url?: string };
+        idempotencyKey?: string;
+        requestHash?: string;
+      }
     >({
-      query: ({ diaryId, log }) => ({
+      query: ({ diaryId, log, idempotencyKey, requestHash }) => ({
         url: `/diaries/${diaryId}/logs`,
         method: 'POST',
         data: log,
+        headers: {
+          ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+          ...(requestHash ? { 'X-Request-Hash': requestHash } : {}),
+        },
       }),
       transformResponse: (response: { data: DiaryLog }) => response.data,
       invalidatesTags: (_result, _error, { diaryId }) => [
