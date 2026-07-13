@@ -30,6 +30,8 @@ export interface PetStatus {
   missedDays: number;
   moodReason: PetMoodReason | string;
   bubbleMessage: string;
+  ownedItems: string[];
+  equippedItems: string[];
   updatedAt?: string;
 }
 
@@ -43,6 +45,8 @@ export const PET_STATUS_FALLBACK: PetStatus = {
   missedDays: 0,
   moodReason: 'DEFAULT_STATE',
   bubbleMessage: 'Chào chủ vườn!',
+  ownedItems: [],
+  equippedItems: [],
 };
 
 // ─── UI Transition State ──────────────────────────────────────────────────────
