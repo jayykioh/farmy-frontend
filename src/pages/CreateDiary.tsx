@@ -6,7 +6,7 @@ import { MascotLottie } from '../components/MascotLottie';
 import { Button } from '../components/ui/Button';
 import { useGetDiariesQuery } from '../store/api/farmApi';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { createBlobDigest, createDiaryRequestHash } from '../lib/diaryHash';
+import { creahttps://github.com/jayykioh/farmy-frontend/pull/21/conflict?name=package-lock.json&ancestor_oid=48d0b0c446c9d052d2f0b8807bba3d89aef27d3f&base_oid=6f047d0b3fab4616e0d096fd7414a590a758e0dd&head_oid=e7d5e7ca7b84bca5ce9aa0818add94e5dd512cfateBlobDigest, createDiaryRequestHash } from '../lib/diaryHash';
 import { assertStorageRoom, compressImageFile, ensurePersistentStorage } from '../lib/imageCompression';
 import { saveOfflineDiaryDraft } from '../lib/indexedDB';
 import { runDiarySync } from '../lib/diarySyncEngine';

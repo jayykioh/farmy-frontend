@@ -1,109 +1,425 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
-import { PageHeader } from '../components/PageHeader';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  BookOpen,
+  Camera,
+  Clock,
+  Loader2,
+  Send,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-react";
+import { MascotLottie } from "../components/MascotLottie";
+import { PageHeader } from "../components/PageHeader";
+import {
+  fetchChatMessages,
+  streamChatMessage,
+  submitChatFeedback,
+  type ChatMessage,
+} from "../api/chat";
+
+type FeedbackValue = "positive" | "negative";
+
+type UiMessage = ChatMessage & {
+  feedback?: FeedbackValue;
+  feedbackSubmitting?: boolean;
+  localId?: string;
+  streaming?: boolean;
+};
+
+const createLocalId = () =>
+  `local-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+const formatMessageDate = (value?: string) => {
+  if (!value) return "Hôm nay";
+
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(value));
+};
 
 export const ChatActive: React.FC = () => {
   const navigate = useNavigate();
-  const [inputValue, setInputValue] = useState('');
+  const { sessionId: routeSessionId } = useParams<{ sessionId?: string }>();
+  const [sessionId, setSessionId] = useState<string | undefined>(
+    routeSessionId,
+  );
+  const [messages, setMessages] = useState<UiMessage[]>([]);
+  const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(Boolean(routeSessionId));
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const dateLabel = useMemo(() => {
+    const firstMessage = messages.find((message) => message.created_at);
+    return formatMessageDate(firstMessage?.created_at);
+  }, [messages]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSessionId(routeSessionId);
+
+    if (!routeSessionId) {
+      setMessages([]);
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+    setErrorMessage("");
+
+    fetchChatMessages(routeSessionId)
+      .then((response) => {
+        if (cancelled) return;
+        setMessages(response.items);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error(err);
+        setErrorMessage("Không thể tải lịch sử trò chuyện.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routeSessionId]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages, isStreaming]);
+
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const updateMessage = (
+    messageId: string,
+    updater: (message: UiMessage) => UiMessage,
+  ) => {
+    setMessages((prev) =>
+      prev.map((message) =>
+        message._id === messageId || message.localId === messageId
+          ? updater(message)
+          : message,
+      ),
+    );
+  };
+
+  const handleFeedback = async (
+    message: UiMessage,
+    feedback: FeedbackValue,
+  ) => {
+    if (
+      !sessionId ||
+      message.feedbackSubmitting ||
+      message._id.startsWith("local-")
+    ) {
+      return;
+    }
+
+    const previousFeedback = message.feedback;
+    updateMessage(message._id, (current) => ({
+      ...current,
+      feedback,
+      feedbackSubmitting: true,
+    }));
+    setErrorMessage("");
+
+    try {
+      await submitChatFeedback({
+        session_id: sessionId,
+        message_id: message._id,
+        rating: feedback === "positive" ? 1 : -1,
+        helpful: feedback === "positive",
+      });
+      updateMessage(message._id, (current) => ({
+        ...current,
+        feedback,
+        feedbackSubmitting: false,
+      }));
+    } catch (err) {
+      console.error(err);
+      updateMessage(message._id, (current) => ({
+        ...current,
+        feedback: previousFeedback,
+        feedbackSubmitting: false,
+      }));
+      setErrorMessage("Không thể gửi phản hồi. Bạn thử lại sau nhé.");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const content = inputValue.trim();
+
+    if (!content || isStreaming) {
+      return;
+    }
+
+    const userLocalId = createLocalId();
+    const assistantLocalId = createLocalId();
+    const now = new Date().toISOString();
+    const controller = new AbortController();
+
+    abortRef.current?.abort();
+    abortRef.current = controller;
+    setInputValue("");
+    setErrorMessage("");
+    setIsStreaming(true);
+    setMessages((prev) => [
+      ...prev,
+      {
+        _id: userLocalId,
+        localId: userLocalId,
+        role: "user",
+        content,
+        status: "completed",
+        created_at: now,
+      },
+      {
+        _id: assistantLocalId,
+        localId: assistantLocalId,
+        role: "assistant",
+        content: "",
+        status: "pending",
+        created_at: now,
+        streaming: true,
+      },
+    ]);
+
+    try {
+      await streamChatMessage(content, sessionId, {
+        signal: controller.signal,
+        onMeta: (meta) => {
+          setSessionId(meta.session_id);
+          if (!routeSessionId) {
+            window.history.replaceState(
+              null,
+              "",
+              `/chat/active/${meta.session_id}`,
+            );
+          }
+        },
+        onToken: (delta) => {
+          if (!delta) return;
+          updateMessage(assistantLocalId, (message) => ({
+            ...message,
+            content: `${message.content}${delta}`,
+          }));
+        },
+        onDone: (done) => {
+          updateMessage(assistantLocalId, (message) => ({
+            ...message,
+            _id: done.assistant_message_id,
+            status: "completed",
+            streaming: false,
+          }));
+        },
+      });
+    } catch (err) {
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      console.error(err);
+      setErrorMessage(
+        err instanceof Error ? err.message : "Không thể gửi tin nhắn.",
+      );
+      updateMessage(assistantLocalId, (message) => ({
+        ...message,
+        content:
+          message.content ||
+          "Không thể tạo phản hồi lúc này. Bạn thử lại sau nhé.",
+        status: "failed",
+        streaming: false,
+      }));
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsStreaming(false);
+      }
+    }
+  };
 
   return (
     <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 text-left font-sans flex flex-col overflow-hidden">
-      
-      <PageHeader 
+      <PageHeader
         title="FarmDiaries AI"
-        subtitle="Tri Kỷ AI"
+        subtitle={isStreaming ? "Bé Thóc đang trả lời" : "Tri Kỷ AI"}
         leftButton="back"
         rightButton="camera"
-        onRightClick={() => navigate('/scan')}
+        onRightClick={() => navigate("/scan")}
       />
 
-      {/* Main Content Area */}
-      <main className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-bg-surface-1 z-0">
-        
-        {/* Date Marker */}
+      <main
+        ref={scrollRef}
+        className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-bg-surface-1 z-0"
+      >
         <div className="flex justify-center mt-6">
           <span className="bg-white border border-border-main/50 text-text-main/50 font-bold text-xs px-4 py-1 rounded-full shadow-sm">
-            Today
+            {dateLabel}
           </span>
         </div>
 
-        {/* User Message */}
-        <div className="flex flex-col items-end w-full">
-          <div className="bg-primary-container text-white p-4 rounded-[24px] rounded-br-sm shadow-md max-w-[85%] mb-2 border border-primary">
-            <p className="font-medium text-base">My tomato plants are looking a bit yellow on the bottom leaves. Any idea what's wrong?</p>
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 py-16 text-text-main/60 font-bold">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Đang tải trò chuyện...
           </div>
-          <img 
-            alt="Diseased Leaf" 
-            className="w-32 h-32 object-cover rounded-[16px] border border-border-main/50 shadow-sm mb-2 mt-2" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyc2CklwPKEgfI6-9b0NNXtw4oq71KYLWnb4bN2-nKPkdmIXkM1bjtRm9oox1uKBm-XZcOXu6blKfXlhR6NVPLsE8SxjtCjfojB_ylJboSonAHMBf4pe5Xo4u_NvPI6XG1lsG9V8CmoJ4k2WjzaQXkyvALVHLoexhc1TkL-g1ZB_tEqB5X2DcZrnDi3LuppgIrAb7ymQasWMs4ujCGQkA8wBI2sVXXO8pfSaO8TVr95Tr6YQBB6Z-9-5sKNENewNkn75rDGzWsYpN0" 
-          />
-        </div>
+        ) : messages.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
+            <div className="w-28 h-28 mb-4">
+              <MascotLottie className="w-full h-full drop-shadow-md" />
+            </div>
+            <h2 className="text-2xl font-black text-text-main mb-2">
+              Hỏi Bé Thóc về ruộng vườn
+            </h2>
+            <p className="text-text-main/70 font-medium max-w-sm">
+              Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý
+              tình huống ngoài đồng.
+            </p>
+          </div>
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.localId ?? message._id}
+              className={`flex flex-col w-full ${message.role === "user" ? "items-end" : "items-start"}`}
+            >
+              {message.role === "assistant" ? (
+                <div className="flex items-end gap-2 mb-1">
+                  <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
+                    <MascotLottie
+                      className={`w-full h-full -mt-1 ${message.streaming ? "animate-pulse" : ""}`}
+                    />
+                  </div>
+                  <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">
+                    Bé Thóc
+                  </span>
+                </div>
+              ) : null}
 
-        {/* AI Message */}
-        <div className="flex flex-col items-start w-full mt-4">
-          <div className="flex items-end gap-2 mb-1">
-            <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
-              <MascotLottie className="w-full h-full -mt-1" />
-            </div>
-            <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">Bé Thóc</span>
-          </div>
-          
-          <div className="bg-white text-text-main p-4 rounded-[24px] rounded-bl-sm border border-border-main/50 max-w-[85%] shadow-sm ml-12 relative">
-            
-            <p className="font-medium text-base mb-2">I noticed signs of nutrient stress. It looks like it could be a nitrogen deficiency based on the yellowing starting from the older bottom leaves.</p>
-            <p className="font-bold text-sm text-primary">Want to save this as a diary note?</p>
-            
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-2 mt-4">
-              <button 
-                onClick={() => navigate('/diary/create')}
-                className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
+              <div
+                className={`${message.role === "user" ? "bg-primary-container text-white rounded-br-sm border-primary" : "bg-white text-text-main rounded-bl-sm border-border-main/50 ml-12"} p-4 rounded-[24px] shadow-sm max-w-[85%] border`}
               >
-                <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg> 
-                Save to diary
-              </button>
-              <button className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1">
-                <svg className="w-4 h-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> 
-                Set reminder
-              </button>
+                <p className="font-medium text-base whitespace-pre-wrap">
+                  {message.content ||
+                    (message.streaming ? "Đang suy nghĩ..." : "")}
+                </p>
+
+                {message.role === "assistant" &&
+                message.status === "completed" ? (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => void handleFeedback(message, "positive")}
+                      disabled={message.feedbackSubmitting}
+                      aria-pressed={message.feedback === "positive"}
+                      aria-label="Đánh giá phản hồi hữu ích"
+                      className={`bg-white border px-3 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                        message.feedback === "positive"
+                          ? "text-primary border-primary/40 bg-primary/5"
+                          : "text-text-main border-border-main/50"
+                      }`}
+                    >
+                      {message.feedbackSubmitting &&
+                      message.feedback === "positive" ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ThumbsUp className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleFeedback(message, "negative")}
+                      disabled={message.feedbackSubmitting}
+                      aria-pressed={message.feedback === "negative"}
+                      aria-label="Đánh giá phản hồi chưa hữu ích"
+                      className={`bg-white border px-3 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                        message.feedback === "negative"
+                          ? "text-red-600 border-red-200 bg-red-50"
+                          : "text-text-main border-border-main/50"
+                      }`}
+                    >
+                      {message.feedbackSubmitting &&
+                      message.feedback === "negative" ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ThumbsDown className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => navigate("/diary/create")}
+                      className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
+                    >
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      Ghi nhật ký
+                    </button>
+                    <button
+                      onClick={() => navigate("/reminder/create")}
+                      className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
+                    >
+                      <Clock className="w-4 h-4 text-secondary" />
+                      Đặt nhắc nhở
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
+          ))
+        )}
+
+        {errorMessage ? (
+          <div className="bg-red-50 border border-red-100 text-red-700 rounded-2xl px-4 py-3 font-bold text-sm">
+            {errorMessage}
           </div>
-        </div>
-        
-        {/* Invisible spacer */}
-        <div className="h-[20px]"></div>
+        ) : null}
+
+        <div className="h-[20px]" />
       </main>
 
-      {/* Chat Input Area - Fixed at bottom */}
       <div className="fixed bottom-24 md:bottom-8 left-0 right-0 w-full pt-6 pb-4 px-4 md:px-8 z-30 flex justify-center pointer-events-none">
-        <div className="w-full max-w-3xl flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-lg focus-within:shadow-xl focus-within:-translate-y-[2px] transition-all pointer-events-auto">
-          <button 
-            onClick={() => navigate('/scan')}
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-3xl flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-lg focus-within:shadow-xl focus-within:-translate-y-[2px] transition-all pointer-events-auto"
+        >
+          <button
+            type="button"
+            onClick={() => navigate("/scan")}
             className="p-3 text-text-main/50 hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 cursor-pointer"
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <Camera className="w-6 h-6" />
           </button>
-          
-          <input 
-            className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-base text-text-main placeholder:text-border-main h-full py-3 outline-none" 
-            placeholder="Ask Bé Thóc anything..." 
+
+          <input
+            className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-base text-text-main placeholder:text-border-main h-full py-3 outline-none min-w-0"
+            placeholder="Nhắn tin Bé Thóc..."
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            disabled={isStreaming}
           />
-          
-          <button className="p-3 text-white bg-primary rounded-full hover:bg-primary-container transition-colors flex items-center justify-center mr-1 shadow-sm active:scale-95 cursor-pointer">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+
+          <button
+            type="submit"
+            disabled={!inputValue.trim() || isStreaming}
+            className="p-3 text-white bg-primary rounded-full hover:bg-primary-container transition-colors flex items-center justify-center mr-1 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isStreaming ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
           </button>
-        </div>
+        </form>
       </div>
-      
     </div>
   );
 };

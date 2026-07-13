@@ -7,6 +7,8 @@ import {
   useGetDiaryDetailQuery,
   useGetDiaryLogsQuery,
   useGetDiariesQuery,
+  useUpdateDiaryMutation,
+  useDeleteDiaryMutation,
 } from '../store/api/farmApi';
 import { Button } from '../components/ui/Button';
 import { useAppSelector } from '../store/hooks';
@@ -85,6 +87,36 @@ export const DiaryHistory: React.FC = () => {
     skip: !activeDiaryId,
   });
 
+  const [updateDiary] = useUpdateDiaryMutation();
+  const [deleteDiary] = useDeleteDiaryMutation();
+
+  const handleArchive = async () => {
+    if (!activeDiaryId || !diary) return;
+    if (window.confirm('Bạn có chắc muốn lưu trữ vụ mùa này?')) {
+      try {
+        await updateDiary({ id: activeDiaryId, data: { status: 'archived' } }).unwrap();
+        alert('Đã lưu trữ vụ mùa!');
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi khi lưu trữ!');
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!activeDiaryId) return;
+    if (window.confirm('Bạn có chắc muốn xóa vụ mùa này? Không thể hoàn tác!')) {
+      try {
+        await deleteDiary(activeDiaryId).unwrap();
+        alert('Đã xóa vụ mùa!');
+        navigate('/diary');
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi khi xóa!');
+      }
+    }
+  };
+
   const loading = diariesLoading || diaryLoading || logsLoading;
   const visibleOfflineDrafts = useMemo(
     () => (userId && activeDiaryId ? offlineDrafts : []),
@@ -157,6 +189,27 @@ export const DiaryHistory: React.FC = () => {
         leftButton="back"
       />
       <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
+      <PageHeader 
+        title={diary ? `Lịch sử: ${diary.crop_type}` : 'Nhật ký canh tác'} 
+        subtitle="Chi tiết các hoạt động chăm sóc cây trồng" 
+        leftButton="back"
+        rightButton="none"
+      />
+      <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
+        {diary && (
+          <div className="flex justify-end gap-2">
+            {diary.status === 'active' && (
+              <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
+                <Archive className="w-4 h-4" /> Lưu trữ
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
+              <Trash2 className="w-4 h-4" /> Xóa vụ mùa
+            </Button>
+          </div>
+        )}
+
+        {/* Bé Thóc Encouragement */}
         <section className="flex items-end gap-4 w-full">
           <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-border-main/50 shrink-0 relative overflow-hidden p-1 shadow-sm">
             <MascotLottie className="w-full h-full -mt-1" />

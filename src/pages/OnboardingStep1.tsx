@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { Wheat, Apple, Coffee, Leaf, Sprout } from 'lucide-react';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 
 export const OnboardingStep1: React.FC = () => {
   const navigate = useNavigate();
+  const { checkingAuth } = useRequireAuth();
   const [selectedCrop, setSelectedCrop] = useState<string>('lua-nuoc');
 
   const crops = [
@@ -14,6 +16,10 @@ export const OnboardingStep1: React.FC = () => {
     { id: 'rau-mau', label: <span className="flex items-center gap-1"><Leaf className="w-4 h-4" /> Rau màu</span> },
     { id: 'khac', label: <span className="flex items-center gap-1"><Sprout className="w-4 h-4" /> Khác</span> },
   ];
+
+  if (checkingAuth) {
+    return null;
+  }
 
   return (
     <div className="relative min-h-[100svh] w-full overflow-x-hidden bg-gradient-to-b from-bg-surface via-bg-main to-primary-lightest/20 text-left font-sans">

@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageHeader } from '../components/PageHeader';
+import { useAuthStore } from '../store/authStore';
+import { deleteAccount, exportUserData } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
 
 export const AccountSettings: React.FC = () => {
+  const { user } = useAuthStore();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState('Nguyễn Văn Nông');
+  const [name, setName] = useState(user?.name || 'Nông dân Ẩn danh');
   const [farmName, setFarmName] = useState('Nông trại Vườn Xanh');
   const [region, setRegion] = useState('An Giang');
   const [editName, setEditName] = useState(name);
   const [editFarmName, setEditFarmName] = useState(farmName);
   const [editRegion, setEditRegion] = useState(region);
 
+  const navigate = useNavigate();
+  const { clearSession } = useAuthStore();
+
   const handleSaveName = () => {
     setName(editName);
     setFarmName(editFarmName);
     setRegion(editRegion);
     setIsEditingName(false);
+    alert('Trong phiên bản hiện tại, API cập nhật hồ sơ chưa được hỗ trợ từ phía server. Thay đổi chỉ lưu tạm trên giao diện.');
   };
 
   const handleCancel = () => {
@@ -22,6 +30,38 @@ export const AccountSettings: React.FC = () => {
     setEditFarmName(farmName);
     setEditRegion(region);
     setIsEditingName(false);
+  };
+
+  const handleExportData = async () => {
+    try {
+      const blob = await exportUserData();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'farmy_user_data.json');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi xuất dữ liệu. Vui lòng thử lại!');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('CẢNH BÁO: Hành động này sẽ xóa toàn bộ dữ liệu của bạn và không thể hoàn tác. Bạn có chắc chắn muốn XÓA TÀI KHOẢN?')) {
+      return;
+    }
+    
+    try {
+      await deleteAccount();
+      alert('Tài khoản của bạn đã được đánh dấu xóa.');
+      clearSession();
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi xóa tài khoản. Vui lòng thử lại!');
+    }
   };
 
   return (
@@ -160,7 +200,7 @@ export const AccountSettings: React.FC = () => {
               <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
                 <div>
                   <p className="text-xs text-text-main/60 font-semibold uppercase">Email</p>
-                  <p className="text-base font-semibold text-text-main">user@example.com</p>
+                  <p className="text-base font-semibold text-text-main">{user?.email || 'N/A'}</p>
                 </div>
                 <svg className="w-5 h-5 text-text-main/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -211,11 +251,20 @@ export const AccountSettings: React.FC = () => {
           </div>
         </div>
 
-        {/* Danger Zone */}
+        {/* Privacy & Danger Zone */}
         <div className="bg-white rounded-[24px] border border-error-main/20 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-error-main mb-4">Vùng nguy hiểm</h2>
+          <h2 className="text-lg font-bold text-text-main mb-4">Dữ liệu & Quyền riêng tư</h2>
           
           <button 
+            onClick={handleExportData}
+            className="w-full bg-bg-surface-1 border border-border-main/50 text-text-main font-bold rounded-[12px] px-4 py-3 hover:bg-bg-surface transition-colors cursor-pointer active:scale-95 mb-4"
+          >
+            Xuất dữ liệu của tôi
+          </button>
+
+          <h2 className="text-lg font-bold text-error-main mb-4 mt-6">Vùng nguy hiểm</h2>
+          <button 
+            onClick={handleDeleteAccount}
             className="w-full bg-error-light text-error-main font-bold rounded-[12px] px-4 py-3 hover:bg-error-light/80 transition-colors cursor-pointer active:scale-95"
           >
             Xóa tài khoản

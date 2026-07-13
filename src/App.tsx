@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from './components/layout/MainLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { PageHeaderProvider } from './contexts/PageHeaderContext';
 import { useDiaryOfflineSync } from './hooks/useDiaryOfflineSync';
 
@@ -45,26 +46,29 @@ export function App() {
             <Route element={<MainLayout />}>
               <Route path="/" element={<WelcomeAuth />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/onboarding-1" element={<OnboardingStep1 />} />
-              <Route path="/onboarding-2" element={<OnboardingStep2 />} />
-              <Route path="/onboarding-3" element={<OnboardingStep3 />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/diary" element={<DiaryList />} />
-              <Route path="/diary/history" element={<DiaryHistory />} />
-              <Route path="/diary/create" element={<CreateDiary />} />
-              <Route path="/chat/active" element={<ChatActive />} />
-              <Route path="/chat" element={<ChatList />} />
-              <Route path="/scan" element={<PlantScan />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/help-support" element={<HelpSupport />} />
-              <Route path="/account-settings" element={<AccountSettings />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/reminders" element={<Reminders />} />
-              <Route path="/reminder/create" element={<CreateReminder />} />
-              <Route path="/celebration" element={<Celebration />} />
-              <Route path="/farm-feed" element={<FarmFeed />} />
-              <Route path="/snap/:id" element={<SnapDetail />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/onboarding-1" element={<OnboardingStep1 />} />
+                <Route path="/onboarding-2" element={<OnboardingStep2 />} />
+                <Route path="/onboarding-3" element={<OnboardingStep3 />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/diary" element={<DiaryList />} />
+                <Route path="/diary/history" element={<DiaryHistory />} />
+                <Route path="/diary/create" element={<CreateDiary />} />
+                <Route path="/chat/active" element={<ChatActive />} />
+                <Route path="/chat/active/:sessionId" element={<ChatActive />} />
+                <Route path="/chat" element={<ChatList />} />
+                <Route path="/scan" element={<PlantScan />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/help-support" element={<HelpSupport />} />
+                <Route path="/account-settings" element={<AccountSettings />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/reminders" element={<Reminders />} />
+                <Route path="/reminder/create" element={<CreateReminder />} />
+                <Route path="/celebration" element={<Celebration />} />
+                <Route path="/farm-feed" element={<FarmFeed />} />
+                <Route path="/snap/:id" element={<SnapDetail />} />
+              </Route>
 
               {/* Error & Status Pages - Outside MainLayout */}
               <Route path="/loading" element={<LoadingScreen />} />

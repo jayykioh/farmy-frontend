@@ -62,6 +62,7 @@ export type DiaryLog = {
   activity_type: string;
   content: string;
   image_url?: string;
+  photo_urls?: string[];
   created_at: string;
   updated_at: string;
 };
@@ -70,6 +71,7 @@ export type CreateDiaryLogPayload = {
   activity_type: string;
   content: string;
   image_url?: string;
+  photo_urls?: string[];
 };
 
 export const fetchDiaryLogs = async (diaryId: string) => {
