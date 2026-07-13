@@ -4,9 +4,11 @@ import { PageHeader } from '../components/PageHeader';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { MapPin, Award, Flame, Droplets, Clock, Target, LogOut, PenLine, Medal, ShieldAlert } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
+  const { user, logout: logoutUser } = useAuthStore();
   const { data: petStatusRaw, isLoading: loading } = usePetStatus();
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
@@ -30,7 +32,7 @@ export const Profile: React.FC = () => {
           <img alt="Farmer Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsbCWDiuGTF5iEwK2O9pm1CMMzFdWx0hc4ellAPSIR0Fd0W04AaUk2McKFTBpkyt54F7qbz59AxRVm00X7l_paTxXsYAhKb0DJ2UtW18iwcftc8NpvHSUtky7QtZ3LYS_Jvnwzb_uyHj7Snd_GZJ5qRjx6kGvs2Y-yZafDMesEmvqIG9HZ3b06V39xa_0py0IGkepiBfpB_L-Nfe8YfQg-4VDdxhF78xd9seUk1RNYLfCuF3wEdwSvukiK2uu0wpN98-IjRJs9NRru" />
         </div>
         <div className="flex-1 z-10">
-          <h2 className="text-2xl font-extrabold text-text-h mb-1">Nguyen Van A</h2>
+          <h2 className="text-2xl font-extrabold text-text-h mb-1">{user?.name || 'Nông dân Ẩn danh'}</h2>
           <p className="text-base text-text-main/70 flex items-center gap-1 font-semibold">
             <MapPin className="w-4 h-4" />
             Mekong Delta, Vietnam
@@ -228,11 +230,13 @@ export const Profile: React.FC = () => {
           </button>
         </div>
         <button 
-          onClick={() => navigate('/')} 
+          onClick={() => {
+            logoutUser().then(() => navigate('/'));
+          }} 
           className="w-full mt-6 bg-white text-error font-bold text-base py-4 rounded-[20px] border border-error-container hover:bg-error-container/20 active:bg-error-container/40 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
         >
           <LogOut className="w-5 h-5" />
-          Sign Out
+          Đăng xuất
         </button>
       </section>
       

@@ -5,11 +5,12 @@ import { PageHeader } from '../components/PageHeader';
 import {
   useGetPendingRemindersQuery,
   useCompleteReminderMutation,
+  useCancelReminderMutation,
 } from '../store/api/farmApi';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { useInvalidatePetStatus } from '../features/pet/hooks/useInvalidatePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
-import { Droplets, Clock, Repeat, Plus } from 'lucide-react';
+import { Droplets, Clock, Repeat, Plus, Trash2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export const Reminders: React.FC = () => {
@@ -19,6 +20,7 @@ export const Reminders: React.FC = () => {
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
   const invalidatePetStatus = useInvalidatePetStatus();
   const [completeReminder] = useCompleteReminderMutation();
+  const [cancelReminder] = useCancelReminderMutation();
 
   const loading = remindersLoading;
 
@@ -29,6 +31,16 @@ export const Reminders: React.FC = () => {
     } catch (err) {
       console.error(err);
       alert('Không thể hoàn thành nhắc nhở!');
+    }
+  };
+
+  const handleCancel = async (id: string) => {
+    if (!window.confirm('Bạn có chắc muốn hủy nhắc nhở này?')) return;
+    try {
+      await cancelReminder(id).unwrap();
+    } catch (err) {
+      console.error(err);
+      alert('Không thể hủy nhắc nhở!');
     }
   };
 
@@ -90,12 +102,20 @@ export const Reminders: React.FC = () => {
                       </span>) : null}
                     </div>
                   </div>
-                  <Button 
-                    onClick={() => handleComplete(reminder._id)}
-                    className="px-4 py-2 text-xs"
-                  >
-                    Xong
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button 
+                      onClick={() => handleComplete(reminder._id)}
+                      className="px-4 py-2 text-xs"
+                    >
+                      Xong
+                    </Button>
+                    <button 
+                      onClick={() => handleCancel(reminder._id)}
+                      className="text-xs text-error-main/70 hover:text-error transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Hủy
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

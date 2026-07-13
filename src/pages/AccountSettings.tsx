@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, exportUserData } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 
 export const AccountSettings: React.FC = () => {
+  const { user } = useAuthStore();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState('Nguyễn Văn Nông');
+  const [name, setName] = useState(user?.name || 'Nông dân Ẩn danh');
   const [farmName, setFarmName] = useState('Nông trại Vườn Xanh');
   const [region, setRegion] = useState('An Giang');
   const [editName, setEditName] = useState(name);
@@ -21,6 +22,7 @@ export const AccountSettings: React.FC = () => {
     setFarmName(editFarmName);
     setRegion(editRegion);
     setIsEditingName(false);
+    alert('Trong phiên bản hiện tại, API cập nhật hồ sơ chưa được hỗ trợ từ phía server. Thay đổi chỉ lưu tạm trên giao diện.');
   };
 
   const handleCancel = () => {
@@ -198,7 +200,7 @@ export const AccountSettings: React.FC = () => {
               <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
                 <div>
                   <p className="text-xs text-text-main/60 font-semibold uppercase">Email</p>
-                  <p className="text-base font-semibold text-text-main">user@example.com</p>
+                  <p className="text-base font-semibold text-text-main">{user?.email || 'N/A'}</p>
                 </div>
                 <svg className="w-5 h-5 text-text-main/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
