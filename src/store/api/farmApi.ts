@@ -1,5 +1,6 @@
 import { baseApi } from './baseApi';
 import type { FarmPlot, Diary, DiaryLog, Reminder } from '../../api/farm';
+import type { PlantScanResult } from '../../types/plantScan';
 
 export const farmApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -88,12 +89,23 @@ export const farmApi = baseApi.injectEndpoints({
     }),
     createDiaryLog: builder.mutation<
       DiaryLog,
-      { diaryId: string; log: { activity_type: string; content: string; image_url?: string; photo_urls?: string[] } }
-    >({
-      query: ({ diaryId, log }) => ({
+
+      {
+       diaryId: string; 
+        log: { activity_type: string; content: string; image_url?: string; photo_urls?: string[] };
+        idempotencyKey?: string;
+        requestHash?: string;
+      }
+
+    ({
+      query: ({ diaryId, log, idempotencyKey, requestHash }) => ({
         url: `/diaries/${diaryId}/logs`,
         method: 'POST',
         data: log,
+        headers: {
+          ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+          ...(requestHash ? { 'X-Request-Hash': requestHash } : {}),
+        },
       }),
       transformResponse: (response: { data: DiaryLog }) => response.data,
       invalidatesTags: (_result, _error, { diaryId }) => [
@@ -158,6 +170,16 @@ export const farmApi = baseApi.injectEndpoints({
     }),
 
 
+    // 5. Plant Scan
+    uploadPlantScan: builder.mutation<PlantScanResult, FormData>({
+      query: (formData) => ({
+        url: '/plant-scans',
+        method: 'POST',
+        data: formData,
+      }),
+      transformResponse: (response: { data: PlantScanResult }) => response.data,
+    }),
+
   }),
   overrideExisting: false,
 });
@@ -175,6 +197,7 @@ export const {
   useCompleteReminderMutation,
   useCancelReminderMutation,
   useCreateReminderMutation,
+  useUploadPlantScanMutation,
   useUpdateDiaryMutation,
   useDeleteDiaryMutation,
 } = farmApi;
