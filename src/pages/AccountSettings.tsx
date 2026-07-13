@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, exportUserData } from '../api/auth';

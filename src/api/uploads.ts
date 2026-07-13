@@ -29,10 +29,20 @@ export type CreateSnapRequest = {
 
 const unwrapUploadResponse = (response: SignedUploadResponse): SignedUpload => {
   if ('data' in response) {
-    return response.data;
+    const dataObj = response.data as any;
+    return {
+      signedUrl: dataObj.signedUrl || dataObj.uploadUrl || '',
+      publicUrl: dataObj.publicUrl || '',
+      imageKey: dataObj.imageKey || dataObj.key || '',
+    };
   }
 
-  return response;
+  const rawObj = response as any;
+  return {
+    signedUrl: rawObj.signedUrl || rawObj.uploadUrl || '',
+    publicUrl: rawObj.publicUrl || '',
+    imageKey: rawObj.imageKey || rawObj.key || '',
+  };
 };
 
 export const validateImageFile = (file: File) => {
@@ -48,7 +58,7 @@ export const validateImageFile = (file: File) => {
 export const requestSignedUploadUrl = async (target: UploadTarget, file: File) => {
   validateImageFile(file);
 
-  const endpoint = target === 'diary' ? '/diary/upload-url' : '/snaps/upload-url';
+  const endpoint = target === 'diary' ? '/diaries/upload-url' : '/snaps/upload-url';
   const { data } = await api.post<SignedUploadResponse>(endpoint, {
     filename: file.name,
     contentType: file.type,

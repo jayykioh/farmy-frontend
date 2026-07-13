@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Activity, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout, WifiOff } from 'lucide-react';
+import { Activity, Archive, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout, Trash2, WifiOff } from 'lucide-react';
 import { MascotLottie } from '../components/MascotLottie';
 import { PageHeader } from '../components/PageHeader';
 import {
@@ -183,12 +183,6 @@ export const DiaryHistory: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen bg-bg-surface-1">
-      <PageHeader
-        title={diary ? `Lịch sử: ${diary.crop_type}` : 'Nhật ký canh tác'}
-        subtitle="Chi tiết các hoạt động chăm sóc cây trồng"
-        leftButton="back"
-      />
-      <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
       <PageHeader 
         title={diary ? `Lịch sử: ${diary.crop_type}` : 'Nhật ký canh tác'} 
         subtitle="Chi tiết các hoạt động chăm sóc cây trồng" 
