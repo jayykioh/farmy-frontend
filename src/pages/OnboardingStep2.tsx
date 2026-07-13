@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { useAuthStore } from '../store/authStore';
+import { testZaloNotification } from '../api/auth';
 
 export const OnboardingStep2: React.FC = () => {
   const navigate = useNavigate();
   const { checkingAuth } = useRequireAuth();
+  const { user } = useAuthStore();
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isZaloTestLoading, setIsZaloTestLoading] = useState<boolean>(false);
+
+  const hasPhone = !!user?.phoneNumber;
 
   if (checkingAuth) {
     return null;
@@ -92,18 +98,29 @@ export const OnboardingStep2: React.FC = () => {
           {/* CTA Section */}
           <div className="w-full max-w-[340px] mt-6 space-y-4">
             <button 
-              onClick={() => {
+              disabled={isZaloTestLoading || (!hasPhone && isConnected)}
+              onClick={async () => {
                 if (isConnected) {
+                  if (hasPhone) {
+                    try {
+                      setIsZaloTestLoading(true);
+                      await testZaloNotification();
+                    } catch (error) {
+                      console.error('Failed to send Zalo test notification:', error);
+                    } finally {
+                      setIsZaloTestLoading(false);
+                    }
+                  }
                   navigate('/onboarding-3');
                 } else {
                   setIsConnected(true);
                 }
               }}
-              className={`w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer ${
+              className={`w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                 isConnected ? 'bg-[#08a855] hover:bg-green-600' : 'bg-slate-900 hover:bg-slate-800'
               }`}
             >
-              {isConnected ? 'Tiếp theo' : 'Kết nối Zalo'}
+              {isZaloTestLoading ? 'Đang gửi test...' : (isConnected ? 'Tiếp theo' : 'Kết nối Zalo')}
             </button>
             <div className="flex justify-center pt-2">
               <button 
