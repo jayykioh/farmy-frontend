@@ -6,6 +6,7 @@ import { PageHeaderProvider } from './contexts/PageHeaderContext';
 import { useDiaryOfflineSync } from './hooks/useDiaryOfflineSync';
 
 // Pages
+import Landing from './pages/Landing';
 import WelcomeAuth from './pages/WelcomeAuth';
 import OAuthCallback from './pages/OAuthCallback';
 import Register from './pages/Register';
@@ -46,7 +47,8 @@ export function App() {
         <BrowserRouter>
           <Routes>
             <Route element={<MainLayout />}>
-              <Route path="/" element={<WelcomeAuth />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<WelcomeAuth />} />
               <Route path="/oauth-callback" element={<OAuthCallback />} />
               <Route path="/register" element={<Register />} />
               <Route element={<ProtectedRoute />}>
