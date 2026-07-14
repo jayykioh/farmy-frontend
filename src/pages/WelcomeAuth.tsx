@@ -26,6 +26,8 @@ const getErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+import { getPlots } from '../api/farm';
+
 export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
@@ -47,12 +49,38 @@ export const WelcomeAuth: React.FC = () => {
 
     try {
       await login(credentials);
+<<<<<<< HEAD
       const user = useAuthStore.getState().user;
       if (user?.onboardingCompleted) {
         navigate('/home');
       } else {
         navigate('/onboarding-1');
       }
+=======
+      
+      const user = useAuthStore.getState().user;
+      const localOnboarded = user ? localStorage.getItem(`onboarding_completed_${user.id}`) : null;
+      
+      if (localOnboarded === 'true') {
+        navigate('/home');
+        return;
+      }
+
+      try {
+        const plots = await getPlots();
+        if (plots && plots.length > 0) {
+          if (user) {
+            localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+          }
+          navigate('/home');
+          return;
+        }
+      } catch (plotError) {
+        console.error('Failed to check user plots:', plotError);
+      }
+
+      navigate('/onboarding-1');
+>>>>>>> 585b043 (fix(fe): onboarding, diary/reminder routes, camera/upload UX, account settings profile)
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));
     }

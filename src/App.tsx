@@ -56,6 +56,7 @@ export function App() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/diary" element={<DiaryList />} />
                 <Route path="/diary/history" element={<DiaryHistory />} />
+                <Route path="/diary-history" element={<DiaryHistory />} />
                 <Route path="/diary/create" element={<CreateDiary />} />
                 <Route path="/chat/active" element={<ChatActive />} />
                 <Route path="/chat/active/:sessionId" element={<ChatActive />} />
@@ -69,6 +70,7 @@ export function App() {
                 <Route path="/reminders" element={<Reminders />} />
                 <Route path="/insights" element={<Insights />} />
                 <Route path="/reminder/create" element={<CreateReminder />} />
+                <Route path="/reminders/create" element={<CreateReminder />} />
                 <Route path="/celebration" element={<Celebration />} />
                 <Route path="/farm-feed" element={<FarmFeed />} />
                 <Route path="/snap/:id" element={<SnapDetail />} />

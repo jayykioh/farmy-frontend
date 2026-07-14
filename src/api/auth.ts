@@ -8,6 +8,8 @@ export type AuthUser = {
   role?: string;
   phoneNumber?: string;
   onboardingCompleted?: boolean;
+  farmName?: string;
+  region?: string;
 };
 
 export type AuthResponse = {

@@ -5,6 +5,8 @@ import { useRequireAuth } from '../hooks/useRequireAuth';
 import { completeOnboarding } from '../api/auth';
 import { useAuthStore } from '../store/authStore';
 
+import { useAuthStore } from '../store/authStore';
+
 export const OnboardingStep3: React.FC = () => {
   const navigate = useNavigate();
   const { checkingAuth } = useRequireAuth();
@@ -36,7 +38,11 @@ export const OnboardingStep3: React.FC = () => {
     } catch (error) {
       console.error('Failed to complete onboarding:', error);
       // Fallback navigate to home in case of API failure to not block user
-      navigate('/home');
+      const user = useAuthStore.getState().user;
+    if (user) {
+      localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+    }
+    navigate('/home');
     }
   };
 

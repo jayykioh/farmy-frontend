@@ -114,6 +114,12 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      setState('error');
+      setErrorMessage('Camera chưa sẵn sàng. Vui lòng đợi 1 giây và thử lại.');
+      return;
+    }
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
@@ -272,6 +278,12 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               <p className="text-gray-400 font-medium">Đang mở camera...</p>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-4 bg-white/10 px-5 py-2.5 rounded-full font-bold active:scale-95 text-white"
+              >
+                Chọn ảnh từ máy
+              </button>
             </div>
           ) : null}
 
@@ -280,16 +292,24 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
           ) : null}
 
           {state === 'error' ? (
-            <div className="text-center p-6">
-              <div className="bg-red-500/20 text-red-400 p-4 rounded-2xl mb-4 border border-red-500/30">
+            <div className="text-center p-6 flex flex-col items-center gap-3">
+              <div className="bg-red-500/20 text-red-400 p-4 rounded-2xl mb-2 border border-red-500/30">
                 <p className="font-bold">{errorMessage}</p>
               </div>
-              <button
-                onClick={startCamera}
-                className="bg-white/10 px-6 py-3 rounded-full font-bold active:scale-95"
-              >
-                Thử lại
-              </button>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={startCamera}
+                  className="bg-white/10 px-5 py-2.5 rounded-full font-bold active:scale-95 text-white"
+                >
+                  Thử lại
+                </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-primary px-5 py-2.5 rounded-full font-bold active:scale-95 text-white"
+                >
+                  Chọn ảnh từ máy
+                </button>
+              </div>
             </div>
           ) : null}
         </div>

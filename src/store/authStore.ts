@@ -26,6 +26,7 @@ type AuthState = {
   logout: () => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   setSession: (session: { accessToken?: string | null; user: AuthUser }) => void;
+  updateProfile: (profile: Partial<AuthUser>) => void;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -40,13 +41,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       setAccessToken(accessToken);
     }
 
+    // Merge user with local profile settings (if any)
+    const localProfileStr = localStorage.getItem(`profile_${user.id}`);
+    const localProfile = localProfileStr ? JSON.parse(localProfileStr) : {};
+    const mergedUser = {
+      ...user,
+      ...localProfile,
+    };
+
     set({
       accessToken: accessToken ?? get().accessToken,
       error: null,
       isAuthenticated: true,
       status: 'authenticated',
-      user,
+      user: mergedUser,
     });
+  },
+
+  updateProfile: (profile) => {
+    const currentUser = get().user;
+    if (!currentUser) return;
+    const updatedUser = {
+      ...currentUser,
+      ...profile,
+    };
+    localStorage.setItem(`profile_${currentUser.id}`, JSON.stringify(profile));
+    set({ user: updatedUser });
   },
 
   clearSession: () => {
