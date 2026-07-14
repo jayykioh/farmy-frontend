@@ -9,6 +9,102 @@ if (API_BASE_URL && !API_BASE_URL.endsWith('/api/v1')) {
   API_BASE_URL = `${API_BASE_URL.replace(/\/$/, '')}/api/v1`;
 }
 
+// ─── API Logger ──────────────────────────────────────────────────────────────
+// Always-on logger for debugging FE ↔ BE integration across different DNS/envs.
+const LOG_PREFIX = '[API]';
+
+const logger = {
+  request: (config: InternalAxiosRequestConfig) => {
+    const method = (config.method ?? 'GET').toUpperCase();
+    const url = `${config.baseURL ?? ''}${config.url ?? ''}`;
+    const token = config.headers?.Authorization as string | undefined;
+    const maskedToken = token
+      ? `Bearer ${token.replace('Bearer ', '').slice(0, 8)}...`
+      : 'none';
+
+    console.group(
+      `%c${LOG_PREFIX} ▶ ${method} ${url}`,
+      'color: #4ade80; font-weight: bold;',
+    );
+    console.log('⏰ Time      :', new Date().toISOString());
+    console.log('🌐 Base URL  :', config.baseURL);
+    console.log('🛤️  Endpoint  :', config.url);
+    console.log('📡 Method    :', method);
+    console.log('🔑 Auth Token:', maskedToken);
+    console.log('🛡️  CSRF Token:', config.headers?.['X-XSRF-TOKEN'] ? 'present' : 'not set');
+    if (config.params && Object.keys(config.params).length > 0) {
+      console.log('🔍 Params    :', config.params);
+    }
+    if (config.data) {
+      try {
+        const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+        // mask password fields
+        const safeBody = { ...body };
+        if (safeBody.password) safeBody.password = '***';
+        console.log('📦 Body      :', safeBody);
+      } catch {
+        console.log('📦 Body      :', config.data);
+      }
+    }
+    console.log('⚙️  Timeout   :', config.timeout, 'ms');
+    console.groupEnd();
+  },
+
+  response: (status: number, method: string, url: string, data: unknown, durationMs: number) => {
+    const isOk = status >= 200 && status < 300;
+    console.group(
+      `%c${LOG_PREFIX} ✅ ${status} ${method.toUpperCase()} ${url} (${durationMs}ms)`,
+      `color: ${isOk ? '#60a5fa' : '#fbbf24'}; font-weight: bold;`,
+    );
+    console.log('⏰ Time      :', new Date().toISOString());
+    console.log('📊 Status    :', status);
+    console.log('⏱️  Duration  :', `${durationMs}ms`);
+    console.log('📨 Response  :', data);
+    console.groupEnd();
+  },
+
+  error: (error: AxiosError) => {
+    const method = (error.config?.method ?? 'UNKNOWN').toUpperCase();
+    const url = `${error.config?.baseURL ?? ''}${error.config?.url ?? ''}`;
+    const status = error.response?.status ?? 'NO_RESPONSE';
+
+    console.group(
+      `%c${LOG_PREFIX} ❌ ${status} ${method} ${url}`,
+      'color: #f87171; font-weight: bold;',
+    );
+    console.log('⏰ Time       :', new Date().toISOString());
+    console.log('🌐 URL        :', url);
+    console.log('📡 Method     :', method);
+    console.log('📊 Status     :', status);
+    console.log('💬 Message    :', error.message);
+    if (error.response) {
+      console.log('📨 Resp Data  :', error.response.data);
+      console.log('📋 Resp Headers:', error.response.headers);
+    } else if (error.request) {
+      console.warn('⚠️  No response received — possible CORS, DNS, or network issue');
+      console.log('📤 Request    :', error.request);
+    } else {
+      console.log('🔧 Setup Error:', error.message);
+    }
+    console.log('🔗 Config     :', {
+      baseURL: error.config?.baseURL,
+      url: error.config?.url,
+      method: error.config?.method,
+      timeout: error.config?.timeout,
+      withCredentials: error.config?.withCredentials,
+    });
+    console.groupEnd();
+  },
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
+console.log(
+  `%c${LOG_PREFIX} 🚀 API Client initialized`,
+  'color: #a78bfa; font-weight: bold;',
+  '\n  Base URL:', API_BASE_URL,
+  '\n  Env:', import.meta.env.MODE,
+);
+
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
@@ -95,6 +191,9 @@ export const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
+// Track request start times for duration calculation
+const requestTimestamps = new Map<string, number>();
+
 api.interceptors.request.use(async (config) => {
   const accessToken = getAccessToken();
 
@@ -110,12 +209,39 @@ api.interceptors.request.use(async (config) => {
     config.headers['X-XSRF-TOKEN'] = await getCsrfToken();
   }
 
+  // Log the outgoing request
+  logger.request(config);
+
+  // Store timestamp keyed by method+url for duration tracking
+  const key = `${config.method}-${config.url}-${Date.now()}`;
+  (config as InternalAxiosRequestConfig & { _logKey?: string })._logKey = key;
+  requestTimestamps.set(key, Date.now());
+
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const config = response.config as InternalAxiosRequestConfig & { _logKey?: string };
+    const key = config._logKey ?? '';
+    const startTime = requestTimestamps.get(key) ?? Date.now();
+    requestTimestamps.delete(key);
+    const duration = Date.now() - startTime;
+
+    logger.response(
+      response.status,
+      config.method ?? 'GET',
+      `${config.baseURL ?? ''}${config.url ?? ''}`,
+      response.data,
+      duration,
+    );
+
+    return response;
+  },
   async (error: AxiosError) => {
+    // Log every error response immediately
+    logger.error(error);
+
     const originalRequest = error.config as RetryableRequestConfig | undefined;
 
     if (!originalRequest) {
