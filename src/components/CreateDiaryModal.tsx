@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useCreateDiaryMutation, useGetPlotsQuery } from '../store/api/farmApi';
 import { useCreateDiaryMutation, useGetPlotsQuery, useCreatePlotMutation } from '../store/api/farmApi';
 import { Button } from './ui/Button';
 
@@ -9,11 +8,9 @@ type Props = {
 };
 
 export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
-  const { data: plots = [] } = useGetPlotsQuery();
-  const [createDiary, { isLoading }] = useCreateDiaryMutation();
+  const { data: plots = [] } = useGetPlotsQuery(undefined, { skip: !isOpen });
   const [createDiary, { isLoading: isCreatingDiary }] = useCreateDiaryMutation();
   const [createPlot, { isLoading: isCreatingPlot }] = useCreatePlotMutation();
-  const { data: plots } = useGetPlotsQuery(undefined, { skip: !isOpen });
   const [cropType, setCropType] = useState('Lúa');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -30,7 +27,6 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
     try {
       await createDiary({
         plot_id: plots[0]._id,
-        plot_id: plotId,
         crop_type: cropType,
         start_date: startDate,
       }).unwrap();
