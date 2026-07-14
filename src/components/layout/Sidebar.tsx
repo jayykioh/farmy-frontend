@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BookText, Bot, User, Sprout, Lightbulb } from 'lucide-react';
+import { Home, BookText, Bot, User, Sprout, Lightbulb, ShoppingBag } from 'lucide-react';
 import { usePetStatus } from '../../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../../features/pet/types/pet.types';
 
@@ -13,7 +13,8 @@ export const Sidebar: React.FC = () => {
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
     { to: '/chat', icon: Bot, label: 'AI Pet' },
     { to: '/insights', icon: Lightbulb, label: 'Insights' },
-    { to: '/profile', icon: User, label: 'Hồ sơ' }
+    { to: '/shop', icon: ShoppingBag, label: 'Cửa hàng' },
+    { to: '/profile', icon: User, label: 'Hồ sơ' },
   ];
 
   return (
