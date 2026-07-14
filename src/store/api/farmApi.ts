@@ -89,15 +89,13 @@ export const farmApi = baseApi.injectEndpoints({
     }),
     createDiaryLog: builder.mutation<
       DiaryLog,
-
       {
-       diaryId: string; 
+        diaryId: string;
         log: { activity_type: string; content: string; image_url?: string; photo_urls?: string[] };
         idempotencyKey?: string;
         requestHash?: string;
       }
-
-    ({
+    >({
       query: ({ diaryId, log, idempotencyKey, requestHash }) => ({
         url: `/diaries/${diaryId}/logs`,
         method: 'POST',

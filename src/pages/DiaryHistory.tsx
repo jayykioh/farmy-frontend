@@ -189,13 +189,6 @@ export const DiaryHistory: React.FC = () => {
         leftButton="back"
       />
       <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
-      <PageHeader 
-        title={diary ? `Lịch sử: ${diary.crop_type}` : 'Nhật ký canh tác'} 
-        subtitle="Chi tiết các hoạt động chăm sóc cây trồng" 
-        leftButton="back"
-        rightButton="none"
-      />
-      <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
         {diary && (
           <div className="flex justify-end gap-2">
             {diary.status === 'active' && (
