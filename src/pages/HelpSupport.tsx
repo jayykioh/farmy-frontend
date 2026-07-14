@@ -64,8 +64,8 @@ export const HelpSupport: React.FC = () => {
     {
       id: 9,
       category: 'Kết nối',
-      question: 'Tôi có thể kết nối Zalo không?',
-      answer: 'Có! Kết nối Zalo để nhận nhắc nhở trực tiếp qua ứng dụng Zalo. Vào Settings > Thông báo và bật "Kết nối Zalo".'
+      question: 'Tôi có thể nhận thông báo qua Email không?',
+      answer: 'Có! Kết nối Email để nhận nhắc nhở trực tiếp qua hộp thư của bạn. Vào Settings > Thông báo và bật "Kết nối Email".'
     },
     {
       id: 10,
@@ -117,7 +117,7 @@ export const HelpSupport: React.FC = () => {
             </svg>
             Cần giúp đỡ?
           </h2>
-          <p className="text-base text-text-main/70 mb-4">Không tìm thấy câu trả lời? Liên hệ với chúng tôi qua email hoặc Zalo.</p>
+          <p className="text-base text-text-main/70 mb-4">Không tìm thấy câu trả lời? Liên hệ với chúng tôi qua email hỗ trợ.</p>
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <a 
               href="mailto:support@farmdiary.ai"

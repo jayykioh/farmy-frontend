@@ -5,7 +5,7 @@ import { updatePushSubscription } from '../api/auth';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
-  const [zaloNotifications, setZaloNotifications] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
   const [isPushLoading, setIsPushLoading] = useState(false);
 
@@ -55,21 +55,21 @@ export const Settings: React.FC = () => {
         <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm">
           <h2 className="text-lg font-bold text-text-main mb-4">Thông báo</h2>
           
-          {/* Zalo Notifications Toggle */}
-          <div className="flex items-center justify-between mb-4 pb-4 border-b border-border-main/20">
-            <div className="flex-1">
-              <p className="font-semibold text-base text-text-main">Kết nối Zalo</p>
-              <p className="text-sm text-text-main/60 mt-1">Nhận nhắc nhở qua Zalo</p>
+          {/* Email Notifications Toggle */}
+          <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-border-main/50 mb-3 shadow-sm">
+            <div>
+              <p className="font-semibold text-base text-text-main">Kết nối Email</p>
+              <p className="text-sm text-text-main/60 mt-1">Nhận nhắc nhở qua Email</p>
             </div>
-            <button 
-              onClick={() => setZaloNotifications(!zaloNotifications)}
-              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors cursor-pointer ${
-                zaloNotifications ? 'bg-primary-container' : 'bg-border-main/20'
+            <button
+              onClick={() => setEmailNotifications(!emailNotifications)}
+              className={`w-14 h-8 rounded-full p-1 transition-colors duration-300 ease-in-out ${
+                emailNotifications ? 'bg-primary-container' : 'bg-border-main/20'
               }`}
             >
-              <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
-                  zaloNotifications ? 'translate-x-7' : 'translate-x-1'
+              <div
+                className={`w-6 h-6 rounded-full bg-white shadow-sm transform transition-transform duration-300 ease-in-out ${
+                  emailNotifications ? 'translate-x-7' : 'translate-x-1'
                 }`}
               />
             </button>

@@ -17,6 +17,7 @@ import {
   submitChatFeedback,
   type ChatMessage,
 } from "../api/chat";
+import { ChatSourceCards } from "../components/chat/ChatSourceCards";
 
 type FeedbackValue = "positive" | "negative";
 
@@ -38,6 +39,28 @@ const formatMessageDate = (value?: string) => {
     month: "2-digit",
     year: "numeric",
   }).format(new Date(value));
+};
+
+const parseMessageContent = (content: string) => {
+  if (!content) return null;
+  const parts = content.split(/(\[\d+\])/g);
+  return parts.map((part, index) => {
+    const match = part.match(/\[(\d+)\]/);
+    if (match) {
+      return (
+        <sup
+          key={index}
+          className="text-primary font-bold cursor-pointer hover:underline bg-primary/10 px-1 rounded-sm mx-0.5"
+          onClick={() => {
+            // Future: Scroll to the corresponding card
+          }}
+        >
+          {match[1]}
+        </sup>
+      );
+    }
+    return part;
+  });
 };
 
 export const ChatActive: React.FC = () => {
@@ -222,6 +245,7 @@ export const ChatActive: React.FC = () => {
             _id: done.assistant_message_id,
             status: "completed",
             streaming: false,
+            citations: done.citations,
           }));
         },
       });
@@ -309,8 +333,11 @@ export const ChatActive: React.FC = () => {
               <div
                 className={`${message.role === "user" ? "bg-primary-container text-white rounded-br-sm border-primary" : "bg-white text-text-main rounded-bl-sm border-border-main/50 ml-12"} p-4 rounded-[24px] shadow-sm max-w-[85%] border`}
               >
-                <p className="font-medium text-base whitespace-pre-wrap">
-                  {message.content ||
+                {message.role === "assistant" && message.citations && message.citations.length > 0 && (
+                  <ChatSourceCards citations={message.citations} />
+                )}
+                <p className="font-medium text-base whitespace-pre-wrap leading-relaxed">
+                  {message.content ? parseMessageContent(message.content) :
                     (message.streaming ? "Đang suy nghĩ..." : "")}
                 </p>
 

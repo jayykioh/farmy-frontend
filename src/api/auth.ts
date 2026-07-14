@@ -6,6 +6,7 @@ export type AuthUser = {
   name?: string;
   avatarUrl?: string;
   role?: string;
+  phoneNumber?: string;
 };
 
 export type AuthResponse = {
@@ -97,4 +98,9 @@ export const deleteAccount = async () => {
 export const exportUserData = async () => {
   const response = await api.get('/users/me/export', { responseType: 'blob' });
   return response.data;
+};
+
+export const testEmailNotification = async () => {
+  const { data } = await api.post('/auth/email-notification/test');
+  return data;
 };

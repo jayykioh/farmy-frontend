@@ -1,12 +1,14 @@
 import { NavLink } from 'react-router-dom';
-import { Home, BookText, Bot, User } from 'lucide-react';
+import { Home, BookText, Bot, User, Lightbulb, ShoppingBag } from 'lucide-react';
 
 export const BottomNavigation = () => {
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
     { to: '/chat', icon: Bot, label: 'AI Pet' },
-    { to: '/profile', icon: User, label: 'Hồ sơ' }
+    { to: '/insights', icon: Lightbulb, label: 'Insights' },
+    { to: '/shop', icon: ShoppingBag, label: 'Cửa hàng' },
+    { to: '/profile', icon: User, label: 'Hồ sơ' },
   ];
 
   return (

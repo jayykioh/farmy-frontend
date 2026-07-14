@@ -11,6 +11,15 @@ export type ChatSession = {
   updated_at?: string;
 };
 
+export type ChatCitation = {
+  source_id: string;
+  source_type: "diary_log" | "knowledge_source";
+  chunk_index: number;
+  score: number;
+  title?: string;
+  url?: string;
+};
+
 export type ChatMessage = {
   _id: string;
   role: ChatRole;
@@ -18,6 +27,7 @@ export type ChatMessage = {
   status?: ChatMessageStatus;
   reply_to_message_id?: string;
   created_at?: string;
+  citations?: ChatCitation[];
 };
 
 export type ChatFeedbackPayload = {
@@ -48,7 +58,7 @@ export type StreamMeta = {
 
 export type StreamDone = {
   assistant_message_id: string;
-  citations?: unknown[];
+  citations?: ChatCitation[];
 };
 
 export type StreamError = {

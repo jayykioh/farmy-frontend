@@ -1,18 +1,24 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BookText, Bot, User, Sprout } from 'lucide-react';
+import { Home, BookText, Bot, User, Sprout, Lightbulb, ShoppingBag, LogOut } from 'lucide-react';
 import { usePetStatus } from '../../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../../features/pet/types/pet.types';
+import { useAuthStore } from '../../store/authStore';
+import { useNavigate } from 'react-router-dom';
 
 export const Sidebar: React.FC = () => {
   const { data: petStatusRaw } = usePetStatus();
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
 
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
     { to: '/chat', icon: Bot, label: 'AI Pet' },
-    { to: '/profile', icon: User, label: 'Hồ sơ' }
+    { to: '/insights', icon: Lightbulb, label: 'Insights' },
+    { to: '/shop', icon: ShoppingBag, label: 'Cửa hàng' },
+    { to: '/profile', icon: User, label: 'Hồ sơ' },
   ];
 
   return (
@@ -60,18 +66,27 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer area inside sidebar */}
-      <div className="p-6 border-t border-border-main/30 bg-bg-surface-1/50">
+      <div className="p-6 border-t border-border-main/30 bg-bg-surface-1/50 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
-            H
+            {user?.name?.[0]?.toUpperCase() || 'F'}
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-text-main">Hải Nông Dân</span>
+            <span className="text-sm font-bold text-text-main line-clamp-1 max-w-[100px]">{user?.name || 'Nông dân'}</span>
             <span className="text-xs text-text-main/50 font-medium">
               Cấp độ {petStatus.level}
             </span>
           </div>
         </div>
+        <button 
+          onClick={() => {
+            logout().then(() => navigate('/'));
+          }}
+          className="p-2 text-text-main/50 hover:text-error hover:bg-error-container/20 rounded-full transition-colors"
+          title="Đăng xuất"
+        >
+          <LogOut size={18} />
+        </button>
       </div>
     </aside>
   );
