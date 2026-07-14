@@ -1,6 +1,8 @@
 import type { AppDispatch } from '../store';
 import { baseApi } from '../store/api/baseApi';
 import { api } from '../api/client';
+import { queryClient } from './queryClient';
+import { PET_STATUS_QUERY_KEY } from '../features/pet/hooks/usePetStatus';
 import {
   DIARY_SYNC_LOCK_KEY,
   claimSyncLease,
@@ -105,6 +107,7 @@ const syncDraft = async (draft: OfflineDiaryDraft, dispatch?: AppDispatch) => {
       lastError: undefined,
     }));
     invalidateDiaryData(dispatch, draft.diaryId);
+    queryClient.invalidateQueries({ queryKey: PET_STATUS_QUERY_KEY });
     return true;
   } catch (error) {
     const retryStatus = isRetryableError(error);

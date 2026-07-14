@@ -47,7 +47,12 @@ export const WelcomeAuth: React.FC = () => {
 
     try {
       await login(credentials);
-      navigate('/onboarding-1');
+      const user = useAuthStore.getState().user;
+      if (user?.onboardingCompleted) {
+        navigate('/home');
+      } else {
+        navigate('/onboarding-1');
+      }
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));
     }

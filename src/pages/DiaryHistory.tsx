@@ -11,7 +11,7 @@ import {
   useDeleteDiaryMutation,
 } from '../store/api/farmApi';
 import { Button } from '../components/ui/Button';
-import { useAppSelector } from '../store/hooks';
+import { useAuthStore } from '../store/authStore';
 import {
   OFFLINE_DIARY_DRAFTS_CHANGED,
   deleteOfflineDiaryDraft,
@@ -73,7 +73,7 @@ export const DiaryHistory: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const diaryIdParam = searchParams.get('diaryId');
-  const userId = useAppSelector((state) => state.auth.user?.id);
+  const userId = useAuthStore((state) => state.user?.id);
   const [offlineDrafts, setOfflineDrafts] = useState<OfflineDiaryDraft[]>([]);
 
   const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();

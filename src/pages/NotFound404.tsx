@@ -57,7 +57,7 @@ export const NotFound404: React.FC = () => {
         {/* Action Buttons */}
         <div className="w-full flex flex-col gap-3 sm:flex-row">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
             className="flex-1 bg-primary text-white font-bold text-base py-3 rounded-full shadow-md hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -38,3 +38,15 @@ Thumbs.db
 *.sln
 *.sw?
 .contextos/
+ai_chat_spec.md
+architecture_plan.md
+core_features_spec.md
+embedding_spec.md
+jira_backlog.md
+task_plan.md
+architecture.md
+auth_spec.md
+blueprint.md
+uc1-diary-crud.puml
+uc2-ai-chat.puml
+use-case-diagram.puml

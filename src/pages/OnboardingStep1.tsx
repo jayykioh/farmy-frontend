@@ -8,6 +8,7 @@ export const OnboardingStep1: React.FC = () => {
   const navigate = useNavigate();
   const { checkingAuth } = useRequireAuth();
   const [selectedCrop, setSelectedCrop] = useState<string>('lua-nuoc');
+  const [farmName, setFarmName] = useState<string>('');
 
   const crops = [
     { id: 'lua-nuoc', label: <span className="flex items-center gap-1"><Wheat className="w-4 h-4" /> Lúa nước</span> },
@@ -81,7 +82,14 @@ export const OnboardingStep1: React.FC = () => {
               <div className="space-y-2 w-full max-w-[340px] mx-auto text-left">
                 <label htmlFor="farm-name" className="ml-2 text-sm font-bold text-text-main/70">Tên nông trại của bạn</label>
                 <div className="relative">
-                  <input id="farm-name" className="h-13 w-full rounded-full border border-border-main/50 bg-bg-main px-6 text-base font-semibold transition-all placeholder:text-text-main/30 focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Ví dụ: Vườn Nhà Bé Thóc" type="text" />
+                  <input
+                    id="farm-name"
+                    className="h-13 w-full rounded-full border border-border-main/50 bg-bg-main px-6 text-base font-semibold transition-all placeholder:text-text-main/30 focus:outline-none focus:ring-2 focus:ring-primary-container"
+                    placeholder="Ví dụ: Vườn Nhà Bé Thóc"
+                    type="text"
+                    value={farmName}
+                    onChange={(e) => setFarmName(e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -111,7 +119,11 @@ export const OnboardingStep1: React.FC = () => {
 
             <div className="pt-2 w-full max-w-[340px] mx-auto mt-2 mb-4">
               <button
-                onClick={() => navigate('/onboarding-2')}
+                onClick={() => {
+                  localStorage.setItem('onboarding_farmName', farmName || 'Vườn Nhà Bé Thóc');
+                  localStorage.setItem('onboarding_selectedCrop', selectedCrop);
+                  navigate('/onboarding-2');
+                }}
                 className="w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center bg-slate-900 hover:bg-slate-800 shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer"
               >
                 Tiếp theo

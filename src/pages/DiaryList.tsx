@@ -33,9 +33,9 @@ export const DiaryList: React.FC = () => {
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Bưởi</button>
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Cà chua</button>
           <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Khác</button>
-          
+
           <div className="w-px h-6 bg-border-main/50 mx-1 flex-shrink-0"></div>
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="px-5 py-2 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-primary/20 cursor-pointer flex items-center gap-1"
           >
@@ -50,7 +50,7 @@ export const DiaryList: React.FC = () => {
           <div className="py-20 text-center flex flex-col gap-4 items-center">
             <span className="text-4xl">📔</span>
             <p className="font-bold text-text-main/70 text-lg">Chưa có nhật ký vụ mùa nào.</p>
-            <button 
+            <button
               onClick={() => setIsModalOpen(true)}
               className="px-6 py-3 bg-primary text-white font-bold rounded-full hover:bg-primary-dark cursor-pointer shadow-md"
             >
@@ -62,9 +62,9 @@ export const DiaryList: React.FC = () => {
             {diaries.map(diary => {
               const cropImg = getCropImage(diary.crop_type);
               return (
-                <article 
+                <article
                   key={diary._id}
-                  onClick={() => navigate(`/diary-history?diaryId=${diary._id}`)}
+                  onClick={() => navigate(`/diary/history?diaryId=${diary._id}`)}
                   className="bg-white border border-border-main/50 p-4 rounded-2xl shadow-sm flex gap-4 items-start active:scale-[0.98] hover:shadow-md transition-all duration-200 cursor-pointer group"
                 >
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-bg-surface flex items-center justify-center border border-border-main/20 group-hover:border-primary/30 transition-colors">
@@ -89,17 +89,35 @@ export const DiaryList: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-sm text-text-main/80 line-clamp-2 mt-1 flex-1">
-                      Mật độ canh tác ổn định. Nhấp vào đây để xem chi tiết lịch trình chăm sóc.
+                      {diary.latest_log
+                        ? diary.latest_log.content
+                        : 'Chưa có ghi chép hoạt động nào cho vụ mùa này. Nhấp vào đây để xem chi tiết.'}
                     </p>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
-                        <svg className="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 20a6 6 0 01-6-6c0-4 6-10.75 6-10.75S18 10 18 14a6 6 0 01-6 6z"/></svg>
-                        <span className="text-[11px] font-bold text-blue-600">Đã tưới</span>
-                      </div>
-                      <div className="flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-full border border-orange-100">
-                        <svg className="w-3.5 h-3.5 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
-                        <span className="text-[11px] font-bold text-orange-600">32°C - Nắng</span>
-                      </div>
+                      {diary.latest_log ? (
+                        <>
+                          <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${
+                            diary.latest_log.activity_type.toLowerCase().includes('tưới')
+                              ? 'bg-blue-50 border-blue-100 text-blue-600'
+                              : diary.latest_log.activity_type.toLowerCase().includes('phân') || diary.latest_log.activity_type.toLowerCase().includes('dưỡng')
+                                ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                                : diary.latest_log.activity_type.toLowerCase().includes('thuốc') || diary.latest_log.activity_type.toLowerCase().includes('sâu')
+                                  ? 'bg-orange-50 border-orange-100 text-orange-600'
+                                  : 'bg-primary/10 border-primary/20 text-primary'
+                          }`}>
+                            <span>{diary.latest_log.activity_type}</span>
+                          </div>
+                          <div className="flex items-center gap-1 bg-gray-50 px-2.5 py-0.5 rounded-full border border-gray-200/60 text-gray-500 text-[11px] font-bold">
+                            <span>
+                              {new Date(diary.latest_log.created_at).toLocaleDateString('vi-VN')}
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-1 bg-gray-50 px-2.5 py-0.5 rounded-full border border-gray-200/60 text-gray-400 text-[11px] font-bold">
+                          <span>Chưa có hoạt động</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -110,7 +128,7 @@ export const DiaryList: React.FC = () => {
       </main>
 
       {/* Floating Action Button for Create Diary */}
-      <button 
+      <button
         onClick={() => navigate('/diary/create')}
         className="fixed bottom-[140px] right-4 md:bottom-24 md:right-8 w-14 h-14 bg-white text-primary border border-primary/20 rounded-full flex items-center justify-center shadow-lg shadow-black/5 z-40 transition-transform hover:scale-110 active:scale-95 cursor-pointer"
         aria-label="Tạo Nhật ký"
@@ -122,7 +140,7 @@ export const DiaryList: React.FC = () => {
 
       <SnapFAB />
 
-      <CreateDiaryModal 
+      <CreateDiaryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

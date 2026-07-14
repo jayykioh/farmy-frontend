@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { runDiarySync, stopDiarySync } from '../lib/diarySyncEngine';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch } from '../store/hooks';
+import { useAuthStore } from '../store/authStore';
 
 export const useDiaryOfflineSync = () => {
   const dispatch = useAppDispatch();
-  const userId = useAppSelector((state) => state.auth.user?.id);
+  const userId = useAuthStore((state) => state.user?.id);
 
   useEffect(() => {
     if (!userId) {

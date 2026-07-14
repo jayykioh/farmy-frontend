@@ -7,6 +7,7 @@ export type AuthUser = {
   avatarUrl?: string;
   role?: string;
   phoneNumber?: string;
+  onboardingCompleted?: boolean;
 };
 
 export type AuthResponse = {
@@ -45,10 +46,15 @@ const normalizeAuthResponse = (data: LoginResponseData | RegisterResponseData): 
     throw new Error('Auth response did not include access token');
   }
 
-  const user = data.user ?? {
+  const rawUser = data.user ?? {
     id: 'user_id' in data && data.user_id ? data.user_id : '',
     email: 'email' in data && data.email ? data.email : '',
     name: 'name' in data ? data.name : undefined,
+  };
+
+  const user: AuthUser = {
+    ...rawUser,
+    onboardingCompleted: data.user?.onboardingCompleted ?? (data as any).onboardingCompleted ?? false,
   };
 
   return {
@@ -103,4 +109,15 @@ export const exportUserData = async () => {
 export const testEmailNotification = async () => {
   const { data } = await api.post('/auth/email-notification/test');
   return data;
+};
+
+export type CompleteOnboardingPayload = {
+  onboarding_completed: boolean;
+  farmName?: string;
+  primaryCrops?: string;
+};
+
+export const completeOnboarding = async (payload: CompleteOnboardingPayload) => {
+  const { data } = await api.patch<ApiResponse<any>>('/users/me', payload);
+  return data.data;
 };
