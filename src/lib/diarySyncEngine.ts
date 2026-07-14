@@ -48,7 +48,7 @@ export const stopDiarySync = () => {
 
 const isRetryableError = (error: unknown) => {
   const status = (error as { response?: { status?: number } }).response?.status;
-  const errorCode = (error as any).response?.data?.errorCode;
+  const errorCode = (error as { response?: { data?: { errorCode?: string } } }).response?.data?.errorCode;
   if (!status) return true;
   if (status === 401) return 'pause';
   if (errorCode === 'IDEMPOTENCY_IN_PROGRESS') return true;

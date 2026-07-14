@@ -5,7 +5,7 @@ import {
   useGetDiariesQuery,
   useCreateReminderMutation,
 } from '../store/api/farmApi';
-import { Droplets, Sprout, FlaskConical, Wheat, MessageCircle, Bell } from 'lucide-react';
+import { MessageCircle, Bell } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export const CreateReminder: React.FC = () => {

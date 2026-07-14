@@ -36,18 +36,20 @@ export const Shop: React.FC = () => {
 
   const handleBuy = (itemId: string) => {
     buyMutation.mutate(itemId, {
-      onSuccess: (res: any) => {
+      onSuccess: (res: unknown) => {
+        const successData = res as { message?: string };
         setModal({
           type: 'success',
           title: 'Mua thành công! 🎉',
-          message: res.message || 'Chúc mừng bạn đã sở hữu món đồ mới cho Bé Thóc.',
+          message: successData.message || 'Chúc mừng bạn đã sở hữu món đồ mới cho Bé Thóc.',
         });
       },
-      onError: (err: any) => {
+      onError: (err: unknown) => {
+        const errorResponse = err as { response?: { data?: { message?: string } } };
         setModal({
           type: 'error',
           title: 'Giao dịch thất bại ❌',
-          message: err.response?.data?.message || 'Không đủ XP hoặc có lỗi hệ thống xảy ra.',
+          message: errorResponse.response?.data?.message || 'Không đủ XP hoặc có lỗi hệ thống xảy ra.',
         });
       }
     });
@@ -55,18 +57,20 @@ export const Shop: React.FC = () => {
 
   const handleEquip = (itemId: string) => {
     equipMutation.mutate(itemId, {
-      onSuccess: (res: any) => {
+      onSuccess: (res: unknown) => {
+        const successData = res as { message?: string };
         setModal({
           type: 'success',
           title: 'Đã thay đổi trang phục! ✨',
-          message: res.message || 'Bé Thóc trông thật tuyệt vời trong diện mạo mới!',
+          message: successData.message || 'Bé Thóc trông thật tuyệt vời trong diện mạo mới!',
         });
       },
-      onError: (err: any) => {
+      onError: (err: unknown) => {
+        const errorResponse = err as { response?: { data?: { message?: string } } };
         setModal({
           type: 'error',
           title: 'Trang bị thất bại ❌',
-          message: err.response?.data?.message || 'Có lỗi xảy ra khi trang bị món đồ này.',
+          message: errorResponse.response?.data?.message || 'Có lỗi xảy ra khi trang bị món đồ này.',
         });
       }
     });
