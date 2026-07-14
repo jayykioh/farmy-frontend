@@ -100,7 +100,7 @@ export const exportUserData = async () => {
   return response.data;
 };
 
-export const testZaloNotification = async () => {
-  const { data } = await api.post('/auth/zalo-notification/test');
+export const testEmailNotification = async () => {
+  const { data } = await api.post('/auth/email-notification/test');
   return data;
 };

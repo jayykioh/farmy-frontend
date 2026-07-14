@@ -96,7 +96,7 @@ export const Reminders: React.FC = () => {
                     </p>
                     <div className="flex gap-2 mt-2">
                       <span className="px-2 py-0.5 bg-bg-surface text-text-main/70 rounded-full text-[10px] font-bold border border-border-main/50">Push</span>
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-800 rounded-full text-[10px] font-bold border border-blue-100">Zalo</span>
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-800 rounded-full text-[10px] font-bold border border-blue-100">Email</span>
                       {reminder.repeat && reminder.repeat !== 'none' ? (<span className="px-2 py-0.5 bg-amber-50 text-amber-800 rounded-full text-[10px] font-bold border border-amber-100 flex items-center gap-1">
                         <Repeat className="w-3 h-3" /> {reminder.repeat === 'daily' ? 'Hàng ngày' : 'Hàng tuần'}
                       </span>) : null}

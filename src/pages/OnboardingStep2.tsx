@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { useAuthStore } from '../store/authStore';
-import { testZaloNotification } from '../api/auth';
+import { testEmailNotification } from '../api/auth';
 
 export const OnboardingStep2: React.FC = () => {
   const navigate = useNavigate();
   const { checkingAuth } = useRequireAuth();
   const { user } = useAuthStore();
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [isZaloTestLoading, setIsZaloTestLoading] = useState<boolean>(false);
+  const [isEmailTestLoading, setIsEmailTestLoading] = useState<boolean>(false);
 
-  const hasPhone = !!user?.phoneNumber;
+  const hasEmail = !!user?.email;
 
   if (checkingAuth) {
     return null;
@@ -68,10 +68,10 @@ export const OnboardingStep2: React.FC = () => {
           {/* Content */}
           <div className="text-center max-w-[340px] w-full mb-4">
             <h1 className="text-2xl font-bold text-text-h mb-4 leading-tight">
-              Kết nối thông báo Zalo
+              Kết nối thông báo Email
             </h1>
             <p className="text-base text-text-main/70 px-4">
-              Nhận nhắc nhở tưới nước và bón phân trực tiếp qua Zalo để không bao giờ bỏ lỡ.
+              Nhận nhắc nhở tưới nước và bón phân trực tiếp qua Email để không bao giờ bỏ lỡ.
             </p>
           </div>
 
@@ -82,11 +82,11 @@ export const OnboardingStep2: React.FC = () => {
             className="w-full max-w-[340px] bg-slate-100/80 hover:bg-slate-100 rounded-[24px] p-4 flex items-center justify-between mt-4 mb-2 active:scale-[0.98] transition-all cursor-pointer border border-transparent hover:border-slate-200/60"
           >
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-[14px] bg-[#0068FF] flex items-center justify-center text-white font-extrabold text-[14px] tracking-tight shadow-[0_2px_10px_rgba(0,104,255,0.3)]">
-                Zalo
+              <div className="w-11 h-11 rounded-[14px] bg-[#EA4335] flex items-center justify-center text-white font-extrabold text-[14px] tracking-tight shadow-[0_2px_10px_rgba(234,67,53,0.3)]">
+                Email
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-[15px] font-extrabold text-slate-800 leading-tight mb-0.5">Thông báo Zalo</span>
+                <span className="text-[15px] font-extrabold text-slate-800 leading-tight mb-0.5">Thông báo Email</span>
                 <span className="text-[13px] font-semibold text-slate-500">Nhận nhắc nhở tưới cây</span>
               </div>
             </div>
@@ -98,17 +98,17 @@ export const OnboardingStep2: React.FC = () => {
           {/* CTA Section */}
           <div className="w-full max-w-[340px] mt-6 space-y-4">
             <button 
-              disabled={isZaloTestLoading || (!hasPhone && isConnected)}
+              disabled={isEmailTestLoading || (!hasEmail && isConnected)}
               onClick={async () => {
                 if (isConnected) {
-                  if (hasPhone) {
+                  if (hasEmail) {
                     try {
-                      setIsZaloTestLoading(true);
-                      await testZaloNotification();
+                      setIsEmailTestLoading(true);
+                      await testEmailNotification();
                     } catch (error) {
-                      console.error('Failed to send Zalo test notification:', error);
+                      console.error('Failed to send Email test notification:', error);
                     } finally {
-                      setIsZaloTestLoading(false);
+                      setIsEmailTestLoading(false);
                     }
                   }
                   navigate('/onboarding-3');
@@ -120,7 +120,7 @@ export const OnboardingStep2: React.FC = () => {
                 isConnected ? 'bg-[#08a855] hover:bg-green-600' : 'bg-slate-900 hover:bg-slate-800'
               }`}
             >
-              {isZaloTestLoading ? 'Đang gửi test...' : (isConnected ? 'Tiếp theo' : 'Kết nối Zalo')}
+              {isEmailTestLoading ? 'Đang gửi test...' : (isConnected ? 'Tiếp theo' : 'Kết nối Email')}
             </button>
             <div className="flex justify-center pt-2">
               <button 

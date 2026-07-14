@@ -232,7 +232,7 @@ export const CreateReminder: React.FC = () => {
                   <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
                     <MessageCircle className="w-5 h-5" />
                   </div>
-                  <span className="font-bold text-base text-text-main flex items-center gap-2">Nhận qua Zalo (Mock)</span>
+                  <span className="font-bold text-base text-text-main flex items-center gap-2">Nhận qua Email</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" defaultChecked disabled className="sr-only peer" />
