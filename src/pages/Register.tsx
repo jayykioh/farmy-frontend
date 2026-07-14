@@ -150,7 +150,7 @@ export const Register: React.FC = () => {
             </button>
           </form>
           <p className="text-sm text-text-main/60 text-center mt-2">
-            Đã có tài khoản? <button onClick={() => navigate('/')} className="text-primary font-bold hover:underline cursor-pointer">Đăng nhập</button>
+            Đã có tài khoản? <button onClick={() => navigate('/login')} className="text-primary font-bold hover:underline cursor-pointer">Đăng nhập</button>
           </p>
         </div>
       </div>
