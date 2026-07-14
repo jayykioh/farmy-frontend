@@ -99,6 +99,7 @@ const logger = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 console.log(
+
   `%c${LOG_PREFIX} 🚀 API Client initialized`,
   'color: #a78bfa; font-weight: bold;',
   '\n  Base URL:', API_BASE_URL,
@@ -165,9 +166,9 @@ const isUnsafeMethod = (method?: string) =>
 const isCsrfExemptUrl = (url?: string) =>
   Boolean(
     url?.includes('/auth/login') ||
-      url?.includes('/auth/register') ||
-      url?.includes('/auth/refresh') ||
-      url?.includes('/csrf-token'),
+    url?.includes('/auth/register') ||
+    url?.includes('/auth/refresh') ||
+    url?.includes('/csrf-token'),
   );
 
 const getCsrfToken = async () => {
