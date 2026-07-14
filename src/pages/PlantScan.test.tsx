@@ -81,7 +81,7 @@ describe('PlantScan Component', () => {
     };
     
     // api is the mocked axios instance, we delay the response to test loading state
-    let resolveApi: (value: any) => void;
+    let resolveApi: (value: unknown) => void;
     vi.mocked(api).mockImplementationOnce(() => new Promise((resolve) => {
       resolveApi = resolve;
     }));

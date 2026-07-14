@@ -9,6 +9,8 @@ import {
   type RegisterPayload,
 } from '../api/auth';
 import { clearAccessToken, getAccessToken, setAccessToken } from '../api/client';
+import { store } from './index';
+import { baseApi } from './api/baseApi';
 
 type AuthStatus = 'idle' | 'checking' | 'authenticated' | 'unauthenticated';
 
@@ -49,6 +51,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearSession: () => {
     clearAccessToken();
+    store.dispatch(baseApi.util.resetApiState());
     set({
       accessToken: null,
       error: null,

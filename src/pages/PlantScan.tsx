@@ -17,7 +17,7 @@ export const PlantScan: React.FC = () => {
   const [scanResult, setScanResult] = useState<PlantScanResult | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadPlantScan, { isLoading }] = useUploadPlantScanMutation();
+  const [uploadPlantScan] = useUploadPlantScanMutation();
 
   // Cleanup object URL
   useEffect(() => {
@@ -28,12 +28,7 @@ export const PlantScan: React.FC = () => {
     };
   }, [previewUrl]);
 
-  // Tie analyzing state to isLoading
-  useEffect(() => {
-    if (isLoading) {
-      setScanState('analyzing');
-    }
-  }, [isLoading]);
+
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

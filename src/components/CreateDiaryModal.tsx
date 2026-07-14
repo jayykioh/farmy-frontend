@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCreateDiaryMutation } from '../store/api/farmApi';
+import { useCreateDiaryMutation, useGetPlotsQuery } from '../store/api/farmApi';
 import { Button } from './ui/Button';
 
 type Props = {
@@ -8,6 +8,7 @@ type Props = {
 };
 
 export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
+  const { data: plots = [] } = useGetPlotsQuery();
   const [createDiary, { isLoading }] = useCreateDiaryMutation();
   const [cropType, setCropType] = useState('Lúa');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -16,9 +17,13 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (plots.length === 0) {
+      alert('Không tìm thấy mảnh vườn nào. Vui lòng hoàn thành onboarding hoặc tạo mảnh vườn trước.');
+      return;
+    }
     try {
       await createDiary({
-        plot_id: 'default-plot', // Temporary workaround if there's no plot UI
+        plot_id: plots[0]._id,
         crop_type: cropType,
         start_date: startDate,
       }).unwrap();

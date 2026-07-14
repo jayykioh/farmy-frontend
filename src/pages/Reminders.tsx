@@ -125,7 +125,7 @@ export const Reminders: React.FC = () => {
       </main>
       {/* FAB */}
       <button 
-        onClick={() => navigate('/reminders/create')}
+        onClick={() => navigate('/reminder/create')}
         className="fixed bottom-[100px] right-6 md:right-8 lg:right-1/2 lg:translate-x-[360px] w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center z-40 cursor-pointer"
       >
         <Plus className="w-8 h-8" />

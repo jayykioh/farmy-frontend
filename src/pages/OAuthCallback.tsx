@@ -29,7 +29,11 @@ export default function OAuthCallback() {
               accessToken: accessToken,
               user: response.data.data
             });
-            navigate('/home', { replace: true });
+            if (response.data.data.onboardingCompleted) {
+              navigate('/home', { replace: true });
+            } else {
+              navigate('/onboarding-1', { replace: true });
+            }
           } else {
             throw new Error('Failed to fetch user');
           }

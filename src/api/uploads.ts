@@ -28,20 +28,20 @@ export type CreateSnapRequest = {
 };
 
 const unwrapUploadResponse = (response: SignedUploadResponse): SignedUpload => {
-  if ('data' in response) {
-    const dataObj = response.data as any;
+  if ('data' in response && response.data) {
+    const dataObj = response.data as Record<string, unknown>;
     return {
-      signedUrl: dataObj.signedUrl || dataObj.uploadUrl || '',
-      publicUrl: dataObj.publicUrl || '',
-      imageKey: dataObj.imageKey || dataObj.key || '',
+      signedUrl: String(dataObj.signedUrl || dataObj.uploadUrl || ''),
+      publicUrl: String(dataObj.publicUrl || ''),
+      imageKey: String(dataObj.imageKey || dataObj.key || ''),
     };
   }
 
-  const rawObj = response as any;
+  const rawObj = response as unknown as Record<string, unknown>;
   return {
-    signedUrl: rawObj.signedUrl || rawObj.uploadUrl || '',
-    publicUrl: rawObj.publicUrl || '',
-    imageKey: rawObj.imageKey || rawObj.key || '',
+    signedUrl: String(rawObj.signedUrl || rawObj.uploadUrl || ''),
+    publicUrl: String(rawObj.publicUrl || ''),
+    imageKey: String(rawObj.imageKey || rawObj.key || ''),
   };
 };
 

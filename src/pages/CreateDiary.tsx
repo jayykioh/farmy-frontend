@@ -5,24 +5,22 @@ import { PageHeader } from '../components/PageHeader';
 import { MascotLottie } from '../components/MascotLottie';
 import { Button } from '../components/ui/Button';
 import { useGetDiariesQuery } from '../store/api/farmApi';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch } from '../store/hooks';
+import { useAuthStore } from '../store/authStore';
 import { createBlobDigest, createDiaryRequestHash } from '../lib/diaryHash';
 import { assertStorageRoom, compressImageFile, ensurePersistentStorage } from '../lib/imageCompression';
 import { saveOfflineDiaryDraft } from '../lib/indexedDB';
 import { runDiarySync } from '../lib/diarySyncEngine';
 
-const DEFAULT_IMAGE_URL =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBBsDRgI1pvIo50IOk1rW3XMKV7rFhTt9_s8aTQNkN_WywF7AIGqdVhXjoHALtZprcHrXKjLhttsRZCpjA4uvk_Um24WBesbsE838pimS7ZoudphdnkPFClv9WTTHUkJeYPc4xmdfViit333Cz9CIlJOwN1Q3vb7F72FPHvJMjnyqxQTdgnBBr2O-MnyEgAEIaPO1Dm6D_LT6RC8NAcso7A3hw9dfbzxz58X2roER3BslU56C5sb_vWdPjtLft7MqmLlOGLkEQso-ij';
-
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const userId = useAppSelector((state) => state.auth.user?.id);
+  const userId = useAuthStore((state) => state.user?.id);
   const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
   const [growthStage, setGrowthStage] = useState('');
   const [notes, setNotes] = useState('');
-  const [imageUrl, setImageUrl] = useState(DEFAULT_IMAGE_URL);
+  const [imageUrl, setImageUrl] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);

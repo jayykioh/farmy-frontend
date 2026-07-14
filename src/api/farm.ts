@@ -17,6 +17,12 @@ export interface Diary {
   status: 'active' | 'archived' | 'deleted';
   metadata?: Record<string, any>;
   plot_name?: string; // populated locally or in UI
+  latest_log?: {
+    _id: string;
+    activity_type: string;
+    content: string;
+    created_at: string;
+  } | null;
 }
 
 export interface DiaryLog {
