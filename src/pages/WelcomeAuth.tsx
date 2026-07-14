@@ -127,7 +127,10 @@ export const WelcomeAuth: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => setErrorMsg('Đăng nhập Google chưa có API backend. Vui lòng dùng email và mật khẩu.')}
+              onClick={() => {
+                const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+                window.location.href = `${backendUrl}/auth/google`;
+              }}
               disabled={isBusy}
               className="w-full bg-transparent text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 font-bold py-2.5 px-5 rounded-[20px] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
