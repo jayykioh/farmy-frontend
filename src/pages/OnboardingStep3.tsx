@@ -10,37 +10,34 @@ export const OnboardingStep3: React.FC = () => {
   const { checkingAuth } = useRequireAuth();
 
   const handleFinish = async () => {
-    try {
-      const farmName = localStorage.getItem('onboarding_farmName') || 'Vườn Nhà Bé Thóc';
-      const selectedCrop = localStorage.getItem('onboarding_selectedCrop') || 'lua-nuoc';
+    const farmName = localStorage.getItem('onboarding_farmName') || 'Vườn Nhà Bé Thóc';
+    const selectedCrop = localStorage.getItem('onboarding_selectedCrop') || 'lua-nuoc';
 
+    // Update local auth store optimistically to prevent redirect loop
+    const user = useAuthStore.getState().user;
+    if (user) {
+      useAuthStore.getState().setSession({
+        user: { ...user, onboardingCompleted: true }
+      });
+      // Persist to localStorage immediately as fallback in case API fails
+      localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+    }
+
+    try {
       await completeOnboarding({
         onboarding_completed: true,
         farmName,
         primaryCrops: selectedCrop,
       });
 
-      // Clear local storage
+      // Clear onboarding temp data on success
       localStorage.removeItem('onboarding_farmName');
       localStorage.removeItem('onboarding_selectedCrop');
-
-      // Update local auth store
-      const user = useAuthStore.getState().user;
-      if (user) {
-        useAuthStore.getState().setSession({
-          user: { ...user, onboardingCompleted: true }
-        });
-      }
-
-      navigate('/home');
     } catch (error) {
-      console.error('Failed to complete onboarding:', error);
-      // Fallback navigate to home in case of API failure to not block user
-      const user = useAuthStore.getState().user;
-    if (user) {
-      localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
-    }
-    navigate('/home');
+      console.error('Failed to complete onboarding on server, but proceeding locally:', error);
+      // localStorage flag already set above — user will not be looped
+    } finally {
+      navigate('/home');
     }
   };
 
