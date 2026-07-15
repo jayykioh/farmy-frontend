@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, BellRing, CheckCircle2 } from 'lucide-react';
 import { MascotLottie } from '../components/MascotLottie';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { completeOnboarding } from '../api/auth';
@@ -46,19 +47,18 @@ export const OnboardingStep3: React.FC = () => {
   }
 
   return (
-    <div className="w-full h-full min-h-[100svh] relative text-left bg-gradient-to-b from-blue-100 to-green-50 overflow-hidden font-sans">
+    <div className="w-full h-full min-h-[100svh] relative text-left bg-[linear-gradient(180deg,#dbeafe_0%,#f7fff7_52%,#ecfdf5_100%)] overflow-hidden font-sans">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.22] [background-image:radial-gradient(circle_at_1px_1px,rgba(20,30,23,0.14)_1px,transparent_0)] [background-size:28px_28px]" />
 
       {/* Top App Bar (Branding) */}
       <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
         <button
           onClick={() => navigate('/onboarding-2')}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-slate-200/50 text-slate-700 transition-transform active:scale-90"
+          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/85 backdrop-blur-xl shadow-[0_8px_24px_rgba(20,30,23,0.06)] border border-white/80 text-slate-700 transition-all hover:-translate-y-0.5 hover:text-slate-950 active:scale-90"
         >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+          <ArrowLeft className="h-5 w-5" />
         </button>
-        <div className="flex h-10 items-center justify-center rounded-full bg-white/80 px-5 backdrop-blur-md shadow-sm border border-slate-200/50">
+        <div className="flex h-10 items-center justify-center rounded-full bg-white/85 px-5 backdrop-blur-xl shadow-[0_8px_24px_rgba(20,30,23,0.06)] border border-white/80">
           <span className="text-sm font-extrabold text-slate-800 tracking-tight">FarmDiaries</span>
         </div>
         <div className="w-10 h-10" /> {/* Spacer */}
@@ -73,9 +73,7 @@ export const OnboardingStep3: React.FC = () => {
             <MascotLottie state="sleepy" className="w-full h-full" />
             {/* Floating Bell Element */}
             <div className="absolute bottom-10 right-10 origin-top animate-[spin_2s_ease-in-out_infinite]">
-              <svg className="w-12 h-12 text-[#FFC107] drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
-              </svg>
+              <BellRing className="w-12 h-12 text-[#FFC107] drop-shadow-md" />
             </div>
           </div>
         </div>
@@ -93,7 +91,7 @@ export const OnboardingStep3: React.FC = () => {
         </div>
 
         {/* Bottom/Right Sheet UI */}
-        <section className="w-full md:w-1/2 bg-white md:bg-white/90 md:backdrop-blur-xl z-50 rounded-t-[40px] md:rounded-3xl px-6 pt-8 pb-12 flex flex-col items-center gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.08),inset_0_-4px_8px_rgba(0,0,0,0.05)] md:shadow-xl md:border md:border-border-main/50 transition-transform self-end md:self-center md:mr-8 md:py-12 absolute md:relative bottom-0 md:bottom-auto">
+        <section className="w-full md:w-1/2 bg-white/95 md:bg-white/90 md:backdrop-blur-xl z-50 rounded-t-[40px] md:rounded-3xl px-6 pt-8 pb-12 flex flex-col items-center gap-6 shadow-[0_-20px_60px_rgba(20,30,23,0.08)] md:shadow-[0_24px_70px_rgba(20,30,23,0.12)] md:border md:border-border-main/45 transition-transform self-end md:self-center md:mr-8 md:py-12 absolute md:relative bottom-0 md:bottom-auto">
 
           {/* Progress Indicator */}
           <div className="flex items-center gap-1.5 mb-2" aria-label="Onboarding progress: step 3 of 3">
@@ -104,10 +102,14 @@ export const OnboardingStep3: React.FC = () => {
 
           {/* Content */}
           <div className="text-center space-y-4 px-4">
-            <h2 className="text-2xl font-bold text-text-h leading-tight">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/[0.10] text-primary-container shadow-inner">
+              <CheckCircle2 className="h-7 w-7" />
+            </div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-primary-container/55">Almost ready</p>
+            <h2 className="text-2xl font-black text-text-h leading-tight md:text-3xl">
               Nhận thông báo trình duyệt
             </h2>
-            <p className="text-lg text-text-main/70">
+            <p className="text-base font-semibold leading-7 text-text-main/65">
               Cho phép Bé Thóc gửi thông báo nhanh để cập nhật tình trạng sức khỏe cây trồng của bạn.
             </p>
           </div>
@@ -116,9 +118,10 @@ export const OnboardingStep3: React.FC = () => {
           <div className="w-full max-w-[340px] mt-6 space-y-4">
             <button
               onClick={handleFinish}
-              className="w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center bg-slate-900 hover:bg-slate-800 shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer"
+              className="group flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary-container text-base font-extrabold text-white shadow-[0_16px_34px_rgba(0,109,53,0.24)] transition-all hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_20px_42px_rgba(8,168,85,0.28)] active:scale-[0.98]"
             >
-              Cho phép thông báo
+              <span className="relative">Cho phép thông báo</span>
+              <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" />
             </button>
             <div className="flex justify-center pt-2">
               <button
