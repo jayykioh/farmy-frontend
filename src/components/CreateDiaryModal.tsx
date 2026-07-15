@@ -9,7 +9,7 @@ type Props = {
 
 export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [createDiary, { isLoading: isCreatingDiary }] = useCreateDiaryMutation();
-  const [, { isLoading: isCreatingPlot }] = useCreatePlotMutation();
+  const [createPlot, { isLoading: isCreatingPlot }] = useCreatePlotMutation();
   const { data: plots = [] } = useGetPlotsQuery(undefined, { skip: !isOpen });
   const [cropType, setCropType] = useState('Lúa');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -20,20 +20,30 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (plots.length === 0) {
-      alert('Không tìm thấy mảnh vườn nào. Vui lòng hoàn thành onboarding hoặc tạo mảnh vườn trước.');
-      return;
-    }
     try {
+      let activePlotId = '';
+      if (plots.length === 0) {
+        // Fallback: If onboarding failed to create a plot on the backend (e.g. 500 error),
+        // we automatically create a default plot here so the user can still use the app.
+        const newPlot = await createPlot({
+          name: 'Vườn mặc định',
+          area_size: 100,
+          description: 'Tạo tự động do lỗi lưu onboarding',
+        }).unwrap();
+        activePlotId = newPlot._id;
+      } else {
+        activePlotId = plots[0]._id;
+      }
+
       await createDiary({
-        plot_id: plots[0]._id,
+        plot_id: activePlotId,
         crop_type: cropType,
         start_date: startDate,
       }).unwrap();
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Tạo nhật ký thất bại.');
+      alert('Tạo nhật ký hoặc mảnh vườn thất bại.');
     }
   };
 
