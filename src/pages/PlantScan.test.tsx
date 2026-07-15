@@ -8,9 +8,9 @@ import { farmApi } from '../store/api/farmApi';
 import { PageHeaderProvider } from '../contexts/PageHeaderContext';
 import { api } from '../api/client';
 
-// Mock MascotLottie
-vi.mock('../components/MascotLottie', () => ({
-  MascotLottie: () => <div data-testid="mascot-lottie" />
+// Mock PetMascot
+vi.mock('../features/pet/components/PetMascot', () => ({
+  PetMascot: () => <div data-testid="mascot-lottie" />
 }));
 
 // Mock the axios api instance

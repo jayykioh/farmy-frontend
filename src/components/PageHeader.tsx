@@ -7,6 +7,7 @@ export interface PageHeaderProps {
   subtitle?: React.ReactNode;
   leftButton?: 'back' | 'close' | 'none';
   rightButton?: 'notification' | 'camera' | 'none';
+  onLeftClick?: () => void;
   onRightClick?: () => void;
   showOnDesktop?: boolean;
   className?: string;
@@ -18,6 +19,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle,
   leftButton = 'back',
   rightButton = 'none',
+  onLeftClick,
   onRightClick,
   showOnDesktop = true,
   className = '',
@@ -32,7 +34,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   }, [setPageHeaderVisible]);
 
   const handleLeftClick = () => {
-    if (leftButton === 'back') {
+    if (onLeftClick) {
+      onLeftClick();
+      return;
+    }
+    if (leftButton === 'back' || leftButton === 'close') {
       navigate(-1);
     }
   };

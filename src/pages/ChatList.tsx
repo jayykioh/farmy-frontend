@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Loader2, Plus } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { PageHeader } from '../components/PageHeader';
 import { fetchChatSessions, type ChatSession } from '../api/chat';
 
@@ -28,6 +30,9 @@ export const ChatList: React.FC = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   useEffect(() => {
     let cancelled = false;
@@ -108,7 +113,7 @@ export const ChatList: React.FC = () => {
           <div className="mt-12 flex flex-col items-center text-center">
             <div className="relative">
               <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
-                <MascotLottie className="w-full h-full drop-shadow-lg" />
+                <PetMascot className="w-full h-full drop-shadow-lg" status={petStatus} size={112} />
               </div>
               <div className="bg-white border border-border-main/50 absolute -top-8 left-1/2 -translate-x-1/2 px-5 py-2 rounded-[20px] rounded-br-sm whitespace-nowrap shadow-sm">
                 <p className="text-text-main font-bold text-sm">Bé Thóc luôn lắng nghe bạn!</p>

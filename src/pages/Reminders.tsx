@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 import { PageHeader } from '../components/PageHeader';
 import {
   useGetPendingRemindersQuery,
@@ -60,7 +60,7 @@ export const Reminders: React.FC = () => {
         
         <div className="bg-white border border-primary/20 shadow-sm rounded-[24px] p-4 mb-6 flex items-center gap-4 relative">
           <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-primary/20 shadow-sm relative flex-shrink-0 p-1">
-            <MascotLottie className="w-full h-full -mt-1" state={petStatus.mood} />
+            <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
           </div>
           <div className="flex-1">
             <p className="font-medium text-base text-text-main">

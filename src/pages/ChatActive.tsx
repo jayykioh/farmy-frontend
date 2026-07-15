@@ -9,7 +9,9 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from "lucide-react";
-import { MascotLottie } from "../components/MascotLottie";
+import { PetMascot } from "../features/pet/components/PetMascot";
+import { usePetStatus } from "../features/pet/hooks/usePetStatus";
+import { PET_STATUS_FALLBACK } from "../features/pet/types/pet.types";
 import { PageHeader } from "../components/PageHeader";
 import {
   fetchChatMessages,
@@ -76,6 +78,9 @@ export const ChatActive: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const dateLabel = useMemo(() => {
     const firstMessage = messages.find((message) => message.created_at);
@@ -301,7 +306,7 @@ export const ChatActive: React.FC = () => {
         ) : messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
             <div className="w-28 h-28 mb-4">
-              <MascotLottie className="w-full h-full drop-shadow-md" />
+              <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={112} />
             </div>
             <h2 className="text-2xl font-black text-text-main mb-2">
               Hỏi Bé Thóc về ruộng vườn
@@ -320,8 +325,9 @@ export const ChatActive: React.FC = () => {
               {message.role === "assistant" ? (
                 <div className="flex items-end gap-2 mb-1">
                   <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
-                    <MascotLottie
+                    <PetMascot
                       className={`w-full h-full -mt-1 ${message.streaming ? "animate-pulse" : ""}`}
+                      status={petStatus} size={40}
                     />
                   </div>
                   <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">

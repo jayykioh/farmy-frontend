@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 
 export const Celebration: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export const Celebration: React.FC = () => {
         <div className="relative mb-8 mt-12 w-48 h-48 flex items-center justify-center animate-[bounce_2s_ease-in-out_infinite]">
           {/* Bé Thóc Mascot Image */}
           <div className="w-40 h-40 rounded-full border-[6px] border-white shadow-2xl bg-white overflow-hidden p-2 flex items-center justify-center">
-             <MascotLottie state="excited" className="w-full h-full -mt-2" />
+             <PetMascot staticMood="excited" className="w-full h-full -mt-2" size={144} />
           </div>
           {/* Floating XP Popup */}
           <div className="absolute -top-4 -right-4 bg-yellow-400 text-yellow-900 border-4 border-yellow-100 rounded-full px-5 py-2 shadow-[0_6px_0_0_#fde047] animate-[pulse_1.5s_cubic-bezier(0.4,0,0.6,1)_infinite] z-20">

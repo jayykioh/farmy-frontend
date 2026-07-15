@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Activity, Archive, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout, Trash2, WifiOff } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { PageHeader } from '../components/PageHeader';
 import {
   useGetDiaryDetailQuery,
@@ -75,6 +77,9 @@ export const DiaryHistory: React.FC = () => {
   const diaryIdParam = searchParams.get('diaryId');
   const userId = useAuthStore((state) => state.user?.id);
   const [offlineDrafts, setOfflineDrafts] = useState<OfflineDiaryDraft[]>([]);
+
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();
   const activeDiaryId = diaryIdParam || (diaries.length > 0 ? diaries[0]._id : undefined);
@@ -206,7 +211,7 @@ export const DiaryHistory: React.FC = () => {
         {/* Bé Thóc Encouragement */}
         <section className="flex items-end gap-4 w-full">
           <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-border-main/50 shrink-0 relative overflow-hidden p-1 shadow-sm">
-            <MascotLottie className="w-full h-full -mt-1" />
+            <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
           </div>
           <div className="relative bg-white border border-border-main/50 rounded-2xl p-4 mb-2 flex-1 shadow-sm">
             <p className="text-base font-medium text-text-main">

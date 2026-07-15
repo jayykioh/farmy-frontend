@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Leaf, AlertTriangle, Wheat } from 'lucide-react';
-import { MascotLottie } from './MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 import type { SnapCondition } from '../types/farmSnap';
 import { createSnap, uploadSnapPhoto } from '../api/snaps';
 
@@ -253,7 +253,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
         <div className="flex items-center bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">
           <div className="w-6 h-6 rounded-full bg-white overflow-hidden flex items-center justify-center mr-2">
-            <MascotLottie className="w-8 h-8" />
+            <PetMascot staticMood="neutral" className="w-8 h-8" size={32} />
           </div>
           <span className="font-bold text-sm">Farm Snap</span>
         </div>

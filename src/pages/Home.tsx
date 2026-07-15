@@ -100,7 +100,7 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6 animate-in fade-in duration-300">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-primary/10 blur-3xl scale-150 pointer-events-none" />
-              <PetMascot status={{ ...petStatus, bubbleMessage: 'Chào mừng bạn! 🌱' }} size={180} className="relative drop-shadow-xl" />
+              <PetMascot status={petStatus} size={180} className="relative drop-shadow-xl" />
             </div>
             <div className="flex flex-col gap-2 max-w-xs">
               <h1 className="text-2xl font-black text-text-h tracking-tight">Chào mừng đến FarmDiaries!</h1>
@@ -123,7 +123,7 @@ export const Home: React.FC = () => {
           <div className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6 animate-in fade-in duration-300">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-secondary/10 blur-3xl scale-150 pointer-events-none" />
-              <PetMascot status={{ ...petStatus, bubbleMessage: 'Vườn chờ canh tác! 🌿' }} size={180} className="relative drop-shadow-xl" />
+              <PetMascot status={petStatus} size={180} className="relative drop-shadow-xl" />
             </div>
             <div className="flex flex-col gap-2 max-w-xs">
               <h1 className="text-2xl font-black text-text-h tracking-tight">Chưa có vụ mùa nào</h1>
