@@ -7,8 +7,6 @@ export type AuthUser = {
   avatarUrl?: string;
   role?: string;
   phoneNumber?: string;
-  onboardingCompleted?: boolean;
-  farmName?: string;
   region?: string;
 };
 
@@ -56,7 +54,6 @@ const normalizeAuthResponse = (data: LoginResponseData | RegisterResponseData): 
 
   const user: AuthUser = {
     ...rawUser,
-    onboardingCompleted: data.user?.onboardingCompleted ?? (data as Record<string, unknown>).onboardingCompleted === true,
   };
 
   return {
@@ -113,13 +110,4 @@ export const testEmailNotification = async () => {
   return data;
 };
 
-export type CompleteOnboardingPayload = {
-  onboarding_completed: boolean;
-  farmName?: string;
-  primaryCrops?: string;
-};
 
-export const completeOnboarding = async (payload: CompleteOnboardingPayload) => {
-  const { data } = await api.patch<ApiResponse<unknown>>('/users/me', payload);
-  return data.data;
-};
