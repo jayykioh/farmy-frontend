@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, MailCheck } from 'lucide-react';
 import { MascotLottie } from '../components/MascotLottie';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { useAuthStore } from '../store/authStore';
@@ -32,11 +31,13 @@ export const OnboardingStep2: React.FC = () => {
       <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
         <button
           onClick={() => navigate('/onboarding-1')}
-          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/85 backdrop-blur-xl shadow-[0_8px_24px_rgba(20,30,23,0.06)] border border-white/80 text-slate-700 transition-all hover:-translate-y-0.5 hover:text-slate-950 active:scale-90"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-slate-200/50 text-slate-700 transition-transform active:scale-90"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
-        <div className="flex h-10 items-center justify-center rounded-full bg-white/85 px-5 backdrop-blur-xl shadow-[0_8px_24px_rgba(20,30,23,0.06)] border border-white/80">
+        <div className="flex h-10 items-center justify-center rounded-full bg-white/80 px-5 backdrop-blur-md shadow-sm border border-slate-200/50">
           <span className="text-sm font-extrabold text-slate-800 tracking-tight">FarmDiaries</span>
         </div>
         <div className="w-10 h-10" /> {/* Spacer */}
@@ -53,7 +54,7 @@ export const OnboardingStep2: React.FC = () => {
         </div>
 
         {/* Bottom/Right Sheet */}
-        <div className="w-full md:max-w-[460px] bg-white/95 md:bg-white/90 md:backdrop-blur-xl rounded-t-[40px] md:rounded-3xl md:border md:border-border-main/45 shadow-[0_-20px_60px_rgba(20,30,23,0.08)] md:shadow-[0_24px_70px_rgba(20,30,23,0.12)] px-6 pt-6 pb-12 flex flex-col items-center z-20 h-auto self-end md:self-center md:mr-8 md:py-12">
+        <div className="w-full md:max-w-[440px] bg-white md:bg-white/90 md:backdrop-blur-xl rounded-t-[40px] md:rounded-3xl md:border md:border-border-main/50 shadow-[0_-20px_50px_rgba(0,0,0,0.06)] md:shadow-xl px-6 pt-6 pb-12 flex flex-col items-center z-20 h-auto self-end md:self-center md:mr-8 md:py-12">
           {/* Handle */}
           <div className="w-12 h-1.5 bg-text-main/10 rounded-full mb-8 md:hidden"></div>
 
@@ -66,11 +67,10 @@ export const OnboardingStep2: React.FC = () => {
 
           {/* Content */}
           <div className="text-center max-w-[340px] w-full mb-4">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-primary-container/55">Step 2 of 3</p>
-            <h1 className="text-2xl font-black text-text-h mb-4 leading-tight md:text-3xl">
+            <h1 className="text-2xl font-bold text-text-h mb-4 leading-tight">
               Kết nối thông báo Email
             </h1>
-            <p className="text-base font-semibold leading-7 text-text-main/65 px-2">
+            <p className="text-base text-text-main/70 px-4">
               Nhận nhắc nhở tưới nước và bón phân trực tiếp qua Email để không bao giờ bỏ lỡ.
             </p>
           </div>
@@ -79,19 +79,15 @@ export const OnboardingStep2: React.FC = () => {
           <button 
             type="button"
             onClick={() => setIsConnected(!isConnected)}
-            className={`group w-full max-w-[340px] rounded-[26px] p-4 flex items-center justify-between mt-4 mb-2 active:scale-[0.98] transition-all cursor-pointer border text-left ${
-              isConnected
-                ? 'border-primary/25 bg-primary/[0.08] shadow-[0_14px_34px_rgba(8,168,85,0.12)]'
-                : 'border-border-main/45 bg-white shadow-[0_12px_30px_rgba(20,30,23,0.06)] hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[0_18px_38px_rgba(20,30,23,0.09)]'
-            }`}
+            className="w-full max-w-[340px] bg-slate-100/80 hover:bg-slate-100 rounded-[24px] p-4 flex items-center justify-between mt-4 mb-2 active:scale-[0.98] transition-all cursor-pointer border border-transparent hover:border-slate-200/60"
           >
             <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold text-[14px] tracking-tight transition-colors ${isConnected ? 'bg-primary text-white shadow-[0_10px_24px_rgba(8,168,85,0.22)]' : 'bg-[#EA4335] text-white shadow-[0_10px_24px_rgba(234,67,53,0.22)]'}`}>
-                {isConnected ? <CheckCircle2 className="h-6 w-6" /> : <MailCheck className="h-6 w-6" />}
+              <div className="w-11 h-11 rounded-[14px] bg-[#EA4335] flex items-center justify-center text-white font-extrabold text-[14px] tracking-tight shadow-[0_2px_10px_rgba(234,67,53,0.3)]">
+                Email
               </div>
               <div className="flex flex-col items-start">
                 <span className="text-[15px] font-extrabold text-slate-800 leading-tight mb-0.5">Thông báo Email</span>
-                <span className="text-[13px] font-semibold text-slate-500">{isConnected ? 'Đã bật gửi nhắc thử' : 'Nhận nhắc nhở tưới cây'}</span>
+                <span className="text-[13px] font-semibold text-slate-500">Nhận nhắc nhở tưới cây</span>
               </div>
             </div>
             <div className={`flex items-center justify-center w-12 h-7 rounded-full transition-colors duration-300 ${isConnected ? 'bg-[#08a855]' : 'bg-slate-300'}`}>
@@ -120,12 +116,11 @@ export const OnboardingStep2: React.FC = () => {
                   setIsConnected(true);
                 }
               }}
-              className={`group flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl text-base font-extrabold text-white shadow-[0_16px_34px_rgba(0,109,53,0.20)] transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${
-                isConnected ? 'bg-primary-container hover:bg-primary hover:shadow-[0_20px_42px_rgba(8,168,85,0.28)]' : 'bg-slate-950 hover:bg-slate-900 hover:shadow-[0_18px_36px_rgba(15,23,42,0.22)]'
+              className={`w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                isConnected ? 'bg-[#08a855] hover:bg-green-600' : 'bg-slate-900 hover:bg-slate-800'
               }`}
             >
-              <span className="relative">{isEmailTestLoading ? 'Đang gửi test...' : (isConnected ? 'Tiếp theo' : 'Kết nối Email')}</span>
-              {!isEmailTestLoading ? <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" /> : null}
+              {isEmailTestLoading ? 'Đang gửi test...' : (isConnected ? 'Tiếp theo' : 'Kết nối Email')}
             </button>
             <div className="flex justify-center pt-2">
               <button 
