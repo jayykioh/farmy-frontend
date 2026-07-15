@@ -10,7 +10,6 @@ import Landing from './pages/Landing';
 import WelcomeAuth from './pages/WelcomeAuth';
 import OAuthCallback from './pages/OAuthCallback';
 import Register from './pages/Register';
-import OnboardingStep3 from './pages/OnboardingStep3';
 import Home from './pages/Home';
 import DiaryList from './pages/DiaryList';
 import DiaryHistory from './pages/DiaryHistory';

@@ -20,10 +20,8 @@ export const AccountSettings: React.FC = () => {
   const { user, updateProfile } = useAuthStore();
   const [isEditingName, setIsEditingName] = useState(false);
   const [name, setName] = useState(user?.name || 'Nông dân Ẩn danh');
-  const [farmName, setFarmName] = useState(user?.farmName || 'Nông trại Vườn Xanh');
   const [region, setRegion] = useState(user?.region || 'An Giang');
   const [editName, setEditName] = useState(name);
-  const [editFarmName, setEditFarmName] = useState(farmName);
   const [editRegion, setEditRegion] = useState(region);
   
   const [isUploading, setIsUploading] = useState(false);
@@ -34,16 +32,14 @@ export const AccountSettings: React.FC = () => {
 
   const handleSaveName = () => {
     setName(editName);
-    setFarmName(editFarmName);
     setRegion(editRegion);
-    updateProfile({ name: editName, farmName: editFarmName, region: editRegion });
+    updateProfile({ name: editName, region: editRegion });
     setIsEditingName(false);
     alert('Đã cập nhật hồ sơ của bạn thành công!');
   };
 
   const handleCancel = () => {
     setEditName(name);
-    setEditFarmName(farmName);
     setEditRegion(region);
     setIsEditingName(false);
   };
@@ -164,17 +160,6 @@ export const AccountSettings: React.FC = () => {
                 />
               </div>
 
-              {/* Farm Name Field */}
-              <div>
-                <label className="block text-sm font-semibold text-text-main mb-2">Tên nông trại</label>
-                <input 
-                  type="text"
-                  value={editFarmName}
-                  onChange={(e) => setEditFarmName(e.target.value)}
-                  className="w-full bg-bg-surface-1 border border-border-main/50 rounded-[12px] px-4 py-3 text-base font-medium text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-                />
-              </div>
-
               {/* Region Field */}
               <div>
                 <label className="block text-sm font-semibold text-text-main mb-2">Khu vực</label>
@@ -222,17 +207,6 @@ export const AccountSettings: React.FC = () => {
                 </svg>
               </div>
 
-              {/* Farm Name Info */}
-              <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
-                <div>
-                  <p className="text-xs text-text-main/60 font-semibold uppercase">Tên nông trại</p>
-                  <p className="text-base font-semibold text-text-main">{farmName}</p>
-                </div>
-                <svg className="w-5 h-5 text-text-main/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-
               {/* Region Info */}
               <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
                 <div>
@@ -261,7 +235,6 @@ export const AccountSettings: React.FC = () => {
               onClick={() => {
                 setIsEditingName(true);
                 setEditName(name);
-                setEditFarmName(farmName);
                 setEditRegion(region);
               }}
               className="w-full mt-4 bg-primary text-white font-bold rounded-full px-4 py-3 hover:bg-primary-container transition-colors cursor-pointer active:scale-95"
