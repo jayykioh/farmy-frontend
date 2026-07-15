@@ -20,28 +20,28 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let plotId = plots[0]?._id;
-
     try {
-      if (!plotId) {
-        // Auto-create a default plot if none exists
-        const defaultPlot = await createPlot({
-          name: 'Vườn của tôi',
+      let activePlotId = plots[0]?._id;
+      if (!activePlotId) {
+        // Fallback: If onboarding failed to create a plot on the backend,
+        // we automatically create a default plot here so the user can still use the app.
+        const newPlot = await createPlot({
+          name: 'Vườn mặc định',
           area_size: 1,
-          description: 'Mảnh vườn mặc định',
+          description: 'Tạo tự động do lỗi lưu onboarding',
         }).unwrap();
-        plotId = defaultPlot._id;
+        activePlotId = newPlot._id;
       }
 
       await createDiary({
-        plot_id: plotId,
+        plot_id: activePlotId,
         crop_type: cropType,
         start_date: startDate,
       }).unwrap();
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Tạo vụ mùa thất bại.');
+      alert('Tạo vụ mùa hoặc mảnh vườn thất bại.');
     }
   };
 

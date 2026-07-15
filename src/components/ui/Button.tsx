@@ -24,8 +24,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     
-    // Base styles
-    const baseStyles = 'group relative flex items-center justify-center gap-2 font-bold transition-all duration-300 active:scale-[0.98] outline-none';
+    const baseStyles = 'group relative isolate flex cursor-pointer items-center justify-center gap-2 overflow-hidden font-extrabold tracking-[-0.01em] outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main active:scale-[0.98] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55';
     
     // Width styles
     const widthStyles = fullWidth ? 'w-full' : '';
@@ -39,10 +38,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Color/Visual variants
     const variantStyles = {
-      primary: 'bg-primary text-white shadow-[0_4px_12px_rgba(8,168,85,0.25)] hover:shadow-[0_8px_20px_rgba(8,168,85,0.35)] active:translate-y-0.5 active:shadow-[0_2px_8px_rgba(8,168,85,0.2)]',
-      secondary: 'bg-white text-primary border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 shadow-sm active:translate-y-0.5',
-      outline: 'bg-transparent text-slate-700 border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 active:translate-y-0.5',
-      ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 active:bg-slate-200',
+      primary: 'bg-primary-container text-white shadow-[0_12px_30px_rgba(0,109,53,0.24)] hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_16px_34px_rgba(8,168,85,0.28)] active:translate-y-0 active:shadow-[0_8px_18px_rgba(0,109,53,0.18)]',
+      secondary: 'border border-primary/20 bg-white text-primary shadow-[0_10px_24px_rgba(20,30,23,0.06),inset_0_1px_0_rgba(255,255,255,0.7)] hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 hover:shadow-[0_14px_30px_rgba(20,30,23,0.09)] active:translate-y-0',
+      outline: 'border border-slate-200/90 bg-white/85 text-slate-700 shadow-[0_8px_22px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur hover:-translate-y-0.5 hover:border-primary/25 hover:bg-white hover:text-slate-950 hover:shadow-[0_14px_30px_rgba(15,23,42,0.08)] active:translate-y-0',
+      ghost: 'bg-transparent text-slate-600 hover:bg-white/70 hover:text-slate-900 active:bg-white',
     };
 
     return (
@@ -51,8 +50,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${widthStyles} ${className}`}
         {...props}
       >
-        {/* Subtle top gradient for primary buttons to give physical depth */}
-        {variant === 'primary' ? (<div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-inherit pointer-events-none opacity-50"></div>) : null}
         {icon ? (<span className="shrink-0 flex items-center justify-center">
           {icon}
         </span>) : null}
