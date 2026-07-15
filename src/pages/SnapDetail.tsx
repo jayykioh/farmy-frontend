@@ -13,6 +13,7 @@ import {
   Wheat,
   Send,
 } from 'lucide-react';
+import { resolveImageUrl } from '../utils/url';
 import { Button } from '../components/ui/Button';
 import { createSnapComment, fetchSnap, reactToSnap } from '../api/snaps';
 import type { SnapReactionType } from '../types/farmSnap';
@@ -113,7 +114,7 @@ export const SnapDetail: React.FC = () => {
     <div className="w-full h-[100svh] bg-black text-white flex flex-col relative overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-110"
-        style={{ backgroundImage: `url(${snap.imageUrl})` }}
+        style={{ backgroundImage: `url(${resolveImageUrl(snap.imageUrl)})` }}
       />
 
       <div className="absolute top-0 left-0 right-0 p-4 pt-6 z-20 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
@@ -141,9 +142,11 @@ export const SnapDetail: React.FC = () => {
 
       <div className="flex-1 w-full flex items-center justify-center z-10 relative">
         <img
-          src={snap.imageUrl}
+          src={resolveImageUrl(snap.imageUrl)}
           alt={snap.caption || 'Farm Snap'}
           className="w-full max-h-[80svh] object-contain"
+          loading="lazy"
+          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?q=80&w=800&auto=format&fit=crop'; }}
         />
       </div>
 
