@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MascotLottie } from '../components/MascotLottie';
-import { ArrowRight, Apple, CheckCircle2, Coffee, Leaf, Sprout, Wheat } from 'lucide-react';
+import { Wheat, Apple, Coffee, Leaf, Sprout } from 'lucide-react';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 
 export const OnboardingStep1: React.FC = () => {
@@ -11,11 +11,11 @@ export const OnboardingStep1: React.FC = () => {
   const [farmName, setFarmName] = useState<string>('');
 
   const crops = [
-    { id: 'lua-nuoc', label: 'Lúa nước', description: 'Ruộng mùa vụ', icon: Wheat },
-    { id: 'cay-an-trai', label: 'Cây ăn trái', description: 'Vườn lâu năm', icon: Apple },
-    { id: 'ca-phe', label: 'Cà phê', description: 'Canh tác cao nguyên', icon: Coffee },
-    { id: 'rau-mau', label: 'Rau màu', description: 'Luân canh ngắn ngày', icon: Leaf },
-    { id: 'khac', label: 'Khác', description: 'Tự cá nhân hóa', icon: Sprout },
+    { id: 'lua-nuoc', label: <span className="flex items-center gap-1"><Wheat className="w-4 h-4" /> Lúa nước</span> },
+    { id: 'cay-an-trai', label: <span className="flex items-center gap-1"><Apple className="w-4 h-4" /> Cây ăn trái</span> },
+    { id: 'ca-phe', label: <span className="flex items-center gap-1"><Coffee className="w-4 h-4" /> Cà phê</span> },
+    { id: 'rau-mau', label: <span className="flex items-center gap-1"><Leaf className="w-4 h-4" /> Rau màu</span> },
+    { id: 'khac', label: <span className="flex items-center gap-1"><Sprout className="w-4 h-4" /> Khác</span> },
   ];
 
   if (checkingAuth) {
@@ -30,7 +30,7 @@ export const OnboardingStep1: React.FC = () => {
       {/* Responsive onboarding app bar */}
       <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
         <div className="w-10 h-10" /> {/* Spacer */}
-        <div className="flex h-10 items-center justify-center rounded-full bg-white/85 px-5 backdrop-blur-xl shadow-[0_8px_24px_rgba(20,30,23,0.06)] border border-white/80">
+        <div className="flex h-10 items-center justify-center rounded-full bg-white/80 px-5 backdrop-blur-md shadow-sm border border-slate-200/50">
           <span className="text-sm font-extrabold text-slate-800 tracking-tight">FarmDiaries</span>
         </div>
         <div className="w-10 h-10" /> {/* Spacer */}
@@ -38,12 +38,12 @@ export const OnboardingStep1: React.FC = () => {
 
       <main className="relative z-10 mx-auto grid min-h-[100svh] w-full max-w-6xl grid-cols-1 items-end px-4 pb-0 pt-28 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(440px,520px)] lg:items-center lg:gap-12 lg:pb-8 lg:pt-28">
         {/* Mascot / desktop story panel */}
-        <section className="relative flex min-h-[280px] w-full flex-col items-center justify-center px-2 pb-6 lg:min-h-[520px] lg:items-start lg:rounded-[36px] lg:border lg:border-white/70 lg:bg-white/50 lg:p-8 lg:shadow-[0_24px_80px_rgba(20,30,23,0.09)] lg:backdrop-blur-xl">
+        <section className="relative flex min-h-[280px] w-full flex-col items-center justify-center px-2 pb-6 lg:min-h-[520px] lg:items-start lg:rounded-[36px] lg:border lg:border-white/70 lg:bg-white/45 lg:p-8 lg:shadow-[0_24px_80px_rgba(20,30,23,0.08)] lg:backdrop-blur-md">
           <div className="absolute inset-x-8 bottom-10 hidden h-24 rounded-full bg-primary-lightest/20 blur-3xl lg:block" />
 
           <div className="relative z-10 flex flex-col items-center lg:items-start">
             <div className="mb-4 hidden max-w-lg lg:block">
-              <p className="mb-3 inline-flex rounded-full border border-emerald-100 bg-white/85 px-4 py-2 text-sm font-extrabold text-primary-container shadow-sm">
+              <p className="mb-3 inline-flex rounded-full border border-border-main/60 bg-bg-surface/80 px-4 py-2 text-sm font-extrabold text-primary shadow-sm">
                 Thiết lập lần đầu
               </p>
               <h2 className="text-4xl font-black leading-tight tracking-tight text-text-h xl:text-5xl">
@@ -63,7 +63,7 @@ export const OnboardingStep1: React.FC = () => {
         </section>
 
         {/* Setup panel */}
-        <section className="z-20 flex w-full flex-col items-center gap-6 rounded-t-[40px] border-x border-t border-border-main/40 bg-white/[0.92] px-6 pb-10 pt-8 shadow-[0_-20px_60px_rgba(0,0,0,0.06)] backdrop-blur-xl md:mx-auto md:max-w-[460px] md:rounded-[32px] md:border md:shadow-[0_24px_70px_rgba(20,30,23,0.12)] lg:mx-0 lg:min-h-0 lg:p-8">
+        <section className="z-20 flex w-full flex-col items-center gap-6 rounded-t-[40px] border-x border-t border-border-main/40 bg-white/90 px-6 pb-10 pt-8 shadow-[0_-20px_60px_rgba(0,0,0,0.05)] backdrop-blur-md md:mx-auto md:max-w-[440px] md:rounded-[32px] md:border md:shadow-[0_24px_70px_rgba(20,30,23,0.10)] lg:mx-0 lg:min-h-0 lg:p-8">
           <div className="mb-2 h-1.5 w-12 rounded-full bg-text-main/10 lg:hidden" />
 
           <div className="flex items-center gap-1.5 mb-2" aria-label="Onboarding progress: step 1 of 3">
@@ -84,7 +84,7 @@ export const OnboardingStep1: React.FC = () => {
                 <div className="relative">
                   <input
                     id="farm-name"
-                    className="h-14 w-full rounded-2xl border border-border-main/45 bg-white px-5 text-base font-semibold shadow-[0_8px_24px_rgba(20,30,23,0.04)] transition-all placeholder:text-text-main/30 focus:border-primary/45 focus:outline-none focus:ring-4 focus:ring-primary/10"
+                    className="h-13 w-full rounded-full border border-border-main/50 bg-bg-main px-6 text-base font-semibold transition-all placeholder:text-text-main/30 focus:outline-none focus:ring-2 focus:ring-primary-container"
                     placeholder="Ví dụ: Vườn Nhà Bé Thóc"
                     type="text"
                     value={farmName}
@@ -95,29 +95,21 @@ export const OnboardingStep1: React.FC = () => {
 
               <div className="space-y-2 w-full max-w-[340px] mx-auto text-left">
                 <label className="ml-2 text-xs font-black uppercase tracking-wider text-text-main/50">Loại cây trồng chính</label>
-                <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="flex flex-wrap gap-2 w-full">
                   {crops.map((crop) => {
                     const isSelected = selectedCrop === crop.id;
-                    const CropIcon = crop.icon;
                     return (
                       <button
                         key={crop.id}
                         type="button"
                         onClick={() => setSelectedCrop(crop.id)}
-                        className={`group relative flex min-h-[74px] cursor-pointer items-center gap-3 rounded-2xl border p-3 text-left transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary/10 ${
+                        className={`inline-flex items-center justify-center px-4 h-10 rounded-full font-extrabold text-sm transition-all duration-100 cursor-pointer ${
                           isSelected
-                            ? 'border-primary/30 bg-primary-container text-white shadow-[0_14px_30px_rgba(8,168,85,0.20)]'
-                            : 'border-border-main/45 bg-white text-slate-800 shadow-[0_8px_22px_rgba(20,30,23,0.04)] hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[0_12px_28px_rgba(20,30,23,0.08)]'
-                        } active:scale-[0.98]`}
+                            ? 'bg-slate-900 text-white shadow-sm scale-95'
+                            : 'bg-slate-100/90 hover:bg-slate-200/70 text-slate-800'
+                        } active:scale-90 focus:outline-none`}
                       >
-                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-white/15' : 'bg-primary/[0.08] text-primary-container'}`}>
-                          <CropIcon className="h-5 w-5" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black leading-tight">{crop.label}</span>
-                          <span className={`mt-0.5 block text-xs font-bold leading-tight ${isSelected ? 'text-white/70' : 'text-text-main/45'}`}>{crop.description}</span>
-                        </span>
-                        {isSelected ? <CheckCircle2 className="h-5 w-5 shrink-0 text-white" /> : null}
+                        {crop.label}
                       </button>
                     );
                   })}
@@ -132,10 +124,9 @@ export const OnboardingStep1: React.FC = () => {
                   localStorage.setItem('onboarding_selectedCrop', selectedCrop);
                   navigate('/onboarding-2');
                 }}
-                className="group flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary-container text-base font-extrabold text-white shadow-[0_16px_34px_rgba(0,109,53,0.24)] transition-all hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_20px_42px_rgba(8,168,85,0.28)] active:scale-[0.98]"
+                className="w-full text-white font-extrabold text-base h-14 rounded-2xl flex items-center justify-center bg-slate-900 hover:bg-slate-800 shadow-sm active:scale-[0.98] transition-all duration-100 cursor-pointer"
               >
-                <span className="relative">Tiếp theo</span>
-                <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" />
+                Tiếp theo
               </button>
             </div>
           </div>
