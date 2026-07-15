@@ -10,6 +10,8 @@ export const DiaryList: React.FC = () => {
   const { data: diaries = [], isLoading: loading } = useGetDiariesQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [filter, setFilter] = useState('Tất cả');
+
   const getCropImage = (cropType: string) => {
     const typeLower = cropType.toLowerCase();
     if (typeLower.includes('lúa')) {
@@ -18,8 +20,17 @@ export const DiaryList: React.FC = () => {
     if (typeLower.includes('cà chua')) {
       return 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJ98QwVUaI-DYbws4DExxqd5xte7Qsvnb_b1pfuim31P1em64_rv8k8mhv-ekc8vTVSDCAXyl2iszSTYAk-UGVNY3DAuFbnqmHK8vvkA1kl7Gk7g-MyndBvWKCjfG5eYPNiCsJ8ETcmdNgkjOpGqEEiDgdWh1ZZD1LInCVY4-RDhT6EnOkcQmqqNP5aKuHqDgJcqbw1aU03xTwIeAgj44GBwbORCJUR6IuOK5-Q3P17hzsLuTXZvHOCZNDXU4HrHFK_jc3FcLYK9Lc';
     }
-    return '';
+    if (typeLower.includes('bưởi')) {
+      return 'https://images.unsplash.com/photo-1557090495-fc9312e77b28?q=80&w=200&auto=format&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?q=80&w=200&auto=format&fit=crop'; // Default crop image
   };
+
+  const filteredDiaries = diaries.filter(diary => {
+    if (filter === 'Tất cả') return true;
+    if (filter === 'Khác') return !['lúa', 'bưởi', 'cà chua'].some(c => diary.crop_type.toLowerCase().includes(c));
+    return diary.crop_type.toLowerCase().includes(filter.toLowerCase());
+  });
 
   return (
     <div className="w-full min-h-full bg-bg-surface-1">
@@ -28,12 +39,19 @@ export const DiaryList: React.FC = () => {
 
         {/* Filter Chips */}
         <section className="flex gap-2 overflow-x-auto scrollbar-hide py-2 items-center">
-          <button className="px-5 py-2 bg-primary text-white rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-primary-dark cursor-pointer">Tất cả</button>
-          <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Lúa</button>
-          <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Bưởi</button>
-          <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Cà chua</button>
-          <button className="px-5 py-2 bg-white border border-border-main/50 text-text-main/70 rounded-full font-bold whitespace-nowrap hover:bg-bg-surface-1 hover:text-text-main transition-colors active:scale-95 cursor-pointer">Khác</button>
-
+          {['Tất cả', 'Lúa', 'Bưởi', 'Cà chua', 'Khác'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setFilter(tab)}
+              className={`px-5 py-2 rounded-full font-bold whitespace-nowrap active:scale-95 transition-all cursor-pointer shadow-sm ${
+                filter === tab 
+                  ? 'bg-primary text-white hover:bg-primary-dark' 
+                  : 'bg-white border border-border-main/50 text-text-main/70 hover:bg-bg-surface-1 hover:text-text-main'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
           <div className="w-px h-6 bg-border-main/50 mx-1 flex-shrink-0"></div>
           <button
             onClick={() => setIsModalOpen(true)}
@@ -46,10 +64,10 @@ export const DiaryList: React.FC = () => {
         {/* Diary Timeline / Grid */}
         {loading ? (
           <div className="py-20 text-center font-bold text-text-main/70">Đang tải nhật ký...</div>
-        ) : diaries.length === 0 ? (
+        ) : filteredDiaries.length === 0 ? (
           <div className="py-20 text-center flex flex-col gap-4 items-center">
             <span className="text-4xl">📔</span>
-            <p className="font-bold text-text-main/70 text-lg">Chưa có nhật ký vụ mùa nào.</p>
+            <p className="font-bold text-text-main/70 text-lg">Chưa có nhật ký vụ mùa nào cho bộ lọc này.</p>
             <button
               onClick={() => setIsModalOpen(true)}
               className="px-6 py-3 bg-primary text-white font-bold rounded-full hover:bg-primary-dark cursor-pointer shadow-md"
@@ -59,7 +77,7 @@ export const DiaryList: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-2">
-            {diaries.map(diary => {
+            {filteredDiaries.map(diary => {
               const cropImg = getCropImage(diary.crop_type);
               return (
                 <article
@@ -130,7 +148,8 @@ export const DiaryList: React.FC = () => {
       {/* Floating Action Button for Create Diary */}
       <button
         onClick={() => navigate('/diary/create')}
-        className="fixed bottom-[140px] right-4 md:bottom-24 md:right-8 w-14 h-14 bg-white text-primary border border-primary/20 rounded-full flex items-center justify-center shadow-lg shadow-black/5 z-40 transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+        className="fixed right-4 md:right-8 w-14 h-14 bg-white text-primary border border-primary/20 rounded-full flex items-center justify-center shadow-lg shadow-black/5 z-40 transition-transform hover:scale-110 active:scale-95 cursor-pointer"
+        style={{ bottom: 'calc(152px + env(safe-area-inset-bottom))' }}
         aria-label="Tạo Nhật ký"
       >
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">

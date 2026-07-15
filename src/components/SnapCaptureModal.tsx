@@ -31,7 +31,8 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
   onSuccess,
 }) => {
   const [state, setState] = useState<CaptureState>('idle');
-  const [, setStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -78,10 +79,6 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
       }
 
       setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.play();
-      }
       setState('camera');
     } catch (err) {
       if (cameraRequestRef.current !== requestId) {
@@ -93,6 +90,24 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
       setErrorMessage('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
     }
   }, [facingMode, stopCamera]);
+
+  useEffect(() => {
+    if (state === 'camera' && stream && videoRef.current) {
+      const video = videoRef.current;
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play()
+          .then(() => setIsCameraReady(true))
+          .catch(err => {
+            console.error('Camera play error:', err);
+            setErrorMessage('Không thể phát video từ camera.');
+            setState('error');
+          });
+      };
+    } else {
+      setIsCameraReady(false);
+    }
+  }, [state, stream]);
 
   useEffect(() => {
     if (isOpen) {
@@ -114,7 +129,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (video.videoWidth === 0 || video.videoHeight === 0) {
+    if (!isCameraReady || video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
       setState('error');
       setErrorMessage('Camera chưa sẵn sàng. Vui lòng đợi 1 giây và thử lại.');
       return;
@@ -381,9 +396,10 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
                     <button
                       onClick={handleCapture}
-                      className="w-20 h-20 rounded-full border-4 border-white flex justify-center items-center active:scale-90 transition-transform"
+                      disabled={!isCameraReady}
+                      className={`w-20 h-20 rounded-full border-4 flex justify-center items-center transition-transform ${isCameraReady ? 'border-white active:scale-90' : 'border-white/50 opacity-50'}`}
                     >
-                      <div className="w-16 h-16 rounded-full bg-white"></div>
+                      <div className={`w-16 h-16 rounded-full ${isCameraReady ? 'bg-white' : 'bg-white/50'}`}></div>
                     </button>
 
                     <button
