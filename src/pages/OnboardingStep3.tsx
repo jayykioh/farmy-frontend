@@ -19,6 +19,8 @@ export const OnboardingStep3: React.FC = () => {
       useAuthStore.getState().setSession({
         user: { ...user, onboardingCompleted: true }
       });
+      // Persist to localStorage immediately as fallback in case API fails
+      localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
     }
 
     try {
@@ -28,11 +30,12 @@ export const OnboardingStep3: React.FC = () => {
         primaryCrops: selectedCrop,
       });
 
-      // Clear local storage
+      // Clear onboarding temp data on success
       localStorage.removeItem('onboarding_farmName');
       localStorage.removeItem('onboarding_selectedCrop');
     } catch (error) {
       console.error('Failed to complete onboarding on server, but proceeding locally:', error);
+      // localStorage flag already set above — user will not be looped
     } finally {
       navigate('/home');
     }
