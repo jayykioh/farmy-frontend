@@ -8,7 +8,7 @@ export const MainLayout = () => {
   const { isPageHeaderVisible } = usePageHeader();
   
   // List of paths where bottom navigation should be hidden
-  const hideBottomNavPaths = ['/', '/register', '/onboarding-1', '/onboarding-2', '/onboarding-3', '/loading', '/network-error', '/maintenance', '/404', '/celebration'];
+  const hideBottomNavPaths = ['/', '/login', '/register', '/onboarding-1', '/onboarding-2', '/onboarding-3', '/loading', '/network-error', '/maintenance', '/404', '/celebration'];
   const showBottomNav = !hideBottomNavPaths.includes(location.pathname);
 
   return (

@@ -7,6 +7,11 @@ import axios from 'axios';
 import { MascotLottie } from '../components/MascotLottie';
 import { useAuthStore } from '../store/authStore';
 
+const hasCompletedOnboardingLocally = (userId?: string): boolean => {
+  if (!userId) return false;
+  return localStorage.getItem(`onboarding_completed_${userId}`) === 'true';
+};
+
 const loginSchema = z.object({
   email: z.string().trim().min(1, 'Vui lòng nhập email.').email('Email không hợp lệ.'),
   password: z.string().min(1, 'Vui lòng nhập mật khẩu.'),
@@ -48,7 +53,7 @@ export const WelcomeAuth: React.FC = () => {
     try {
       await login(credentials);
       const user = useAuthStore.getState().user;
-      if (user?.onboardingCompleted) {
+      if (user?.onboardingCompleted || hasCompletedOnboardingLocally(user?.id)) {
         navigate('/home');
       } else {
         navigate('/onboarding-1');
