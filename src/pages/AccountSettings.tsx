@@ -1,18 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, exportUserData } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
+import { uploadSnapPhoto } from '../api/snaps';
+
+const PROVINCES = [
+  'Hà Nội', 'TP. Hồ Chí Minh', 'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
+  'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cần Thơ', 'Cao Bằng',
+  'Đà Nẵng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang',
+  'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hải Phòng', 'Hậu Giang', 'Hòa Bình', 'Hưng Yên', 'Khánh Hòa',
+  'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định',
+  'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên', 'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi',
+  'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa',
+  'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái'
+];
 
 export const AccountSettings: React.FC = () => {
-  const { user } = useAuthStore();
+  const { user, updateProfile } = useAuthStore();
   const [isEditingName, setIsEditingName] = useState(false);
   const [name, setName] = useState(user?.name || 'Nông dân Ẩn danh');
-  const [farmName, setFarmName] = useState('Nông trại Vườn Xanh');
-  const [region, setRegion] = useState('An Giang');
+  const [farmName, setFarmName] = useState(user?.farmName || 'Nông trại Vườn Xanh');
+  const [region, setRegion] = useState(user?.region || 'An Giang');
   const [editName, setEditName] = useState(name);
   const [editFarmName, setEditFarmName] = useState(farmName);
   const [editRegion, setEditRegion] = useState(region);
+  
+  const [isUploading, setIsUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
   const { clearSession } = useAuthStore();
@@ -21,8 +36,9 @@ export const AccountSettings: React.FC = () => {
     setName(editName);
     setFarmName(editFarmName);
     setRegion(editRegion);
+    updateProfile({ name: editName, farmName: editFarmName, region: editRegion });
     setIsEditingName(false);
-    alert('Trong phiên bản hiện tại, API cập nhật hồ sơ chưa được hỗ trợ từ phía server. Thay đổi chỉ lưu tạm trên giao diện.');
+    alert('Đã cập nhật hồ sơ của bạn thành công!');
   };
 
   const handleCancel = () => {
@@ -30,6 +46,27 @@ export const AccountSettings: React.FC = () => {
     setEditFarmName(farmName);
     setEditRegion(region);
     setIsEditingName(false);
+  };
+
+  const handleAvatarClick = () => {
+    avatarInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const upload = await uploadSnapPhoto(file);
+      updateProfile({ avatarUrl: upload.publicUrl });
+      alert('Đã thay đổi ảnh đại diện thành công!');
+    } catch (err) {
+      console.error(err);
+      alert('Không thể tải ảnh đại diện lên. Vui lòng thử lại!');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleExportData = async () => {
@@ -66,6 +103,13 @@ export const AccountSettings: React.FC = () => {
 
   return (
     <div className="w-full min-h-[100svh] bg-bg-surface-1 text-left font-sans pb-24 md:pb-8">
+      <input
+        type="file"
+        ref={avatarInputRef}
+        onChange={handleAvatarChange}
+        accept="image/*"
+        className="hidden"
+      />
       
       <PageHeader 
         title="Account Settings"
@@ -78,15 +122,28 @@ export const AccountSettings: React.FC = () => {
         
         {/* Profile Avatar Section */}
         <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border-2 border-primary/30">
-            <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
+          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border-2 border-primary/30 overflow-hidden relative group">
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            )}
+            {isUploading && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
           <p className="text-lg font-bold text-text-main">{name}</p>
           <p className="text-sm text-text-main/60">Nông dân Siêng năng</p>
-          <button className="mt-4 bg-primary text-white px-4 py-2 rounded-full font-semibold text-sm hover:bg-primary-container transition-colors cursor-pointer">
-            Thay đổi ảnh đại diện
+          <button 
+            onClick={handleAvatarClick}
+            disabled={isUploading}
+            className="mt-4 bg-primary text-white px-4 py-2 rounded-full font-semibold text-sm hover:bg-primary-container transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {isUploading ? 'Đang tải...' : 'Thay đổi ảnh đại diện'}
           </button>
         </div>
 
@@ -126,18 +183,9 @@ export const AccountSettings: React.FC = () => {
                   onChange={(e) => setEditRegion(e.target.value)}
                   className="w-full bg-bg-surface-1 border border-border-main/50 rounded-[12px] px-4 py-3 text-base font-medium text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                 >
-                  <option>An Giang</option>
-                  <option>Bạc Liêu</option>
-                  <option>Bến Tre</option>
-                  <option>Cần Thơ</option>
-                  <option>Đồng Tháp</option>
-                  <option>Hậu Giang</option>
-                  <option>Kiên Giang</option>
-                  <option>Long An</option>
-                  <option>Sóc Trăng</option>
-                  <option>Tiền Giang</option>
-                  <option>Trà Vinh</option>
-                  <option>Vĩnh Long</option>
+                  {PROVINCES.map((prov) => (
+                    <option key={prov} value={prov}>{prov}</option>
+                  ))}
                 </select>
               </div>
             </div>
