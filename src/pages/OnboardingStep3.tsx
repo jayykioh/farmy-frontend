@@ -5,8 +5,6 @@ import { useRequireAuth } from '../hooks/useRequireAuth';
 import { completeOnboarding } from '../api/auth';
 import { useAuthStore } from '../store/authStore';
 
-import { useAuthStore } from '../store/authStore';
-
 export const OnboardingStep3: React.FC = () => {
   const navigate = useNavigate();
   const { checkingAuth } = useRequireAuth();

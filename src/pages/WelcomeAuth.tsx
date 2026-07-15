@@ -49,16 +49,12 @@ export const WelcomeAuth: React.FC = () => {
 
     try {
       await login(credentials);
-<<<<<<< HEAD
       const user = useAuthStore.getState().user;
       if (user?.onboardingCompleted) {
         navigate('/home');
-      } else {
-        navigate('/onboarding-1');
+        return;
       }
-=======
-      
-      const user = useAuthStore.getState().user;
+
       const localOnboarded = user ? localStorage.getItem(`onboarding_completed_${user.id}`) : null;
       
       if (localOnboarded === 'true') {
@@ -80,7 +76,6 @@ export const WelcomeAuth: React.FC = () => {
       }
 
       navigate('/onboarding-1');
->>>>>>> 585b043 (fix(fe): onboarding, diary/reminder routes, camera/upload UX, account settings profile)
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));
     }
