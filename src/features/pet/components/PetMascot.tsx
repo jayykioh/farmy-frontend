@@ -54,19 +54,59 @@ export const PetMascot: React.FC<PetMascotProps> = ({
         message={message}
         className="pet-mascot-wrapper__bubble"
       />) : null}
-      <img
-        src={src}
-        alt={`Bé Thóc đang ${ui?.label ?? 'trung lập'}`}
-        aria-label={ui?.description}
-        width={size}
-        height={size}
-        draggable={false}
-        className={[
-          'pet-mascot-img',
-          transition.isTransitioning && !staticMood ? 'pet-mascot-img--transitioning' : '',
-        ].join(' ').trim()}
-        style={{ userSelect: 'none' }}
-      />
+      
+      <div style={{ position: 'relative', width: size, height: size }}>
+        <img
+          src={src}
+          alt={`Bé Thóc đang ${ui?.label ?? 'trung lập'}`}
+          aria-label={ui?.description}
+          width={size}
+          height={size}
+          draggable={false}
+          className={[
+            'pet-mascot-img',
+            transition.isTransitioning && !staticMood ? 'pet-mascot-img--transitioning' : '',
+          ].join(' ').trim()}
+          style={{ userSelect: 'none', width: '100%', height: '100%', objectContain: 'contain' }}
+        />
+
+        {/* Real Physical Equipping Logic */}
+        {status?.equippedItemsDetails?.map((item) => {
+          const isGlasses = item.name.toLowerCase().includes('kính') || item._id.includes('kinh');
+          
+          // Custom styles depending on item type
+          const itemStyle: React.CSSProperties = isGlasses
+            ? {
+                position: 'absolute',
+                top: '32%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '50%',
+                height: 'auto',
+                pointerEvents: 'none',
+                zIndex: 11,
+              }
+            : {
+                position: 'absolute',
+                top: '-18%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '80%',
+                height: 'auto',
+                pointerEvents: 'none',
+                zIndex: 10,
+              };
+
+          return (
+            <img
+              key={item._id}
+              src={item.image_url}
+              alt={item.name}
+              style={itemStyle}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };

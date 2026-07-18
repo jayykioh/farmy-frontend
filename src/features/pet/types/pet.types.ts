@@ -32,6 +32,12 @@ export interface PetStatus {
   bubbleMessage: string;
   ownedItems: string[];
   equippedItems: string[];
+  equippedItemsDetails?: Array<{
+    _id: string;
+    name: string;
+    category: string;
+    image_url: string;
+  }>;
   updatedAt?: string;
 }
 
