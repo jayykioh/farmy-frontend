@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState } from 'react';
 import { PetMascot } from '../../features/pet/components/PetMascot';
 import { updatePushSubscription } from '../../api/auth';

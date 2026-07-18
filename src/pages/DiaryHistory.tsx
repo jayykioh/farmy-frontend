@@ -4,6 +4,7 @@ import { Activity, Archive, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout,
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
+import toast from 'react-hot-toast';
 import { PageHeader } from '../components/PageHeader';
 import {
   useGetDiaryDetailQuery,
@@ -100,10 +101,10 @@ export const DiaryHistory: React.FC = () => {
     if (window.confirm('Bạn có chắc muốn lưu trữ vụ mùa này?')) {
       try {
         await updateDiary({ id: activeDiaryId, data: { status: 'archived' } }).unwrap();
-        alert('Đã lưu trữ vụ mùa!');
+        toast.success('Đã lưu trữ vụ mùa!');
       } catch (e) {
         console.error(e);
-        alert('Lỗi khi lưu trữ!');
+        toast.error('Lỗi khi lưu trữ!');
       }
     }
   };
@@ -113,11 +114,11 @@ export const DiaryHistory: React.FC = () => {
     if (window.confirm('Bạn có chắc muốn xóa vụ mùa này? Không thể hoàn tác!')) {
       try {
         await deleteDiary(activeDiaryId).unwrap();
-        alert('Đã xóa vụ mùa!');
+        toast.success('Đã xóa vụ mùa!');
         navigate('/diary');
       } catch (e) {
         console.error(e);
-        alert('Lỗi khi xóa!');
+        toast.error('Lỗi khi xóa!');
       }
     }
   };
@@ -196,15 +197,26 @@ export const DiaryHistory: React.FC = () => {
       />
       <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
         {diary && (
-          <div className="flex justify-end gap-2">
-            {diary.status === 'active' && (
-              <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
-                <Archive className="w-4 h-4" /> Lưu trữ
+          <div className="flex justify-between items-center gap-4">
+            <div>
+              <span className={`px-3 py-1.5 rounded-full text-sm font-bold shadow-sm border ${
+                diary.status === 'archived' 
+                  ? 'bg-slate-100 text-slate-600 border-slate-200' 
+                  : 'bg-primary/10 text-primary-dark border-primary/20'
+              }`}>
+                {diary.status === 'active' ? '🌱 Đang canh tác' : '📦 Đã lưu trữ'}
+              </span>
+            </div>
+            <div className="flex justify-end gap-2">
+              {diary.status === 'active' && (
+                <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
+                  <Archive className="w-4 h-4" /> Lưu trữ
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
+                <Trash2 className="w-4 h-4" /> Xóa vụ mùa
               </Button>
-            )}
-            <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
-              <Trash2 className="w-4 h-4" /> Xóa vụ mùa
-            </Button>
+            </div>
           </div>
         )}
 

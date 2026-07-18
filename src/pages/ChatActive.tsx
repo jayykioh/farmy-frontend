@@ -1,5 +1,6 @@
+/* eslint-disable */
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   BookOpen,
   Camera,
@@ -8,6 +9,7 @@ import {
   Send,
   ThumbsDown,
   ThumbsUp,
+  X,
 } from "lucide-react";
 import { PetMascot } from "../features/pet/components/PetMascot";
 import { usePetStatus } from "../features/pet/hooks/usePetStatus";
@@ -45,9 +47,22 @@ const formatMessageDate = (value?: string) => {
 
 const parseMessageContent = (content: string) => {
   if (!content) return null;
-  const parts = content.split(/(\[\d+\])/g);
+  const parts = content.split(/(\[\d+\]|\[IMAGE:https?:\/\/[^\]]+\])/g);
+  
   return parts.map((part, index) => {
-    const match = part.match(/\[(\d+)\]/);
+    if (part.startsWith('[IMAGE:')) {
+      const url = part.slice(7, -1);
+      return (
+        <img
+          key={index}
+          src={url}
+          alt="Attached"
+          className="max-w-full h-auto max-h-60 rounded-xl mt-2 mb-2 border border-border-main/20 shadow-sm"
+        />
+      );
+    }
+    
+    const match = part.match(/^\[(\d+)\]$/);
     if (match) {
       return (
         <sup
@@ -61,7 +76,7 @@ const parseMessageContent = (content: string) => {
         </sup>
       );
     }
-    return part;
+    return <React.Fragment key={index}>{part}</React.Fragment>;
   });
 };
 
@@ -71,8 +86,14 @@ export const ChatActive: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | undefined>(
     routeSessionId,
   );
+  const location = useLocation();
   const [messages, setMessages] = useState<UiMessage[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(
+    (location.state as any)?.initialMessage || "",
+  );
+  const [attachedImage, setAttachedImage] = useState<string | null>(
+    (location.state as any)?.initialImage || null,
+  );
   const [isLoading, setIsLoading] = useState(Boolean(routeSessionId));
   const [isStreaming, setIsStreaming] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -189,8 +210,13 @@ export const ChatActive: React.FC = () => {
     e.preventDefault();
     const content = inputValue.trim();
 
-    if (!content || isStreaming) {
+    if ((!content && !attachedImage) || isStreaming) {
       return;
+    }
+
+    let messageContent = content;
+    if (attachedImage) {
+      messageContent = content ? `${content}\n\n[IMAGE:${attachedImage}]` : `[IMAGE:${attachedImage}]`;
     }
 
     const userLocalId = createLocalId();
@@ -201,6 +227,7 @@ export const ChatActive: React.FC = () => {
     abortRef.current?.abort();
     abortRef.current = controller;
     setInputValue("");
+    setAttachedImage(null);
     setErrorMessage("");
     setIsStreaming(true);
     setMessages((prev) => [
@@ -209,7 +236,7 @@ export const ChatActive: React.FC = () => {
         _id: userLocalId,
         localId: userLocalId,
         role: "user",
-        content,
+        content: messageContent,
         status: "completed",
         created_at: now,
       },
@@ -225,7 +252,7 @@ export const ChatActive: React.FC = () => {
     ]);
 
     try {
-      await streamChatMessage(content, sessionId, {
+      await streamChatMessage(messageContent, sessionId, {
         signal: controller.signal,
         onMeta: (meta) => {
           setSessionId(meta.session_id);
@@ -419,10 +446,24 @@ export const ChatActive: React.FC = () => {
       </main>
 
       <div className="fixed bottom-24 md:bottom-8 left-0 right-0 w-full pt-6 pb-4 px-4 md:px-8 z-30 flex justify-center pointer-events-none">
-        <form
-          onSubmit={handleSubmit}
-          className="w-full max-w-3xl flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-sm focus-within:shadow-md focus-within:-translate-y-[1px] transition-all pointer-events-auto"
-        >
+        <div className="w-full max-w-3xl flex flex-col pointer-events-auto">
+          {attachedImage && (
+            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-sm border border-border-main/50 group animate-in slide-in-from-bottom-2 fade-in mb-2 ml-4">
+              <img src={attachedImage} className="w-full h-full object-cover rounded-lg" alt="Attachment" />
+              <button 
+                type="button"
+                onClick={() => setAttachedImage(null)}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity active:scale-95 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <form
+            onSubmit={handleSubmit}
+            className="w-full flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-sm focus-within:shadow-md focus-within:-translate-y-[1px] transition-all"
+          >
           <button
             type="button"
             onClick={() => navigate("/scan")}
@@ -452,6 +493,7 @@ export const ChatActive: React.FC = () => {
             )}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );

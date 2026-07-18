@@ -4,6 +4,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { PageHeaderProvider } from './contexts/PageHeaderContext';
 import { useDiaryOfflineSync } from './hooks/useDiaryOfflineSync';
+import { Toaster } from 'react-hot-toast';
 
 // Pages
 import Landing from './pages/Landing';
@@ -40,6 +41,7 @@ export function App() {
 
   return (
     <ErrorBoundary>
+      <Toaster position="top-center" />
       <PageHeaderProvider>
         <BrowserRouter>
           <Routes>
