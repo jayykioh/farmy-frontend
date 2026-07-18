@@ -8,7 +8,8 @@ export const SnapFAB: React.FC = () => {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-[80px] md:bottom-8 right-4 md:right-8 w-14 h-14 bg-primary text-white rounded-full shadow-[0_4px_20px_rgba(8,168,85,0.4)] flex items-center justify-center z-40 active:scale-90 transition-transform hover:scale-105"
+        className="fixed right-4 md:right-8 w-14 h-14 bg-primary text-white rounded-full shadow-[0_4px_20px_rgba(8,168,85,0.4)] flex items-center justify-center z-50 active:scale-90 transition-transform hover:scale-105"
+        style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}
         aria-label="Chụp Farm Snap"
       >
         <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">

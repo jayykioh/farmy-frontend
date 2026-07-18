@@ -1,7 +1,8 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import { BottomNavigation } from './BottomNavigation';
 import { Sidebar } from './Sidebar';
 import { usePageHeader } from '../../contexts/PageHeaderContext';
+import { useReminders } from '../../hooks/useReminders';
 
 export const MainLayout = () => {
   const location = useLocation();
@@ -10,6 +11,9 @@ export const MainLayout = () => {
   // List of paths where bottom navigation should be hidden
   const hideBottomNavPaths = ['/', '/login', '/register', '/onboarding-1', '/onboarding-2', '/onboarding-3', '/loading', '/network-error', '/maintenance', '/404', '/celebration'];
   const showBottomNav = !hideBottomNavPaths.includes(location.pathname);
+
+  const { data: pendingReminders } = useReminders({ status: 'pending' });
+  const pendingCount = pendingReminders?.length || 0;
 
   return (
     <div className="flex min-h-[100svh] w-full bg-bg-main font-sans relative">
@@ -32,11 +36,16 @@ export const MainLayout = () => {
              </svg>
              <input type="text" placeholder="Tìm kiếm..." className="w-full bg-bg-surface border border-border-main/40 rounded-full py-2 pl-10 pr-4 text-[13.5px] focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" />
           </div>
-          <button className="w-10 h-10 flex items-center justify-center text-text-main hover:bg-black/[0.04] rounded-full active:scale-95 transition-all">
+          <Link to="/reminders" className="relative w-10 h-10 flex items-center justify-center text-text-main hover:bg-black/[0.04] rounded-full active:scale-95 transition-all">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-          </button>
+            {pendingCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-bg-main shadow-sm">
+                {pendingCount > 9 ? '9+' : pendingCount}
+              </span>
+            )}
+          </Link>
         </header>) : null}
 
         {/* Main Content Area */}

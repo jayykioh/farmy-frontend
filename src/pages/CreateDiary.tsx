@@ -166,32 +166,51 @@ export const CreateDiary: React.FC = () => {
             <section className="bg-white border border-border-main/50 rounded-3xl p-5 shadow-sm space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="space-y-2">
-                  <span className="font-bold text-sm text-text-main ml-2">Chọn vụ mùa</span>
+                  <span className="font-bold text-sm text-text-main ml-2">Chọn vụ mùa *</span>
                   <span className="relative block">
                     <select
                       value={activeDiaryId}
                       onChange={(event) => setSelectedDiaryId(event.target.value)}
-                      className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container appearance-none shadow-sm"
+                      className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container appearance-none shadow-sm cursor-pointer"
                     >
-                      {diaries.map((diary) => (
-                        <option key={diary._id} value={diary._id}>
-                          {diary.crop_type} ({diary.status === 'active' ? 'Đang canh tác' : 'Lưu trữ'})
-                        </option>
-                      ))}
+                      <optgroup label="🌱 Đang canh tác">
+                        {diaries.filter(d => d.status === 'active').map((diary) => (
+                          <option key={diary._id} value={diary._id}>
+                            {diary.crop_type} - {new Date(diary.start_date).toLocaleDateString('vi-VN')}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="📦 Đã lưu trữ">
+                        {diaries.filter(d => d.status === 'archived').map((diary) => (
+                          <option key={diary._id} value={diary._id}>
+                            {diary.crop_type} - {new Date(diary.start_date).toLocaleDateString('vi-VN')}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-main/70 w-5 h-5" />
                   </span>
                 </label>
 
                 <label className="space-y-2">
-                  <span className="font-bold text-sm text-text-main ml-2">Giai đoạn sinh trưởng</span>
-                  <input
-                    value={growthStage}
-                    onChange={(event) => setGrowthStage(event.target.value)}
-                    className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container shadow-sm"
-                    placeholder="Đang làm đòng / Trổ bông"
-                    type="text"
-                  />
+                  <span className="font-bold text-sm text-text-main ml-2">Giai đoạn sinh trưởng *</span>
+                  <span className="relative block">
+                    <select
+                      value={growthStage}
+                      onChange={(event) => setGrowthStage(event.target.value)}
+                      className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container appearance-none shadow-sm cursor-pointer"
+                      required
+                    >
+                      <option value="" disabled>Chọn giai đoạn...</option>
+                      <option value="Gieo hạt / Nảy mầm">Gieo hạt / Nảy mầm</option>
+                      <option value="Cây non / Phát triển">Cây non / Phát triển</option>
+                      <option value="Ra hoa / Làm đòng">Ra hoa / Làm đòng</option>
+                      <option value="Kết trái / Nuôi hạt">Kết trái / Nuôi hạt</option>
+                      <option value="Gần thu hoạch">Gần thu hoạch</option>
+                      <option value="Khác">Khác</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-main/70 w-5 h-5" />
+                  </span>
                 </label>
               </div>
 
@@ -234,9 +253,9 @@ export const CreateDiary: React.FC = () => {
               <div className="space-y-3">
                 <span className="font-bold text-sm text-text-main ml-2">Hình ảnh thực tế</span>
                 <div className="grid grid-cols-4 gap-4">
-                  <label className="aspect-square border border-dashed border-border-main rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-bg-surface-1 transition-colors group">
+                  <label className="aspect-square border border-dashed border-border-main rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-bg-surface-1 transition-colors group p-2">
                     <input
-                      accept="image/*"
+                      accept="image/png, image/jpeg"
                       className="hidden"
                       type="file"
                       multiple
@@ -244,6 +263,7 @@ export const CreateDiary: React.FC = () => {
                     />
                     <Camera className="w-6 h-6 text-text-main/30 group-hover:text-primary transition-colors" />
                     <span className="text-[10px] font-bold text-text-main/50 mt-1">Thêm ảnh</span>
+                    <span className="text-[8px] font-medium text-text-main/40 mt-0.5 text-center leading-tight">PNG, JPG<br/>(Tối đa 5MB)</span>
                   </label>
 
                   {imageUrl ? (
