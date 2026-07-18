@@ -132,7 +132,7 @@ type CsrfTokenResponse = ApiResponse<{
   csrfToken: string;
 }>;
 
-let accessToken: string | null = null;
+let accessToken: string | null = localStorage.getItem('farmdiaries_access_token');
 let isRefreshing = false;
 let refreshQueue: TokenRefreshSubscriber[] = [];
 let csrfToken: string | null = null;
@@ -141,10 +141,16 @@ export const getAccessToken = () => accessToken;
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
+  if (token) {
+    localStorage.setItem('farmdiaries_access_token', token);
+  } else {
+    localStorage.removeItem('farmdiaries_access_token');
+  }
 };
 
 export const clearAccessToken = () => {
-  setAccessToken(null);
+  accessToken = null;
+  localStorage.removeItem('farmdiaries_access_token');
 };
 
 const processRefreshQueue = (error: unknown, accessToken?: string) => {

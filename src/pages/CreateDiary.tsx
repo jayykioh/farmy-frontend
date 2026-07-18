@@ -11,6 +11,7 @@ import { createBlobDigest, createDiaryRequestHash } from '../lib/diaryHash';
 import { assertStorageRoom, compressImageFile, ensurePersistentStorage } from '../lib/imageCompression';
 import { saveOfflineDiaryDraft } from '../lib/indexedDB';
 import { runDiarySync } from '../lib/diarySyncEngine';
+import { CreateSeasonModal } from '../components/modals';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +25,9 @@ export const CreateDiary: React.FC = () => {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const activeDiaryId = selectedDiaryId || diaries[0]?._id || '';
+  const [showCreateSeason, setShowCreateSeason] = useState(false);
+  const activeDiaries = diaries.filter((d) => d.status === 'active');
+  const activeDiaryId = selectedDiaryId || activeDiaries[0]?._id || '';
 
   const selectedDiary = useMemo(
     () => diaries.find((diary) => diary._id === activeDiaryId),
@@ -126,8 +129,15 @@ export const CreateDiary: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[100svh] bg-bg-main text-left font-sans">
-      <PageHeader title="Nhật ký mới" leftButton="close" rightButton="none" />
+    <>
+      <CreateSeasonModal
+        isOpen={showCreateSeason}
+        onClose={() => setShowCreateSeason(false)}
+        onSuccess={() => setShowCreateSeason(false)}
+        mode="add-season"
+      />
+      <div className="w-full min-h-[100svh] bg-bg-main text-left font-sans">
+      <PageHeader title="Nhật ký hoạt động" leftButton="close" rightButton="none" />
 
       <main className="w-full max-w-2xl mx-auto pt-24 pb-36 md:pb-10 px-5 md:px-8">
         {fetching ? (
@@ -136,11 +146,20 @@ export const CreateDiary: React.FC = () => {
           </div>
         ) : diaries.length === 0 ? (
           <div className="py-20 text-center flex flex-col gap-4 items-center">
-            <Sprout className="w-12 h-12 text-primary/50" />
-            <p className="font-bold text-text-main/70">
-              Bạn chưa bắt đầu vụ mùa nào để ghi nhật ký.
-            </p>
-            <Button onClick={() => navigate('/home')}>Về trang chủ</Button>
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-primary/10 blur-2xl scale-150 pointer-events-none" />
+              <Sprout className="w-14 h-14 text-primary/60 relative" />
+            </div>
+            <div className="flex flex-col gap-1.5 max-w-[240px]">
+              <p className="font-black text-text-h text-lg">Chưa có vụ mùa nào</p>
+              <p className="text-sm font-medium text-text-main/60 leading-relaxed">
+                Bạn cần tạo một vụ mùa trước khi ghi nhật ký hoạt động.
+              </p>
+            </div>
+            <Button onClick={() => setShowCreateSeason(true)}>
+              <Sprout className="w-4 h-4" />
+              Tạo vụ mùa
+            </Button>
           </div>
         ) : (
           <form onSubmit={handleSave} className="space-y-6">
@@ -277,6 +296,7 @@ export const CreateDiary: React.FC = () => {
         </footer>
       ) : null}
     </div>
+    </>
   );
 };
 

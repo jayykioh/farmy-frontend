@@ -9,3 +9,4 @@ export default mergeConfig(viteConfig, defineConfig({
     setupFiles: './src/setupTests.ts',
   },
 }));
+
