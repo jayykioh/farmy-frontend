@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
   Check,
-  ChevronRight,
   Pencil,
   Leaf,
   Loader2,
@@ -15,7 +14,6 @@ import {
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
-import { PageHeader } from '../components/PageHeader';
 import {
   deleteChatSession,
   fetchChatSessions,

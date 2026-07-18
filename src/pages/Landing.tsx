@@ -5,8 +5,7 @@ import {
   ChevronRight,
   ScanLine,
   MessageSquare,
-  Activity,
-  Cat
+  Activity
 } from 'lucide-react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 
