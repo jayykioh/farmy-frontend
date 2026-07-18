@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 interface LoadingScreenProps {
@@ -12,15 +12,6 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   subtitle = 'Bé Thóc đang chuẩn bị cho bạn',
   showBethoc = true,
 }) => {
-  const [dots, setDots] = useState('');
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots(prev => (prev.length < 3 ? prev + '.' : ''));
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="w-full min-h-[100svh] bg-[#FBFBFD] flex flex-col items-center justify-center px-4 py-8 gap-8">
       
