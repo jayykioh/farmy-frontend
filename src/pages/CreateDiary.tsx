@@ -14,6 +14,7 @@ import { assertStorageRoom, compressImageFile, ensurePersistentStorage } from '.
 import { saveOfflineDiaryDraft } from '../lib/indexedDB';
 import { runDiarySync } from '../lib/diarySyncEngine';
 import { CreateSeasonModal } from '../components/modals';
+import toast from 'react-hot-toast';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
@@ -63,11 +64,11 @@ export const CreateDiary: React.FC = () => {
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!activeDiaryId) {
-      alert('Vui lòng chọn hoặc tạo nhật ký vụ mùa trước.');
+      toast.error('Vui lòng chọn hoặc tạo nhật ký vụ mùa trước.');
       return;
     }
     if (!userId) {
-      alert('Vui lòng đăng nhập lại để lưu nhật ký offline.');
+      toast.error('Vui lòng đăng nhập lại để lưu nhật ký offline.');
       return;
     }
 
@@ -115,9 +116,9 @@ export const CreateDiary: React.FC = () => {
     } catch (error) {
       console.error(error);
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-        alert('Bộ nhớ offline không đủ để lưu nhật ký này.');
+        toast('Bộ nhớ offline không đủ để lưu nhật ký này.', { icon: 'ℹ️' });
       } else {
-        alert('Không thể lưu nhật ký offline.');
+        toast.error('Không thể lưu nhật ký offline.');
       }
     } finally {
       setIsSaving(false);
