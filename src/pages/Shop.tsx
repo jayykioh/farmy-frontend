@@ -100,7 +100,7 @@ export const Shop: React.FC = () => {
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.2}
-              onDragEnd={(_, info) => {
+              onDragEnd={(_: any, info: any) => {
                 if (info.offset.y > 100) setModal(null);
               }}
               className="bg-white/80 backdrop-blur-xl rounded-[32px] border border-black/[0.04] p-6 max-w-sm w-full shadow-[0_24px_80px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-4 cursor-grab active:cursor-grabbing"

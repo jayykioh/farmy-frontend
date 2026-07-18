@@ -67,7 +67,7 @@ export const PetMascot: React.FC<PetMascotProps> = ({
             'pet-mascot-img',
             transition.isTransitioning && !staticMood ? 'pet-mascot-img--transitioning' : '',
           ].join(' ').trim()}
-          style={{ userSelect: 'none', width: '100%', height: '100%', objectContain: 'contain' }}
+          style={{ userSelect: 'none', width: '100%', height: '100%', objectFit: 'contain' }}
         />
 
         {/* Real Physical Equipping Logic */}
