@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState } from 'react';
-import { MascotLottie } from '../MascotLottie';
+import { PetMascot } from '../../features/pet/components/PetMascot';
 import { updatePushSubscription } from '../../api/auth';
 
 // ────────────────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ export const NotificationConsentOverlay: React.FC<Props> = ({ userId, onDismiss 
 
   return (
     // Overlay full-screen — same visual effect as the original /onboarding-3 page
-    <div className="fixed inset-0 z-[9999] w-full h-full min-h-[100svh] bg-gradient-to-b from-blue-100 to-green-50 overflow-hidden font-sans text-left flex flex-col">
+    <div className="fixed inset-0 z-[9999] w-full h-full min-h-[100svh] bg-[#FBFBFD] overflow-hidden font-sans text-left flex flex-col">
 
       {/* Top App Bar (Branding) */}
       <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
@@ -99,8 +100,8 @@ export const NotificationConsentOverlay: React.FC<Props> = ({ userId, onDismiss 
         {/* Mascot Section */}
         <div className="relative w-full aspect-square md:aspect-auto md:w-1/2 flex items-center justify-center z-10 md:h-full">
           <div className="relative w-64 h-64 md:w-80 md:h-80">
-            {/* Mascot Lottie */}
-            <MascotLottie state="sleepy" className="w-full h-full" />
+            {/* Mascot */}
+            <PetMascot staticMood="sleepy" className="w-full h-full" size={320} />
             {/* Floating Bell Element */}
             <div className="absolute bottom-10 right-10 origin-top animate-[spin_2s_ease-in-out_infinite]">
               <svg className="w-12 h-12 text-[#FFC107] drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
@@ -164,10 +165,6 @@ export const NotificationConsentOverlay: React.FC<Props> = ({ userId, onDismiss 
         </section>
       </main>
 
-      {/* Wavy Grass Background */}
-      <svg className="absolute bottom-0 left-0 w-full h-[120px] fill-[#10B981] z-0 pointer-events-none opacity-50 md:opacity-100" preserveAspectRatio="none" viewBox="0 0 1440 120">
-        <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
-      </svg>
     </div>
   );
 };

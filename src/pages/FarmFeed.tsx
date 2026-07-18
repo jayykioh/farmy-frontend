@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { SnapCard } from '../components/SnapCard';
 import { SnapCaptureModal } from '../components/SnapCaptureModal';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { fetchSnapFeed, reactToSnap } from '../api/snaps';
 import type { SnapCondition, SnapReactionType } from '../types/farmSnap';
 import { SnapFAB } from '../components/SnapFAB';
@@ -18,6 +20,9 @@ export const FarmFeed: React.FC = () => {
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<FeedFilter>('all');
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const feedQuery = useQuery({
     queryKey: ['snaps', 'feed', filter],
@@ -106,7 +111,7 @@ export const FarmFeed: React.FC = () => {
         {feedQuery.isError ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
-              <MascotLottie className="w-full h-full" />
+              <PetMascot className="w-full h-full" status={petStatus} size={88} />
             </div>
             <h3 className="text-xl font-bold text-text-h mb-2">Chưa tải được Farm Feed</h3>
             <p className="text-text-main/70 mb-6 max-w-sm">
@@ -136,7 +141,7 @@ export const FarmFeed: React.FC = () => {
           /* Empty State */
           (<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
-              <MascotLottie className="w-full h-full" />
+              <PetMascot className="w-full h-full" status={petStatus} size={88} />
             </div>
             <h3 className="text-xl font-bold text-text-h mb-2">Chưa có snap nào!</h3>
             <p className="text-text-main/70 mb-6 max-w-sm flex items-center justify-center gap-1">

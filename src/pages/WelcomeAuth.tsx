@@ -4,13 +4,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axios from 'axios';
-import { ArrowRight, LockKeyhole, Mail, Sparkles } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
+import { ArrowRight, LockKeyhole, Mail, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { PetMascot } from '../features/pet/components/PetMascot';
 import { useAuthStore } from '../store/authStore';
 
 const loginSchema = z.object({
   email: z.string().trim().min(1, 'Vui lòng nhập email.').email('Email không hợp lệ.'),
   password: z.string().min(1, 'Vui lòng nhập mật khẩu.'),
+  rememberMe: z.boolean().optional(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -33,6 +34,7 @@ export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register: registerField,
     handleSubmit,
@@ -42,6 +44,7 @@ export const WelcomeAuth: React.FC = () => {
     defaultValues: {
       email: '',
       password: '',
+      rememberMe: false,
     },
   });
 
@@ -66,19 +69,17 @@ export const WelcomeAuth: React.FC = () => {
   const isBusy = isSubmitting;
 
   return (
-    <div className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(155deg,#f8fff7_0%,#ffffff_45%,#fff4d8_100%)] md:items-center md:justify-center">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.28] [background-image:radial-gradient(circle_at_1px_1px,rgba(20,30,23,0.12)_1px,transparent_0)] [background-size:26px_26px]" />
-      <div className="pointer-events-none absolute -left-20 top-12 h-72 w-72 rounded-full bg-primary-lightest/25 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-16 h-80 w-80 rounded-full bg-secondary-light/45 blur-3xl" />
+    <div className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[#FBFBFD] md:items-center md:justify-center">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.4] [background-image:radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] [background-size:24px_24px]" />
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden md:h-auto md:grid md:grid-cols-[0.95fr_1.05fr] md:rounded-[36px] md:border md:border-white/80 md:bg-white/65 md:shadow-[0_30px_100px_rgba(20,30,23,0.14)] md:backdrop-blur-xl">
-        <main className="relative flex flex-1 flex-col items-center justify-center px-6 pb-4 pt-10 md:items-start md:bg-[radial-gradient(circle_at_35%_25%,rgba(121,252,158,0.22),transparent_34%)] md:px-10 md:py-12 md:text-left">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white/80 px-3.5 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-container shadow-sm">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden md:h-auto md:grid md:grid-cols-[0.95fr_1.05fr] md:rounded-[36px] md:border md:border-black/[0.04] md:bg-white/80 md:shadow-[0_24px_80px_rgba(0,0,0,0.04)] md:backdrop-blur-xl">
+        <main className="relative flex flex-1 flex-col items-center justify-center px-6 pb-4 pt-10 md:items-start md:bg-transparent md:px-10 md:py-12 md:text-left">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-black/[0.02] px-3.5 py-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
             <Sparkles className="h-3.5 w-3.5" />
             Farm companion
           </div>
           <div className="w-32 h-32 mb-4 relative flex items-center justify-center md:h-44 md:w-44">
-            <MascotLottie className="w-full h-full drop-shadow-md" />
+            <PetMascot staticMood="happy" className="w-full h-full drop-shadow-md" size={176} />
           </div>
           <div className="flex w-full max-w-[360px] flex-col gap-3 text-center md:text-left">
             <h1 className="text-4xl font-black leading-tight tracking-tight text-text-h md:text-5xl">Grow better, every day.</h1>
@@ -96,9 +97,9 @@ export const WelcomeAuth: React.FC = () => {
           </div>
         </main>
 
-        <div className="flex w-full flex-col gap-4 rounded-t-[32px] border-t border-border-main/50 bg-bg-main/95 px-6 pb-8 pt-6 shadow-[0_-20px_70px_rgba(20,30,23,0.08)] md:rounded-none md:border-l md:border-t-0 md:bg-white/80 md:px-10 md:py-12 md:shadow-none">
+        <div className="flex w-full flex-col gap-4 rounded-t-[32px] border-t border-black/[0.04] bg-white px-6 pb-8 pt-6 shadow-[0_-20px_40px_rgba(0,0,0,0.02)] md:rounded-none md:border-l md:border-t-0 md:bg-white/95 md:px-10 md:py-12 md:shadow-none backdrop-blur-2xl">
           <div className="mb-2 text-left">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-primary-container/60">Secure sign in</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">Secure sign in</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-text-h">Chào mừng trở lại</h2>
           </div>
           <form className="flex flex-col gap-3" onSubmit={handleSubmit(submitLogin)}>
@@ -128,15 +129,41 @@ export const WelcomeAuth: React.FC = () => {
                 <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-main/35" />
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder="Nhập mật khẩu"
                   disabled={isBusy}
-                  className="w-full rounded-2xl border border-border-main/55 bg-white py-3.5 pl-12 pr-5 text-base font-semibold shadow-[0_8px_24px_rgba(20,30,23,0.04)] outline-none transition-all placeholder:text-text-main/30 focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
+                  className="w-full rounded-2xl border border-border-main/55 bg-white py-3.5 pl-12 pr-12 text-base font-semibold shadow-[0_8px_24px_rgba(20,30,23,0.04)] outline-none transition-all placeholder:text-text-main/30 focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
                   {...registerField('password')}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-main/40 hover:text-text-main/70 transition-colors focus:outline-none cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
               {errors.password ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.password.message}</p> : null}
+            </div>
+
+            <div className="flex items-center justify-between mt-1 mb-2 px-1">
+              <label className="flex items-center gap-2.5 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    className="peer appearance-none w-5 h-5 rounded-[6px] border-2 border-border-main/55 bg-white checked:bg-primary checked:border-primary transition-all cursor-pointer shadow-sm hover:border-primary/50"
+                    {...registerField('rememberMe')}
+                  />
+                  <svg className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="text-sm font-semibold text-text-main/70 group-hover:text-text-main/90 transition-colors">Ghi nhớ đăng nhập</span>
+              </label>
+              <button type="button" className="text-sm font-bold text-primary hover:text-primary-dark hover:underline transition-colors focus:outline-none cursor-pointer">
+                Quên mật khẩu?
+              </button>
             </div>
 
             <button

@@ -4,10 +4,20 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-let API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-if (API_BASE_URL && !API_BASE_URL.endsWith('/api/v1')) {
-  API_BASE_URL = `${API_BASE_URL.replace(/\/$/, '')}/api/v1`;
-}
+const API_VERSION_PATH = '/api/v1';
+
+const normalizeApiBaseUrl = (apiUrl?: string) => {
+  const baseUrl = (apiUrl || 'http://localhost:3000')
+    .trim()
+    .replace(/[;\s]+$/g, '')
+    .replace(/\/+$/g, '');
+
+  return baseUrl.endsWith(API_VERSION_PATH)
+    ? baseUrl
+    : `${baseUrl}${API_VERSION_PATH}`;
+};
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
 
 // ─── API Logger ──────────────────────────────────────────────────────────────
 // Always-on logger for debugging FE ↔ BE integration across different DNS/envs.
@@ -177,7 +187,7 @@ const isCsrfExemptUrl = (url?: string) =>
     url?.includes('/csrf-token'),
   );
 
-const getCsrfToken = async () => {
+export const getCsrfToken = async () => {
   if (csrfToken) return csrfToken;
 
   const response = await axios.get<CsrfTokenResponse>(

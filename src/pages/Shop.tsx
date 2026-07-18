@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MascotLottie } from '../components/MascotLottie';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { useShopItems, useBuyItem, useEquipItem } from '../features/shop/hooks/useShop';
@@ -77,33 +78,61 @@ export const Shop: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[100svh] relative text-left bg-gradient-to-b from-[#d0e5fa] to-[#79fc9e] overflow-x-hidden font-sans">
+    <div className="w-full min-h-[100svh] relative text-left bg-[#FBFBFD] overflow-x-hidden font-sans">
       {/* Custom Alert Modal */}
-      {modal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity">
-          <div className="bg-white/90 backdrop-blur-md rounded-[32px] border border-white/60 p-6 max-w-sm w-full shadow-2xl flex flex-col items-center text-center gap-4 animate-[scaleIn_0.2s_ease-out]">
-            {modal.type === 'success' ? (
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-3xl animate-bounce">
-                ✨
-              </div>
-            ) : (
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl">
-                ⚠️
-              </div>
-            )}
-            <div>
-              <h3 className="text-lg font-extrabold text-text-h mb-1">{modal.title}</h3>
-              <p className="text-sm text-text-main/70">{modal.message}</p>
-            </div>
-            <button
-              onClick={() => setModal(null)}
-              className="w-full py-3 bg-primary text-white font-bold rounded-2xl active:scale-[0.98] transition-transform shadow-md hover:bg-primary-dark"
+      <AnimatePresence>
+        {modal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(_, info) => {
+                if (info.offset.y > 100) setModal(null);
+              }}
+              className="bg-white/80 backdrop-blur-xl rounded-[32px] border border-black/[0.04] p-6 max-w-sm w-full shadow-[0_24px_80px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-4 cursor-grab active:cursor-grabbing"
             >
-              Tuyệt vời
-            </button>
-          </div>
-        </div>
-      )}
+              {/* Drag Handle */}
+              <div className="w-12 h-1.5 bg-black/10 rounded-full mb-2"></div>
+              
+              {modal.type === 'success' ? (
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', damping: 10, stiffness: 200, delay: 0.1 }}
+                  className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-3xl"
+                >
+                  ✨
+                </motion.div>
+              ) : (
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl">
+                  ⚠️
+                </div>
+              )}
+              <div>
+                <h3 className="text-lg font-extrabold text-text-h mb-1">{modal.title}</h3>
+                <p className="text-sm text-text-main/70">{modal.message}</p>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setModal(null)}
+                className="w-full py-3 bg-primary text-white font-bold rounded-2xl shadow-md hover:bg-primary-dark"
+              >
+                Tuyệt vời
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Page Content */}
       <div className="w-full max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-12 flex flex-col gap-6">
@@ -124,19 +153,27 @@ export const Shop: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Chips */}
+        {/* Category Chips with Framer Motion Magic Pill */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2 rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform ${
+              className={`relative px-5 py-2 rounded-full font-bold whitespace-nowrap shadow-sm transition-colors ${
                 activeCategory === cat.id
-                  ? 'bg-primary text-white hover:bg-primary-dark'
+                  ? 'text-white'
                   : 'bg-white/70 border border-border-main/30 text-text-main/70 hover:bg-white hover:text-text-main'
               }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              {cat.label}
+              {activeCategory === cat.id && (
+                <motion.div
+                  layoutId="activeCategory"
+                  className="absolute inset-0 bg-primary rounded-full shadow-md"
+                  transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <span className="relative z-10">{cat.label}</span>
             </button>
           ))}
         </div>
@@ -147,17 +184,11 @@ export const Shop: React.FC = () => {
           {/* Left: Preview Card */}
           <div className="w-full lg:w-[280px] flex-shrink-0">
             <div className="bg-white/80 backdrop-blur-sm rounded-[28px] border border-white/60 shadow-lg p-4 flex flex-col items-center gap-3">
-              <p className="text-xs font-bold text-text-main/40 uppercase tracking-widest">Đang trang bị</p>
-              <div className="relative w-full h-[220px] rounded-[20px] bg-gradient-to-b from-sky-50 to-green-50 border border-border-main/20 flex items-end justify-center overflow-hidden">
-                {/* Wavy grass */}
-                <div className="absolute inset-x-0 bottom-0 h-16 opacity-50">
-                  <svg preserveAspectRatio="none" viewBox="0 0 1440 320" className="w-full h-full">
-                    <path fill="#08a855" fillOpacity="1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-                  </svg>
-                </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Đang trang bị</p>
+              <div className="relative w-full h-[220px] rounded-[20px] bg-[#F5F5F7] flex items-end justify-center overflow-hidden">
                 <div className="relative z-10 mb-6 animate-[bounce_4s_ease-in-out_infinite]">
-                  <div className="w-32 h-32 rounded-full shadow-lg bg-white border-4 border-white overflow-hidden p-2">
-                    <MascotLottie className="w-full h-full -mt-2 drop-shadow-md" state={petStatus.mood} />
+                  <div className="w-32 h-32 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.04)] bg-white border-[6px] border-white overflow-hidden p-2">
+                    <PetMascot className="w-full h-full -mt-2 drop-shadow-md" status={petStatus} size={112} />
                   </div>
                   {/* Equipped indicator */}
                   {currentlyEquippedInActiveCategory && (
@@ -188,10 +219,23 @@ export const Shop: React.FC = () => {
               const canAfford = petStatus.exp >= item.price;
 
               return (
-                <div key={item._id} className={`bg-white/80 backdrop-blur-sm border shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-all ${isEquipped ? 'border-primary/50 ring-2 ring-primary/20' : 'border-border-main/30'}`}>
+                <motion.div 
+                  key={item._id} 
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileTap={!isLocked ? { scale: 0.96 } : {}}
+                  transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                  className={`bg-white/80 backdrop-blur-sm border shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-all ${isEquipped ? 'border-primary/50 ring-2 ring-primary/20' : 'border-border-main/30'}`}
+                >
                   <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border border-border-main/20 mb-3 flex items-center justify-center overflow-hidden relative group-hover:bg-primary/5 transition-colors">
                     {!isLocked ? (
-                      <img alt={item.name} className="w-3/4 h-3/4 object-contain animate-[bounce_4s_ease-in-out_infinite]" src={item.image_url} />
+                      <motion.img 
+                        layoutId={`item-img-${item._id}`}
+                        alt={item.name} 
+                        className="w-3/4 h-3/4 object-contain" 
+                        src={item.image_url} 
+                      />
                     ) : (
                       <div className="text-text-main/30 flex flex-col items-center">
                         <svg className="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,11 +253,11 @@ export const Shop: React.FC = () => {
 
                   {/* Button logic */}
                   {isEquipped ? (
-                     <button onClick={() => handleEquip(item._id)} className="w-full py-2 bg-primary text-white rounded-full font-bold text-sm shadow-sm active:scale-95 transition-transform border-b-[3px] border-primary-dark active:border-b-0 active:translate-y-[3px]">
+                     <button onClick={() => handleEquip(item._id)} className="w-full py-2 bg-primary text-white rounded-full font-bold text-sm shadow-sm transition-transform border-b-[3px] border-primary-dark">
                        Đã trang bị
                      </button>
                   ) : isOwned ? (
-                     <button onClick={() => handleEquip(item._id)} className="w-full py-2 bg-white border border-primary/50 text-primary rounded-full font-bold text-sm active:scale-95 transition-transform hover:bg-primary/5 shadow-sm">
+                     <button onClick={() => handleEquip(item._id)} className="w-full py-2 bg-white border border-primary/50 text-primary rounded-full font-bold text-sm transition-transform hover:bg-primary/5 shadow-sm">
                        Mặc thử
                      </button>
                   ) : isLocked ? (
@@ -224,7 +268,7 @@ export const Shop: React.FC = () => {
                      <button 
                        onClick={() => handleBuy(item._id)}
                        disabled={buyMutation.isPending}
-                       className="w-full py-2 bg-white border border-border-main/40 text-text-main rounded-full font-bold text-sm active:scale-95 transition-transform hover:bg-bg-surface-1 shadow-sm disabled:opacity-50"
+                       className="w-full py-2 bg-white border border-border-main/40 text-text-main rounded-full font-bold text-sm transition-transform hover:bg-bg-surface-1 shadow-sm disabled:opacity-50"
                      >
                        {buyMutation.isPending ? 'Đang mua...' : 'Mua ngay'}
                      </button>
@@ -233,7 +277,7 @@ export const Shop: React.FC = () => {
                        Thiếu XP
                      </button>
                   )}
-                </div>
+                </motion.div>
               );
             })}
 

@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Activity, Archive, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout, Trash2, WifiOff } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
+import toast from 'react-hot-toast';
 import { PageHeader } from '../components/PageHeader';
 import {
   useGetDiaryDetailQuery,
@@ -76,6 +79,9 @@ export const DiaryHistory: React.FC = () => {
   const userId = useAuthStore((state) => state.user?.id);
   const [offlineDrafts, setOfflineDrafts] = useState<OfflineDiaryDraft[]>([]);
 
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
+
   const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();
   const activeDiaryId = diaryIdParam || (diaries.length > 0 ? diaries[0]._id : undefined);
 
@@ -95,10 +101,10 @@ export const DiaryHistory: React.FC = () => {
     if (window.confirm('Bạn có chắc muốn lưu trữ vụ mùa này?')) {
       try {
         await updateDiary({ id: activeDiaryId, data: { status: 'archived' } }).unwrap();
-        alert('Đã lưu trữ vụ mùa!');
+        toast.success('Đã lưu trữ vụ mùa!');
       } catch (e) {
         console.error(e);
-        alert('Lỗi khi lưu trữ!');
+        toast.error('Lỗi khi lưu trữ!');
       }
     }
   };
@@ -108,11 +114,11 @@ export const DiaryHistory: React.FC = () => {
     if (window.confirm('Bạn có chắc muốn xóa vụ mùa này? Không thể hoàn tác!')) {
       try {
         await deleteDiary(activeDiaryId).unwrap();
-        alert('Đã xóa vụ mùa!');
+        toast.success('Đã xóa vụ mùa!');
         navigate('/diary');
       } catch (e) {
         console.error(e);
-        alert('Lỗi khi xóa!');
+        toast.error('Lỗi khi xóa!');
       }
     }
   };
@@ -191,22 +197,33 @@ export const DiaryHistory: React.FC = () => {
       />
       <div className="w-full flex flex-col gap-6 px-4 md:px-8 pt-24 pb-8 max-w-5xl mx-auto">
         {diary && (
-          <div className="flex justify-end gap-2">
-            {diary.status === 'active' && (
-              <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
-                <Archive className="w-4 h-4" /> Lưu trữ
+          <div className="flex justify-between items-center gap-4">
+            <div>
+              <span className={`px-3 py-1.5 rounded-full text-sm font-bold shadow-sm border ${
+                diary.status === 'archived' 
+                  ? 'bg-slate-100 text-slate-600 border-slate-200' 
+                  : 'bg-primary/10 text-primary-dark border-primary/20'
+              }`}>
+                {diary.status === 'active' ? '🌱 Đang canh tác' : '📦 Đã lưu trữ'}
+              </span>
+            </div>
+            <div className="flex justify-end gap-2">
+              {diary.status === 'active' && (
+                <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
+                  <Archive className="w-4 h-4" /> Lưu trữ
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
+                <Trash2 className="w-4 h-4" /> Xóa vụ mùa
               </Button>
-            )}
-            <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
-              <Trash2 className="w-4 h-4" /> Xóa vụ mùa
-            </Button>
+            </div>
           </div>
         )}
 
         {/* Bé Thóc Encouragement */}
         <section className="flex items-end gap-4 w-full">
           <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-border-main/50 shrink-0 relative overflow-hidden p-1 shadow-sm">
-            <MascotLottie className="w-full h-full -mt-1" />
+            <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
           </div>
           <div className="relative bg-white border border-border-main/50 rounded-2xl p-4 mb-2 flex-1 shadow-sm">
             <p className="text-base font-medium text-text-main">

@@ -12,7 +12,7 @@ export const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 w-full left-0 bg-bg-surface/85 backdrop-blur-xl border-t border-border-main/40 pb-safe z-50 md:hidden">
+    <nav className="fixed bottom-0 w-full left-0 bg-white/80 backdrop-blur-xl border-t border-black/[0.05] pb-safe z-50 md:hidden">
       <div className="flex justify-around items-center h-[60px] px-2 mb-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -27,9 +27,9 @@ export const BottomNavigation = () => {
                   <Icon 
                     size={24} 
                     strokeWidth={isActive ? 2.5 : 2} 
-                    className={`transition-colors duration-300 ${isActive ? 'text-primary-container' : 'text-text-muted'}`}
+                    className={`transition-colors duration-300 ${isActive ? 'text-slate-800' : 'text-slate-400'}`}
                   />
-                  <span className={`text-[10.5px] leading-none tracking-tight transition-colors duration-300 ${isActive ? 'font-semibold text-primary-container' : 'font-medium text-text-muted'}`}>
+                  <span className={`text-[10.5px] leading-none tracking-tight transition-colors duration-300 ${isActive ? 'font-semibold text-slate-800' : 'font-medium text-slate-400'}`}>
                     {item.label}
                   </span>
                 </>

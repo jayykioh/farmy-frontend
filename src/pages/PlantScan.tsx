@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { PageHeader } from '../components/PageHeader';
 import { useUploadPlantScanMutation } from '../store/api/farmApi';
 import { extractPlantScanErrorCode } from '../api/plantScan';
 import type { PlantScanResult } from '../types/plantScan';
+import toast from 'react-hot-toast';
 
 type ScanState = 'viewfinder' | 'analyzing' | 'result';
 
@@ -12,6 +15,9 @@ export const PlantScan: React.FC = () => {
   const navigate = useNavigate();
   const [scanState, setScanState] = useState<ScanState>('viewfinder');
   
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
+
   const [selectedCrop, setSelectedCrop] = useState('Lúa');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<PlantScanResult | null>(null);
@@ -57,28 +63,28 @@ export const PlantScan: React.FC = () => {
       setScanState('viewfinder');
       switch (errorCode) {
         case 'SCAN_IMAGE_BLURRY':
-          alert('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
+          toast.error('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
           break;
         case 'NOT_A_PLANT_IMAGE':
-          alert('Bé Thóc chỉ có thể phân tích ảnh cây trồng. Vui lòng thử lại.');
+          toast.error('Bé Thóc chỉ có thể phân tích ảnh cây trồng. Vui lòng thử lại.');
           break;
         case 'SCAN_QUOTA_EXCEEDED':
-          alert('Bạn đã hết lượt quét trong ngày hôm nay.');
+          toast.error('Bạn đã hết lượt quét trong ngày hôm nay.');
           break;
         case 'AI_SCAN_QUOTA_BUSY':
-          alert('Hệ thống AI đang quá tải. Vui lòng thử lại sau vài phút.');
+          toast.error('Hệ thống AI đang quá tải. Vui lòng thử lại sau vài phút.');
           break;
         case 'PLANT_SCAN_PERSISTENCE_FAILED':
-          alert('Lỗi lưu trữ dữ liệu. Vui lòng thử lại.');
+          toast.error('Lỗi lưu trữ dữ liệu. Vui lòng thử lại.');
           break;
         case 'SCAN_INVALID_FILE':
         case 'INVALID_IMAGE_TYPE':
-          alert('Vui lòng tải lên file ảnh hợp lệ (JPG, PNG, WebP) dưới 5MB.');
+          toast.error('Vui lòng tải lên file ảnh hợp lệ (JPG, PNG, WebP) dưới 5MB.');
           break;
         case 'UNKNOWN':
         case 'LLM_ERROR':
         default:
-          alert('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
+          toast.error('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
           break;
       }
     }
@@ -165,7 +171,7 @@ export const PlantScan: React.FC = () => {
         {scanState === 'analyzing' ? (<div className="flex-1 flex flex-col items-center justify-center h-full w-full max-w-md mx-auto gap-6">
           <div className="w-48 h-48 relative flex items-center justify-center">
             <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
-            <MascotLottie className="w-32 h-32" />
+            <PetMascot className="w-32 h-32" status={petStatus} size={128} />
           </div>
           <h2 className="text-2xl font-bold text-text-h text-center mt-4">Đang phân tích...</h2>
           <p className="text-text-main/70 text-center max-w-xs">Bé Thóc đang xem xét lá cây, vui lòng đợi một chút nhé!</p>
@@ -190,7 +196,7 @@ export const PlantScan: React.FC = () => {
               {/* Mascot Dialogue */}
               <div className="flex items-end gap-3 z-10 md:mt-0 -mt-10 pl-4 relative">
                 <div className="w-16 h-16 rounded-full border border-border-main/50 bg-white overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 shadow-sm">
-                  <MascotLottie className="w-full h-full -mt-1" />
+                  <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
                 </div>
                 {/* Speech Bubble */}
                 <div className="bg-white border border-border-main/50 rounded-[20px] rounded-bl-sm p-3 shadow-sm relative max-w-[250px] mb-2">

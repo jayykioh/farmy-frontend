@@ -2,7 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Camera, Droplets, FlaskConical, BugOff, Save, Sprout, X } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Button } from '../components/ui/Button';
 import { useGetDiariesQuery } from '../store/api/farmApi';
 import { useAppDispatch } from '../store/hooks';
@@ -12,12 +14,15 @@ import { assertStorageRoom, compressImageFile, ensurePersistentStorage } from '.
 import { saveOfflineDiaryDraft } from '../lib/indexedDB';
 import { runDiarySync } from '../lib/diarySyncEngine';
 import { CreateSeasonModal } from '../components/modals';
+import toast from 'react-hot-toast';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userId = useAuthStore((state) => state.user?.id);
   const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
   const [growthStage, setGrowthStage] = useState('');
   const [notes, setNotes] = useState('');
@@ -59,11 +64,11 @@ export const CreateDiary: React.FC = () => {
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!activeDiaryId) {
-      alert('Vui lòng chọn hoặc tạo nhật ký vụ mùa trước.');
+      toast.error('Vui lòng chọn hoặc tạo nhật ký vụ mùa trước.');
       return;
     }
     if (!userId) {
-      alert('Vui lòng đăng nhập lại để lưu nhật ký offline.');
+      toast.error('Vui lòng đăng nhập lại để lưu nhật ký offline.');
       return;
     }
 
@@ -111,9 +116,9 @@ export const CreateDiary: React.FC = () => {
     } catch (error) {
       console.error(error);
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-        alert('Bộ nhớ offline không đủ để lưu nhật ký này.');
+        toast('Bộ nhớ offline không đủ để lưu nhật ký này.', { icon: 'ℹ️' });
       } else {
-        alert('Không thể lưu nhật ký offline.');
+        toast.error('Không thể lưu nhật ký offline.');
       }
     } finally {
       setIsSaving(false);
@@ -137,7 +142,12 @@ export const CreateDiary: React.FC = () => {
         mode="add-season"
       />
       <div className="w-full min-h-[100svh] bg-bg-main text-left font-sans">
-      <PageHeader title="Nhật ký hoạt động" leftButton="close" rightButton="none" />
+      <PageHeader
+        title="Nhật ký hoạt động"
+        subtitle="Ghi lại tiến trình hôm nay"
+        leftButton="close"
+        rightButton="camera"
+        onLeftClick={() => navigate('/diary')} />
 
       <main className="w-full max-w-2xl mx-auto pt-24 pb-36 md:pb-10 px-5 md:px-8">
         {fetching ? (
@@ -166,32 +176,51 @@ export const CreateDiary: React.FC = () => {
             <section className="bg-white border border-border-main/50 rounded-3xl p-5 shadow-sm space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="space-y-2">
-                  <span className="font-bold text-sm text-text-main ml-2">Chọn vụ mùa</span>
+                  <span className="font-bold text-sm text-text-main ml-2">Chọn vụ mùa *</span>
                   <span className="relative block">
                     <select
                       value={activeDiaryId}
                       onChange={(event) => setSelectedDiaryId(event.target.value)}
-                      className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container appearance-none shadow-sm"
+                      className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container appearance-none shadow-sm cursor-pointer"
                     >
-                      {diaries.map((diary) => (
-                        <option key={diary._id} value={diary._id}>
-                          {diary.crop_type} ({diary.status === 'active' ? 'Đang canh tác' : 'Lưu trữ'})
-                        </option>
-                      ))}
+                      <optgroup label="🌱 Đang canh tác">
+                        {diaries.filter(d => d.status === 'active').map((diary) => (
+                          <option key={diary._id} value={diary._id}>
+                            {diary.crop_type} - {new Date(diary.start_date).toLocaleDateString('vi-VN')}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="📦 Đã lưu trữ">
+                        {diaries.filter(d => d.status === 'archived').map((diary) => (
+                          <option key={diary._id} value={diary._id}>
+                            {diary.crop_type} - {new Date(diary.start_date).toLocaleDateString('vi-VN')}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-main/70 w-5 h-5" />
                   </span>
                 </label>
 
                 <label className="space-y-2">
-                  <span className="font-bold text-sm text-text-main ml-2">Giai đoạn sinh trưởng</span>
-                  <input
-                    value={growthStage}
-                    onChange={(event) => setGrowthStage(event.target.value)}
-                    className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container shadow-sm"
-                    placeholder="Đang làm đòng / Trổ bông"
-                    type="text"
-                  />
+                  <span className="font-bold text-sm text-text-main ml-2">Giai đoạn sinh trưởng *</span>
+                  <span className="relative block">
+                    <select
+                      value={growthStage}
+                      onChange={(event) => setGrowthStage(event.target.value)}
+                      className="w-full bg-white border border-border-main/80 rounded-full px-6 py-3 font-medium text-base focus:border-primary-container focus:ring-1 focus:ring-primary-container appearance-none shadow-sm cursor-pointer"
+                      required
+                    >
+                      <option value="" disabled>Chọn giai đoạn...</option>
+                      <option value="Gieo hạt / Nảy mầm">Gieo hạt / Nảy mầm</option>
+                      <option value="Cây non / Phát triển">Cây non / Phát triển</option>
+                      <option value="Ra hoa / Làm đòng">Ra hoa / Làm đòng</option>
+                      <option value="Kết trái / Nuôi hạt">Kết trái / Nuôi hạt</option>
+                      <option value="Gần thu hoạch">Gần thu hoạch</option>
+                      <option value="Khác">Khác</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-main/70 w-5 h-5" />
+                  </span>
                 </label>
               </div>
 
@@ -234,9 +263,9 @@ export const CreateDiary: React.FC = () => {
               <div className="space-y-3">
                 <span className="font-bold text-sm text-text-main ml-2">Hình ảnh thực tế</span>
                 <div className="grid grid-cols-4 gap-4">
-                  <label className="aspect-square border border-dashed border-border-main rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-bg-surface-1 transition-colors group">
+                  <label className="aspect-square border border-dashed border-border-main rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-bg-surface-1 transition-colors group p-2">
                     <input
-                      accept="image/*"
+                      accept="image/png, image/jpeg"
                       className="hidden"
                       type="file"
                       multiple
@@ -244,6 +273,7 @@ export const CreateDiary: React.FC = () => {
                     />
                     <Camera className="w-6 h-6 text-text-main/30 group-hover:text-primary transition-colors" />
                     <span className="text-[10px] font-bold text-text-main/50 mt-1">Thêm ảnh</span>
+                    <span className="text-[8px] font-medium text-text-main/40 mt-0.5 text-center leading-tight">PNG, JPG<br/>(Tối đa 5MB)</span>
                   </label>
 
                   {imageUrl ? (
@@ -267,7 +297,7 @@ export const CreateDiary: React.FC = () => {
 
             <section className="bg-bg-surface-1 border border-primary/20 p-4 rounded-xl flex gap-4 items-center shadow-sm">
               <div className="w-16 h-16 flex-shrink-0">
-                <MascotLottie className="w-full h-full drop-shadow-md" />
+                <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={64} />
               </div>
               <p className="text-sm font-medium text-text-main/80 leading-tight">
                 Ghi lại thay đổi của cây trồng mỗi ngày giúp Farmy đưa ra khuyến nghị tốt hơn.

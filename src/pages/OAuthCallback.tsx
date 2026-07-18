@@ -32,7 +32,7 @@ export default function OAuthCallback() {
             if (response.data.data.onboardingCompleted) {
               navigate('/home', { replace: true });
             } else {
-              navigate('/onboarding-1', { replace: true });
+              navigate('/home', { replace: true });
             }
           } else {
             throw new Error('Failed to fetch user');

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { updatePushSubscription } from '../api/auth';
+import toast from 'react-hot-toast';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -30,10 +31,10 @@ export const Settings: React.FC = () => {
 
       await updatePushSubscription(mockSubscription);
       setPushNotifications(true);
-      alert('Đã đăng ký nhận thông báo Push thành công!');
+      toast.success('Đã đăng ký nhận thông báo Push thành công!');
     } catch (err) {
       console.error('Failed to subscribe to push notifications:', err);
-      alert('Lỗi đăng ký thông báo Push. Vui lòng thử lại!');
+      toast.error('Lỗi đăng ký thông báo Push. Vui lòng thử lại!');
     } finally {
       setIsPushLoading(false);
     }

@@ -135,3 +135,7 @@ export const createSnapComment = async (id: string, content: string) => {
   );
   return data.data;
 };
+
+export const deleteSnap = async (id: string) => {
+  await api.delete(`/snaps/${id}`);
+};

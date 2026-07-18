@@ -1,15 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 
 export const Celebration: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 relative text-left font-sans flex flex-col items-center justify-center overflow-hidden">
+    <div className="w-full h-full min-h-[100svh] bg-[#FBFBFD] relative text-left font-sans flex flex-col items-center justify-center overflow-hidden">
       
       {/* Ambient Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary-lightest/50 to-bg-surface-1"></div>
 
       {/* Decorative Elements (Confetti/Stars) */}
       <div className="absolute top-10 left-10 text-yellow-400 animate-[bounce_3s_ease-in-out_infinite]">
@@ -32,7 +31,7 @@ export const Celebration: React.FC = () => {
         <div className="relative mb-8 mt-12 w-48 h-48 flex items-center justify-center animate-[bounce_2s_ease-in-out_infinite]">
           {/* Bé Thóc Mascot Image */}
           <div className="w-40 h-40 rounded-full border-[6px] border-white shadow-2xl bg-white overflow-hidden p-2 flex items-center justify-center">
-             <MascotLottie state="excited" className="w-full h-full -mt-2" />
+             <PetMascot staticMood="excited" className="w-full h-full -mt-2" size={144} />
           </div>
           {/* Floating XP Popup */}
           <div className="absolute -top-4 -right-4 bg-yellow-400 text-yellow-900 border-4 border-yellow-100 rounded-full px-5 py-2 shadow-[0_6px_0_0_#fde047] animate-[pulse_1.5s_cubic-bezier(0.4,0,0.6,1)_infinite] z-20">
@@ -63,9 +62,8 @@ export const Celebration: React.FC = () => {
         </div>
 
         {/* Badge Card */}
-        <div className="bg-white border border-border-main/50 rounded-[20px] p-4 flex items-center gap-4 w-full mb-12 shadow-sm relative overflow-hidden group hover:border-yellow-300 transition-colors">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-yellow-100/50 to-transparent rounded-bl-full pointer-events-none"></div>
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 w-14 h-14 rounded-full flex items-center justify-center border border-yellow-200 shadow-sm relative z-10 group-hover:scale-110 transition-transform">
+        <div className="bg-white border border-black/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-[20px] p-4 flex items-center gap-4 w-full mb-12 relative overflow-hidden group hover:border-yellow-300 transition-colors">
+          <div className="bg-yellow-50 w-14 h-14 rounded-full flex items-center justify-center border border-yellow-200 shadow-sm relative z-10 group-hover:scale-110 transition-transform">
             <svg className="w-8 h-8 text-yellow-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div className="flex flex-col relative z-10">
