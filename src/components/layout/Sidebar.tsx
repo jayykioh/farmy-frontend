@@ -1,10 +1,9 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, BookText, Bot, User, Sprout, Lightbulb, ShoppingBag, LogOut } from 'lucide-react';
 import { usePetStatus } from '../../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../../features/pet/types/pet.types';
 import { useAuthStore } from '../../store/authStore';
-import { useNavigate } from 'react-router-dom';
 
 export const Sidebar: React.FC = () => {
   const { data: petStatusRaw } = usePetStatus();
@@ -15,25 +14,25 @@ export const Sidebar: React.FC = () => {
   const navItems = [
     { to: '/home', icon: Home, label: 'Trang chủ' },
     { to: '/diary', icon: BookText, label: 'Nhật ký' },
-    { to: '/chat', icon: Bot, label: 'AI Pet' },
-    { to: '/insights', icon: Lightbulb, label: 'Insights' },
+    { to: '/chat', icon: Bot, label: 'Trợ lý ảo' },
+    { to: '/insights', icon: Lightbulb, label: 'Phân tích' },
     { to: '/shop', icon: ShoppingBag, label: 'Cửa hàng' },
     { to: '/profile', icon: User, label: 'Hồ sơ' },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-[#FBFBFD] border-r border-black/[0.05] z-50">
+    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-[#fbfbfd] border-r border-black/[0.05] z-50">
       
       {/* Brand / Logo */}
-      <div className="h-14 flex items-center gap-2.5 px-6 mt-5 mb-3">
-        <div className="flex items-center justify-center text-primary">
-          <Sprout size={24} strokeWidth={2.5} />
+      <div className="h-16 flex items-center gap-2.5 px-6 mt-4 mb-2">
+        <div className="flex items-center justify-center cursor-pointer" onClick={() => navigate('/home')}>
+          <Sprout size={24} strokeWidth={2} className="text-[#1d1d1f]" />
         </div>
-        <span className="font-semibold text-[15px] text-text-main tracking-tight">FarmDiaries</span>
+        <span className="font-semibold text-[17px] text-[#1d1d1f] tracking-tight cursor-pointer" onClick={() => navigate('/home')}>FarmDiaries</span>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-3.5 flex flex-col gap-1">
+      <nav className="flex-1 px-4 flex flex-col gap-1.5 mt-2 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -41,10 +40,10 @@ export const Sidebar: React.FC = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `group relative flex items-center gap-3 px-3 py-2 rounded-[10px] transition-all duration-300 ease-out outline-none select-none active:scale-[0.96] ${
+                `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 outline-none select-none ${
                   isActive
-                    ? 'bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-black/[0.02] text-slate-800 font-semibold'
-                    : 'text-slate-500 hover:bg-black/[0.04] hover:text-slate-800'
+                    ? 'bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/[0.04] text-[#1d1d1f] font-medium'
+                    : 'text-[#86868b] border border-transparent hover:bg-black/[0.03] hover:text-[#1d1d1f]'
                 }`
               }
             >
@@ -52,12 +51,12 @@ export const Sidebar: React.FC = () => {
                 <>
                   <Icon
                     size={18}
-                    strokeWidth={isActive ? 2.5 : 2}
-                    className={`transition-colors duration-300 ${
-                      isActive ? 'text-slate-800' : 'text-slate-400 group-hover:text-slate-600'
+                    strokeWidth={isActive ? 2 : 1.5}
+                    className={`transition-colors duration-200 ${
+                      isActive ? 'text-[#1d1d1f]' : 'text-[#86868b] group-hover:text-[#1d1d1f]'
                     }`}
                   />
-                  <span className="text-[13.5px] leading-none mt-[1px]">{item.label}</span>
+                  <span className="text-[14px] leading-none mt-[1px]">{item.label}</span>
                 </>
               )}
             </NavLink>
@@ -66,14 +65,18 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer area inside sidebar */}
-      <div className="p-6 border-t border-black/[0.05] bg-transparent flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center font-bold text-white shadow-sm">
-            {user?.name?.[0]?.toUpperCase() || 'F'}
+      <div className="p-4 mx-4 mb-6 rounded-2xl bg-white border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex justify-between items-center transition-all duration-300 hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center gap-3 cursor-pointer overflow-hidden" onClick={() => navigate('/profile')}>
+          <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-black/[0.05] flex items-center justify-center font-semibold text-[#1d1d1f] overflow-hidden shrink-0">
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              user?.name?.[0]?.toUpperCase() || 'F'
+            )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-800 line-clamp-1 max-w-[100px]">{user?.name || 'Nông dân'}</span>
-            <span className="text-xs text-slate-500 font-medium">
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-[14px] font-semibold text-[#1d1d1f] line-clamp-1">{user?.name || 'Nông dân'}</span>
+            <span className="text-[12px] text-[#86868b] font-medium line-clamp-1">
               Cấp độ {petStatus.level}
             </span>
           </div>
@@ -82,10 +85,10 @@ export const Sidebar: React.FC = () => {
           onClick={() => {
             logout().then(() => navigate('/'));
           }}
-          className="p-2 text-text-main/50 hover:text-error hover:bg-error-container/20 rounded-full transition-colors"
+          className="p-2 text-[#86868b] hover:text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0"
           title="Đăng xuất"
         >
-          <LogOut size={18} />
+          <LogOut size={16} strokeWidth={1.5} />
         </button>
       </div>
     </aside>
