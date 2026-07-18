@@ -2,7 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Camera, Droplets, FlaskConical, BugOff, Save, Sprout, X } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Button } from '../components/ui/Button';
 import { useGetDiariesQuery } from '../store/api/farmApi';
 import { useAppDispatch } from '../store/hooks';
@@ -19,6 +21,8 @@ export const CreateDiary: React.FC = () => {
   const dispatch = useAppDispatch();
   const userId = useAuthStore((state) => state.user?.id);
   const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
   const [growthStage, setGrowthStage] = useState('');
   const [notes, setNotes] = useState('');
@@ -138,7 +142,12 @@ export const CreateDiary: React.FC = () => {
         mode="add-season"
       />
       <div className="w-full min-h-[100svh] bg-bg-main text-left font-sans">
-      <PageHeader title="Nhật ký hoạt động" leftButton="close" rightButton="none" />
+      <PageHeader
+        title="Nhật ký hoạt động"
+        subtitle="Ghi lại tiến trình hôm nay"
+        leftButton="close"
+        rightButton="camera"
+        onLeftClick={() => navigate('/diary')} />
 
       <main className="w-full max-w-2xl mx-auto pt-24 pb-36 md:pb-10 px-5 md:px-8">
         {fetching ? (
@@ -288,7 +297,7 @@ export const CreateDiary: React.FC = () => {
 
             <section className="bg-bg-surface-1 border border-primary/20 p-4 rounded-xl flex gap-4 items-center shadow-sm">
               <div className="w-16 h-16 flex-shrink-0">
-                <MascotLottie className="w-full h-full drop-shadow-md" />
+                <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={64} />
               </div>
               <p className="text-sm font-medium text-text-main/80 leading-tight">
                 Ghi lại thay đổi của cây trồng mỗi ngày giúp Farmy đưa ra khuyến nghị tốt hơn.

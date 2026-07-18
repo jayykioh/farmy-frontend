@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axios from 'axios';
 import { ArrowRight, LockKeyhole, Mail, Sparkles } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 import { useAuthStore } from '../store/authStore';
 
 const loginSchema = z.object({
@@ -78,7 +78,7 @@ export const WelcomeAuth: React.FC = () => {
             Farm companion
           </div>
           <div className="w-32 h-32 mb-4 relative flex items-center justify-center md:h-44 md:w-44">
-            <MascotLottie className="w-full h-full drop-shadow-md" />
+            <PetMascot staticMood="happy" className="w-full h-full drop-shadow-md" size={176} />
           </div>
           <div className="flex w-full max-w-[360px] flex-col gap-3 text-center md:text-left">
             <h1 className="text-4xl font-black leading-tight tracking-tight text-text-h md:text-5xl">Grow better, every day.</h1>

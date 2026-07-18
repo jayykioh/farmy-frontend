@@ -11,7 +11,9 @@ import {
   ThumbsUp,
   X,
 } from "lucide-react";
-import { MascotLottie } from "../components/MascotLottie";
+import { PetMascot } from "../features/pet/components/PetMascot";
+import { usePetStatus } from "../features/pet/hooks/usePetStatus";
+import { PET_STATUS_FALLBACK } from "../features/pet/types/pet.types";
 import { PageHeader } from "../components/PageHeader";
 import {
   fetchChatMessages,
@@ -97,6 +99,9 @@ export const ChatActive: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const dateLabel = useMemo(() => {
     const firstMessage = messages.find((message) => message.created_at);
@@ -282,14 +287,12 @@ export const ChatActive: React.FC = () => {
       }
 
       console.error(err);
-      setErrorMessage(
-        err instanceof Error ? err.message : "Không thể gửi tin nhắn.",
-      );
-      updateMessage(assistantLocalId, (message) => ({
-        ...message,
+      const errorMessageText = err instanceof Error ? err.message : "Không thể gửi tin nhắn.";
+      setErrorMessage(errorMessageText);
+      updateMessage(assistantLocalId, (current) => ({
+        ...current,
         content:
-          message.content ||
-          "Không thể tạo phản hồi lúc này. Bạn thử lại sau nhé.",
+          current.content || `Lỗi hệ thống: ${errorMessageText}`,
         status: "failed",
         streaming: false,
       }));
@@ -301,7 +304,7 @@ export const ChatActive: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 text-left font-sans flex flex-col overflow-hidden">
+    <div className="w-full h-full min-h-[100svh] bg-white text-left font-sans flex flex-col overflow-hidden">
       <PageHeader
         title="FarmDiaries AI"
         subtitle={isStreaming ? "Bé Thóc đang trả lời" : "Tri Kỷ AI"}
@@ -312,7 +315,7 @@ export const ChatActive: React.FC = () => {
 
       <main
         ref={scrollRef}
-        className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-bg-surface-1 z-0"
+        className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-white z-0"
       >
         <div className="flex justify-center mt-6">
           <span className="bg-white border border-border-main/50 text-text-main/50 font-bold text-xs px-4 py-1 rounded-full shadow-sm">
@@ -328,7 +331,7 @@ export const ChatActive: React.FC = () => {
         ) : messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
             <div className="w-28 h-28 mb-4">
-              <MascotLottie className="w-full h-full drop-shadow-md" />
+              <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={112} />
             </div>
             <h2 className="text-2xl font-black text-text-main mb-2">
               Hỏi Bé Thóc về ruộng vườn
@@ -346,9 +349,10 @@ export const ChatActive: React.FC = () => {
             >
               {message.role === "assistant" ? (
                 <div className="flex items-end gap-2 mb-1">
-                  <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
-                    <MascotLottie
+                  <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 p-0.5">
+                    <PetMascot
                       className={`w-full h-full -mt-1 ${message.streaming ? "animate-pulse" : ""}`}
+                      status={petStatus} size={40}
                     />
                   </div>
                   <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">
@@ -358,7 +362,7 @@ export const ChatActive: React.FC = () => {
               ) : null}
 
               <div
-                className={`${message.role === "user" ? "bg-primary-container text-white rounded-br-sm border-primary" : "bg-white text-text-main rounded-bl-sm border-border-main/50 ml-12"} p-4 rounded-[24px] shadow-sm max-w-[85%] border`}
+                className={`${message.role === "user" ? "bg-primary-container text-white rounded-br-sm" : "bg-[#fcfaf5] text-text-main rounded-bl-sm border border-border-main/50 ml-12"} p-4 rounded-2xl max-w-[85%]`}
               >
                 {message.role === "assistant" && message.citations && message.citations.length > 0 && (
                   <ChatSourceCards citations={message.citations} />
@@ -377,7 +381,7 @@ export const ChatActive: React.FC = () => {
                       disabled={message.feedbackSubmitting}
                       aria-pressed={message.feedback === "positive"}
                       aria-label="Đánh giá phản hồi hữu ích"
-                      className={`bg-white border px-3 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                      className={`bg-white border px-3 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
                         message.feedback === "positive"
                           ? "text-primary border-primary/40 bg-primary/5"
                           : "text-text-main border-border-main/50"
@@ -396,7 +400,7 @@ export const ChatActive: React.FC = () => {
                       disabled={message.feedbackSubmitting}
                       aria-pressed={message.feedback === "negative"}
                       aria-label="Đánh giá phản hồi chưa hữu ích"
-                      className={`bg-white border px-3 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                      className={`bg-white border px-3 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
                         message.feedback === "negative"
                           ? "text-red-600 border-red-200 bg-red-50"
                           : "text-text-main border-border-main/50"
@@ -411,14 +415,14 @@ export const ChatActive: React.FC = () => {
                     </button>
                     <button
                       onClick={() => navigate("/diary/create")}
-                      className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
+                      className="bg-white text-text-main border border-border-main/50 px-4 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1"
                     >
                       <BookOpen className="w-4 h-4 text-primary" />
                       Ghi nhật ký
                     </button>
                     <button
                       onClick={() => navigate("/reminder/create")}
-                      className="bg-white text-text-main border border-border-main/50 px-4 py-2 rounded-full font-bold text-sm shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all active:scale-95 flex items-center gap-1"
+                      className="bg-white text-text-main border border-border-main/50 px-4 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1"
                     >
                       <Clock className="w-4 h-4 text-secondary" />
                       Đặt nhắc nhở
@@ -442,7 +446,7 @@ export const ChatActive: React.FC = () => {
       <div className="fixed bottom-24 md:bottom-8 left-0 right-0 w-full pt-6 pb-4 px-4 md:px-8 z-30 flex justify-center pointer-events-none">
         <div className="w-full max-w-3xl flex flex-col pointer-events-auto">
           {attachedImage && (
-            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-md border border-border-main/50 group animate-in slide-in-from-bottom-2 fade-in mb-2 ml-4">
+            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-sm border border-border-main/50 group animate-in slide-in-from-bottom-2 fade-in mb-2 ml-4">
               <img src={attachedImage} className="w-full h-full object-cover rounded-lg" alt="Attachment" />
               <button 
                 type="button"
@@ -456,7 +460,7 @@ export const ChatActive: React.FC = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="w-full flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-lg focus-within:shadow-xl focus-within:-translate-y-[2px] transition-all"
+            className="w-full flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-sm focus-within:shadow-md focus-within:-translate-y-[1px] transition-all"
           >
           <button
             type="button"

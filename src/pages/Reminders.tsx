@@ -9,12 +9,17 @@ import { Plus, Calendar, CheckCircle2, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format, isToday, isFuture } from 'date-fns';
 import { vi } from 'date-fns/locale/vi';
+import { PetMascot } from '../features/pet/components/PetMascot';
+import { usePetStatus } from '../features/pet/hooks/usePetStatus';
+import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 
 type Tab = 'today' | 'upcoming' | 'done';
 
 const Reminders: React.FC = () => {
   const [tab, setTab] = useState<Tab>('today');
   const queryClient = useQueryClient();
+  const { data: petStatusRaw } = usePetStatus();
+  const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
   
   const statusFilter = tab === 'done' ? 'completed' : 'pending';
   const { data: reminders = [], isLoading } = useReminders({ status: statusFilter });
@@ -68,8 +73,19 @@ const Reminders: React.FC = () => {
       
       <main className="w-full max-w-2xl mx-auto pt-[72px] px-4 md:px-6 flex flex-col flex-1">
         
+        <div className="bg-white border border-primary/20 shadow-sm rounded-[24px] p-4 mt-4 mb-2 flex items-center gap-4 relative">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-primary/20 shadow-sm relative flex-shrink-0 p-1">
+            <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-base text-text-main">
+              Đừng quên chăm sóc cây đúng giờ để nhận được <strong className="text-secondary-dark bg-secondary-light/30 px-1 rounded font-extrabold">gấp đôi XP</strong> nhé!
+            </p>
+          </div>
+        </div>
+
         {/* Tabs */}
-        <div className="flex bg-gray-100 p-1 rounded-xl mb-6 mt-4">
+        <div className="flex bg-gray-100 p-1 rounded-xl mb-6 mt-2">
           <button 
             onClick={() => setTab('today')}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-all ${tab === 'today' ? 'bg-white shadow-sm text-text-main' : 'text-text-main/60 hover:text-text-main/80'}`}
