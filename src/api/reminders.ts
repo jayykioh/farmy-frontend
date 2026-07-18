@@ -34,8 +34,8 @@ export type CreateReminderPayload = {
 
 export type UpdateReminderPayload = Partial<CreateReminderPayload>;
 
-export const fetchReminders = async () => {
-  const { data } = await api.get<ApiResponse<Reminder[]>>('/reminders');
+export const fetchReminders = async (params?: { status?: string }) => {
+  const { data } = await api.get<ApiResponse<Reminder[]>>('/reminders', { params });
   return data.data;
 };
 

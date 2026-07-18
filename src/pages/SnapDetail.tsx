@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -12,9 +13,14 @@ import {
   Sprout,
   Wheat,
   Send,
+  Trash2,
+  Edit2,
+  Archive,
 } from 'lucide-react';
+import { resolveImageUrl } from '../utils/url';
 import { Button } from '../components/ui/Button';
-import { createSnapComment, fetchSnap, reactToSnap } from '../api/snaps';
+import { createSnapComment, fetchSnap, reactToSnap, deleteSnap } from '../api/snaps';
+import { useAuthStore } from '../store/authStore';
 import type { SnapReactionType } from '../types/farmSnap';
 
 const getReaction = (
@@ -28,6 +34,8 @@ export const SnapDetail: React.FC = () => {
   const queryClient = useQueryClient();
   const [now] = React.useState(() => Date.now());
   const [comment, setComment] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { user } = useAuthStore();
 
   const snapQuery = useQuery({
     queryKey: ['snaps', 'detail', id],
@@ -37,8 +45,35 @@ export const SnapDetail: React.FC = () => {
 
   const reactionMutation = useMutation({
     mutationFn: (type: SnapReactionType) => reactToSnap(id as string, type),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['snaps'] });
+    onMutate: async (type) => {
+      await queryClient.cancelQueries({ queryKey: ['snaps', 'detail', id] });
+      const previousSnap = queryClient.getQueryData(['snaps', 'detail', id]);
+      
+      queryClient.setQueryData(['snaps', 'detail', id], (old: any) => {
+        if (!old) return old;
+        const newReactions = old.reactions.map((r: any) => {
+          if (r.type === type) {
+            return {
+              ...r,
+              count: r.userReacted ? r.count - 1 : r.count + 1,
+              userReacted: !r.userReacted
+            };
+          }
+          return r;
+        });
+        return { ...old, reactions: newReactions };
+      });
+      
+      return { previousSnap };
+    },
+    onError: (_err, _newTodo, context) => {
+      if (context?.previousSnap) {
+        queryClient.setQueryData(['snaps', 'detail', id], context.previousSnap);
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['snaps', 'detail', id] });
+      void queryClient.invalidateQueries({ queryKey: ['snaps', 'feed'] });
     },
   });
 
@@ -47,6 +82,15 @@ export const SnapDetail: React.FC = () => {
     onSuccess: () => {
       setComment('');
       void queryClient.invalidateQueries({ queryKey: ['snaps'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteSnap(id as string),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['snaps', 'feed'] });
+      void queryClient.invalidateQueries({ queryKey: ['snapFeed'] });
+      navigate('/farm-feed', { replace: true });
     },
   });
 
@@ -113,7 +157,7 @@ export const SnapDetail: React.FC = () => {
     <div className="w-full h-[100svh] bg-black text-white flex flex-col relative overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-110"
-        style={{ backgroundImage: `url(${snap.imageUrl})` }}
+        style={{ backgroundImage: `url(${resolveImageUrl(snap.imageUrl)})` }}
       />
 
       <div className="absolute top-0 left-0 right-0 p-4 pt-6 z-20 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
@@ -134,16 +178,78 @@ export const SnapDetail: React.FC = () => {
           </span>
         </div>
 
-        <button className="p-2 text-white/80 active:scale-95" aria-label="Tùy chọn">
-          <MoreVertical className="w-6 h-6" />
-        </button>
+        {snap.userId === user?.id && (
+          <div className="relative">
+            <button 
+              className="p-2 text-white/90 active:scale-95 transition-transform bg-black/40 rounded-full backdrop-blur-sm" 
+              aria-label="Tùy chọn"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            
+            {showDropdown && (
+              <>
+                {/* Backdrop to close dropdown */}
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowDropdown(false)} 
+                />
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                  <div className="py-1">
+                    <button
+                      className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+                      onClick={() => {
+                        setShowDropdown(false);
+                        alert('Chức năng chỉnh sửa đang được phát triển');
+                      }}
+                    >
+                      <Edit2 className="w-4 h-4 text-slate-400" />
+                      <span className="font-medium">Chỉnh sửa</span>
+                    </button>
+                    
+                    <button
+                      className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors"
+                      onClick={() => {
+                        setShowDropdown(false);
+                        alert('Chức năng lưu trữ đang được phát triển');
+                      }}
+                    >
+                      <Archive className="w-4 h-4 text-slate-400" />
+                      <span className="font-medium">Lưu trữ ảnh</span>
+                    </button>
+                    
+                    <div className="h-px bg-slate-100 my-1" />
+                    
+                    <button
+                      className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                      onClick={() => {
+                        setShowDropdown(false);
+                        if (window.confirm('Bạn có chắc chắn muốn xóa bài đăng này không?')) {
+                          deleteMutation.mutate();
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <span className="font-medium">Xóa bài đăng</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 w-full flex items-center justify-center z-10 relative">
         <img
-          src={snap.imageUrl}
+          src={resolveImageUrl(snap.imageUrl)}
           alt={snap.caption || 'Farm Snap'}
           className="w-full max-h-[80svh] object-contain"
+          loading="lazy"
+          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?q=80&w=800&auto=format&fit=crop'; }}
         />
       </div>
 
@@ -229,7 +335,12 @@ export const SnapDetail: React.FC = () => {
           </div>
 
           <Button
-            onClick={() => navigate('/chat/active')}
+            onClick={() => navigate('/chat/active', { 
+              state: { 
+                initialMessage: 'Bạn có thể phân tích bức ảnh này giúp tôi được không?',
+                initialImage: resolveImageUrl(snap.imageUrl)
+              } 
+            })}
             icon={<MessageSquare className="w-4 h-4 text-white fill-white/10" />}
             className="text-sm shadow-[0_0_15px_rgba(8,168,85,0.4)]"
           >

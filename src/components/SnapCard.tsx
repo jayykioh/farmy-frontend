@@ -2,6 +2,7 @@ import React from 'react';
 import type { FarmSnap, SnapReactionType } from '../types/farmSnap';
 import { useNavigate } from 'react-router-dom';
 import { Heart, ThumbsUp, AlertTriangle, MessageSquare, Leaf, Wheat, Sprout } from 'lucide-react';
+import { resolveImageUrl } from '../utils/url';
 
 interface SnapCardProps {
   snap: FarmSnap;
@@ -58,7 +59,13 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false,
         onClick={onClick}
         className="w-[160px] h-[220px] rounded-[20px] overflow-hidden relative cursor-pointer flex-shrink-0 snap-center shadow-sm border border-border-main/20 hover:-translate-y-1 transition-transform"
       >
-        <img src={snap.imageUrl} alt={snap.cropType} className="w-full h-full object-cover" />
+        <img 
+          src={resolveImageUrl(snap.imageUrl)} 
+          alt={snap.cropType} 
+          className="w-full h-full object-cover" 
+          loading="lazy"
+          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?q=80&w=400&auto=format&fit=crop'; }}
+        />
         
         {/* Top Pills */}
         <div className="absolute top-2 left-2 flex gap-1">
@@ -90,7 +97,13 @@ export const SnapCard: React.FC<SnapCardProps> = ({ snap, onClick, mini = false,
       onClick={onClick}
       className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative cursor-pointer shadow-sm border border-border-main/20 mb-4 hover:shadow-md transition-shadow group"
     >
-      <img src={snap.imageUrl} alt={snap.cropType} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+      <img 
+        src={resolveImageUrl(snap.imageUrl)} 
+        alt={snap.cropType} 
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+        loading="lazy"
+        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?q=80&w=800&auto=format&fit=crop'; }}
+      />
       {/* Top Overlay */}
       <div className="absolute top-0 left-0 right-0 p-4 pt-4 flex gap-2 justify-between items-start bg-gradient-to-b from-black/60 to-transparent">
         <div className="flex gap-2">
