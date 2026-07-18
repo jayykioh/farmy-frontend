@@ -4,6 +4,7 @@ import {
   login as loginRequest,
   logout as logoutRequest,
   register as registerRequest,
+  updateProfile as updateProfileRequest,
   type AuthUser,
   type LoginPayload,
   type RegisterPayload,
@@ -26,7 +27,7 @@ type AuthState = {
   logout: () => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   setSession: (session: { accessToken?: string | null; user: AuthUser }) => void;
-  updateProfile: (profile: Partial<AuthUser>) => void;
+  updateProfile: (profile: Partial<AuthUser>) => Promise<void>;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -58,15 +59,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  updateProfile: (profile) => {
+  updateProfile: async (profile) => {
     const currentUser = get().user;
     if (!currentUser) return;
-    const updatedUser = {
-      ...currentUser,
-      ...profile,
-    };
-    localStorage.setItem(`profile_${currentUser.id}`, JSON.stringify(profile));
-    set({ user: updatedUser });
+    
+    try {
+      // Create a payload mapped to what the backend expects
+      const payload: { name?: string; location?: string; avatarUrl?: string } = {};
+      if (profile.name) payload.name = profile.name;
+      if (profile.region) payload.location = profile.region;
+      if (profile.avatarUrl) payload.avatarUrl = profile.avatarUrl;
+      
+      const updatedUserFromApi = await updateProfileRequest(payload);
+      
+      const updatedUser = {
+        ...currentUser,
+        ...profile, // Apply local changes just in case
+        ...updatedUserFromApi,
+      };
+      
+      localStorage.setItem(`profile_${currentUser.id}`, JSON.stringify(profile));
+      set({ user: updatedUser });
+    } catch (error) {
+      console.error('Failed to update profile to backend:', error);
+      throw error;
+    }
   },
 
   clearSession: () => {
