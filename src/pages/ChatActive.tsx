@@ -287,14 +287,12 @@ export const ChatActive: React.FC = () => {
       }
 
       console.error(err);
-      setErrorMessage(
-        err instanceof Error ? err.message : "Không thể gửi tin nhắn.",
-      );
-      updateMessage(assistantLocalId, (message) => ({
-        ...message,
+      const errorMessageText = err instanceof Error ? err.message : "Không thể gửi tin nhắn.";
+      setErrorMessage(errorMessageText);
+      updateMessage(assistantLocalId, (current) => ({
+        ...current,
         content:
-          message.content ||
-          "Không thể tạo phản hồi lúc này. Bạn thử lại sau nhé.",
+          current.content || `Lỗi hệ thống: ${errorMessageText}`,
         status: "failed",
         streaming: false,
       }));
