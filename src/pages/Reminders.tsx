@@ -6,7 +6,7 @@ import { completeReminder } from '../api/reminders';
 import type { Reminder } from '../api/reminders';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Calendar, CheckCircle2, Clock } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { format, isToday, isFuture } from 'date-fns';
 import { vi } from 'date-fns/locale/vi';
 
@@ -14,7 +14,6 @@ type Tab = 'today' | 'upcoming' | 'done';
 
 const Reminders: React.FC = () => {
   const [tab, setTab] = useState<Tab>('today');
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   
   const statusFilter = tab === 'done' ? 'completed' : 'pending';

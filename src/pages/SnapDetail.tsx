@@ -65,7 +65,7 @@ export const SnapDetail: React.FC = () => {
       
       return { previousSnap };
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _newTodo, context) => {
       if (context?.previousSnap) {
         queryClient.setQueryData(['snaps', 'detail', id], context.previousSnap);
       }

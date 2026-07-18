@@ -32,7 +32,7 @@ export const Home: React.FC = () => {
   const snaps = snapFeedData?.data || [];
 
   // Fetch authoritative pet status from backend
-  const { data: petStatusRaw } = usePetStatus(user?.id);
+  const { data: petStatusRaw } = usePetStatus();
 
   const queryClient = useQueryClient();
   const { data: pendingReminders = [] } = useReminders({ status: 'pending' });
@@ -52,7 +52,7 @@ export const Home: React.FC = () => {
   const bubbleMessage = petStatus.bubbleMessage;
 
   const [showCreateSeasonModal, setShowCreateSeasonModal] = useState(false);
-  const [createSeasonMode, setCreateSeasonMode] = useState<'first-time' | 'new-season'>('first-time');
+  const [createSeasonMode, setCreateSeasonMode] = useState<'first-time' | 'add-season'>('first-time');
   const [setupState, setSetupState] = useState<SetupState>('loading');
 
   const { data: plots = [] } = useGetPlotsQuery();
@@ -68,7 +68,7 @@ export const Home: React.FC = () => {
     }
   }, [plots, diaries]);
 
-  const openCreateSeason = (mode: 'first-time' | 'new-season') => {
+  const openCreateSeason = (mode: 'first-time' | 'add-season') => {
     setCreateSeasonMode(mode);
     setShowCreateSeasonModal(true);
   };
@@ -140,7 +140,7 @@ export const Home: React.FC = () => {
             {moodReasonMap[petStatus.moodReason] || petStatus.moodReason || '✨ Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
           </p>
           <button
-            onClick={() => openCreateSeason('new-season')}
+            onClick={() => openCreateSeason('add-season')}
             className="flex items-center gap-2 bg-primary-container text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_16px_34px_rgba(0,109,53,0.24)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
             <Sprout className="w-5 h-5" />
