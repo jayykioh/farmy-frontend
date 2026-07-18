@@ -41,7 +41,43 @@ export function App() {
 
   return (
     <ErrorBoundary>
-      <Toaster position="top-center" />
+      <Toaster 
+        position="bottom-right" 
+        toastOptions={{
+          style: {
+            borderRadius: '100px',
+            background: '#ffffff',
+            color: '#1a1a1a',
+            boxShadow: '0 10px 40px -10px rgba(0,0,0,0.15)',
+            padding: '12px 24px',
+            fontSize: '14px',
+            fontWeight: '600',
+            border: '1px solid rgba(0,0,0,0.05)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#08A855',
+              secondary: '#ffffff',
+            },
+            style: {
+              background: '#f2fcf5',
+              borderColor: '#e0f6e8',
+              color: '#067a3d',
+            }
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#ffffff',
+            },
+            style: {
+              background: '#fef2f2',
+              borderColor: '#fee2e2',
+              color: '#b91c1c',
+            }
+          }
+        }}
+      />
       <PageHeaderProvider>
         <BrowserRouter>
           <Routes>

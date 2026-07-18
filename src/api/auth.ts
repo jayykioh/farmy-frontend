@@ -105,6 +105,11 @@ export const exportUserData = async () => {
   return response.data;
 };
 
+export const updateProfile = async (payload: { name?: string; location?: string; avatarUrl?: string }) => {
+  const { data } = await api.patch<ApiResponse<AuthUser>>('/users/me', payload);
+  return data.data;
+};
+
 export const testEmailNotification = async () => {
   const { data } = await api.post('/auth/email-notification/test');
   return data;

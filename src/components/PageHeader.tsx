@@ -32,7 +32,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   }, [setPageHeaderVisible]);
 
   const handleLeftClick = () => {
-    if (leftButton === 'back') {
+    if (leftButton === 'back' || leftButton === 'close') {
       navigate(-1);
     }
   };

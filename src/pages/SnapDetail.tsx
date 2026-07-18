@@ -22,6 +22,7 @@ import { Button } from '../components/ui/Button';
 import { createSnapComment, fetchSnap, reactToSnap, deleteSnap } from '../api/snaps';
 import { useAuthStore } from '../store/authStore';
 import type { SnapReactionType } from '../types/farmSnap';
+import toast from 'react-hot-toast';
 
 const getReaction = (
   reactions: Awaited<ReturnType<typeof fetchSnap>>['reactions'],
@@ -203,7 +204,7 @@ export const SnapDetail: React.FC = () => {
                       className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors"
                       onClick={() => {
                         setShowDropdown(false);
-                        alert('Chức năng chỉnh sửa đang được phát triển');
+                        toast('Chức năng chỉnh sửa đang được phát triển', { icon: 'ℹ️' });
                       }}
                     >
                       <Edit2 className="w-4 h-4 text-slate-400" />
@@ -214,7 +215,7 @@ export const SnapDetail: React.FC = () => {
                       className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors"
                       onClick={() => {
                         setShowDropdown(false);
-                        alert('Chức năng lưu trữ đang được phát triển');
+                        toast('Chức năng lưu trữ đang được phát triển', { icon: 'ℹ️' });
                       }}
                     >
                       <Archive className="w-4 h-4 text-slate-400" />

@@ -5,6 +5,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useUploadPlantScanMutation } from '../store/api/farmApi';
 import { extractPlantScanErrorCode } from '../api/plantScan';
 import type { PlantScanResult } from '../types/plantScan';
+import toast from 'react-hot-toast';
 
 type ScanState = 'viewfinder' | 'analyzing' | 'result';
 
@@ -57,28 +58,28 @@ export const PlantScan: React.FC = () => {
       setScanState('viewfinder');
       switch (errorCode) {
         case 'SCAN_IMAGE_BLURRY':
-          alert('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
+          toast.error('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
           break;
         case 'NOT_A_PLANT_IMAGE':
-          alert('Bé Thóc chỉ có thể phân tích ảnh cây trồng. Vui lòng thử lại.');
+          toast.error('Bé Thóc chỉ có thể phân tích ảnh cây trồng. Vui lòng thử lại.');
           break;
         case 'SCAN_QUOTA_EXCEEDED':
-          alert('Bạn đã hết lượt quét trong ngày hôm nay.');
+          toast.error('Bạn đã hết lượt quét trong ngày hôm nay.');
           break;
         case 'AI_SCAN_QUOTA_BUSY':
-          alert('Hệ thống AI đang quá tải. Vui lòng thử lại sau vài phút.');
+          toast.error('Hệ thống AI đang quá tải. Vui lòng thử lại sau vài phút.');
           break;
         case 'PLANT_SCAN_PERSISTENCE_FAILED':
-          alert('Lỗi lưu trữ dữ liệu. Vui lòng thử lại.');
+          toast.error('Lỗi lưu trữ dữ liệu. Vui lòng thử lại.');
           break;
         case 'SCAN_INVALID_FILE':
         case 'INVALID_IMAGE_TYPE':
-          alert('Vui lòng tải lên file ảnh hợp lệ (JPG, PNG, WebP) dưới 5MB.');
+          toast.error('Vui lòng tải lên file ảnh hợp lệ (JPG, PNG, WebP) dưới 5MB.');
           break;
         case 'UNKNOWN':
         case 'LLM_ERROR':
         default:
-          alert('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
+          toast.error('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
           break;
       }
     }

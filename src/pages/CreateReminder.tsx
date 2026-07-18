@@ -7,6 +7,7 @@ import {
 } from '../store/api/farmApi';
 import { MessageCircle, Bell } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import toast from 'react-hot-toast';
 
 export const CreateReminder: React.FC = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ export const CreateReminder: React.FC = () => {
     e.preventDefault();
     const titleVal = selectedActivity === 'custom' ? customActivity.trim() : selectedActivity;
     if (!titleVal) {
-      alert('Vui lòng nhập hoạt động vườn!');
+      toast.error('Vui lòng nhập hoạt động vườn!');
       return;
     }
 
@@ -84,7 +85,7 @@ export const CreateReminder: React.FC = () => {
       navigate('/reminders');
     } catch (err) {
       console.error(err);
-      alert('Không thể tạo nhắc nhở. Vui lòng kiểm tra lại!');
+      toast.error('Không thể tạo nhắc nhở. Vui lòng kiểm tra lại!');
     }
   };
 

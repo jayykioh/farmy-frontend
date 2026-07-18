@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { deleteAccount, exportUserData } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { uploadSnapPhoto } from '../api/snaps';
+import toast from 'react-hot-toast';
 
 const PROVINCES = [
   'Hà Nội', 'TP. Hồ Chí Minh', 'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh',
@@ -30,12 +31,16 @@ export const AccountSettings: React.FC = () => {
   const navigate = useNavigate();
   const { clearSession } = useAuthStore();
 
-  const handleSaveName = () => {
-    setName(editName);
-    setRegion(editRegion);
-    updateProfile({ name: editName, region: editRegion });
-    setIsEditingName(false);
-    alert('Đã cập nhật hồ sơ của bạn thành công!');
+  const handleSaveName = async () => {
+    try {
+      await updateProfile({ name: editName, region: editRegion });
+      setName(editName);
+      setRegion(editRegion);
+      setIsEditingName(false);
+      toast.success('Đã cập nhật hồ sơ của bạn thành công!');
+    } catch (err) {
+      toast.error('Có lỗi xảy ra khi cập nhật hồ sơ!');
+    }
   };
 
   const handleCancel = () => {
@@ -55,11 +60,11 @@ export const AccountSettings: React.FC = () => {
     try {
       setIsUploading(true);
       const upload = await uploadSnapPhoto(file);
-      updateProfile({ avatarUrl: upload.publicUrl });
-      alert('Đã thay đổi ảnh đại diện thành công!');
+      await updateProfile({ avatarUrl: upload.publicUrl });
+      toast.success('Đã thay đổi ảnh đại diện thành công!');
     } catch (err) {
       console.error(err);
-      alert('Không thể tải ảnh đại diện lên. Vui lòng thử lại!');
+      toast.error('Không thể tải ảnh đại diện lên. Vui lòng thử lại!');
     } finally {
       setIsUploading(false);
     }
@@ -77,7 +82,7 @@ export const AccountSettings: React.FC = () => {
       link.parentNode?.removeChild(link);
     } catch (err) {
       console.error(err);
-      alert('Lỗi xuất dữ liệu. Vui lòng thử lại!');
+      toast.error('Lỗi xuất dữ liệu. Vui lòng thử lại!');
     }
   };
 
@@ -88,12 +93,12 @@ export const AccountSettings: React.FC = () => {
     
     try {
       await deleteAccount();
-      alert('Tài khoản của bạn đã được đánh dấu xóa.');
+      toast.success('Tài khoản của bạn đã được đánh dấu xóa.');
       clearSession();
       navigate('/');
     } catch (err) {
       console.error(err);
-      alert('Lỗi xóa tài khoản. Vui lòng thử lại!');
+      toast.error('Lỗi xóa tài khoản. Vui lòng thử lại!');
     }
   };
 
