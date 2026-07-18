@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
-import { PetMascot } from '../features/pet/components/PetMascot';
+
 import { MapPin, Award, Flame, Droplets, Clock, Target, LogOut, PenLine, Medal, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { 
