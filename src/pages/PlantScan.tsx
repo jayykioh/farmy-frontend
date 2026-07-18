@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
@@ -22,8 +22,77 @@ export const PlantScan: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<PlantScanResult | null>(null);
   
+  // Camera State
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
+  
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraRequestRef = useRef(0);
   const [uploadPlantScan] = useUploadPlantScanMutation();
+
+  const stopCamera = useCallback(() => {
+    setStream((prevStream) => {
+      if (prevStream) {
+        prevStream.getTracks().forEach((track) => track.stop());
+      }
+      return null;
+    });
+  }, []);
+
+  const startCamera = useCallback(async () => {
+    const requestId = cameraRequestRef.current + 1;
+    cameraRequestRef.current = requestId;
+    stopCamera();
+    
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode,
+          width: { ideal: 1080 },
+          height: { ideal: 1920 },
+        },
+      });
+
+      if (cameraRequestRef.current !== requestId) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
+      setStream(mediaStream);
+    } catch (err) {
+      if (cameraRequestRef.current !== requestId) return;
+      console.error('Camera error:', err);
+      toast.error('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
+    }
+  }, [facingMode, stopCamera]);
+
+  useEffect(() => {
+    if (scanState === 'viewfinder') {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    return () => stopCamera();
+  }, [scanState, startCamera, stopCamera]);
+
+  useEffect(() => {
+    if (scanState === 'viewfinder' && stream && videoRef.current) {
+      const video = videoRef.current;
+      video.srcObject = stream;
+      video.onloadedmetadata = () => {
+        video.play()
+          .then(() => setIsCameraReady(true))
+          .catch(err => {
+            console.error('Camera play error:', err);
+          });
+      };
+    } else {
+      setIsCameraReady(false);
+    }
+  }, [scanState, stream]);
 
   // Cleanup object URL
   useEffect(() => {
@@ -34,17 +103,11 @@ export const PlantScan: React.FC = () => {
     };
   }, [previewUrl]);
 
-
-
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Create preview
+  const processScanFile = async (file: File) => {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    stopCamera();
 
-    // Call API
     setScanState('analyzing');
     const formData = new FormData();
     formData.append('image', file);
@@ -53,7 +116,6 @@ export const PlantScan: React.FC = () => {
     try {
       const response = await uploadPlantScan(formData).unwrap();
       setScanResult(response);
-      // Fallback to returned image URL if available
       if (response.image_url || response.thumbnail_url) {
         setPreviewUrl(response.image_url || response.thumbnail_url || null);
       }
@@ -61,6 +123,7 @@ export const PlantScan: React.FC = () => {
     } catch (error) {
       const errorCode = extractPlantScanErrorCode(error);
       setScanState('viewfinder');
+      startCamera();
       switch (errorCode) {
         case 'SCAN_IMAGE_BLURRY':
           toast.error('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
@@ -88,15 +151,58 @@ export const PlantScan: React.FC = () => {
           break;
       }
     }
-    
-    // Clear input
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    if (!file) return;
+    await processScanFile(file);
   };
 
   const handleCaptureClick = () => {
-    fileInputRef.current?.click();
+    if (!videoRef.current || !canvasRef.current || !isCameraReady) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    const container = video.parentElement;
+    const containerW = container?.clientWidth ?? video.clientWidth;
+    const containerH = container?.clientHeight ?? video.clientHeight;
+    const videoW = video.videoWidth;
+    const videoH = video.videoHeight;
+    const containerAspect = containerW / containerH;
+    const videoAspect = videoW / videoH;
+
+    let sx = 0, sy = 0, sw = videoW, sh = videoH;
+    if (videoAspect > containerAspect) {
+      sw = videoH * containerAspect;
+      sx = (videoW - sw) / 2;
+    } else {
+      sh = videoW / containerAspect;
+      sy = (videoH - sh) / 2;
+    }
+
+    canvas.width = Math.round(sw);
+    canvas.height = Math.round(sh);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (facingMode === 'user') {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        toast.error('Lỗi chụp ảnh. Vui lòng thử lại.');
+        return;
+      }
+      const file = new File([blob], `plant-scan-${Date.now()}.jpeg`, { type: 'image/jpeg' });
+      processScanFile(file);
+    }, 'image/jpeg', 0.85);
   };
 
   const handleRetake = () => {
@@ -107,6 +213,10 @@ export const PlantScan: React.FC = () => {
     }
     setPreviewUrl(null);
   };
+  
+  const toggleCamera = () => {
+    setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
+  };
 
   return (
     <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 relative text-left font-sans flex flex-col">
@@ -115,6 +225,9 @@ export const PlantScan: React.FC = () => {
         leftButton="back"
         rightButton="none"
       />
+      
+      <canvas ref={canvasRef} className="hidden" />
+
       {/* Main Content Canvas */}
       <main className={`flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 pt-[72px] ${scanState === 'viewfinder' ? 'pb-24' : 'pb-[120px] md:pb-8'} flex flex-col ${scanState === 'result' ? 'md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 mt-4' : 'mt-4'}`}>
         
@@ -122,7 +235,6 @@ export const PlantScan: React.FC = () => {
         <input 
           type="file" 
           accept="image/*" 
-          capture="environment" 
           className="hidden" 
           ref={fileInputRef} 
           onChange={handleFileSelect} 
@@ -132,37 +244,66 @@ export const PlantScan: React.FC = () => {
           {/* Viewfinder Area */}
           <div className="relative w-full aspect-[3/4] bg-black rounded-[32px] overflow-hidden shadow-xl border-4 border-border-main/20 flex flex-col">
             
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-               {/* Placeholder until capture */}
-               <svg className="w-16 h-16 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-               </svg>
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900 overflow-hidden">
+               {stream ? (
+                 <video
+                   ref={videoRef}
+                   autoPlay
+                   playsInline
+                   muted
+                   className="w-full h-full object-cover"
+                   style={facingMode === 'user' ? { transform: 'scaleX(-1)' } : undefined}
+                 />
+               ) : (
+                 <svg className="w-16 h-16 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                 </svg>
+               )}
             </div>
 
             {/* Top Bar overlays */}
             <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-              {/* Crop Selection */}
               <select 
                 value={selectedCrop}
                 onChange={(e) => setSelectedCrop(e.target.value)}
                 className="bg-black/50 text-white backdrop-blur-md border border-white/20 rounded-full px-4 py-2 font-bold text-sm outline-none appearance-none cursor-pointer"
               >
-                <option value="Lúa">Lúa</option>
-                <option value="Bưởi">Bưởi</option>
-                <option value="Cà phê">Cà phê</option>
+                <option value="Lúa" className="text-black">Lúa</option>
+                <option value="Bưởi" className="text-black">Bưởi</option>
+                <option value="Cà phê" className="text-black">Cà phê</option>
               </select>
+              
+              <button
+                onClick={toggleCamera}
+                className="w-10 h-10 flex justify-center items-center rounded-full bg-black/50 backdrop-blur-md border border-white/20 active:scale-95 text-white"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
             </div>
 
             {/* Bottom Capture Area inside Viewfinder */}
             <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8 z-10">
-              {/* Capture Button */}
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="w-12 h-12 flex justify-center items-center rounded-full bg-black/50 backdrop-blur-md border border-white/20 active:scale-95 text-white"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+              </button>
+
               <button 
                 onClick={handleCaptureClick}
-                className="w-20 h-20 rounded-full border-4 border-white/50 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+                disabled={!isCameraReady}
+                className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all group ${isCameraReady ? 'border-white/50 hover:scale-105 active:scale-95 cursor-pointer' : 'border-white/30 opacity-50'}`}
               >
-                <div className="w-16 h-16 rounded-full transition-colors bg-white group-hover:bg-gray-200"></div>
+                <div className={`w-16 h-16 rounded-full transition-colors ${isCameraReady ? 'bg-white group-hover:bg-gray-200' : 'bg-white/50'}`}></div>
               </button>
+              
+              <div className="w-12 h-12" /> {/* Spacer */}
             </div>
           </div>
           <p className="text-sm font-bold text-text-main/60 text-center">Giữ camera sát lá bị bệnh để AI chẩn đoán tốt nhất</p>
@@ -316,13 +457,21 @@ export const PlantScan: React.FC = () => {
               </button>
             </section>
 
-            {/* Retake Button */}
-            <button 
-              onClick={handleRetake}
-              className="w-full text-text-main/50 font-bold py-2 hover:text-text-main transition-colors mt-2 cursor-pointer"
-            >
-              Chụp lại
-            </button>
+            {/* Retake / Upload Buttons */}
+            <section className="flex justify-center gap-6 mt-2">
+              <button 
+                onClick={handleRetake}
+                className="text-text-main/50 font-bold py-2 hover:text-text-main transition-colors cursor-pointer"
+              >
+                Chụp lại
+              </button>
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="text-primary font-bold py-2 hover:text-primary-dark transition-colors cursor-pointer flex items-center gap-1"
+              >
+                Tải ảnh lên
+              </button>
+            </section>
 
           </div>
         </>) : null}
@@ -332,4 +481,3 @@ export const PlantScan: React.FC = () => {
 };
 
 export default PlantScan;
-

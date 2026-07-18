@@ -5,7 +5,7 @@ import { SnapFAB } from '../components/SnapFAB';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery } from '../store/api/farmApi';
 import { CreateSeasonModal } from '../components/modals/CreateSeasonModal';
-import { Filter, ArrowUpDown } from 'lucide-react';
+import { Filter, ArrowUpDown, Search } from 'lucide-react';
 
 type FilterType = 'all' | 'active' | 'archived' | 'lua' | 'ca-phe' | 'cay-an-trai' | 'rau-mau' | 'other';
 type SortType = 'recent_activity' | 'newest_start' | 'oldest_start';
@@ -18,6 +18,7 @@ export const DiaryList: React.FC = () => {
   // State for filtering & sorting
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeSort, setActiveSort] = useState<SortType>('recent_activity');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const getCropImage = (cropType: string) => {
     const typeLower = cropType.toLowerCase();
@@ -59,6 +60,14 @@ export const DiaryList: React.FC = () => {
       }
     });
 
+    if (searchTerm.trim() !== '') {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(diary => 
+        diary.crop_type.toLowerCase().includes(term) ||
+        (diary.latest_log && diary.latest_log.content.toLowerCase().includes(term))
+      );
+    }
+
     // 2. Sort
     filtered.sort((a, b) => {
       const getLatestTime = (d: typeof a) => d.latest_log?.created_at ? new Date(d.latest_log.created_at).getTime() : new Date(d.start_date).getTime();
@@ -76,7 +85,7 @@ export const DiaryList: React.FC = () => {
     });
 
     return filtered;
-  }, [diaries, activeFilter, activeSort]);
+  }, [diaries, activeFilter, activeSort, searchTerm]);
 
 
 
@@ -98,6 +107,20 @@ export const DiaryList: React.FC = () => {
             >
               <span className="text-lg leading-none mt-[-2px]">+</span> Thêm vụ mùa
             </button>
+          </div>
+
+          {/* Search Bar */}
+          <div className="px-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm vụ mùa, ghi chú..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white border border-border-main/50 rounded-xl text-sm font-medium text-text-main placeholder:text-text-main/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-sm"
+              />
+            </div>
           </div>
 
           <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2 items-center">
