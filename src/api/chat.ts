@@ -1,4 +1,4 @@
-import { api, getAccessToken } from "./client";
+import { api, getAccessToken, getCsrfToken } from "./client";
 
 export type ChatRole = "user" | "assistant" | "system";
 export type ChatMessageStatus = "pending" | "completed" | "failed";
@@ -136,6 +136,19 @@ export const fetchChatMessages = async (
   return normalizePaginated<ChatMessage>(data);
 };
 
+export const deleteChatSession = async (sessionId: string) => {
+  await api.delete(`/chat/sessions/${sessionId}`);
+};
+
+export const renameChatSession = async (sessionId: string, title: string) => {
+  const { data } = await api.patch<WrappedResponse<ChatSession>>(
+    `/chat/sessions/${sessionId}`,
+    { title },
+  );
+
+  return unwrapResponse(data);
+};
+
 export const submitChatFeedback = async (payload: ChatFeedbackPayload) => {
   const { data } = await api.post<ChatFeedbackResponse>(
     "/chat/feedback",
@@ -177,9 +190,12 @@ export const streamChatMessage = async (
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
+    headers["X-XSRF-TOKEN"] = await getCsrfToken();
+
     const response = await fetch(getApiUrl("/chat/stream"), {
       method: "POST",
       headers,
+      credentials: "include",
       body: JSON.stringify({
         message,
         client_message_id: createClientMessageId(),
