@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { SnapFAB } from '../components/SnapFAB';
 import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery } from '../store/api/farmApi';
@@ -86,24 +87,10 @@ export const DiaryList: React.FC = () => {
     return filtered;
   }, [diaries, activeFilter, activeSort, searchTerm]);
 
-  const FilterChip = ({ type, label }: { type: FilterType, label: string }) => {
-    const isActive = activeFilter === type;
-    return (
-      <button
-        onClick={() => setActiveFilter(type)}
-        className={`px-4 py-2 rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-all cursor-pointer text-sm ${
-          isActive 
-            ? 'bg-slate-800 text-white hover:bg-slate-900 scale-105 shadow-md' 
-            : 'bg-white border border-border-main/50 text-text-main/70 hover:bg-bg-surface-1 hover:text-text-main hover:border-slate-300'
-        }`}
-      >
-        {label}
-      </button>
-    );
-  };
+
 
   return (
-    <div className="w-full min-h-full bg-bg-surface-1">
+    <div className="w-full min-h-full bg-[#fbfbfd]">
       <PageHeader title="Nhật ký nông trại" leftButton="none" />
       <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-8 flex flex-col gap-6">
 
@@ -112,11 +99,11 @@ export const DiaryList: React.FC = () => {
           <div className="flex justify-between items-center px-1">
             <h2 className="text-xl font-black text-text-h flex items-center gap-2">
               Danh sách Vụ mùa
-              <span className="text-sm font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full">{processedDiaries.length}</span>
+              <span className="text-[13px] font-bold bg-[#E8F8F5] text-[#008A5E] px-2.5 py-0.5 rounded-full border border-[#008A5E]/10">{processedDiaries.length}</span>
             </h2>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-slate-100 text-slate-800 border border-transparent rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-slate-200 cursor-pointer flex items-center gap-1.5 text-sm"
+              className="px-4 py-2 bg-[#E8F8F5] text-[#008A5E] border border-[#008A5E]/10 rounded-full font-bold whitespace-nowrap active:scale-95 transition-transform hover:bg-[#D1F2EB] cursor-pointer flex items-center gap-1.5 text-[14px]"
             >
               <span className="text-lg leading-none mt-[-2px]">+</span> Thêm vụ mùa
             </button>
@@ -137,17 +124,43 @@ export const DiaryList: React.FC = () => {
           </div>
 
           <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2 items-center">
-            <div className="flex items-center gap-1.5 mr-1 text-text-main/50">
+            <div className="flex items-center gap-1.5 mr-1 text-[#86868b]">
               <Filter className="w-4 h-4" />
             </div>
-            <FilterChip type="all" label="Tất cả" />
-            <FilterChip type="active" label="Đang canh tác" />
-            <FilterChip type="archived" label="Lưu trữ" />
-            <div className="w-px h-6 bg-border-main/50 mx-1 flex-shrink-0"></div>
-            <FilterChip type="lua" label="Lúa" />
-            <FilterChip type="ca-phe" label="Cà phê" />
-            <FilterChip type="cay-an-trai" label="Ăn trái" />
-            <FilterChip type="other" label="Khác" />
+            {[
+              { type: 'all', label: 'Tất cả' },
+              { type: 'active', label: 'Đang canh tác' },
+              { type: 'archived', label: 'Lưu trữ' },
+              { type: 'separator', label: '' },
+              { type: 'lua', label: 'Lúa' },
+              { type: 'ca-phe', label: 'Cà phê' },
+              { type: 'cay-an-trai', label: 'Ăn trái' },
+              { type: 'other', label: 'Khác' }
+            ].map((f, idx) => {
+              if (f.type === 'separator') return <div key={idx} className="w-px h-6 bg-black/[0.06] mx-1 flex-shrink-0"></div>;
+              const isActive = activeFilter === f.type;
+              return (
+                <button
+                  key={f.type}
+                  onClick={() => setActiveFilter(f.type as FilterType)}
+                  className={`relative px-4 py-1.5 rounded-full font-medium whitespace-nowrap transition-colors cursor-pointer text-[14px] ${
+                    isActive 
+                      ? 'text-white' 
+                      : 'bg-white/70 border border-black/[0.04] text-[#86868b] hover:bg-white hover:text-[#1d1d1f]'
+                  }`}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeFilter"
+                      className="absolute inset-0 bg-[#34C759] rounded-full shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10">{f.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Sorting Dropdown */}
@@ -201,62 +214,50 @@ export const DiaryList: React.FC = () => {
                 <article
                   key={diary._id}
                   onClick={() => navigate(`/diary/history?diaryId=${diary._id}`)}
-                  className="bg-white border border-border-main/40 p-4 rounded-2xl shadow-[0_2px_12px_rgba(20,30,23,0.03)] flex gap-4 items-start active:scale-[0.98] hover:shadow-[0_8px_24px_rgba(20,30,23,0.06)] hover:border-slate-300 transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                  className="bg-white border border-black/[0.04] p-4 rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex gap-4 items-center hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)] transition-all duration-300 cursor-pointer group"
                 >
-                  {/* Status Indicator Bar */}
-                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${diary.status === 'active' ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
-
-                  <div className="w-20 h-20 md:w-22 md:h-22 rounded-xl overflow-hidden flex-shrink-0 bg-bg-surface flex items-center justify-center border border-border-main/20 group-hover:border-slate-300 transition-colors ml-1">
+                  <div className="w-[72px] h-[72px] rounded-2xl overflow-hidden flex-shrink-0 bg-[#f5f5f7] border border-black/[0.03] flex items-center justify-center relative">
+                    {diary.status === 'active' && (
+                      <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#30d158] border-[1.5px] border-white z-10 shadow-sm"></div>
+                    )}
                     {cropImg ? (
-                      <img alt={diary.crop_type} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={cropImg} />
+                      <img alt={diary.crop_type} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src={cropImg} />
                     ) : (
-                      <span className="text-3xl grayscale group-hover:grayscale-0 transition-all duration-300">🌱</span>
+                      <span className="text-2xl">🌱</span>
                     )}
                   </div>
                   
-                  <div className="flex-1 min-w-0 flex flex-col h-full">
-                    <div className="flex justify-between items-start mb-1">
-                      <div className="min-w-0 pr-2">
-                        <h3 className="text-lg font-black text-text-h truncate group-hover:text-slate-600 transition-colors tracking-tight">{diary.crop_type}</h3>
-                        <span className="text-text-main/50 text-xs font-semibold block mt-0.5">
-                          Bắt đầu: {new Date(diary.start_date).toLocaleDateString('vi-VN')}
-                        </span>
-                      </div>
-                      <span className={`px-2 py-1 text-[10px] font-black rounded-full uppercase whitespace-nowrap tracking-wider ${diary.status === 'active' ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-slate-400'}`}>
-                        {diary.status === 'active' ? 'Đang canh tác' : 'Đã lưu trữ'}
-                      </span>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="flex justify-between items-center mb-0.5">
+                      <h3 className="text-[17px] font-semibold text-[#1d1d1f] truncate tracking-tight">{diary.crop_type}</h3>
                     </div>
                     
-                    <p className="text-sm text-text-main/70 font-medium line-clamp-2 mt-1.5 flex-1">
-                      {diary.latest_log
-                        ? diary.latest_log.content
-                        : 'Chưa có ghi chép nào. Nhấn để cập nhật tình trạng mới nhất.'}
+                    <p className="text-[14px] text-[#86868b] line-clamp-1 mb-2.5">
+                      {diary.latest_log ? diary.latest_log.content : 'Chưa có ghi chép nào.'}
                     </p>
                     
-                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border-main/30">
+                    <div className="flex items-center gap-2">
                       {diary.latest_log ? (
-                        <>
-                          <div className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold ${
-                            diary.latest_log.activity_type.toLowerCase().includes('tưới')
-                              ? 'bg-blue-50 text-blue-700'
-                              : diary.latest_log.activity_type.toLowerCase().includes('phân') || diary.latest_log.activity_type.toLowerCase().includes('dưỡng')
-                                ? 'bg-emerald-50 text-emerald-700'
-                                : diary.latest_log.activity_type.toLowerCase().includes('thuốc') || diary.latest_log.activity_type.toLowerCase().includes('sâu')
-                                  ? 'bg-orange-50 text-orange-700'
-                                  : 'bg-slate-100 text-slate-700'
-                          }`}>
-                            <span>{diary.latest_log.activity_type}</span>
-                          </div>
-                          <div className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-lg text-slate-500 text-[11px] font-bold">
-                            <span>
-                              {new Date(diary.latest_log.created_at).toLocaleDateString('vi-VN')}
-                            </span>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center gap-1 bg-slate-50 px-2.5 py-1 rounded-lg text-slate-400 text-[11px] font-bold">
-                          <span>Chưa có hoạt động</span>
+                        <div className="flex items-center gap-2">
+                           <span className={`text-[12px] font-medium px-2 py-0.5 rounded-lg border ${
+                             diary.latest_log.activity_type.toLowerCase().includes('tưới')
+                               ? 'bg-[#E5F1FF] text-[#0066CC] border-[#0066CC]/10'
+                               : diary.latest_log.activity_type.toLowerCase().includes('phân') || diary.latest_log.activity_type.toLowerCase().includes('dưỡng')
+                                 ? 'bg-[#E8F8F5] text-[#008A5E] border-[#008A5E]/10'
+                                 : diary.latest_log.activity_type.toLowerCase().includes('thuốc') || diary.latest_log.activity_type.toLowerCase().includes('sâu')
+                                   ? 'bg-[#FFF3E0] text-[#E67300] border-[#E67300]/10'
+                                   : 'bg-[#f5f5f7] text-[#1d1d1f] border-black/[0.03]'
+                           }`}>
+                             {diary.latest_log.activity_type}
+                           </span>
+                           <span className="text-[12px] text-[#86868b] font-medium">
+                             {new Date(diary.latest_log.created_at).toLocaleDateString('vi-VN')}
+                           </span>
                         </div>
+                      ) : (
+                        <span className="text-[12px] font-medium px-2 py-0.5 rounded-lg bg-[#f5f5f7] text-[#86868b] border border-black/[0.03]">
+                          Bắt đầu: {new Date(diary.start_date).toLocaleDateString('vi-VN')}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -270,10 +271,11 @@ export const DiaryList: React.FC = () => {
       {/* Floating Action Button for Create Diary (Log) */}
       <button
         onClick={() => navigate('/diary/create')}
-        className="fixed bottom-[140px] right-4 md:bottom-24 md:right-8 w-15 h-15 bg-slate-800 text-white border border-transparent rounded-full flex items-center justify-center shadow-[0_12px_28px_rgba(0,0,0,0.2)] z-40 transition-transform hover:scale-105 hover:-translate-y-1 active:scale-95 cursor-pointer hover:bg-slate-900"
+        className="fixed right-4 md:right-8 w-14 h-14 bg-[#34C759] text-white rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(52,199,89,0.35)] z-40 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+        style={{ bottom: 'calc(150px + env(safe-area-inset-bottom))' }}
         aria-label="Tạo Nhật ký"
       >
-        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
         </svg>
       </button>
