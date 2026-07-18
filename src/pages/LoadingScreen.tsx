@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface LoadingScreenProps {
   message?: string;
@@ -21,10 +22,19 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   }, []);
 
   return (
-    <div className="w-full min-h-[100svh] bg-bg-surface-1 flex flex-col items-center justify-center px-4 py-8 gap-8">
+    <div className="w-full min-h-[100svh] bg-[#FBFBFD] flex flex-col items-center justify-center px-4 py-8 gap-8">
       
       {/* Animated Bethoc or Loading Spinner */}
-      <div className="w-40 h-40 flex items-center justify-center">
+      <motion.div 
+        className="w-40 h-40 flex items-center justify-center relative"
+        animate={{ scale: [0.98, 1.02, 0.98] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <motion.div 
+          className="absolute inset-0 bg-primary/5 rounded-[40px] blur-xl"
+          animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.9, 1.1, 0.9] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        />
         {showBethoc ? (
           <React.Suspense fallback={
             <div className="w-32 h-32 bg-primary-container/20 rounded-full animate-pulse" />
@@ -52,20 +62,32 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Loading Text */}
-      <div className="text-center space-y-2">
-        <p className="text-lg font-bold text-text-main">
-          {message}<span className="inline-block w-8 text-left">{dots}</span>
-        </p>
-        <p className="text-sm text-text-main/60">{subtitle}</p>
-      </div>
+      <motion.div 
+        className="text-center flex flex-col gap-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+      >
+        <h2 className="text-xl font-bold text-text-h tracking-tight">{message}</h2>
+        {subtitle && (
+          <p className="text-sm font-medium text-text-main/50 tracking-wide">
+            {subtitle}
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 1, 1, 0] }}
+              transition={{ duration: 2, repeat: Infinity, times: [0, 0.2, 0.8, 1] }}
+            >...</motion.span>
+          </p>
+        )}
+      </motion.div>
 
       {/* Progress Bar */}
-      <div className="w-full max-w-xs h-1.5 bg-primary-container/20 rounded-full overflow-hidden">
+      <div className="w-full max-w-xs h-1.5 bg-slate-100 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-gradient-to-r from-primary via-primary-container to-primary rounded-full animate-pulse"
+          className="h-full bg-slate-900 rounded-full"
           style={{
             animation: 'shimmer 2s infinite',
           }}

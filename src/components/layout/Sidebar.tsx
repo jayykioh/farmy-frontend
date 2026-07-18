@@ -22,7 +22,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-bg-main border-r border-border-main/40 z-50">
+    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-[#FBFBFD] border-r border-black/[0.05] z-50">
       
       {/* Brand / Logo */}
       <div className="h-14 flex items-center gap-2.5 px-6 mt-5 mb-3">
@@ -43,8 +43,8 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) =>
                 `group relative flex items-center gap-3 px-3 py-2 rounded-[10px] transition-all duration-300 ease-out outline-none select-none active:scale-[0.96] ${
                   isActive
-                    ? 'bg-bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] text-primary-container font-medium'
-                    : 'text-text-muted hover:bg-black/[0.04] hover:text-text-main'
+                    ? 'bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-black/[0.02] text-slate-800 font-semibold'
+                    : 'text-slate-500 hover:bg-black/[0.04] hover:text-slate-800'
                 }`
               }
             >
@@ -54,7 +54,7 @@ export const Sidebar: React.FC = () => {
                     size={18}
                     strokeWidth={isActive ? 2.5 : 2}
                     className={`transition-colors duration-300 ${
-                      isActive ? 'text-primary-container' : 'text-text-muted group-hover:text-text-main'
+                      isActive ? 'text-slate-800' : 'text-slate-400 group-hover:text-slate-600'
                     }`}
                   />
                   <span className="text-[13.5px] leading-none mt-[1px]">{item.label}</span>
@@ -66,14 +66,14 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer area inside sidebar */}
-      <div className="p-6 border-t border-border-main/30 bg-bg-surface-1/50 flex justify-between items-center">
+      <div className="p-6 border-t border-black/[0.05] bg-transparent flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+          <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center font-bold text-white shadow-sm">
             {user?.name?.[0]?.toUpperCase() || 'F'}
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-text-main line-clamp-1 max-w-[100px]">{user?.name || 'Nông dân'}</span>
-            <span className="text-xs text-text-main/50 font-medium">
+            <span className="text-sm font-bold text-slate-800 line-clamp-1 max-w-[100px]">{user?.name || 'Nông dân'}</span>
+            <span className="text-xs text-slate-500 font-medium">
               Cấp độ {petStatus.level}
             </span>
           </div>

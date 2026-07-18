@@ -128,7 +128,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
   return (
     <header
-      className={`bg-bg-main/80 backdrop-blur-md border-b border-border-main/40 shadow-sm fixed top-0 w-full z-40 flex justify-between items-center px-2 md:px-8 py-2.5 max-w-3xl left-1/2 -translate-x-1/2 md:max-w-none md:left-0 md:-translate-x-0 ${sidebarClass} ${desktopClass} transition-all duration-300 ${className}`}
+      className={`bg-[#FBFBFD]/80 backdrop-blur-xl border-b border-black/[0.05] shadow-sm fixed top-0 w-full z-40 flex justify-between items-center px-2 md:px-8 py-2.5 max-w-3xl left-1/2 -translate-x-1/2 md:max-w-none md:left-0 md:-translate-x-0 ${sidebarClass} ${desktopClass} transition-all duration-300 ${className}`}
     >
       {renderLeftButton()}
       <div className="flex flex-col items-center justify-center flex-1">

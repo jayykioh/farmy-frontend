@@ -13,7 +13,7 @@ export const MaintenanceMode: React.FC<MaintenanceModeProps> = ({
   contactEmail = 'support@farmdiary.ai',
 }) => {
   return (
-    <div className="w-full min-h-[100svh] bg-gradient-to-b from-bg-surface-1 to-primary-container/10 flex flex-col items-center justify-center px-4 py-8">
+    <div className="w-full min-h-[100svh] bg-[#FBFBFD] flex flex-col items-center justify-center px-4 py-8">
       
       {/* Top spacing */}
       <div className="flex-1" />
@@ -25,10 +25,10 @@ export const MaintenanceMode: React.FC<MaintenanceModeProps> = ({
         <div className="relative w-40 h-40 flex items-center justify-center">
           {/* Working Bethoc */}
           <div className="relative w-40 h-40">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary-container/20 rounded-3xl flex items-center justify-center shadow-inner border border-primary/10">
-              <Settings className="w-24 h-24 text-primary animate-[spin_10s_linear_infinite]" />
+            <div className="absolute inset-0 bg-white rounded-3xl flex items-center justify-center shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/[0.04]">
+              <Settings className="w-24 h-24 text-slate-800 animate-[spin_10s_linear_infinite]" />
             </div>
-            <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-warning rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+            <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
               <Wrench className="w-6 h-6 text-white animate-[bounce_2s_infinite]" />
             </div>
           </div>

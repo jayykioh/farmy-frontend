@@ -5,7 +5,7 @@ export const NotFound404: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-h-[100svh] bg-bg-surface-1 text-left font-sans flex flex-col items-center justify-center px-4 py-8">
+    <div className="w-full min-h-[100svh] bg-[#FBFBFD] text-left font-sans flex flex-col items-center justify-center px-4 py-8">
       {/* Top spacing */}
       <div className="flex-1" />
 
@@ -15,7 +15,6 @@ export const NotFound404: React.FC = () => {
         {/* Animated Error Mascot */}
         <div className="relative w-48 h-48 flex items-center justify-center -mb-4">
           {/* Confused / Crying Bé Thóc Illustration */}
-          <div className="absolute inset-0 bg-gradient-to-br from-error-container/40 to-warning/10 rounded-[40px] blur-2xl animate-pulse"></div>
           <img src="/pet/crying.svg" alt="Bé Thóc đang khóc" className="w-full h-full object-contain relative z-10 drop-shadow-xl" draggable={false} />
           
           {/* Question Mark Badge */}
@@ -26,7 +25,7 @@ export const NotFound404: React.FC = () => {
 
         {/* Error Text */}
         <div className="text-center space-y-4">
-          <h1 className="text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-error to-warning drop-shadow-sm tracking-tighter">
+          <h1 className="text-7xl font-extrabold text-slate-900 drop-shadow-sm tracking-tighter">
             404
           </h1>
           <h2 className="text-2xl md:text-3xl font-black text-text-main tracking-tight">Ôi không! Lạc đường mất rồi</h2>

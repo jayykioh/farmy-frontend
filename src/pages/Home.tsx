@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
@@ -56,10 +57,16 @@ export const Home: React.FC = () => {
   const [createSeasonMode, setCreateSeasonMode] = useState<'first-time' | 'add-season'>('first-time');
   const [setupState, setSetupState] = useState<SetupState>('loading');
 
-  const { data: plots = [] } = useGetPlotsQuery();
-  const { data: diaries = [] } = useGetDiariesQuery();
+  const { data: plots = [], isLoading: plotsLoading } = useGetPlotsQuery();
+  const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();
 
   useEffect(() => {
+    // Wait until both APIs finish loading before determining state to prevent UI flicker
+    if (plotsLoading || diariesLoading) {
+      setSetupState('loading');
+      return;
+    }
+    
     if (plots.length === 0) {
       setSetupState('NO_PLOT');
     } else if (diaries.length === 0) {
@@ -67,7 +74,7 @@ export const Home: React.FC = () => {
     } else {
       setSetupState('READY');
     }
-  }, [plots, diaries]);
+  }, [plots, diaries, plotsLoading, diariesLoading]);
 
   const openCreateSeason = (mode: 'first-time' | 'add-season') => {
     setCreateSeasonMode(mode);
@@ -90,8 +97,7 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full flex flex-col gap-6 md:gap-8 px-4 md:px-8 py-6 md:py-10 max-w-7xl mx-auto min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-80 w-[760px] -translate-x-1/2 rounded-full bg-primary/[0.06] blur-3xl" />
+    <div className="relative w-full flex flex-col gap-6 md:gap-8 px-4 md:px-8 py-6 md:py-10 max-w-7xl mx-auto min-h-screen overflow-hidden bg-[#FBFBFD]">
 
       {/* ── Create Season Modal */}
       <CreateSeasonModal
@@ -101,36 +107,64 @@ export const Home: React.FC = () => {
         mode={createSeasonMode}
       />
 
+      {/* ══ LOADING STATE ═════════════════════════════════════════ */}
+      {setupState === 'loading' && (
+        <div className="flex flex-col items-center justify-center min-h-[70svh] gap-6 animate-pulse">
+          <div className="w-40 h-40 bg-slate-200 rounded-full mb-4"></div>
+          <div className="w-48 h-6 bg-slate-200 rounded-full mb-2"></div>
+          <div className="w-64 h-4 bg-slate-200 rounded-full"></div>
+        </div>
+      )}
+
       {/* ══ EMPTY STATE: NO PLOT ══════════════════════════════════ */}
       {setupState === 'NO_PLOT' && (
-        <div className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6 animate-in fade-in duration-300">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-primary/10 blur-3xl scale-150 pointer-events-none" />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6"
+        >
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
+            className="relative"
+          >
             <PetMascot status={{ ...petStatus, bubbleMessage: 'Chào mừng bạn! 🌱' }} size={180} className="relative drop-shadow-xl" />
-          </div>
+          </motion.div>
           <div className="flex flex-col gap-2 max-w-xs">
             <h1 className="text-2xl font-black text-text-h tracking-tight">Chào mừng đến FarmDiaries!</h1>
             <p className="text-base text-text-main/60 font-medium leading-relaxed">
               Hãy tạo mảnh vườn đầu tiên và bắt đầu vụ mùa để Bé Thóc có thể theo dõi cây trồng cùng bạn.
             </p>
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => openCreateSeason('first-time')}
-            className="flex items-center gap-2 bg-primary-container text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_16px_34px_rgba(0,109,53,0.24)] hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(8,168,85,0.28)] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-2 bg-slate-900 text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-shadow duration-200 cursor-pointer"
           >
             <Sprout className="w-5 h-5" />
             Bắt đầu vụ mùa đầu tiên
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
 
       {/* ══ EMPTY STATE: HAS PLOT, NO ACTIVE DIARY ══════════════ */}
       {setupState === 'NO_ACTIVE_DIARY' && (
-        <div className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6 animate-in fade-in duration-300">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-secondary/10 blur-3xl scale-150 pointer-events-none" />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6"
+        >
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
+            className="relative"
+          >
             <PetMascot status={{ ...petStatus, bubbleMessage: 'Vườn chờ canh tác! 🌿' }} size={180} className="relative drop-shadow-xl" />
-          </div>
+          </motion.div>
           <div className="flex flex-col gap-2 max-w-xs">
             <h1 className="text-2xl font-black text-text-h tracking-tight">Chưa có vụ mùa nào</h1>
             <p className="text-base text-text-main/60 font-medium leading-relaxed">
@@ -140,14 +174,15 @@ export const Home: React.FC = () => {
           <p className="text-sm font-medium text-text-main/50 mt-1">
             {moodReasonMap[petStatus.moodReason] || petStatus.moodReason || '✨ Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
           </p>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => openCreateSeason('add-season')}
-            className="flex items-center gap-2 bg-primary-container text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_16px_34px_rgba(0,109,53,0.24)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-2 bg-slate-900 text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-shadow duration-200 cursor-pointer"
           >
             <Sprout className="w-5 h-5" />
             Tạo vụ mùa mới
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
 
       {/* ══ READY STATE: Full Dashboard ══════════════════════════ */}
@@ -167,14 +202,22 @@ export const Home: React.FC = () => {
 
           {/* Mascot Emotional Anchor */}
           <section className="flex justify-center relative w-full aspect-square max-h-[320px] md:aspect-auto md:max-h-none md:h-80 lg:h-96 mt-2 mb-6 md:mb-0">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent rounded-[40px] scale-90 blur-2xl opacity-70 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-primary/20 rounded-full blur-3xl opacity-50 pointer-events-none" />
-            <div className="relative w-full h-full max-w-[280px] md:max-w-[400px] rounded-[32px] md:rounded-[40px] overflow-visible md:overflow-hidden bg-white/40 backdrop-blur-xl ring-1 ring-white/60 shadow-[0_8px_32px_rgb(0,0,0,0.04)] flex items-center justify-center p-4 md:p-8">
-              <PetMascot status={petStatus} size={220} className="w-full h-full drop-shadow-xl transition-transform hover:scale-105 duration-500" />
-            </div>
-            <div className="absolute -top-4 md:top-8 right-0 md:right-8 bg-white/95 backdrop-blur-md ring-1 ring-slate-100/80 rounded-[24px] rounded-bl-sm px-5 py-3.5 shadow-[0_8px_24px_rgb(0,0,0,0.08)] animate-[bounce_4s_ease-in-out_infinite] max-w-[220px] md:max-w-xs z-10">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', bounce: 0.4, duration: 0.8 }}
+              className="relative w-full h-full max-w-[280px] md:max-w-[400px] rounded-[36px] overflow-visible md:overflow-hidden bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-black/[0.03] flex items-center justify-center p-4 md:p-8"
+            >
+              <PetMascot status={petStatus} size={220} className="w-full h-full drop-shadow-xl" />
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8, x: 20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ type: 'spring', bounce: 0.5, delay: 0.3 }}
+              className="absolute -top-4 md:top-8 right-0 md:right-8 bg-white/95 backdrop-blur-md ring-1 ring-slate-100/80 rounded-[24px] rounded-bl-sm px-5 py-3.5 shadow-[0_8px_24px_rgb(0,0,0,0.08)] animate-[bounce_4s_ease-in-out_infinite] max-w-[220px] md:max-w-xs z-10"
+            >
               <p className="font-semibold text-slate-700 text-sm md:text-base leading-snug">{bubbleMessage}</p>
-            </div>
+            </motion.div>
           </section>
 
           {/* Main CTA Button (Mobile only) */}
@@ -223,33 +266,39 @@ export const Home: React.FC = () => {
           {/* Quick Actions Grid */}
           <section className="flex flex-col gap-3 mt-2 md:mt-0">
             <h3 className="hidden md:block text-base font-bold text-slate-800 mb-1 px-1">Thao tác nhanh</h3>
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
-              <Button
+            <div className="grid grid-cols-3 gap-3 md:gap-4">
+              <motion.button
+                whileTap={{ scale: 0.93 }}
                 onClick={() => navigate('/reminders')}
-                variant="outline"
-                className="justify-start gap-3 h-auto py-3 md:py-4 px-4 md:px-5 w-full bg-white text-slate-700 hover:text-slate-900"
+                className="group flex flex-col items-center justify-center gap-2 p-3 bg-white rounded-[28px] ring-1 ring-black/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.04)] cursor-pointer hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)] transition-all"
               >
-                <Droplets className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
-                <span className="font-medium">Kiểm tra tưới nước</span>
-              </Button>
+                <div className="w-[52px] h-[52px] flex items-center justify-center rounded-[18px] bg-[#F5F5F7] text-slate-700 mb-0.5 group-hover:bg-[#E5E5EA] transition-colors">
+                  <Droplets className="w-[24px] h-[24px]" strokeWidth={1.75} />
+                </div>
+                <span className="font-semibold text-[13px] text-slate-800 text-center tracking-tight">Tưới nước</span>
+              </motion.button>
 
-              <Button
+              <motion.button
+                whileTap={{ scale: 0.93 }}
                 onClick={() => navigate('/scan')}
-                variant="outline"
-                className="justify-start gap-3 h-auto py-3 md:py-4 px-4 md:px-5 w-full bg-white text-slate-700 hover:text-slate-900"
+                className="group flex flex-col items-center justify-center gap-2 p-3 bg-white rounded-[28px] ring-1 ring-black/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.04)] cursor-pointer hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)] transition-all"
               >
-                <ScanLine className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
-                <span className="font-medium">Quét sức khoẻ cây</span>
-              </Button>
+                <div className="w-[52px] h-[52px] flex items-center justify-center rounded-[18px] bg-[#F5F5F7] text-slate-700 mb-0.5 group-hover:bg-[#E5E5EA] transition-colors">
+                  <ScanLine className="w-[24px] h-[24px]" strokeWidth={1.75} />
+                </div>
+                <span className="font-semibold text-[13px] text-slate-800 text-center tracking-tight">Quét cây</span>
+              </motion.button>
 
-              <Button
+              <motion.button
+                whileTap={{ scale: 0.93 }}
                 onClick={() => navigate('/chat')}
-                variant="outline"
-                className="col-span-2 md:col-span-1 justify-start gap-3 h-auto py-3 md:py-4 px-4 md:px-5 w-full bg-white text-slate-700 hover:text-slate-900"
+                className="group flex flex-col items-center justify-center gap-2 p-3 bg-white rounded-[28px] ring-1 ring-black/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.04)] cursor-pointer hover:shadow-[0_12px_40px_rgb(0,0,0,0.06)] transition-all"
               >
-                <MessageSquare className="w-5 h-5 text-slate-400" strokeWidth={1.5} />
-                <span className="font-medium">Trợ lý AI</span>
-              </Button>
+                <div className="w-[52px] h-[52px] flex items-center justify-center rounded-[18px] bg-[#F5F5F7] text-slate-700 mb-0.5 group-hover:bg-[#E5E5EA] transition-colors">
+                  <MessageSquare className="w-[24px] h-[24px]" strokeWidth={1.75} />
+                </div>
+                <span className="font-semibold text-[13px] text-slate-800 text-center tracking-tight">Trợ lý AI</span>
+              </motion.button>
             </div>
           </section>
         </>
