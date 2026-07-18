@@ -48,9 +48,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   initialPlotId,
 }) => {
   // ─── Bước điều hướng ───────────────────────────────────────────
-  const [step, setStep] = useState<SetupStep>(
-    mode === 'add-season' ? 'season_info' : 'plot_info'
-  );
+  const [step, setStep] = useState<SetupStep>('plot_info');
 
   // ─── Plot form state ───────────────────────────────────────────
   const [plotName, setPlotName] = useState('');
@@ -58,7 +56,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   const [areaUnit, setAreaUnit] = useState<AreaUnit>('m2');
   const [description, setDescription] = useState('');
   const [selectedExistingPlotId, setSelectedExistingPlotId] = useState<string>(initialPlotId ?? '');
-  const [useExistingPlot, setUseExistingPlot] = useState(!!initialPlotId);
+  const [useExistingPlot, setUseExistingPlot] = useState(mode === 'add-season' || !!initialPlotId);
 
   // ─── Diary form state ──────────────────────────────────────────
   const [cropId, setCropId] = useState('');

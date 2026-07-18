@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { useShopItems, useBuyItem, useEquipItem } from '../features/shop/hooks/useShop';
@@ -157,7 +157,7 @@ export const Shop: React.FC = () => {
                 </div>
                 <div className="relative z-10 mb-6 animate-[bounce_4s_ease-in-out_infinite]">
                   <div className="w-32 h-32 rounded-full shadow-lg bg-white border-4 border-white overflow-hidden p-2">
-                    <MascotLottie className="w-full h-full -mt-2 drop-shadow-md" state={petStatus.mood} />
+                    <PetMascot className="w-full h-full -mt-2 drop-shadow-md" status={petStatus} size={112} />
                   </div>
                   {/* Equipped indicator */}
                   {currentlyEquippedInActiveCategory && (

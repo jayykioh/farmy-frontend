@@ -13,7 +13,7 @@ import {
   Activity,
   Smartphone
 } from 'lucide-react';
-import { MascotLottie } from '../components/MascotLottie';
+import { PetMascot } from '../features/pet/components/PetMascot';
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -101,7 +101,7 @@ export const Landing: React.FC = () => {
           <div className="relative overflow-hidden rounded-[3rem] border border-white/80 bg-white/78 p-8 shadow-[0_30px_90px_rgba(20,30,23,0.14)] backdrop-blur-xl">
             <div className="pointer-events-none absolute inset-x-8 top-5 h-16 rounded-full bg-white/60 blur-2xl" />
             <div className="aspect-square relative flex items-center justify-center">
-              <MascotLottie className="w-[120%] h-[120%] drop-shadow-lg" />
+              <PetMascot staticMood="happy" className="w-[120%] h-[120%] drop-shadow-lg" size={200} />
             </div>
             
             {/* Floating UI Elements */}
