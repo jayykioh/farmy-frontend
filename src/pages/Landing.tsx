@@ -19,9 +19,8 @@ export const Landing: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#f7fbf4] font-sans text-slate-900 selection:bg-primary/20 selection:text-primary flex flex-col">
-      <div className="pointer-events-none fixed inset-0 opacity-[0.36] [background-image:radial-gradient(circle_at_1px_1px,rgba(20,30,23,0.10)_1px,transparent_0)] [background-size:28px_28px]" />
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[min(100%,1100px)] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(121,252,158,0.34),rgba(255,223,158,0.14)_42%,transparent_68%)] blur-3xl" />
+    <div className="relative min-h-screen overflow-x-hidden bg-[#FBFBFD] font-sans text-slate-900 selection:bg-primary/20 selection:text-primary flex flex-col">
+      <div className="pointer-events-none fixed inset-0 opacity-[0.4] [background-image:radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] [background-size:24px_24px]" />
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/70 bg-white/72 shadow-[0_1px_0_rgba(20,30,23,0.04)] backdrop-blur-xl">
         <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
@@ -61,7 +60,7 @@ export const Landing: React.FC = () => {
           
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight text-slate-900">
             Canh tác thông minh, <br/>
-            <span className="bg-gradient-to-r from-primary-container via-primary to-emerald-400 bg-clip-text text-transparent">
+            <span className="text-emerald-600">
               hiệu quả mỗi ngày.
             </span>
           </h1>
@@ -97,9 +96,7 @@ export const Landing: React.FC = () => {
         </div>
 
         <div className="flex-1 w-full max-w-lg relative mt-10 lg:mt-0">
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(8,168,85,0.14),rgba(250,189,0,0.10))] rounded-[3rem] -z-10 rotate-3 scale-105" />
-          <div className="relative overflow-hidden rounded-[3rem] border border-white/80 bg-white/78 p-8 shadow-[0_30px_90px_rgba(20,30,23,0.14)] backdrop-blur-xl">
-            <div className="pointer-events-none absolute inset-x-8 top-5 h-16 rounded-full bg-white/60 blur-2xl" />
+          <div className="relative overflow-hidden rounded-[3rem] border border-black/[0.04] bg-white/80 p-8 shadow-[0_24px_80px_rgba(0,0,0,0.04)] backdrop-blur-xl">
             <div className="aspect-square relative flex items-center justify-center">
               <PetMascot staticMood="happy" className="w-[120%] h-[120%] drop-shadow-lg" size={200} />
             </div>
@@ -139,8 +136,7 @@ export const Landing: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Feature 1 (Large) */}
-            <div className="md:col-span-2 group relative overflow-hidden rounded-[32px] border border-emerald-100/80 bg-[linear-gradient(135deg,#f7fff7_0%,#ffffff_55%,#fff7df_100%)] p-8 shadow-[0_18px_55px_rgba(20,30,23,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(20,30,23,0.10)]">
-              <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl transition-opacity duration-500 group-hover:opacity-80" />
+            <div className="md:col-span-2 group relative overflow-hidden rounded-[32px] border border-black/[0.04] bg-white p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_50px_rgba(0,0,0,0.06)]">
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-white rounded-2xl shadow-[0_10px_24px_rgba(8,168,85,0.10)] border border-emerald-100 flex items-center justify-center mb-6">
                   <ScanLine className="w-6 h-6 text-primary" />
@@ -156,8 +152,7 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* Feature 2 (Tall) */}
-            <div className="md:col-span-1 md:row-span-2 group relative overflow-hidden rounded-[32px] bg-[radial-gradient(circle_at_20%_0%,rgba(90,223,133,0.22),transparent_34%),linear-gradient(145deg,#101812,#17251c_45%,#07110b)] p-8 text-white shadow-[0_24px_70px_rgba(7,17,11,0.28)] transition-all duration-300 hover:-translate-y-1">
-              <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:36px_36px]" />
+            <div className="md:col-span-1 md:row-span-2 group relative overflow-hidden rounded-[32px] border border-black/[0.02] bg-[#111111] p-8 text-white shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1">
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-white/10 rounded-2xl border border-white/10 flex items-center justify-center mb-6 shadow-inner">
                   <MessageSquare className="w-6 h-6 text-blue-400" />
@@ -173,9 +168,9 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* Feature 3 (Small) */}
-            <div className="group rounded-[32px] border border-amber-100/80 bg-white p-8 shadow-[0_16px_45px_rgba(20,30,23,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(20,30,23,0.09)]">
-              <div className="w-12 h-12 bg-amber-50 rounded-2xl shadow-sm border border-amber-100 flex items-center justify-center mb-6 transition-transform duration-300 group-hover:rotate-[-6deg] group-hover:scale-105">
-                <Cat className="w-6 h-6 text-amber-500" />
+            <div className="group rounded-[32px] border border-black/[0.04] bg-white p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_50px_rgba(0,0,0,0.06)]">
+              <div className="w-12 h-12 bg-[#FFF8E6] rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:rotate-[-6deg] group-hover:scale-105">
+                <Cat className="w-6 h-6 text-[#F59E0B]" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">Gamified Farm</h3>
               <p className="text-slate-600 leading-relaxed">
@@ -184,9 +179,9 @@ export const Landing: React.FC = () => {
             </div>
 
             {/* Feature 4 (Small) */}
-            <div className="group rounded-[32px] border border-rose-100/80 bg-white p-8 shadow-[0_16px_45px_rgba(20,30,23,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(20,30,23,0.09)]">
-              <div className="w-12 h-12 bg-rose-50 rounded-2xl shadow-sm border border-rose-100 flex items-center justify-center mb-6 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
-                <Activity className="w-6 h-6 text-rose-500" />
+            <div className="group rounded-[32px] border border-black/[0.04] bg-white p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_50px_rgba(0,0,0,0.06)]">
+              <div className="w-12 h-12 bg-[#FFF1F2] rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
+                <Activity className="w-6 h-6 text-[#F43F5E]" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">Theo dõi Nhật ký</h3>
               <p className="text-slate-600 leading-relaxed">

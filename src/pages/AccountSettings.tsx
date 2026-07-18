@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PageHeader } from '../components/PageHeader';
 import { useAuthStore } from '../store/authStore';
 import { deleteAccount, exportUserData } from '../api/auth';
@@ -103,7 +104,7 @@ export const AccountSettings: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[100svh] bg-bg-surface-1 text-left font-sans pb-24 md:pb-8">
+    <div className="w-full min-h-[100svh] bg-[#FBFBFD] text-left font-sans pb-24 md:pb-8">
       <input
         type="file"
         ref={avatarInputRef}
@@ -122,8 +123,8 @@ export const AccountSettings: React.FC = () => {
       <main className="w-full max-w-3xl mx-auto pt-24 md:pt-20 px-4 md:px-8 flex flex-col gap-4">
         
         {/* Profile Avatar Section */}
-        <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border-2 border-primary/30 overflow-hidden relative group">
+        <div className="bg-white rounded-[24px] border border-black/[0.04] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-center">
+          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-[#F5F5F7] flex items-center justify-center border-2 border-white overflow-hidden relative group shadow-sm">
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
@@ -149,119 +150,129 @@ export const AccountSettings: React.FC = () => {
         </div>
 
         {/* Personal Information */}
-        {isEditingName ? (
-          <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-text-main mb-4">Chỉnh sửa thông tin</h2>
-            
-            <div className="space-y-4">
-              {/* Name Field */}
-              <div>
-                <label className="block text-sm font-semibold text-text-main mb-2">Tên</label>
-                <input 
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="w-full bg-bg-surface-1 border border-border-main/50 rounded-[12px] px-4 py-3 text-base font-medium text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-                />
-              </div>
-
-              {/* Region Field */}
-              <div>
-                <label className="block text-sm font-semibold text-text-main mb-2">Khu vực</label>
-                <select 
-                  value={editRegion}
-                  onChange={(e) => setEditRegion(e.target.value)}
-                  className="w-full bg-bg-surface-1 border border-border-main/50 rounded-[12px] px-4 py-3 text-base font-medium text-text-main focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-                >
-                  {PROVINCES.map((prov) => (
-                    <option key={prov} value={prov}>{prov}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 mt-6">
-              <button 
-                onClick={handleSaveName}
-                className="flex-1 bg-primary text-white font-bold rounded-full px-4 py-3 hover:bg-primary-container transition-colors cursor-pointer active:scale-95"
-              >
-                Lưu thay đổi
-              </button>
-              <button 
-                onClick={handleCancel}
-                className="flex-1 bg-white border border-border-main/50 text-text-main font-bold rounded-full px-4 py-3 hover:bg-bg-surface-1 transition-colors cursor-pointer active:scale-95"
-              >
-                Hủy
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-text-main mb-4">Thông tin cá nhân</h2>
-            
-            <div className="space-y-3">
-              {/* Name Info */}
-              <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
-                <div>
-                  <p className="text-xs text-text-main/60 font-semibold uppercase">Tên</p>
-                  <p className="text-base font-semibold text-text-main">{name}</p>
-                </div>
-                <svg className="w-5 h-5 text-text-main/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-
-              {/* Region Info */}
-              <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
-                <div>
-                  <p className="text-xs text-text-main/60 font-semibold uppercase">Khu vực</p>
-                  <p className="text-base font-semibold text-text-main">{region}</p>
-                </div>
-                <svg className="w-5 h-5 text-text-main/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-
-              {/* Email Info */}
-              <div className="flex items-center justify-between p-3 rounded-[12px] bg-bg-surface-1">
-                <div>
-                  <p className="text-xs text-text-main/60 font-semibold uppercase">Email</p>
-                  <p className="text-base font-semibold text-text-main">{user?.email || 'N/A'}</p>
-                </div>
-                <svg className="w-5 h-5 text-text-main/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Edit Button */}
-            <button 
-              onClick={() => {
-                setIsEditingName(true);
-                setEditName(name);
-                setEditRegion(region);
-              }}
-              className="w-full mt-4 bg-primary text-white font-bold rounded-full px-4 py-3 hover:bg-primary-container transition-colors cursor-pointer active:scale-95"
+        <AnimatePresence mode="wait">
+          {isEditingName ? (
+            <motion.div 
+              key="edit"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm"
             >
-              Chỉnh sửa thông tin
-            </button>
-          </div>
-        )}
+              <h2 className="text-lg font-bold text-text-main mb-4">Chỉnh sửa thông tin</h2>
+              
+              <div className="bg-bg-surface-1 rounded-[16px] overflow-hidden border border-black/[0.04]">
+                {/* Name Field */}
+                <div className="p-4 border-b border-black/[0.04]">
+                  <label className="block text-xs font-semibold text-text-main/60 uppercase mb-1">Tên</label>
+                  <input 
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full bg-transparent text-base font-semibold text-text-main focus:outline-none"
+                  />
+                </div>
+
+                {/* Region Field */}
+                <div className="p-4">
+                  <label className="block text-xs font-semibold text-text-main/60 uppercase mb-1">Khu vực</label>
+                  <select 
+                    value={editRegion}
+                    onChange={(e) => setEditRegion(e.target.value)}
+                    className="w-full bg-transparent text-base font-semibold text-text-main focus:outline-none appearance-none"
+                  >
+                    {PROVINCES.map((prov) => (
+                      <option key={prov} value={prov}>{prov}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 mt-6">
+                <motion.button 
+                  whileTap={{ scale: 0.96 }}
+                  onClick={handleSaveName}
+                  className="flex-1 bg-primary text-white font-bold rounded-[16px] px-4 py-3 hover:bg-primary-container transition-colors shadow-sm"
+                >
+                  Lưu
+                </motion.button>
+                <motion.button 
+                  whileTap={{ scale: 0.96 }}
+                  onClick={handleCancel}
+                  className="flex-1 bg-white border border-border-main/50 text-text-main font-bold rounded-[16px] px-4 py-3 hover:bg-bg-surface-1 transition-colors shadow-sm"
+                >
+                  Hủy
+                </motion.button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="view"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm"
+            >
+              <h2 className="text-lg font-bold text-text-main mb-4">Thông tin cá nhân</h2>
+              
+              <div className="bg-bg-surface-1 rounded-[16px] overflow-hidden border border-black/[0.04]">
+                {/* Name Info */}
+                <div className="flex items-center justify-between p-4 border-b border-black/[0.04]">
+                  <div>
+                    <p className="text-xs text-text-main/60 font-semibold uppercase">Tên</p>
+                    <p className="text-base font-semibold text-text-main">{name}</p>
+                  </div>
+                </div>
+
+                {/* Region Info */}
+                <div className="flex items-center justify-between p-4 border-b border-black/[0.04]">
+                  <div>
+                    <p className="text-xs text-text-main/60 font-semibold uppercase">Khu vực</p>
+                    <p className="text-base font-semibold text-text-main">{region}</p>
+                  </div>
+                </div>
+
+                {/* Email Info */}
+                <div className="flex items-center justify-between p-4">
+                  <div>
+                    <p className="text-xs text-text-main/60 font-semibold uppercase">Email</p>
+                    <p className="text-base font-semibold text-text-main">{user?.email || 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Edit Button */}
+              <motion.button 
+                whileTap={{ scale: 0.96 }}
+                onClick={() => {
+                  setIsEditingName(true);
+                  setEditName(name);
+                  setEditRegion(region);
+                }}
+                className="w-full mt-4 bg-primary text-white font-bold rounded-[16px] px-4 py-3 hover:bg-primary-container transition-colors shadow-sm"
+              >
+                Chỉnh sửa thông tin
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Account Status Section */}
         <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm">
           <h2 className="text-lg font-bold text-text-main mb-4">Trạng thái tài khoản</h2>
           
-          <div className="space-y-3">
+          <div className="bg-bg-surface-1 rounded-[16px] overflow-hidden border border-black/[0.04]">
             {/* Account Created */}
-            <div className="p-3 rounded-[12px] bg-bg-surface-1">
+            <div className="p-4 border-b border-black/[0.04]">
               <p className="text-xs text-text-main/60 font-semibold uppercase">Ngày tạo tài khoản</p>
               <p className="text-base font-semibold text-text-main">15 tháng 5 năm 2024</p>
             </div>
 
             {/* Account Status */}
-            <div className="p-3 rounded-[12px] bg-bg-surface-1">
+            <div className="p-4 border-b border-black/[0.04]">
               <p className="text-xs text-text-main/60 font-semibold uppercase">Trạng thái</p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-2 h-2 rounded-full bg-success-main"></div>
@@ -270,7 +281,7 @@ export const AccountSettings: React.FC = () => {
             </div>
 
             {/* Subscription Plan */}
-            <div className="p-3 rounded-[12px] bg-bg-surface-1">
+            <div className="p-4">
               <p className="text-xs text-text-main/60 font-semibold uppercase">Gói</p>
               <p className="text-base font-semibold text-text-main">Miễn phí</p>
             </div>
@@ -281,20 +292,22 @@ export const AccountSettings: React.FC = () => {
         <div className="bg-white rounded-[24px] border border-error-main/20 p-6 shadow-sm">
           <h2 className="text-lg font-bold text-text-main mb-4">Dữ liệu & Quyền riêng tư</h2>
           
-          <button 
+          <motion.button 
+            whileTap={{ scale: 0.96 }}
             onClick={handleExportData}
-            className="w-full bg-bg-surface-1 border border-border-main/50 text-text-main font-bold rounded-[12px] px-4 py-3 hover:bg-bg-surface transition-colors cursor-pointer active:scale-95 mb-4"
+            className="w-full bg-bg-surface-1 border border-border-main/50 text-text-main font-bold rounded-[16px] px-4 py-3 hover:bg-bg-surface transition-colors shadow-sm mb-4"
           >
             Xuất dữ liệu của tôi
-          </button>
+          </motion.button>
 
           <h2 className="text-lg font-bold text-error-main mb-4 mt-6">Vùng nguy hiểm</h2>
-          <button 
+          <motion.button 
+            whileTap={{ scale: 0.96 }}
             onClick={handleDeleteAccount}
-            className="w-full bg-error-light text-error-main font-bold rounded-[12px] px-4 py-3 hover:bg-error-light/80 transition-colors cursor-pointer active:scale-95"
+            className="w-full bg-error-light text-error-main font-bold rounded-[16px] px-4 py-3 hover:bg-error-light/80 transition-colors shadow-sm"
           >
             Xóa tài khoản
-          </button>
+          </motion.button>
           <p className="text-xs text-error-main/70 mt-2 text-center">Hành động này không thể hoàn tác</p>
         </div>
 

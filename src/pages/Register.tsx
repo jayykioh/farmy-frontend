@@ -66,14 +66,12 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[linear-gradient(155deg,#f8fff7_0%,#ffffff_45%,#fff4d8_100%)] md:items-center md:justify-center">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.28] [background-image:radial-gradient(circle_at_1px_1px,rgba(20,30,23,0.12)_1px,transparent_0)] [background-size:26px_26px]" />
-      <div className="pointer-events-none absolute -left-20 top-12 h-72 w-72 rounded-full bg-primary-lightest/25 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-16 h-80 w-80 rounded-full bg-secondary-light/45 blur-3xl" />
+    <div className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[#FBFBFD] md:items-center md:justify-center">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.4] [background-image:radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] [background-size:24px_24px]" />
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden md:h-auto md:grid md:grid-cols-[0.95fr_1.05fr] md:rounded-[36px] md:border md:border-white/80 md:bg-white/65 md:shadow-[0_30px_100px_rgba(20,30,23,0.14)] md:backdrop-blur-xl">
-        <main className="relative flex flex-1 flex-col items-center justify-center px-6 pb-4 pt-10 md:items-start md:bg-[radial-gradient(circle_at_35%_25%,rgba(121,252,158,0.22),transparent_34%)] md:px-10 md:py-12 md:text-left">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white/80 px-3.5 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-container shadow-sm">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden md:h-auto md:grid md:grid-cols-[0.95fr_1.05fr] md:rounded-[36px] md:border md:border-black/[0.04] md:bg-white/80 md:shadow-[0_24px_80px_rgba(0,0,0,0.04)] md:backdrop-blur-xl">
+        <main className="relative flex flex-1 flex-col items-center justify-center px-6 pb-4 pt-10 md:items-start md:bg-transparent md:px-10 md:py-12 md:text-left">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-black/[0.02] px-3.5 py-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
             <Sprout className="h-3.5 w-3.5" />
             Start your farm log
           </div>
@@ -90,9 +88,9 @@ export const Register: React.FC = () => {
           </div>
         </main>
 
-        <div className="flex w-full flex-col gap-4 rounded-t-[32px] border-t border-border-main/50 bg-bg-main/95 px-6 pb-8 pt-6 shadow-[0_-20px_70px_rgba(20,30,23,0.08)] md:rounded-none md:border-l md:border-t-0 md:bg-white/80 md:px-10 md:py-12 md:shadow-none">
+        <div className="flex w-full flex-col gap-4 rounded-t-[32px] border-t border-black/[0.04] bg-white px-6 pb-8 pt-6 shadow-[0_-20px_40px_rgba(0,0,0,0.02)] md:rounded-none md:border-l md:border-t-0 md:bg-white/95 md:px-10 md:py-12 md:shadow-none backdrop-blur-2xl">
           <div className="mb-2 text-left">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-primary-container/60">Create account</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">Create account</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-text-h">Thông tin đăng ký</h2>
           </div>
           <form className="flex flex-col gap-3" onSubmit={handleSubmit(submitRegister)}>

@@ -3,6 +3,7 @@ import type { Reminder } from '../api/reminders';
 import { Check, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale/vi';
+import { motion } from 'framer-motion';
 
 interface ReminderCardProps {
   reminder: Reminder;
@@ -29,44 +30,57 @@ export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDone, on
   const icon = activityIcons[reminder.type || 'other'] || activityIcons['other'];
   
   return (
-    <div className={`p-3 rounded-xl border transition-all ${isPast ? 'bg-red-50/50 border-red-200 shadow-[0_2px_8px_rgba(239,68,68,0.1)]' : reminder.status === 'completed' ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-white border-border-main/50 shadow-sm hover:shadow-md'}`}>
+    <motion.div 
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`p-4 rounded-[24px] ring-1 transition-all ${
+        isPast 
+          ? 'bg-[#FFF9F9] ring-red-500/10 shadow-[0_8px_30px_rgba(239,68,68,0.08)]' 
+          : reminder.status === 'completed' 
+            ? 'bg-slate-50 ring-black/[0.02] opacity-60 shadow-none' 
+            : 'bg-white ring-black/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]'
+      }`}
+    >
       <div className="flex items-start gap-3">
-        <div className="text-2xl mt-1">{icon}</div>
+        <div className="text-3xl mt-0.5">{icon}</div>
         <div className="flex-1 min-w-0">
-          <h4 className={`font-semibold text-text-h truncate ${reminder.status === 'completed' ? 'line-through text-gray-500' : ''}`}>
+          <h4 className={`font-bold text-[15px] leading-tight text-slate-800 tracking-tight mb-1 ${reminder.status === 'completed' ? 'line-through text-slate-400' : ''}`}>
             {reminder.title}
           </h4>
           
-          <div className="flex items-center flex-wrap gap-2 mt-1">
-            <p className={`text-xs flex items-center gap-1 ${isPast ? 'text-red-500 font-medium' : 'text-text-main/60'}`}>
+          <div className="flex items-center flex-wrap gap-2 mt-0.5">
+            <p className={`text-[13px] flex items-center gap-1 ${isPast ? 'text-red-500 font-bold' : 'text-slate-500 font-medium'}`}>
               <Clock className="w-3.5 h-3.5" />
               {format(remindAtDate, 'HH:mm', { locale: vi })}
-              {isPast && <span className="ml-1 text-[10px] bg-red-100 px-1.5 py-0.5 rounded text-red-600">Quá hạn</span>}
+              {isPast && <span className="ml-1 text-[10px] font-black uppercase tracking-wider bg-red-100 px-1.5 py-0.5 rounded-md text-red-600">Quá hạn</span>}
             </p>
           </div>
         </div>
       </div>
       
       {reminder.status !== 'completed' && (onDone || onSnooze) && (
-        <div className="flex gap-2 mt-3 pl-9">
+        <div className="flex gap-2.5 mt-4 pl-[44px]">
           {onDone && (
-            <button 
+            <motion.button 
+              whileTap={{ scale: 0.93 }}
               onClick={onDone} 
-              className="flex-1 py-1.5 px-3 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors"
+              className="flex-1 py-2 px-3 bg-[#E8F8F5] text-[#00A97F] rounded-full text-[13.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Check className="w-4 h-4" /> Đã xong
-            </button>
+              <Check className="w-4 h-4 stroke-[2.5]" /> Đã xong
+            </motion.button>
           )}
           {onSnooze && (
-            <button 
+            <motion.button 
+              whileTap={{ scale: 0.93 }}
               onClick={onSnooze} 
-              className="flex-1 py-1.5 px-3 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-text-main rounded-lg text-sm font-medium transition-colors"
+              className="flex-[0.7] py-2 px-3 bg-slate-100 text-slate-600 rounded-full text-[13.5px] font-bold transition-colors cursor-pointer"
             >
               Hoãn
-            </button>
+            </motion.button>
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };

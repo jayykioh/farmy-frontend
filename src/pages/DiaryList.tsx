@@ -84,8 +84,8 @@ export const DiaryList: React.FC = () => {
         onClick={() => setActiveFilter(type)}
         className={`px-4 py-2 rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-all cursor-pointer text-sm ${
           isActive 
-            ? 'bg-primary text-white hover:bg-primary-dark scale-105' 
-            : 'bg-white border border-border-main/50 text-text-main/70 hover:bg-bg-surface-1 hover:text-text-main hover:border-primary/30'
+            ? 'bg-slate-800 text-white hover:bg-slate-900 scale-105 shadow-md' 
+            : 'bg-white border border-border-main/50 text-text-main/70 hover:bg-bg-surface-1 hover:text-text-main hover:border-slate-300'
         }`}
       >
         {label}
@@ -103,11 +103,11 @@ export const DiaryList: React.FC = () => {
           <div className="flex justify-between items-center px-1">
             <h2 className="text-xl font-black text-text-h flex items-center gap-2">
               Danh sách Vụ mùa
-              <span className="text-sm font-bold bg-primary/10 text-primary-container px-2.5 py-0.5 rounded-full">{processedDiaries.length}</span>
+              <span className="text-sm font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full">{processedDiaries.length}</span>
             </h2>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-primary/20 cursor-pointer flex items-center gap-1.5 text-sm"
+              className="px-4 py-2 bg-slate-100 text-slate-800 border border-transparent rounded-full font-bold whitespace-nowrap shadow-sm active:scale-95 transition-transform hover:bg-slate-200 cursor-pointer flex items-center gap-1.5 text-sm"
             >
               <span className="text-lg leading-none mt-[-2px]">+</span> Thêm vụ mùa
             </button>
@@ -134,7 +134,7 @@ export const DiaryList: React.FC = () => {
               <select
                 value={activeSort}
                 onChange={(e) => setActiveSort(e.target.value as SortType)}
-                className="pl-9 pr-8 py-1.5 bg-white border border-border-main/50 rounded-xl text-xs font-bold text-text-main/80 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none appearance-none cursor-pointer shadow-sm"
+                className="pl-9 pr-8 py-1.5 bg-white border border-border-main/50 rounded-xl text-xs font-bold text-text-main/80 focus:ring-2 focus:ring-slate-200 focus:border-slate-400 outline-none appearance-none cursor-pointer shadow-sm"
               >
                 <option value="recent_activity">Hoạt động gần đây</option>
                 <option value="newest_start">Bắt đầu gần nhất</option>
@@ -159,7 +159,7 @@ export const DiaryList: React.FC = () => {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="mt-2 px-6 py-3.5 bg-primary text-white font-extrabold rounded-2xl hover:bg-primary-dark cursor-pointer shadow-[0_10px_24px_rgba(8,168,85,0.25)] hover:shadow-[0_14px_30px_rgba(8,168,85,0.3)] hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2"
+              className="mt-2 px-6 py-3.5 bg-slate-800 text-white font-extrabold rounded-2xl hover:bg-slate-900 cursor-pointer shadow-[0_10px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2"
             >
               <span>+</span> Bắt đầu vụ mùa mới
             </button>
@@ -168,7 +168,7 @@ export const DiaryList: React.FC = () => {
           <div className="py-20 text-center flex flex-col gap-3 items-center">
             <Filter className="w-10 h-10 text-border-main/80" />
             <p className="font-bold text-text-main/60">Không tìm thấy vụ mùa phù hợp với bộ lọc.</p>
-            <button onClick={() => setActiveFilter('all')} className="text-primary font-bold hover:underline text-sm cursor-pointer mt-1">Xóa bộ lọc</button>
+            <button onClick={() => setActiveFilter('all')} className="text-slate-800 font-bold hover:underline text-sm cursor-pointer mt-1">Xóa bộ lọc</button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mt-2">
@@ -178,12 +178,12 @@ export const DiaryList: React.FC = () => {
                 <article
                   key={diary._id}
                   onClick={() => navigate(`/diary/history?diaryId=${diary._id}`)}
-                  className="bg-white border border-border-main/40 p-4 rounded-2xl shadow-[0_2px_12px_rgba(20,30,23,0.03)] flex gap-4 items-start active:scale-[0.98] hover:shadow-[0_8px_24px_rgba(20,30,23,0.06)] hover:border-primary/20 transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                  className="bg-white border border-border-main/40 p-4 rounded-2xl shadow-[0_2px_12px_rgba(20,30,23,0.03)] flex gap-4 items-start active:scale-[0.98] hover:shadow-[0_8px_24px_rgba(20,30,23,0.06)] hover:border-slate-300 transition-all duration-200 cursor-pointer group relative overflow-hidden"
                 >
                   {/* Status Indicator Bar */}
-                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${diary.status === 'active' ? 'bg-primary' : 'bg-slate-200'}`}></div>
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${diary.status === 'active' ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
 
-                  <div className="w-20 h-20 md:w-22 md:h-22 rounded-xl overflow-hidden flex-shrink-0 bg-bg-surface flex items-center justify-center border border-border-main/20 group-hover:border-primary/30 transition-colors ml-1">
+                  <div className="w-20 h-20 md:w-22 md:h-22 rounded-xl overflow-hidden flex-shrink-0 bg-bg-surface flex items-center justify-center border border-border-main/20 group-hover:border-slate-300 transition-colors ml-1">
                     {cropImg ? (
                       <img alt={diary.crop_type} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={cropImg} />
                     ) : (
@@ -194,12 +194,12 @@ export const DiaryList: React.FC = () => {
                   <div className="flex-1 min-w-0 flex flex-col h-full">
                     <div className="flex justify-between items-start mb-1">
                       <div className="min-w-0 pr-2">
-                        <h3 className="text-lg font-black text-text-h truncate group-hover:text-primary transition-colors tracking-tight">{diary.crop_type}</h3>
+                        <h3 className="text-lg font-black text-text-h truncate group-hover:text-slate-600 transition-colors tracking-tight">{diary.crop_type}</h3>
                         <span className="text-text-main/50 text-xs font-semibold block mt-0.5">
                           Bắt đầu: {new Date(diary.start_date).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
-                      <span className={`px-2 py-1 text-[10px] font-black rounded-full uppercase whitespace-nowrap tracking-wider ${diary.status === 'active' ? 'bg-primary-container/10 text-primary-container' : 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`px-2 py-1 text-[10px] font-black rounded-full uppercase whitespace-nowrap tracking-wider ${diary.status === 'active' ? 'bg-slate-100 text-slate-700' : 'bg-slate-100 text-slate-400'}`}>
                         {diary.status === 'active' ? 'Đang canh tác' : 'Đã lưu trữ'}
                       </span>
                     </div>
@@ -220,7 +220,7 @@ export const DiaryList: React.FC = () => {
                                 ? 'bg-emerald-50 text-emerald-700'
                                 : diary.latest_log.activity_type.toLowerCase().includes('thuốc') || diary.latest_log.activity_type.toLowerCase().includes('sâu')
                                   ? 'bg-orange-50 text-orange-700'
-                                  : 'bg-primary/10 text-primary-dark'
+                                  : 'bg-slate-100 text-slate-700'
                           }`}>
                             <span>{diary.latest_log.activity_type}</span>
                           </div>
@@ -247,7 +247,7 @@ export const DiaryList: React.FC = () => {
       {/* Floating Action Button for Create Diary (Log) */}
       <button
         onClick={() => navigate('/diary/create')}
-        className="fixed bottom-[140px] right-4 md:bottom-24 md:right-8 w-15 h-15 bg-primary-container text-white border border-primary/20 rounded-full flex items-center justify-center shadow-[0_12px_28px_rgba(0,109,53,0.3)] z-40 transition-transform hover:scale-105 hover:-translate-y-1 active:scale-95 cursor-pointer"
+        className="fixed bottom-[140px] right-4 md:bottom-24 md:right-8 w-15 h-15 bg-slate-800 text-white border border-transparent rounded-full flex items-center justify-center shadow-[0_12px_28px_rgba(0,0,0,0.2)] z-40 transition-transform hover:scale-105 hover:-translate-y-1 active:scale-95 cursor-pointer hover:bg-slate-900"
         aria-label="Tạo Nhật ký"
       >
         <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">

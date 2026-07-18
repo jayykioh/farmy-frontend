@@ -11,6 +11,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons.svg'],
+      devOptions: {
+        enabled: false, // Ensure PWA is NOT active in dev to prevent HMR caching bugs
+      },
       manifest: {
         name: 'Farmy',
         short_name: 'Farmy',
@@ -34,6 +37,15 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /\/auth\//, /\/supabase\//],
         runtimeCaching: [
+          // Network First for HTML to ensure users always get the latest version
+          {
+            urlPattern: ({ request }) => request.destination === 'document',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+            },
+          },
+          // Stale While Revalidate for static assets
           {
             urlPattern: ({ request, url }) =>
               request.method === 'GET' &&
