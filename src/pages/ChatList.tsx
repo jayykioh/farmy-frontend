@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Loader2, Plus } from 'lucide-react';
+import {
+  AlertCircle,
+  Check,
+  ChevronRight,
+  Pencil,
+  Leaf,
+  Loader2,
+  MessageCircle,
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { PageHeader } from '../components/PageHeader';
-import { fetchChatSessions, type ChatSession } from '../api/chat';
+import {
+  deleteChatSession,
+  fetchChatSessions,
+  renameChatSession,
+  type ChatSession,
+} from '../api/chat';
 
 const formatRelativeDate = (value?: string) => {
   if (!value) return '';
@@ -30,6 +46,11 @@ export const ChatList: React.FC = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [confirmingSessionId, setConfirmingSessionId] = useState<string | null>(null);
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState('');
+  const [savingSessionId, setSavingSessionId] = useState<string | null>(null);
 
   const { data: petStatusRaw } = usePetStatus();
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
@@ -56,15 +77,85 @@ export const ChatList: React.FC = () => {
     };
   }, []);
 
+  const handleDeleteSession = async (sessionId: string) => {
+    setDeletingSessionId(sessionId);
+    setErrorMessage('');
+
+    try {
+      await deleteChatSession(sessionId);
+      setSessions((current) => current.filter((session) => session._id !== sessionId));
+      setConfirmingSessionId(null);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Không thể xóa cuộc trò chuyện. Bạn thử lại sau nhé.');
+    } finally {
+      setDeletingSessionId(null);
+    }
+  };
+
+  const startEditingSession = (session: ChatSession) => {
+    setConfirmingSessionId(null);
+    setEditingSessionId(session._id);
+    setDraftTitle(session.title || 'Cuộc trò chuyện với Bé Thóc');
+    setErrorMessage('');
+  };
+
+  const handleRenameSession = async (sessionId: string) => {
+    const title = draftTitle.trim();
+    if (!title) {
+      setErrorMessage('Tên cuộc trò chuyện không được để trống.');
+      return;
+    }
+
+    setSavingSessionId(sessionId);
+    setErrorMessage('');
+
+    try {
+      const updated = await renameChatSession(sessionId, title);
+      setSessions((current) =>
+        current.map((session) =>
+          session._id === sessionId ? { ...session, ...updated } : session,
+        ),
+      );
+      setEditingSessionId(null);
+      setDraftTitle('');
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Không thể đổi tên cuộc trò chuyện. Bạn thử lại sau nhé.');
+    } finally {
+      setSavingSessionId(null);
+    }
+  };
+
   return (
-    <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 text-left font-sans pb-[100px] relative overflow-hidden">
+    <div className="w-full h-full min-h-[100svh] bg-[#fcfaf5] text-left font-sans pb-[100px]">
       <PageHeader title="Tri Kỷ AI" leftButton="none" />
 
-      <main className="w-full max-w-3xl mx-auto px-4 md:px-8 pt-24 pb-12 relative min-h-[100svh] flex flex-col">
-        <div className="flex justify-end mb-6">
+      <main className="w-full max-w-3xl mx-auto px-4 md:px-8 pt-24 pb-12 min-h-[100svh] flex flex-col">
+        <section className="mb-6 rounded-2xl border border-border-main/50 bg-white p-5 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-container">
+                <Leaf className="h-3.5 w-3.5" />
+                Sổ tay đồng áng
+              </div>
+              <h2 className="mt-3 text-3xl font-black leading-tight tracking-[-0.04em] text-text-main">
+                Lịch sử tư vấn
+              </h2>
+              <p className="mt-2 max-w-md text-sm font-semibold leading-relaxed text-text-main/65">
+                Mỗi cuộc trò chuyện được giữ lại như một ghi chú canh tác, có thể mở tiếp hoặc dọn bớt khi đã xử lý xong.
+              </p>
+            </div>
+            <div className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#edf5de] border border-primary/10 text-primary-container md:flex">
+              <MessageCircle className="h-6 w-6" />
+            </div>
+          </div>
+        </section>
+
+        <div className="flex justify-end mb-5">
           <button 
             onClick={() => navigate('/chat/active')}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-primary text-white rounded-full font-bold shadow-md active:scale-95 hover:bg-primary-container transition-all"
+            className="flex items-center gap-1.5 px-5 py-2 bg-primary text-white rounded-full font-bold shadow-sm active:scale-95 hover:-translate-y-[1px] transition-all"
           >
             <Plus className="w-5 h-5" />
             Chat mới
@@ -84,29 +175,126 @@ export const ChatList: React.FC = () => {
         ) : sessions.length > 0 ? (
           <div className="space-y-4">
             {sessions.map(session => (
-              <button
+              <article
                 key={session._id}
-                type="button"
-                onClick={() => navigate(`/chat/active/${session._id}`)}
-                className="w-full text-left bg-white border border-border-main/50 p-5 rounded-2xl flex flex-col gap-2 relative overflow-hidden group hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 cursor-pointer shadow-sm"
+                className="group overflow-hidden rounded-2xl border border-border-main/50 bg-white shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-md"
               >
-                <div className="flex justify-between items-start gap-4">
-                  <span className="px-2 py-1 bg-primary-lightest/30 border border-primary-lightest/50 text-primary-container text-[11px] font-extrabold rounded-lg uppercase tracking-wider">
-                    AI
-                  </span>
-                  <span className="text-text-main/50 text-[12px] font-bold whitespace-nowrap">
-                    {formatRelativeDate(session.last_message_at ?? session.updated_at ?? session.created_at)}
-                  </span>
+                <div className="flex items-stretch gap-2 p-4">
+                  {editingSessionId === session._id ? (
+                    <div className="min-w-0 flex-1">
+                      <label className="text-[12px] font-black uppercase tracking-[0.16em] text-primary-container" htmlFor={`chat-title-${session._id}`}>
+                        Tên cuộc trò chuyện
+                      </label>
+                      <input
+                        id={`chat-title-${session._id}`}
+                        aria-label="Tên cuộc trò chuyện"
+                        value={draftTitle}
+                        onChange={(event) => setDraftTitle(event.target.value)}
+                        maxLength={60}
+                        className="mt-2 w-full rounded-2xl border border-primary/20 bg-white px-4 py-3 text-lg font-black text-text-main outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                      />
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void handleRenameSession(session._id)}
+                          disabled={savingSessionId === session._id}
+                          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm active:scale-95 disabled:opacity-70"
+                        >
+                          {savingSessionId === session._id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                          Lưu tên
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingSessionId(null);
+                            setDraftTitle('');
+                          }}
+                          className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-text-main shadow-sm active:scale-95"
+                        >
+                          <X className="h-4 w-4" />
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/chat/active/${session._id}`)}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#edf5de] px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-primary-container">
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          AI
+                        </span>
+                        <span className="text-[12px] font-bold text-text-main/45">
+                          {formatRelativeDate(session.last_message_at ?? session.updated_at ?? session.created_at)}
+                        </span>
+                      </div>
+                      <h3 className="mt-3 line-clamp-2 text-xl font-black leading-snug tracking-[-0.03em] text-text-main">
+                        {session.title || 'Cuộc trò chuyện với Bé Thóc'}
+                      </h3>
+                      <p className="mt-2 line-clamp-2 text-sm font-semibold leading-relaxed text-text-main/62">
+                        Mở lại mạch tư vấn cũ, giữ nguyên bối cảnh nông trại và các ghi chú trước đó.
+                      </p>
+                    </button>
+                  )}
+
+                  <div className="flex shrink-0 flex-col items-end justify-between gap-3">
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        aria-label="Đổi tên cuộc trò chuyện"
+                        onClick={() => startEditingSession(session)}
+                        className="rounded-full border border-primary/10 bg-white/85 p-2.5 text-primary-container shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:bg-primary/5 active:scale-95"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Xóa cuộc trò chuyện"
+                        onClick={() => setConfirmingSessionId(session._id)}
+                        className="rounded-full border border-red-100 bg-white/85 p-2.5 text-red-500 shadow-sm transition-all hover:-translate-y-0.5 hover:border-red-200 hover:bg-red-50 active:scale-95"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-text-main/25 transition-transform group-hover:translate-x-0.5" />
+                  </div>
                 </div>
-                <div className="mt-1">
-                  <p className="text-text-main font-extrabold text-lg line-clamp-1">
-                    {session.title || 'Cuộc trò chuyện với Bé Thóc'}
-                  </p>
-                  <p className="text-text-main/80 text-sm line-clamp-2 mt-1">
-                    Mở lại cuộc trò chuyện để tiếp tục nhận tư vấn theo ngữ cảnh cũ.
-                  </p>
-                </div>
-              </button>
+
+                {confirmingSessionId === session._id ? (
+                  <div className="relative mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-100 bg-red-50/90 px-4 py-3">
+                    <p className="text-sm font-bold text-red-700">
+                      Xóa cuộc trò chuyện này khỏi lịch sử?
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingSessionId(null)}
+                        className="rounded-full bg-white px-4 py-2 text-sm font-bold text-text-main shadow-sm active:scale-95"
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleDeleteSession(session._id)}
+                        disabled={deletingSessionId === session._id}
+                        className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm active:scale-95 disabled:opacity-70"
+                      >
+                        {deletingSessionId === session._id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : null}
+                        Xóa hẳn
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </article>
             ))}
           </div>
         ) : (

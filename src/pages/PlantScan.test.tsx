@@ -4,6 +4,7 @@ import PlantScan from './PlantScan';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { farmApi } from '../store/api/farmApi';
 import { PageHeaderProvider } from '../contexts/PageHeaderContext';
 import { api } from '../api/client';
@@ -26,8 +27,12 @@ window.URL.revokeObjectURL = mockRevokeObjectURL;
 
 describe('PlantScan Component', () => {
   let store: ReturnType<typeof configureStore>;
+  let queryClient: QueryClient;
 
   beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     store = configureStore({
       reducer: {
         [farmApi.reducerPath]: farmApi.reducer,
@@ -48,11 +53,13 @@ describe('PlantScan Component', () => {
   const renderComponent = () => {
     return render(
       <Provider store={store}>
-        <MemoryRouter>
-          <PageHeaderProvider>
-            <PlantScan />
-          </PageHeaderProvider>
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter>
+            <PageHeaderProvider>
+              <PlantScan />
+            </PageHeaderProvider>
+          </MemoryRouter>
+        </QueryClientProvider>
       </Provider>
     );
   };
