@@ -54,7 +54,7 @@ const localStatusMeta: Record<OfflineDiaryDraft['status'], { label: string; clas
 };
 
 const getActivityIcon = (activityType: string) => {
-  const type = activityType.toLowerCase();
+  const type = (activityType || '').toLowerCase();
   if (type.includes('tưới')) return <Droplets className="w-6 h-6 text-blue-500" />;
   if (type.includes('phân') || type.includes('dinh dưỡng')) return <Leaf className="w-6 h-6 text-emerald-500" />;
   if (type.includes('thuốc') || type.includes('sâu')) return <Shield className="w-6 h-6 text-orange-500" />;
@@ -62,7 +62,7 @@ const getActivityIcon = (activityType: string) => {
 };
 
 const getActivityBg = (activityType: string) => {
-  const type = activityType.toLowerCase();
+  const type = (activityType || '').toLowerCase();
   if (type.includes('tưới')) return 'bg-blue-50';
   if (type.includes('phân') || type.includes('dinh dưỡng')) return 'bg-emerald-50';
   if (type.includes('thuốc') || type.includes('sâu')) return 'bg-orange-50';

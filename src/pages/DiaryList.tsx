@@ -97,15 +97,15 @@ export const DiaryList: React.FC = () => {
                       {diary.latest_log ? (
                         <>
                           <div className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${
-                            diary.latest_log.activity_type.toLowerCase().includes('tưới')
+                            (diary.latest_log.activity_type || '').toLowerCase().includes('tưới')
                               ? 'bg-blue-50 border-blue-100 text-blue-600'
-                              : diary.latest_log.activity_type.toLowerCase().includes('phân') || diary.latest_log.activity_type.toLowerCase().includes('dưỡng')
+                              : (diary.latest_log.activity_type || '').toLowerCase().includes('phân') || (diary.latest_log.activity_type || '').toLowerCase().includes('dưỡng')
                                 ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                : diary.latest_log.activity_type.toLowerCase().includes('thuốc') || diary.latest_log.activity_type.toLowerCase().includes('sâu')
+                                : (diary.latest_log.activity_type || '').toLowerCase().includes('thuốc') || (diary.latest_log.activity_type || '').toLowerCase().includes('sâu')
                                   ? 'bg-orange-50 border-orange-100 text-orange-600'
                                   : 'bg-primary/10 border-primary/20 text-primary'
                           }`}>
-                            <span>{diary.latest_log.activity_type}</span>
+                            <span>{diary.latest_log.activity_type || 'Nhật ký'}</span>
                           </div>
                           <div className="flex items-center gap-1 bg-gray-50 px-2.5 py-0.5 rounded-full border border-gray-200/60 text-gray-500 text-[11px] font-bold">
                             <span>

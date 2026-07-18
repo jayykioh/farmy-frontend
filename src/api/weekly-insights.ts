@@ -17,3 +17,8 @@ export const fetchWeeklyInsights = async (limit: number = 10): Promise<WeeklyIns
   // Adjust if backend wraps it in { data: ... }
   return data.data ? data.data : data; 
 };
+
+export const triggerWeeklyInsight = async (): Promise<{ success: boolean; message: string }> => {
+  const { data } = await api.post('/weekly-insights/trigger');
+  return data;
+};
