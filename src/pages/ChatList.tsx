@@ -128,19 +128,14 @@ export const ChatList: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full min-h-[100svh] bg-[#f4f1e8] text-left font-sans pb-[100px] relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 opacity-80">
-        <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute top-32 right-[-80px] h-64 w-64 rounded-full bg-secondary/15 blur-3xl" />
-        <div className="absolute inset-x-0 top-0 h-48 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0))]" />
-      </div>
+    <div className="w-full h-full min-h-[100svh] bg-[#fcfaf5] text-left font-sans pb-[100px]">
       <PageHeader title="Tri Kỷ AI" leftButton="none" />
 
-      <main className="w-full max-w-3xl mx-auto px-4 md:px-8 pt-24 pb-12 relative min-h-[100svh] flex flex-col">
-        <section className="mb-7 rounded-[32px] border border-white/80 bg-white/70 p-5 shadow-[0_18px_50px_rgba(59,79,42,0.10)] backdrop-blur-xl">
+      <main className="w-full max-w-3xl mx-auto px-4 md:px-8 pt-24 pb-12 min-h-[100svh] flex flex-col">
+        <section className="mb-6 rounded-2xl border border-border-main/50 bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-primary-container">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-container">
                 <Leaf className="h-3.5 w-3.5" />
                 Sổ tay đồng áng
               </div>
@@ -151,8 +146,8 @@ export const ChatList: React.FC = () => {
                 Mỗi cuộc trò chuyện được giữ lại như một ghi chú canh tác, có thể mở tiếp hoặc dọn bớt khi đã xử lý xong.
               </p>
             </div>
-            <div className="hidden h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-[#e7dcc5] text-primary-container shadow-inner md:flex">
-              <MessageCircle className="h-7 w-7" />
+            <div className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#edf5de] border border-primary/10 text-primary-container md:flex">
+              <MessageCircle className="h-6 w-6" />
             </div>
           </div>
         </section>
@@ -160,7 +155,7 @@ export const ChatList: React.FC = () => {
         <div className="flex justify-end mb-5">
           <button 
             onClick={() => navigate('/chat/active')}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-primary text-white rounded-full font-bold shadow-md active:scale-95 hover:bg-primary-container transition-all"
+            className="flex items-center gap-1.5 px-5 py-2 bg-primary text-white rounded-full font-bold shadow-sm active:scale-95 hover:-translate-y-[1px] transition-all"
           >
             <Plus className="w-5 h-5" />
             Chat mới
@@ -182,11 +177,9 @@ export const ChatList: React.FC = () => {
             {sessions.map(session => (
               <article
                 key={session._id}
-                className="group relative overflow-hidden rounded-[28px] border border-white/80 bg-[#fffdf6]/90 p-1 shadow-[0_18px_42px_rgba(73,89,54,0.10)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_54px_rgba(73,89,54,0.16)]"
+                className="group overflow-hidden rounded-2xl border border-border-main/50 bg-white shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-md"
               >
-                <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-primary via-secondary to-[#c69c48]" />
-                <div className="absolute -right-10 -top-12 h-28 w-28 rounded-full border border-primary/10 bg-primary/5" />
-                <div className="relative flex items-stretch gap-2 p-4">
+                <div className="flex items-stretch gap-2 p-4">
                   {editingSessionId === session._id ? (
                     <div className="min-w-0 flex-1">
                       <label className="text-[12px] font-black uppercase tracking-[0.16em] text-primary-container" htmlFor={`chat-title-${session._id}`}>
