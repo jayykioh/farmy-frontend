@@ -28,8 +28,22 @@ export const useEquipItem = () => {
   return useMutation({
     mutationFn: shopApi.equipItem,
     onSuccess: () => {
-      // Invalidate pet status to refresh equipped items
+      // Invalidate both pet status (equipped items) and shop items (for UI sync)
       queryClient.invalidateQueries({ queryKey: PET_STATUS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['shopItems'] });
+    },
+  });
+};
+
+/** Semantic alias — same toggle endpoint, used for explicit unequip actions */
+export const useUnequipItem = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: shopApi.unequipItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PET_STATUS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['shopItems'] });
     },
   });
 };
