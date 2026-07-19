@@ -35,18 +35,39 @@ export const deleteAdminUser = async (userId: string) => {
 };
 
 export const getAdminChatSessions = async (params: { page?: number; limit?: number }) => {
-  const response = await api.get('/admin/rag/sessions', { params });
+  const response = await api.get('/admin/chat/sessions', { params });
   return response.data.data;
 };
 
 export const getAdminRAGFiles = async () => {
-  const response = await api.get('/admin/rag/files');
+  const response = await api.get('/admin/knowledge');
   return response.data.data;
 };
 
 export const deleteAdminRAGFile = async (fileId: string) => {
-  const response = await api.delete(`/admin/rag/files/${fileId}`);
+  const response = await api.delete(`/admin/knowledge/${fileId}`);
   return response.data.data;
+};
+
+export const createAdminRAGFile = async (data: FormData | { title: string; category: string; content: string }) => {
+  // If it's FormData, axios handles it automatically.
+  const response = await api.post('/admin/knowledge', data);
+  return response.data.data;
+};
+
+export const validateAdminRAGFile = async (fileId: string) => {
+  const response = await api.post(`/admin/knowledge/${fileId}/validate`);
+  return response.data;
+};
+
+export const confirmAdminRAGFile = async (fileId: string, payload: { action: 'confirm' | 'reject', note?: string }) => {
+  const response = await api.post(`/admin/knowledge/${fileId}/confirm`, payload);
+  return response.data;
+};
+
+export const batchEmbedAdminRAGFiles = async () => {
+  const response = await api.post('/admin/knowledge/batch-embed');
+  return response.data;
 };
 
 export const getAdminScans = async (params: { page?: number; limit?: number }) => {
