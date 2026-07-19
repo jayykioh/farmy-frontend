@@ -67,7 +67,7 @@ export function usePetMoodTransition(
         timerRef.current = null;
       }, TRANSITION_DURATION_MS);
     }
-  }, [status?.mood]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [status?.mood]);  
 
   // Cleanup timer on unmount
   useEffect(() => {

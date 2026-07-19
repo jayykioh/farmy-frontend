@@ -52,178 +52,184 @@ export const Profile: React.FC = () => {
           </p>
         </div>
         {/* Badge overlay */}
-        <div className="absolute right-4 top-4 bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full font-bold text-xs border border-yellow-200 flex items-center gap-1 z-10 shadow-sm rotate-3">
-          <Award className="w-4 h-4" />
-          {petStatus.level >= 15 ? 'Vua Nông Trại' : petStatus.level >= 10 ? 'Chuyên Gia' : 'Tập Sự'}
-        </div>
+        {user?.role !== 'admin' && user?.role !== 'moderator' && (
+          <div className="absolute right-4 top-4 bg-yellow-50 text-yellow-800 px-3 py-1 rounded-full font-bold text-xs border border-yellow-200 flex items-center gap-1 z-10 shadow-sm rotate-3">
+            <Award className="w-4 h-4" />
+            {petStatus.level >= 15 ? 'Vua Nông Trại' : petStatus.level >= 10 ? 'Chuyên Gia' : 'Tập Sự'}
+          </div>
+        )}
         {/* Decorative background pattern */}
         <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-primary-lightest/30 rounded-full pointer-events-none"></div>
       </section>
 
-      {/* Level / XP Summary Card */}
-      <section className="bg-white border border-border-main/50 rounded-[24px] p-6 relative shadow-sm">
-        {loading ? (
-          <div className="py-4 text-center font-bold text-text-main/50">Đang tải thông tin cấp độ...</div>
-        ) : (
-          <>
-            <div className="flex justify-between items-end mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-text-h">Cấp độ {petStatus.level}</h3>
-                <p className="text-base font-semibold text-text-main/70">
-                  {getLevelTitle(petStatus.level)}
-                </p>
-              </div>
-              <div className="text-right flex flex-col items-end">
-                <span className="font-extrabold text-primary text-lg font-mono">
-                  {petStatus.exp} XP
-                </span>
-                <p className="text-xs font-bold text-text-main/50 uppercase tracking-wide">
-                  / {xpNeeded} XP lên cấp {petStatus.level + 1}
-                </p>
-              </div>
-            </div>
-            {/* Progress Bar */}
-            <div className="h-4 bg-bg-surface-1 rounded-full overflow-hidden relative border border-border-main/30">
-              <div 
-                className="absolute top-0 left-0 h-full bg-primary rounded-full shadow-inner transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              ></div>
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Bảng quy định điểm tích lũy (XP rules table) */}
-      <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
-        <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
-          <Target className="w-5 h-5 text-primary" /> Bảng Quy Đổi Điểm (XP Rules)
-        </h3>
-        <p className="text-sm text-text-main/70">
-          Hãy tích cực thực hiện các hoạt động làm vườn để giúp Bé Thóc mau lớn và thăng cấp!
-        </p>
-        <div className="overflow-x-auto border border-border-main/30 rounded-xl">
-          <table className="w-full text-left border-collapse text-sm min-w-[500px]">
-            <thead>
-              <tr className="bg-bg-surface-2 border-b border-border-main/30 font-bold text-text-main/80">
-                <th className="p-3">Hành động</th>
-                <th className="p-3 text-center">XP nhận được</th>
-                <th className="p-3">Tác động tâm trạng</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-main/20 text-text-main/80 font-medium">
-              <tr className="hover:bg-bg-surface-1/50 transition-colors">
-                <td className="p-3 flex items-center gap-2"><PenLine className="w-4 h-4" /> Ghi nhật ký vụ mùa (mỗi ngày)</td>
-                <td className="p-3 text-center text-primary font-bold font-mono">+30 XP</td>
-                <td className="p-3 text-xs text-green-600">Vui vẻ / Hào hứng (Excited)</td>
-              </tr>
-              <tr className="hover:bg-bg-surface-1/50 transition-colors">
-                <td className="p-3 flex items-center gap-2"><Droplets className="w-4 h-4 text-blue-500" /> Hoàn thành nhắc nhở sớm</td>
-                <td className="p-3 text-center text-primary font-bold font-mono">+10 XP</td>
-                <td className="p-3 text-xs text-green-600">Vui vẻ (Happy)</td>
-              </tr>
-              <tr className="hover:bg-bg-surface-1/50 transition-colors bg-red-50/10">
-                <td className="p-3 text-error flex items-center gap-2"><Clock className="w-4 h-4" /> Bỏ lỡ nhắc nhở quá giờ</td>
-                <td className="p-3 text-center text-error font-bold font-mono">0 XP</td>
-                <td className="p-3 text-xs text-error">Buồn bã (Sad)</td>
-              </tr>
-              <tr className="hover:bg-bg-surface-1/50 transition-colors bg-orange-50/10">
-                <td className="p-3 text-orange-600 flex items-center gap-2"><ShieldAlert className="w-4 h-4" /> Báo động sâu bệnh vườn</td>
-                <td className="p-3 text-center text-orange-600 font-bold font-mono">0 XP</td>
-                <td className="p-3 text-xs text-orange-600">Lo lắng (Worried)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* Streak Calendar View */}
-      <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
-            <Flame className="w-6 h-6 text-orange-500 drop-shadow-sm" />
-            Chuỗi {petStatus.streakCount} ngày chăm chỉ!
-          </h3>
-          <div className="flex items-center gap-2 bg-bg-surface-1 px-2 py-1 rounded-full border border-border-main/30">
-            <button onClick={() => setCurrentMonthDate(subMonths(currentMonthDate, 1))} className="p-1 hover:bg-white rounded-full transition-colors cursor-pointer"><ChevronLeft className="w-4 h-4" /></button>
-            <span className="font-bold text-sm text-text-main/70 min-w-[100px] text-center capitalize">
-              {format(currentMonthDate, 'MMMM yyyy', { locale: vi })}
-            </span>
-            <button onClick={() => setCurrentMonthDate(addMonths(currentMonthDate, 1))} className="p-1 hover:bg-white rounded-full transition-colors cursor-pointer"><ChevronRight className="w-4 h-4" /></button>
-          </div>
-        </div>
-        <div className="grid grid-cols-7 gap-1 md:gap-2 text-center mb-2">
-          {['T2','T3','T4','T5','T6','T7','CN'].map((day, i) => (
-            <div key={i} className="font-bold text-xs text-text-main/50">{day}</div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-1 md:gap-2 gap-y-2 md:gap-y-3">
-          {(() => {
-            const monthStart = startOfMonth(currentMonthDate);
-            const monthEnd = endOfMonth(monthStart);
-            const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
-            const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
-            const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
-
-            const streakEnd = petStatus.lastDiaryDate ? startOfDay(new Date(petStatus.lastDiaryDate)) : null;
-            const streakStart = streakEnd && petStatus.streakCount > 0 
-              ? new Date(streakEnd.getTime() - (petStatus.streakCount - 1) * 24 * 60 * 60 * 1000) 
-              : null;
-
-            return calendarDays.map((day, i) => {
-              const isCurrentMonth = isSameMonth(day, currentMonthDate);
-              const isTodayDate = isToday(day);
-              
-              const currentDayStart = startOfDay(day);
-              const isCompleted = streakStart && streakEnd && currentDayStart >= streakStart && currentDayStart <= streakEnd;
-
-              return (
-                <div key={i} className={`flex flex-col items-center gap-1 ${!isCurrentMonth ? 'opacity-30' : ''}`}>
-                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-                    isCompleted 
-                      ? 'bg-primary text-white shadow-md scale-105' 
-                      : isTodayDate
-                        ? 'text-primary bg-primary/10 border border-primary/30'
-                        : 'text-text-main/70 bg-bg-surface-1 border border-border-main/10 hover:bg-bg-surface-2'
-                  }`}>
-                    {format(day, 'd')}
-                  </span>
-                  <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isCompleted ? 'bg-primary scale-110' : 'bg-transparent'}`}></div>
+      {user?.role !== 'admin' && user?.role !== 'moderator' && (
+        <>
+          {/* Level / XP Summary Card */}
+          <section className="bg-white border border-border-main/50 rounded-[24px] p-6 relative shadow-sm">
+            {loading ? (
+              <div className="py-4 text-center font-bold text-text-main/50">Đang tải thông tin cấp độ...</div>
+            ) : (
+              <>
+                <div className="flex justify-between items-end mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-text-h">Cấp độ {petStatus.level}</h3>
+                    <p className="text-base font-semibold text-text-main/70">
+                      {getLevelTitle(petStatus.level)}
+                    </p>
+                  </div>
+                  <div className="text-right flex flex-col items-end">
+                    <span className="font-extrabold text-primary text-lg font-mono">
+                      {petStatus.exp} XP
+                    </span>
+                    <p className="text-xs font-bold text-text-main/50 uppercase tracking-wide">
+                      / {xpNeeded} XP lên cấp {petStatus.level + 1}
+                    </p>
+                  </div>
                 </div>
-              );
-            });
-          })()}
-        </div>
-      </section>
+                {/* Progress Bar */}
+                <div className="h-4 bg-bg-surface-1 rounded-full overflow-hidden relative border border-border-main/30">
+                  <div 
+                    className="absolute top-0 left-0 h-full bg-primary rounded-full shadow-inner transition-all duration-500"
+                    style={{ width: `${progressPercent}%` }}
+                  ></div>
+                </div>
+              </>
+            )}
+          </section>
 
-      {/* Badge Shelf */}
-      <section>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-text-h">Badge Shelf</h3>
-          <button className="font-bold text-primary text-sm hover:underline active:scale-95 transition-transform" onClick={() => navigate('/shop')}>
-            Go to Shop →
-          </button>
-        </div>
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x">
-          <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
-            <div className="w-14 h-14 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shadow-sm">
-              <Medal className="w-7 h-7 text-yellow-500" />
+          {/* Bảng quy định điểm tích lũy (XP rules table) */}
+          <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
+            <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary" /> Bảng Quy Đổi Điểm (XP Rules)
+            </h3>
+            <p className="text-sm text-text-main/70">
+              Hãy tích cực thực hiện các hoạt động làm vườn để giúp Bé Thóc mau lớn và thăng cấp!
+            </p>
+            <div className="overflow-x-auto border border-border-main/30 rounded-xl">
+              <table className="w-full text-left border-collapse text-sm min-w-[500px]">
+                <thead>
+                  <tr className="bg-bg-surface-2 border-b border-border-main/30 font-bold text-text-main/80">
+                    <th className="p-3">Hành động</th>
+                    <th className="p-3 text-center">XP nhận được</th>
+                    <th className="p-3">Tác động tâm trạng</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-main/20 text-text-main/80 font-medium">
+                  <tr className="hover:bg-bg-surface-1/50 transition-colors">
+                    <td className="p-3 flex items-center gap-2"><PenLine className="w-4 h-4" /> Ghi nhật ký vụ mùa (mỗi ngày)</td>
+                    <td className="p-3 text-center text-primary font-bold font-mono">+30 XP</td>
+                    <td className="p-3 text-xs text-green-600">Vui vẻ / Hào hứng (Excited)</td>
+                  </tr>
+                  <tr className="hover:bg-bg-surface-1/50 transition-colors">
+                    <td className="p-3 flex items-center gap-2"><Droplets className="w-4 h-4 text-blue-500" /> Hoàn thành nhắc nhở sớm</td>
+                    <td className="p-3 text-center text-primary font-bold font-mono">+10 XP</td>
+                    <td className="p-3 text-xs text-green-600">Vui vẻ (Happy)</td>
+                  </tr>
+                  <tr className="hover:bg-bg-surface-1/50 transition-colors bg-red-50/10">
+                    <td className="p-3 text-error flex items-center gap-2"><Clock className="w-4 h-4" /> Bỏ lỡ nhắc nhở quá giờ</td>
+                    <td className="p-3 text-center text-error font-bold font-mono">0 XP</td>
+                    <td className="p-3 text-xs text-error">Buồn bã (Sad)</td>
+                  </tr>
+                  <tr className="hover:bg-bg-surface-1/50 transition-colors bg-orange-50/10">
+                    <td className="p-3 text-orange-600 flex items-center gap-2"><ShieldAlert className="w-4 h-4" /> Báo động sâu bệnh vườn</td>
+                    <td className="p-3 text-center text-orange-600 font-bold font-mono">0 XP</td>
+                    <td className="p-3 text-xs text-orange-600">Lo lắng (Worried)</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <span className="font-bold text-sm text-text-main text-center">First Harvest</span>
-          </div>
-          <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
-            <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shadow-sm">
-              <Droplets className="w-7 h-7 text-blue-500" />
+          </section>
+
+          {/* Streak Calendar View */}
+          <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
+                <Flame className="w-6 h-6 text-orange-500 drop-shadow-sm" />
+                Chuỗi {petStatus.streakCount} ngày chăm chỉ!
+              </h3>
+              <div className="flex items-center gap-2 bg-bg-surface-1 px-2 py-1 rounded-full border border-border-main/30">
+                <button onClick={() => setCurrentMonthDate(subMonths(currentMonthDate, 1))} className="p-1 hover:bg-white rounded-full transition-colors cursor-pointer"><ChevronLeft className="w-4 h-4" /></button>
+                <span className="font-bold text-sm text-text-main/70 min-w-[100px] text-center capitalize">
+                  {format(currentMonthDate, 'MMMM yyyy', { locale: vi })}
+                </span>
+                <button onClick={() => setCurrentMonthDate(addMonths(currentMonthDate, 1))} className="p-1 hover:bg-white rounded-full transition-colors cursor-pointer"><ChevronRight className="w-4 h-4" /></button>
+              </div>
             </div>
-            <span className="font-bold text-sm text-text-main text-center">Water Saver</span>
-          </div>
-          <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
-            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center shadow-sm">
-              <ShieldAlert className="w-7 h-7 text-error" />
+            <div className="grid grid-cols-7 gap-1 md:gap-2 text-center mb-2">
+              {['T2','T3','T4','T5','T6','T7','CN'].map((day, i) => (
+                <div key={i} className="font-bold text-xs text-text-main/50">{day}</div>
+              ))}
             </div>
-            <span className="font-bold text-sm text-text-main text-center">Pest Hunter</span>
-          </div>
-        </div>
-      </section>
+            <div className="grid grid-cols-7 gap-1 md:gap-2 gap-y-2 md:gap-y-3">
+              {(() => {
+                const monthStart = startOfMonth(currentMonthDate);
+                const monthEnd = endOfMonth(monthStart);
+                const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+                const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+                const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+
+                const streakEnd = petStatus.lastDiaryDate ? startOfDay(new Date(petStatus.lastDiaryDate)) : null;
+                const streakStart = streakEnd && petStatus.streakCount > 0 
+                  ? new Date(streakEnd.getTime() - (petStatus.streakCount - 1) * 24 * 60 * 60 * 1000) 
+                  : null;
+
+                return calendarDays.map((day, i) => {
+                  const isCurrentMonth = isSameMonth(day, currentMonthDate);
+                  const isTodayDate = isToday(day);
+                  
+                  const currentDayStart = startOfDay(day);
+                  const isCompleted = streakStart && streakEnd && currentDayStart >= streakStart && currentDayStart <= streakEnd;
+
+                  return (
+                    <div key={i} className={`flex flex-col items-center gap-1 ${!isCurrentMonth ? 'opacity-30' : ''}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                        isCompleted 
+                          ? 'bg-primary text-white shadow-md scale-105' 
+                          : isTodayDate
+                            ? 'text-primary bg-primary/10 border border-primary/30'
+                            : 'text-text-main/70 bg-bg-surface-1 border border-border-main/10 hover:bg-bg-surface-2'
+                      }`}>
+                        {format(day, 'd')}
+                      </span>
+                      <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isCompleted ? 'bg-primary scale-110' : 'bg-transparent'}`}></div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </section>
+
+          {/* Badge Shelf */}
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-text-h">Badge Shelf</h3>
+              <button className="font-bold text-primary text-sm hover:underline active:scale-95 transition-transform" onClick={() => navigate('/shop')}>
+                Go to Shop →
+              </button>
+            </div>
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x">
+              <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
+                <div className="w-14 h-14 rounded-full bg-yellow-50 border border-yellow-200 flex items-center justify-center shadow-sm">
+                  <Medal className="w-7 h-7 text-yellow-500" />
+                </div>
+                <span className="font-bold text-sm text-text-main text-center">First Harvest</span>
+              </div>
+              <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
+                <div className="w-14 h-14 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shadow-sm">
+                  <Droplets className="w-7 h-7 text-blue-500" />
+                </div>
+                <span className="font-bold text-sm text-text-main text-center">Water Saver</span>
+              </div>
+              <div className="bg-white border border-border-main/50 min-w-[120px] flex flex-col items-center p-4 gap-3 rounded-[20px] hover:-translate-y-1 transition-transform cursor-pointer shadow-sm snap-start">
+                <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center shadow-sm">
+                  <ShieldAlert className="w-7 h-7 text-error" />
+                </div>
+                <span className="font-bold text-sm text-text-main text-center">Pest Hunter</span>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Settings / Account List */}
       <section className="mb-4">

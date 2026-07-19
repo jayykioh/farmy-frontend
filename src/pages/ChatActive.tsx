@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
@@ -109,7 +109,7 @@ export const ChatActive: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setSessionId(routeSessionId);
 
     if (!routeSessionId) {

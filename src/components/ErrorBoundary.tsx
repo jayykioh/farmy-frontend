@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import React from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, X, RefreshCw, ArrowLeft } from 'lucide-react';

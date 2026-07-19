@@ -270,6 +270,6 @@ export const streamChatMessage = async (
     ) {
       throw err;
     }
-    throw new Error("Không thể kết nối Chat SSE.");
+    throw new Error("Không thể kết nối Chat SSE.", { cause: err });
   }
 };

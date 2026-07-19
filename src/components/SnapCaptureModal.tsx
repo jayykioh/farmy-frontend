@@ -115,7 +115,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       startCamera();
     } else {
       stopCamera();

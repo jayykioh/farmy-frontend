@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, BookText, Bot, User, Sprout, Lightbulb, ShoppingBag, LogOut } from 'lucide-react';
+import { Home, BookText, Bot, User, Sprout, Lightbulb, ShoppingBag, LogOut, Shield } from 'lucide-react';
 import { usePetStatus } from '../../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../../features/pet/types/pet.types';
 import { useAuthStore } from '../../store/authStore';
@@ -11,14 +11,27 @@ export const Sidebar: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
 
-  const navItems = [
-    { to: '/home', icon: Home, label: 'Trang chủ' },
-    { to: '/diary', icon: BookText, label: 'Nhật ký' },
-    { to: '/chat', icon: Bot, label: 'Trợ lý ảo' },
-    { to: '/insights', icon: Lightbulb, label: 'Phân tích' },
-    { to: '/shop', icon: ShoppingBag, label: 'Cửa hàng' },
-    { to: '/profile', icon: User, label: 'Hồ sơ' },
-  ];
+  const isAdmin = user && (user.role === 'admin' || user.role === 'moderator');
+
+  const navItems = isAdmin
+    ? [
+        { to: '/admin', icon: Home, label: 'Tổng quan' },
+        { to: '/admin/users', icon: User, label: 'Thành viên' },
+        { to: '/admin/skins', icon: ShoppingBag, label: 'Quản lý Skin' },
+        { to: '/admin/rag', icon: Bot, label: 'AI & RAG' },
+        { to: '/admin/scans', icon: Sprout, label: 'Lịch sử quét' },
+        { to: '/admin/reminders', icon: BookText, label: 'Nhắc nhở' },
+        { to: '/admin/settings', icon: Shield, label: 'Cấu hình' },
+        { to: '/admin/change-password', icon: Shield, label: 'Đổi mật khẩu' },
+      ]
+    : [
+        { to: '/home', icon: Home, label: 'Trang chủ' },
+        { to: '/diary', icon: BookText, label: 'Nhật ký' },
+        { to: '/chat', icon: Bot, label: 'Trợ lý ảo' },
+        { to: '/insights', icon: Lightbulb, label: 'Phân tích' },
+        { to: '/shop', icon: ShoppingBag, label: 'Cửa hàng' },
+        { to: '/profile', icon: User, label: 'Hồ sơ' },
+      ];
 
   return (
     <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-[#fbfbfd] border-r border-black/[0.05] z-50">
@@ -39,6 +52,7 @@ export const Sidebar: React.FC = () => {
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === '/admin' || item.to === '/home'}
               className={({ isActive }) =>
                 `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 outline-none select-none ${
                   isActive
@@ -77,7 +91,11 @@ export const Sidebar: React.FC = () => {
           <div className="flex flex-col overflow-hidden">
             <span className="text-[14px] font-semibold text-[#1d1d1f] line-clamp-1">{user?.name || 'Nông dân'}</span>
             <span className="text-[12px] text-[#86868b] font-medium line-clamp-1">
-              Cấp độ {petStatus.level}
+              {user?.role === 'admin'
+                ? 'Quản trị viên'
+                : user?.role === 'moderator'
+                ? 'Kiểm duyệt viên'
+                : `Cấp độ ${petStatus.level}`}
             </span>
           </div>
         </div>

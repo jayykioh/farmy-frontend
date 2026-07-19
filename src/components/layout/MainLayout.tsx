@@ -4,14 +4,19 @@ import { Sidebar } from './Sidebar';
 import { usePageHeader } from '../../contexts/PageHeaderContext';
 import { useReminders } from '../../hooks/useReminders';
 import { PWAInstallBanner } from '../overlays/PWAInstallBanner';
+import { useAuthStore } from '../../store/authStore';
 
 export const MainLayout = () => {
   const location = useLocation();
   const { isPageHeaderVisible } = usePageHeader();
   
+  const { user } = useAuthStore();
+  const isAdmin = user && (user.role === 'admin' || user.role === 'moderator');
+
   // List of paths where bottom navigation should be hidden
   const hideBottomNavPaths = ['/', '/login', '/register', '/onboarding-1', '/onboarding-2', '/onboarding-3', '/loading', '/network-error', '/maintenance', '/404', '/celebration'];
   const showBottomNav = !hideBottomNavPaths.includes(location.pathname);
+  const showBottomNavFinal = showBottomNav && !isAdmin;
 
   const { data: pendingReminders } = useReminders({ status: 'pending' });
   const pendingCount = pendingReminders?.length || 0;
@@ -55,7 +60,7 @@ export const MainLayout = () => {
         </main>
         
         {/* Bottom Navigation (Mobile) */}
-        {showBottomNav ? <BottomNavigation /> : null}
+        {showBottomNavFinal ? <BottomNavigation /> : null}
 
         {/* PWA Install Banner */}
         <PWAInstallBanner />
