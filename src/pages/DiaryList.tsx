@@ -49,11 +49,11 @@ export const DiaryList: React.FC = () => {
       switch (activeFilter) {
         case 'active': return diary.status === 'active';
         case 'archived': return diary.status === 'archived';
-        case 'lua': return ['lúa', 'nếp', 'thơm'].some(c => diary.crop_type.toLowerCase().includes(c));
-        case 'ca-phe': return ['cà phê', 'robusta', 'arabica', 'liberica'].some(c => diary.crop_type.toLowerCase().includes(c));
-        case 'cay-an-trai': return ['bưởi', 'cam', 'xoài', 'sầu riêng', 'thanh long', 'chôm chôm', 'mít', 'nhãn'].some(c => diary.crop_type.toLowerCase().includes(c));
-        case 'rau-mau': return ['cà chua', 'bắp cải', 'dưa leo', 'ớt', 'hành', 'rau muống'].some(c => diary.crop_type.toLowerCase().includes(c));
-        case 'other': return !['lúa', 'nếp', 'thơm', 'cà phê', 'robusta', 'arabica', 'liberica', 'bưởi', 'cam', 'xoài', 'sầu riêng', 'thanh long', 'chôm chôm', 'mít', 'nhãn', 'cà chua', 'bắp cải', 'dưa leo', 'ớt', 'hành', 'rau muống'].some(c => diary.crop_type.toLowerCase().includes(c));
+        case 'lua': return ['lúa', 'nếp', 'thơm'].some(c => (diary.crop_type || '').toLowerCase().includes(c));
+        case 'ca-phe': return ['cà phê', 'robusta', 'arabica', 'liberica'].some(c => (diary.crop_type || '').toLowerCase().includes(c));
+        case 'cay-an-trai': return ['bưởi', 'cam', 'xoài', 'sầu riêng', 'thanh long', 'chôm chôm', 'mít', 'nhãn'].some(c => (diary.crop_type || '').toLowerCase().includes(c));
+        case 'rau-mau': return ['cà chua', 'bắp cải', 'dưa leo', 'ớt', 'hành', 'rau muống'].some(c => (diary.crop_type || '').toLowerCase().includes(c));
+        case 'other': return !['lúa', 'nếp', 'thơm', 'cà phê', 'robusta', 'arabica', 'liberica', 'bưởi', 'cam', 'xoài', 'sầu riêng', 'thanh long', 'chôm chôm', 'mít', 'nhãn', 'cà chua', 'bắp cải', 'dưa leo', 'ớt', 'hành', 'rau muống'].some(c => (diary.crop_type || '').toLowerCase().includes(c));
         case 'all':
         default:
           return true;
@@ -63,8 +63,8 @@ export const DiaryList: React.FC = () => {
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(diary => 
-        diary.crop_type.toLowerCase().includes(term) ||
-        (diary.latest_log && diary.latest_log.content.toLowerCase().includes(term))
+        (diary.crop_type || '').toLowerCase().includes(term) ||
+        (diary.latest_log && (diary.latest_log.content || '').toLowerCase().includes(term))
       );
     }
 
@@ -239,16 +239,16 @@ export const DiaryList: React.FC = () => {
                     <div className="flex items-center gap-2">
                       {diary.latest_log ? (
                         <div className="flex items-center gap-2">
-                           <span className={`text-[12px] font-medium px-2 py-0.5 rounded-lg border ${
-                             diary.latest_log.activity_type.toLowerCase().includes('tưới')
+                            <span className={`text-[12px] font-medium px-2 py-0.5 rounded-lg border ${
+                             (diary.latest_log.activity_type || '').toLowerCase().includes('tưới')
                                ? 'bg-[#E5F1FF] text-[#0066CC] border-[#0066CC]/10'
-                               : diary.latest_log.activity_type.toLowerCase().includes('phân') || diary.latest_log.activity_type.toLowerCase().includes('dưỡng')
+                               : (diary.latest_log.activity_type || '').toLowerCase().includes('phân') || (diary.latest_log.activity_type || '').toLowerCase().includes('dưỡng')
                                  ? 'bg-[#E8F8F5] text-[#008A5E] border-[#008A5E]/10'
-                                 : diary.latest_log.activity_type.toLowerCase().includes('thuốc') || diary.latest_log.activity_type.toLowerCase().includes('sâu')
+                                 : (diary.latest_log.activity_type || '').toLowerCase().includes('thuốc') || (diary.latest_log.activity_type || '').toLowerCase().includes('sâu')
                                    ? 'bg-[#FFF3E0] text-[#E67300] border-[#E67300]/10'
                                    : 'bg-[#f5f5f7] text-[#1d1d1f] border-black/[0.03]'
                            }`}>
-                             {diary.latest_log.activity_type}
+                             {diary.latest_log.activity_type || 'Hoạt động'}
                            </span>
                            <span className="text-[12px] text-[#86868b] font-medium">
                              {new Date(diary.latest_log.created_at).toLocaleDateString('vi-VN')}
