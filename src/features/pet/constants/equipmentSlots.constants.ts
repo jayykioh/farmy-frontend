@@ -1,4 +1,4 @@
-import type { ShopItem } from '../../../api/shop';
+
 
 // ─── Equipment Slot System ────────────────────────────────────────────────────
 // Each category maps to a visual layer on the pet mascot.
