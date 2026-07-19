@@ -2,7 +2,9 @@ import React from 'react';
 import { usePetMoodTransition } from '../hooks/usePetMoodTransition';
 import { PetMoodBubble } from './PetMoodBubble';
 import { PET_MOOD_UI_MAP } from '../constants/petMood.constants';
+import { resolveAnchor, sortByLayer } from '../constants/equipmentSlots.constants';
 import type { PetMood, PetStatus } from '../types/pet.types';
+import { useShopItems } from '../../shop/hooks/useShop';
 
 interface PetMascotProps {
   /** Live status from usePetStatus. If undefined, renders neutral skeleton. */
@@ -23,6 +25,7 @@ interface PetMascotProps {
  * - When `status` is provided: transitions between moods using usePetMoodTransition.
  * - When `staticMood` is provided (onboarding): renders that mood directly, no transition.
  * - FE never decides mood; it only renders what the backend/props dictate.
+ * - Equipment items are rendered as absolute-positioned layers with anchor-based positioning.
  */
 export const PetMascot: React.FC<PetMascotProps> = ({
   status,
@@ -33,6 +36,9 @@ export const PetMascot: React.FC<PetMascotProps> = ({
 }) => {
   // Transition hook — handles live backend mood changes
   const transition = usePetMoodTransition(staticMood ? undefined : status);
+  
+  // Hydrate shop items to render equipment
+  const { data: shopItems = [] } = useShopItems();
 
   const effectiveMood : PetMood = staticMood ?? transition.displayMood;
   const src           : string  = staticMood
@@ -43,6 +49,14 @@ export const PetMascot: React.FC<PetMascotProps> = ({
     : transition.moodMessage;
 
   const ui = PET_MOOD_UI_MAP[effectiveMood];
+
+  // If parent passed details directly, use it.
+  // Otherwise, use shopItems to hydrate the equippedItems string IDs.
+  const rawItems = status?.equippedItemsDetails || 
+    (status?.equippedItems ? shopItems.filter(i => status.equippedItems.includes(i._id)) : []);
+
+  // Sort equipped items by z-index layer order for correct rendering
+  const equippedItems = sortByLayer(rawItems);
 
   return (
     <div
@@ -56,6 +70,7 @@ export const PetMascot: React.FC<PetMascotProps> = ({
       />) : null}
       
       <div style={{ position: 'relative', width: size, height: size }}>
+        {/* Base pet image */}
         <img
           src={src}
           alt={`Bé Thóc đang ${ui?.label ?? 'trung lập'}`}
@@ -67,43 +82,50 @@ export const PetMascot: React.FC<PetMascotProps> = ({
             'pet-mascot-img',
             transition.isTransitioning && !staticMood ? 'pet-mascot-img--transitioning' : '',
           ].join(' ').trim()}
-          style={{ userSelect: 'none', width: '100%', height: '100%', objectFit: 'contain' }}
+          style={{ 
+            userSelect: 'none', 
+            width: '100%', 
+            height: '100%', 
+            objectFit: 'contain',
+            position: 'relative',
+            zIndex: 10 // Pet is layer 10
+          }}
         />
 
-        {/* Real Physical Equipping Logic */}
-        {status?.equippedItemsDetails?.map((item) => {
-          const isGlasses = item.name.toLowerCase().includes('kính') || item._id.includes('kinh');
-          
-          // Custom styles depending on item type
-          const itemStyle: React.CSSProperties = isGlasses
-            ? {
-                position: 'absolute',
-                top: '32%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '50%',
-                height: 'auto',
-                pointerEvents: 'none',
-                zIndex: 11,
-              }
-            : {
-                position: 'absolute',
-                top: '-18%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '80%',
-                height: 'auto',
-                pointerEvents: 'none',
-                zIndex: 10,
-              };
+        {/* Equipment layers — anchor-based physical positioning */}
+        {equippedItems.map((item) => {
+          const anchor = resolveAnchor(item);
+          // If anchor.zIndex is 0 (BACKGROUND), it will be 0 < 10 (behind pet).
+          // If anchor.zIndex is > 0 (OUTFIT, HAT), it will be > 10 (in front of pet).
+          const itemZIndex = anchor.zIndex === 0 ? 0 : anchor.zIndex + 10;
 
           return (
-            <img
+            <div
               key={item._id}
-              src={item.image_url}
-              alt={item.name}
-              style={itemStyle}
-            />
+              style={{
+                position: 'absolute',
+                top: anchor.top,
+                left: anchor.left,
+                width: anchor.width,
+                transform: anchor.transform,
+                zIndex: itemZIndex,
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }}
+            >
+              <img
+                src={item.image_url}
+                alt={item.name}
+                draggable={false}
+                className="pet-equipment-item"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </div>
           );
         })}
       </div>

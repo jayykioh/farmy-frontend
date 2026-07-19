@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Cloud -->
+  <path d="M 25 50 Q 25 35 40 35 Q 50 15 70 30 Q 85 30 85 50 Z" fill="#6B7280" opacity="0.9" />
+  <path d="M 25 50 Q 25 35 40 35 Q 50 15 70 30 Q 85 30 85 50 Z" fill="#9CA3AF" transform="translate(0, -3)" />
+  <!-- Raindrops -->
+  <path d="M 35 55 L 30 75 M 50 55 L 45 75 M 65 55 L 60 75 M 75 50 L 70 70" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" stroke-dasharray="4,4" opacity="0.8">
+    <animate attributeName="stroke-dashoffset" from="0" to="8" dur="0.5s" repeatCount="indefinite" />
+  </path>
+</svg>

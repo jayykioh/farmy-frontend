@@ -233,3 +233,42 @@ code, .counter {
   text-align: center;
 }
 
+/* ── Equipment Layer Animations ───────────────────────────────────────────── */
+
+@keyframes equip-scale-in {
+  0%   { opacity: 0; transform: scale(0.3) rotate(-15deg); }
+  60%  { transform: scale(1.15) rotate(3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes equipment-breathe {
+  0%, 100% { transform: translateY(0px) scaleY(1) scaleX(1); }
+  50% { transform: translateY(-5px) scaleY(1.03) scaleX(0.97); }
+}
+
+.pet-equipment-item {
+  animation: 
+    equip-scale-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    equipment-breathe 2s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.5s;
+  transform-origin: 50% 95%; /* Match pet breathe origin */
+}
+
+/* Equipped card glow pulse */
+@keyframes equip-card-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(8, 168, 85, 0.2); }
+  50%      { box-shadow: 0 0 16px 4px rgba(8, 168, 85, 0.12); }
+}
+
+.equip-card-glow {
+  animation: equip-card-glow 2s ease-in-out infinite;
+}
+
+/* Toast entrance */
+@keyframes equip-toast-enter {
+  0%   { opacity: 0; transform: translateY(16px) scale(0.92); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes float { 
+  0%, 100% { transform: translateY(0); } 
+  50% { transform: translateY(-4px); } 
+}

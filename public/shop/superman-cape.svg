@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <defs>
+    <linearGradient id="capeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444" />
+      <stop offset="100%" stop-color="#B91C1C" />
+    </linearGradient>
+  </defs>
+  <!-- Cape body -->
+  <path d="M 30 20 L 70 20 C 85 50, 95 90, 80 115 C 60 110, 40 110, 20 115 C 5 90, 15 50, 30 20 Z" fill="url(#capeGrad)" />
+  <!-- Folds -->
+  <path d="M 40 20 C 45 50, 40 90, 35 112" fill="none" stroke="#991B1B" stroke-width="2" opacity="0.5" />
+  <path d="M 60 20 C 55 50, 60 90, 65 112" fill="none" stroke="#991B1B" stroke-width="2" opacity="0.5" />
+</svg>

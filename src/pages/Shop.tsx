@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
-import { useShopItems, useBuyItem, useEquipItem } from '../features/shop/hooks/useShop';
+import { useShopItems, useBuyItem, useEquipItem, useUnequipItem } from '../features/shop/hooks/useShop';
+import { EquipToast } from '../features/shop/components/EquipToast';
 
 interface ModalConfig {
   type: 'success' | 'error';
@@ -19,10 +20,13 @@ export const Shop: React.FC = () => {
   const { data: items = [], isLoading } = useShopItems();
   const buyMutation = useBuyItem();
   const equipMutation = useEquipItem();
+  const unequipMutation = useUnequipItem();
 
   const [activeCategory, setActiveCategory] = useState<'HAT' | 'OUTFIT' | 'EFFECT' | 'BACKGROUND'>('HAT');
   const [modal, setModal] = useState<ModalConfig | null>(null);
-  const [previewMoodOverride, setPreviewMoodOverride] = useState<'excited' | 'happy' | null>(null);
+  const [previewMoodOverride, setPreviewMoodOverride] = useState<'excited' | 'happy' | 'sad' | null>(null);
+  // Track which item is pending unequip confirmation (two-tap to unequip)
+  const [unequipPendingId, setUnequipPendingId] = useState<string | null>(null);
 
   const categories = [
     { id: 'HAT', label: 'Mũ & Phụ kiện' },
@@ -58,28 +62,72 @@ export const Shop: React.FC = () => {
     });
   };
 
-  const handleEquip = (itemId: string) => {
+  const handleEquip = useCallback((itemId: string) => {
     const item = items.find(i => i._id === itemId);
-    const isEquipped = petStatus.equippedItems?.includes(itemId);
 
     equipMutation.mutate(itemId, {
       onSuccess: () => {
-        if (isEquipped) {
-          toast.success(`Đã tháo ${item?.name || 'phụ kiện'}! ✨`);
-        } else {
-          toast.success(`Đã trang bị ${item?.name || 'phụ kiện'}! 👒`);
-          setPreviewMoodOverride('excited');
-          setTimeout(() => {
-            setPreviewMoodOverride(null);
-          }, 2500);
-        }
+        // Custom rich toast with item thumbnail
+        toast.custom(
+          () => (
+            <EquipToast
+              type="equip"
+              itemName={item?.name || 'phụ kiện'}
+              itemImageUrl={item?.image_url || ''}
+            />
+          ),
+          { duration: 3000 }
+        );
+        // Pet mood reaction — excited for 2.5s
+        setPreviewMoodOverride('excited');
+        setTimeout(() => {
+          setPreviewMoodOverride(null);
+        }, 2500);
       },
       onError: (err: unknown) => {
         const errorResponse = err as { response?: { data?: { message?: string } } };
         toast.error(errorResponse.response?.data?.message || 'Có lỗi xảy ra khi trang bị món đồ này.');
       }
     });
-  };
+  }, [items, equipMutation]);
+
+  const handleUnequip = useCallback((itemId: string) => {
+    // Two-tap confirmation: first tap shows "Tháo?", second tap confirms
+    if (unequipPendingId !== itemId) {
+      setUnequipPendingId(itemId);
+      // Auto-reset after 3 seconds if user doesn't confirm
+      setTimeout(() => setUnequipPendingId(prev => prev === itemId ? null : prev), 3000);
+      return;
+    }
+
+    setUnequipPendingId(null);
+    const item = items.find(i => i._id === itemId);
+
+    unequipMutation.mutate(itemId, {
+      onSuccess: () => {
+        // Custom rich toast for unequip
+        toast.custom(
+          () => (
+            <EquipToast
+              type="unequip"
+              itemName={item?.name || 'phụ kiện'}
+              itemImageUrl={item?.image_url || ''}
+            />
+          ),
+          { duration: 3000 }
+        );
+        // Pet mood reaction — sad for 1.5s then back to normal
+        setPreviewMoodOverride('sad');
+        setTimeout(() => {
+          setPreviewMoodOverride(null);
+        }, 1500);
+      },
+      onError: (err: unknown) => {
+        const errorResponse = err as { response?: { data?: { message?: string } } };
+        toast.error(errorResponse.response?.data?.message || 'Có lỗi xảy ra khi tháo món đồ này.');
+      }
+    });
+  }, [items, unequipMutation, unequipPendingId]);
 
   return (
     <div className="w-full min-h-[100svh] relative text-left bg-[#FBFBFD] overflow-x-hidden font-sans">
@@ -189,24 +237,18 @@ export const Shop: React.FC = () => {
           <div className="w-full lg:w-[280px] flex-shrink-0">
             <div className="bg-white/80 backdrop-blur-sm rounded-[28px] border border-white/60 shadow-lg p-4 flex flex-col items-center gap-3">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Đang trang bị</p>
-              <div className="relative w-full h-[220px] rounded-[20px] bg-[#F5F5F7] flex items-end justify-center overflow-hidden">
-                <div className="relative z-10 mb-6 animate-[bounce_4s_ease-in-out_infinite]">
-                  <div className="w-32 h-32 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.04)] bg-white border-[6px] border-white overflow-hidden p-2">
+              <div className="relative w-full h-[260px] rounded-[20px] flex items-center justify-center overflow-hidden">
+                <div className="relative z-10 animate-[bounce_4s_ease-in-out_infinite]" style={{ animation: 'float 4s ease-in-out infinite' }}>
+                  <div className="w-48 h-48">
                     <PetMascot 
-                      className="w-full h-full -mt-2 drop-shadow-md" 
+                      className="w-full h-full drop-shadow-lg" 
                       status={{
                         ...petStatus,
                         mood: previewMoodOverride ?? petStatus.mood
                       }} 
-                      size={112} 
+                      size={192} 
                     />
                   </div>
-                  {/* Equipped indicator */}
-                  {currentlyEquippedInActiveCategory && (
-                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-white rounded-full shadow-md border-2 border-primary/20 p-1 flex items-center justify-center animate-[scaleIn_0.2s_ease-out]">
-                       <img src={currentlyEquippedInActiveCategory.image_url} alt="" className="w-full h-full object-contain" />
-                    </div>
-                  )}
                 </div>
               </div>
               <p className="text-sm font-bold text-text-main">
@@ -237,9 +279,16 @@ export const Shop: React.FC = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   whileTap={!isLocked ? { scale: 0.96 } : {}}
                   transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                  className={`bg-white/80 backdrop-blur-sm border shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-all ${isEquipped ? 'border-primary/50 ring-2 ring-primary/20' : 'border-border-main/30'}`}
+                  className={`bg-white/80 backdrop-blur-sm border shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-all ${isEquipped ? 'border-primary/50 ring-2 ring-primary/20 equip-card-glow' : 'border-border-main/30'}`}
                 >
                   <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border border-border-main/20 mb-3 flex items-center justify-center overflow-hidden relative group-hover:bg-primary/5 transition-colors">
+                    {/* Equipped badge */}
+                    {isEquipped && (
+                      <div className="absolute top-2 right-2 z-20 bg-primary text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                        Đang mặc
+                      </div>
+                    )}
                     {!isLocked ? (
                       <motion.img 
                         layoutId={`item-img-${item._id}`}
@@ -264,12 +313,38 @@ export const Shop: React.FC = () => {
 
                   {/* Button logic */}
                   {isEquipped ? (
-                     <button onClick={() => handleEquip(item._id)} className="w-full py-2 bg-primary text-white rounded-full font-bold text-sm shadow-sm transition-transform border-b-[3px] border-primary-dark">
-                       Đã trang bị
+                     <button 
+                       onClick={() => handleUnequip(item._id)}
+                       disabled={unequipMutation.isPending}
+                       className={`w-full py-2 rounded-full font-bold text-sm shadow-sm transition-all border-b-[3px] disabled:opacity-50 ${
+                         unequipPendingId === item._id
+                           ? 'bg-amber-500 border-amber-700 text-white animate-pulse'
+                           : 'bg-primary border-primary-dark text-white'
+                       }`}
+                     >
+                       {unequipMutation.isPending ? (
+                         <span className="flex items-center justify-center gap-1.5">
+                           <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+                           Đang tháo...
+                         </span>
+                       ) : unequipPendingId === item._id ? (
+                         'Chạm lần nữa để tháo'
+                       ) : (
+                         '✓ Đã trang bị'
+                       )}
                      </button>
                   ) : isOwned ? (
-                     <button onClick={() => handleEquip(item._id)} className="w-full py-2 bg-white border border-primary/50 text-primary rounded-full font-bold text-sm transition-transform hover:bg-primary/5 shadow-sm">
-                       Mặc thử
+                     <button 
+                       onClick={() => handleEquip(item._id)} 
+                       disabled={equipMutation.isPending}
+                       className="w-full py-2 bg-white border border-primary/50 text-primary rounded-full font-bold text-sm transition-transform hover:bg-primary/5 shadow-sm disabled:opacity-50"
+                     >
+                       {equipMutation.isPending ? (
+                         <span className="flex items-center justify-center gap-1.5">
+                           <span className="w-3 h-3 border-2 border-primary/40 border-t-primary rounded-full animate-spin"></span>
+                           Đang mặc...
+                         </span>
+                       ) : 'Mặc thử'}
                      </button>
                   ) : isLocked ? (
                      <button disabled className="w-full py-2 bg-bg-surface border border-border-main/20 text-text-main/30 rounded-full font-bold text-sm cursor-not-allowed">
