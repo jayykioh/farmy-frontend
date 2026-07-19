@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
-import { MapPin, Award, Flame, Droplets, Clock, Target, LogOut, PenLine, Medal, ShieldAlert } from 'lucide-react';
+
+import { MapPin, Award, Flame, Droplets, Clock, Target, LogOut, PenLine, Medal, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { 
+  startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
+  eachDayOfInterval, format, isSameMonth, isToday, 
+  addMonths, subMonths, startOfDay
+} from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout: logoutUser } = useAuthStore();
   const { data: petStatusRaw, isLoading: loading } = usePetStatus();
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
+
+  const [currentMonthDate, setCurrentMonthDate] = useState(new Date());
 
   const getLevelTitle = (level: number) => {
     if (level < 5) return 'Làm Vườn Tập Sự (Novice Farmer)';
@@ -28,8 +37,12 @@ export const Profile: React.FC = () => {
       
       {/* Header / Profile Summary */}
       <section className="flex items-center gap-4 bg-white p-6 rounded-[24px] border border-border-main/50 relative overflow-hidden shadow-sm">
-        <div className="w-24 h-24 rounded-full border-[3px] border-white shadow-sm bg-bg-surface-1 flex-shrink-0 overflow-hidden z-10 relative">
-          <img alt="Farmer Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsbCWDiuGTF5iEwK2O9pm1CMMzFdWx0hc4ellAPSIR0Fd0W04AaUk2McKFTBpkyt54F7qbz59AxRVm00X7l_paTxXsYAhKb0DJ2UtW18iwcftc8NpvHSUtky7QtZ3LYS_Jvnwzb_uyHj7Snd_GZJ5qRjx6kGvs2Y-yZafDMesEmvqIG9HZ3b06V39xa_0py0IGkepiBfpB_L-Nfe8YfQg-4VDdxhF78xd9seUk1RNYLfCuF3wEdwSvukiK2uu0wpN98-IjRJs9NRru" />
+        <div className="w-24 h-24 rounded-full border-[3px] border-white shadow-sm bg-bg-surface-1 flex-shrink-0 flex items-center justify-center overflow-hidden z-10 relative">
+          <img 
+            alt="Farmer Profile" 
+            className="w-full h-full object-cover" 
+            src={user?.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuDsbCWDiuGTF5iEwK2O9pm1CMMzFdWx0hc4ellAPSIR0Fd0W04AaUk2McKFTBpkyt54F7qbz59AxRVm00X7l_paTxXsYAhKb0DJ2UtW18iwcftc8NpvHSUtky7QtZ3LYS_Jvnwzb_uyHj7Snd_GZJ5qRjx6kGvs2Y-yZafDMesEmvqIG9HZ3b06V39xa_0py0IGkepiBfpB_L-Nfe8YfQg-4VDdxhF78xd9seUk1RNYLfCuF3wEdwSvukiK2uu0wpN98-IjRJs9NRru"} 
+          />
         </div>
         <div className="flex-1 z-10">
           <h2 className="text-2xl font-extrabold text-text-h mb-1">{user?.name || 'Nông dân Ẩn danh'}</h2>
@@ -125,36 +138,60 @@ export const Profile: React.FC = () => {
 
       {/* Streak Calendar View */}
       <section className="bg-white border border-border-main/50 rounded-[24px] p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <h3 className="text-xl font-bold text-text-h flex items-center gap-2">
             <Flame className="w-6 h-6 text-orange-500 drop-shadow-sm" />
-            Chuỗi {petStatus.streakCount} ngày chăm chỉ liên tiếp!
+            Chuỗi {petStatus.streakCount} ngày chăm chỉ!
           </h3>
-          <span className="font-bold text-sm bg-bg-surface-1 text-text-main/70 px-3 py-1 rounded-full border border-border-main/30">
-            {new Date().toLocaleString('vi-VN', { month: 'long' })}
-          </span>
+          <div className="flex items-center gap-2 bg-bg-surface-1 px-2 py-1 rounded-full border border-border-main/30">
+            <button onClick={() => setCurrentMonthDate(subMonths(currentMonthDate, 1))} className="p-1 hover:bg-white rounded-full transition-colors cursor-pointer"><ChevronLeft className="w-4 h-4" /></button>
+            <span className="font-bold text-sm text-text-main/70 min-w-[100px] text-center capitalize">
+              {format(currentMonthDate, 'MMMM yyyy', { locale: vi })}
+            </span>
+            <button onClick={() => setCurrentMonthDate(addMonths(currentMonthDate, 1))} className="p-1 hover:bg-white rounded-full transition-colors cursor-pointer"><ChevronRight className="w-4 h-4" /></button>
+          </div>
         </div>
-        <div className="grid grid-cols-7 gap-2 text-center mb-2">
+        <div className="grid grid-cols-7 gap-1 md:gap-2 text-center mb-2">
           {['T2','T3','T4','T5','T6','T7','CN'].map((day, i) => (
             <div key={i} className="font-bold text-xs text-text-main/50">{day}</div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-2 gap-y-3">
-          {Array.from({ length: Math.max(7, Math.min(30, petStatus.streakCount + 3)) }).map((_, i) => {
-            const isCompleted = i < petStatus.streakCount;
-            return (
-              <div key={i} className="flex flex-col items-center gap-1">
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-                  isCompleted 
-                    ? 'bg-primary text-white shadow-md scale-105' 
-                    : 'text-text-main/70 bg-bg-surface-1 border border-border-main/10'
-                }`}>
-                  {i + 1}
-                </span>
-                <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isCompleted ? 'bg-primary scale-110' : 'bg-border-main/50'}`}></div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-7 gap-1 md:gap-2 gap-y-2 md:gap-y-3">
+          {(() => {
+            const monthStart = startOfMonth(currentMonthDate);
+            const monthEnd = endOfMonth(monthStart);
+            const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+            const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+            const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+
+            const streakEnd = petStatus.lastDiaryDate ? startOfDay(new Date(petStatus.lastDiaryDate)) : null;
+            const streakStart = streakEnd && petStatus.streakCount > 0 
+              ? new Date(streakEnd.getTime() - (petStatus.streakCount - 1) * 24 * 60 * 60 * 1000) 
+              : null;
+
+            return calendarDays.map((day, i) => {
+              const isCurrentMonth = isSameMonth(day, currentMonthDate);
+              const isTodayDate = isToday(day);
+              
+              const currentDayStart = startOfDay(day);
+              const isCompleted = streakStart && streakEnd && currentDayStart >= streakStart && currentDayStart <= streakEnd;
+
+              return (
+                <div key={i} className={`flex flex-col items-center gap-1 ${!isCurrentMonth ? 'opacity-30' : ''}`}>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                    isCompleted 
+                      ? 'bg-primary text-white shadow-md scale-105' 
+                      : isTodayDate
+                        ? 'text-primary bg-primary/10 border border-primary/30'
+                        : 'text-text-main/70 bg-bg-surface-1 border border-border-main/10 hover:bg-bg-surface-2'
+                  }`}>
+                    {format(day, 'd')}
+                  </span>
+                  <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isCompleted ? 'bg-primary scale-110' : 'bg-transparent'}`}></div>
+                </div>
+              );
+            });
+          })()}
         </div>
       </section>
 

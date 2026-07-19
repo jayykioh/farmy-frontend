@@ -7,6 +7,14 @@ export interface ShopItem {
   price: number;
   required_level: number;
   image_url: string;
+  /** Per-item anchor override for precise positioning on the pet mascot */
+  anchor?: {
+    top?: string;
+    left?: string;
+    width?: string;
+    transform?: string;
+    zIndex?: number;
+  };
 }
 
 export const shopApi = {
@@ -20,8 +28,16 @@ export const shopApi = {
     return data;
   },
 
+  /** Toggle equip — equips if not equipped, unequips if already equipped */
   equipItem: async (itemId: string) => {
     const { data } = await api.post('/shop/equip', { itemId });
     return data;
-  }
+  },
+
+  /** Semantic alias for clarity — same endpoint, toggle behavior */
+  unequipItem: async (itemId: string) => {
+    const { data } = await api.post('/shop/equip', { itemId });
+    return data;
+  },
 };
+

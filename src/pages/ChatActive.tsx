@@ -318,7 +318,7 @@ export const ChatActive: React.FC = () => {
         className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-white z-0"
       >
         <div className="flex justify-center mt-6">
-          <span className="bg-white border border-border-main/50 text-text-main/50 font-bold text-xs px-4 py-1 rounded-full shadow-sm">
+          <span className="bg-[#f5f5f7] text-[#86868b] font-medium text-[11px] uppercase tracking-wider px-3 py-1 rounded-full">
             {dateLabel}
           </span>
         </div>
@@ -333,10 +333,10 @@ export const ChatActive: React.FC = () => {
             <div className="w-28 h-28 mb-4">
               <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={112} />
             </div>
-            <h2 className="text-2xl font-black text-text-main mb-2">
+            <h2 className="text-[24px] font-bold text-[#1d1d1f] mb-2 tracking-tight">
               Hỏi Bé Thóc về ruộng vườn
             </h2>
-            <p className="text-text-main/70 font-medium max-w-sm">
+            <p className="text-[#86868b] font-medium text-[15px] max-w-sm leading-relaxed">
               Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý
               tình huống ngoài đồng.
             </p>
@@ -348,26 +348,26 @@ export const ChatActive: React.FC = () => {
               className={`flex flex-col w-full ${message.role === "user" ? "items-end" : "items-start"}`}
             >
               {message.role === "assistant" ? (
-                <div className="flex items-end gap-2 mb-1">
-                  <div className="w-10 h-10 rounded-full bg-white border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 p-0.5">
+                <div className="flex items-end gap-2 mb-1.5 ml-1">
+                  <div className="w-9 h-9 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/[0.02] flex items-center justify-center overflow-hidden shrink-0 p-0.5">
                     <PetMascot
-                      className={`w-full h-full -mt-1 ${message.streaming ? "animate-pulse" : ""}`}
-                      status={petStatus} size={40}
+                      className={`w-full h-full -mt-0.5 ${message.streaming ? "animate-pulse" : ""}`}
+                      status={petStatus} size={36}
                     />
                   </div>
-                  <span className="font-bold text-sm text-text-main/70 ml-2 mb-1">
+                  <span className="font-medium text-[13px] text-[#86868b] ml-1 mb-1">
                     Bé Thóc
                   </span>
                 </div>
               ) : null}
 
               <div
-                className={`${message.role === "user" ? "bg-primary-container text-white rounded-br-sm" : "bg-[#fcfaf5] text-text-main rounded-bl-sm border border-border-main/50 ml-12"} p-4 rounded-2xl max-w-[85%]`}
+                className={`${message.role === "user" ? "bg-[#34C759] text-white rounded-[20px] rounded-br-[4px]" : "bg-[#f5f5f7] text-[#1d1d1f] rounded-[20px] rounded-bl-[4px] border border-black/[0.02] ml-12"} p-4 max-w-[85%]`}
               >
                 {message.role === "assistant" && message.citations && message.citations.length > 0 && (
                   <ChatSourceCards citations={message.citations} />
                 )}
-                <p className="font-medium text-base whitespace-pre-wrap leading-relaxed">
+                <p className="font-medium text-[15px] whitespace-pre-wrap leading-relaxed">
                   {message.content ? parseMessageContent(message.content) :
                     (message.streaming ? "Đang suy nghĩ..." : "")}
                 </p>
@@ -381,17 +381,17 @@ export const ChatActive: React.FC = () => {
                       disabled={message.feedbackSubmitting}
                       aria-pressed={message.feedback === "positive"}
                       aria-label="Đánh giá phản hồi hữu ích"
-                      className={`bg-white border px-3 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                      className={`bg-white border px-3 py-1.5 rounded-full font-semibold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                         message.feedback === "positive"
-                          ? "text-primary border-primary/40 bg-primary/5"
-                          : "text-text-main border-border-main/50"
+                          ? "text-[#34C759] border-[#34C759]/30 bg-[#34C759]/5"
+                          : "text-[#86868b] border-black/[0.04] hover:bg-[#e8e8ed] hover:text-[#1d1d1f]"
                       }`}
                     >
                       {message.feedbackSubmitting &&
                       message.feedback === "positive" ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        <ThumbsUp className="w-4 h-4" />
+                        <ThumbsUp className="w-3.5 h-3.5" />
                       )}
                     </button>
                     <button
@@ -400,31 +400,31 @@ export const ChatActive: React.FC = () => {
                       disabled={message.feedbackSubmitting}
                       aria-pressed={message.feedback === "negative"}
                       aria-label="Đánh giá phản hồi chưa hữu ích"
-                      className={`bg-white border px-3 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1 disabled:opacity-60 disabled:cursor-not-allowed ${
+                      className={`bg-white border px-3 py-1.5 rounded-full font-semibold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                         message.feedback === "negative"
-                          ? "text-red-600 border-red-200 bg-red-50"
-                          : "text-text-main border-border-main/50"
+                          ? "text-[#FF3B30] border-[#FF3B30]/30 bg-[#FF3B30]/5"
+                          : "text-[#86868b] border-black/[0.04] hover:bg-[#e8e8ed] hover:text-[#1d1d1f]"
                       }`}
                     >
                       {message.feedbackSubmitting &&
                       message.feedback === "negative" ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        <ThumbsDown className="w-4 h-4" />
+                        <ThumbsDown className="w-3.5 h-3.5" />
                       )}
                     </button>
                     <button
                       onClick={() => navigate("/diary/create")}
-                      className="bg-white text-text-main border border-border-main/50 px-4 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1"
+                      className="bg-white text-[#1d1d1f] border border-black/[0.04] px-3 py-1.5 rounded-full font-semibold text-[13px] hover:bg-[#e8e8ed] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <BookOpen className="w-4 h-4 text-primary" />
+                      <BookOpen className="w-3.5 h-3.5 text-[#34C759]" />
                       Ghi nhật ký
                     </button>
                     <button
                       onClick={() => navigate("/reminder/create")}
-                      className="bg-white text-text-main border border-border-main/50 px-4 py-1.5 rounded-full font-bold text-sm hover:-translate-y-[1px] hover:shadow-sm transition-all active:scale-95 flex items-center gap-1"
+                      className="bg-white text-[#1d1d1f] border border-black/[0.04] px-3 py-1.5 rounded-full font-semibold text-[13px] hover:bg-[#e8e8ed] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Clock className="w-4 h-4 text-secondary" />
+                      <Clock className="w-3.5 h-3.5 text-[#007AFF]" />
                       Đặt nhắc nhở
                     </button>
                   </div>
@@ -443,15 +443,15 @@ export const ChatActive: React.FC = () => {
         <div className="h-[20px]" />
       </main>
 
-      <div className="fixed bottom-24 md:bottom-8 left-0 right-0 w-full pt-6 pb-4 px-4 md:px-8 z-30 flex justify-center pointer-events-none">
+      <div className="fixed bottom-0 md:bottom-0 left-0 right-0 w-full pt-10 pb-6 px-4 md:px-8 z-30 flex justify-center pointer-events-none bg-gradient-to-t from-white via-white/95 to-transparent">
         <div className="w-full max-w-3xl flex flex-col pointer-events-auto">
           {attachedImage && (
-            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-sm border border-border-main/50 group animate-in slide-in-from-bottom-2 fade-in mb-2 ml-4">
+            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-black/[0.04] group animate-in slide-in-from-bottom-2 fade-in mb-3 ml-4">
               <img src={attachedImage} className="w-full h-full object-cover rounded-lg" alt="Attachment" />
               <button 
                 type="button"
                 onClick={() => setAttachedImage(null)}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity active:scale-95 cursor-pointer"
+                className="absolute -top-2 -right-2 bg-[#FF3B30] text-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity active:scale-95 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -460,18 +460,18 @@ export const ChatActive: React.FC = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="w-full flex items-center gap-2 bg-white border border-border-main/50 rounded-full p-1 shadow-sm focus-within:shadow-md focus-within:-translate-y-[1px] transition-all"
+            className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-xl saturate-150 border border-black/[0.08] rounded-full p-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] focus-within:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all"
           >
           <button
             type="button"
             onClick={() => navigate("/scan")}
-            className="p-3 text-text-main/50 hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 cursor-pointer"
+            className="p-2.5 text-[#86868b] hover:text-[#34C759] transition-colors flex items-center justify-center rounded-full hover:bg-black/[0.04] cursor-pointer"
           >
-            <Camera className="w-6 h-6" />
+            <Camera className="w-[22px] h-[22px]" />
           </button>
 
           <input
-            className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-base text-text-main placeholder:text-border-main h-full py-3 outline-none min-w-0"
+            className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-[15px] text-[#1d1d1f] placeholder:text-[#86868b] h-full py-2.5 outline-none min-w-0"
             placeholder="Nhắn tin Bé Thóc..."
             type="text"
             value={inputValue}
@@ -482,12 +482,12 @@ export const ChatActive: React.FC = () => {
           <button
             type="submit"
             disabled={!inputValue.trim() || isStreaming}
-            className="p-3 text-white bg-primary rounded-full hover:bg-primary-container transition-colors flex items-center justify-center mr-1 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 text-white bg-[#34C759] rounded-full hover:bg-[#248A3D] transition-colors flex items-center justify-center mr-1 shadow-[0_2px_8px_rgba(52,199,89,0.3)] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:bg-[#d1d1d6]"
           >
             {isStreaming ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Send className="w-5 h-5" />
+              <Send className="w-[20px] h-[20px] ml-0.5" />
             )}
           </button>
         </form>

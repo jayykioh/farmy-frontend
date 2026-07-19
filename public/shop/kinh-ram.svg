@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40" width="100%" height="100%">
+  <!-- Kính Râm (Sunglasses) -->
+  <g transform="translate(50, 20)">
+    <!-- Bridge -->
+    <path d="M-10 0 C-5 -5, 5 -5, 10 0" fill="none" stroke="#333" stroke-width="3" />
+    
+    <!-- Left Lens -->
+    <path d="M-10 0 C-10 -10, -35 -10, -35 0 C-35 15, -10 15, -10 0 Z" fill="#222" stroke="#444" stroke-width="2" />
+    <!-- Left glare -->
+    <path d="M-30 -2 L-20 8 M-27 -5 L-15 7" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" opacity="0.3" />
+    
+    <!-- Right Lens -->
+    <path d="M10 0 C10 -10, 35 -10, 35 0 C35 15, 10 15, 10 0 Z" fill="#222" stroke="#444" stroke-width="2" />
+    <!-- Right glare -->
+    <path d="M15 -2 L25 8 M18 -5 L30 7" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" opacity="0.3" />
+    
+    <!-- Temples (Gọng kính) -->
+    <path d="M-35 -2 L-45 -5 M35 -2 L45 -5" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round" />
+  </g>
+</svg>

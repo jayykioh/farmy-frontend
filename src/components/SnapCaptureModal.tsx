@@ -70,7 +70,11 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode },
+        video: {
+          facingMode,
+          width: { ideal: 1080 },
+          height: { ideal: 1920 },
+        },
       });
 
       if (cameraRequestRef.current !== requestId) {
@@ -135,13 +139,40 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
       return;
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Calculate the visible crop to match object-cover viewport
+    const container = video.parentElement;
+    const containerW = container?.clientWidth ?? video.clientWidth;
+    const containerH = container?.clientHeight ?? video.clientHeight;
+    const videoW = video.videoWidth;
+    const videoH = video.videoHeight;
+
+    const containerAspect = containerW / containerH;
+    const videoAspect = videoW / videoH;
+
+    let sx = 0, sy = 0, sw = videoW, sh = videoH;
+    if (videoAspect > containerAspect) {
+      // Video is wider than container → crop sides
+      sw = videoH * containerAspect;
+      sx = (videoW - sw) / 2;
+    } else {
+      // Video is taller than container → crop top/bottom
+      sh = videoW / containerAspect;
+      sy = (videoH - sh) / 2;
+    }
+
+    canvas.width = Math.round(sw);
+    canvas.height = Math.round(sh);
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Flip horizontally for selfie camera
+    if (facingMode === 'user') {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
     cameraRequestRef.current += 1;
 
     canvas.toBlob(
@@ -283,6 +314,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
               playsInline
               muted
               className="w-full h-full object-cover"
+              style={facingMode === 'user' ? { transform: 'scaleX(-1)' } : undefined}
             />
           ) : null}
 

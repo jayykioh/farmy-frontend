@@ -112,6 +112,7 @@ export const CreateDiary: React.FC = () => {
       });
 
       void runDiarySync(userId, dispatch);
+      toast.success('🎉 +30 XP! Nhật ký đã được lưu thành công!');
       navigate('/diary');
     } catch (error) {
       console.error(error);
