@@ -2,10 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { shopApi } from '../../../api/shop';
 import { PET_STATUS_QUERY_KEY } from '../../pet/hooks/usePetStatus';
 
+import { useAuthStore } from '../../../store/authStore';
+
 export const useShopItems = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['shopItems'],
     queryFn: shopApi.getItems,
+    enabled: isAuthenticated,
   });
 };
 

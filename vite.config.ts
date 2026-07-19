@@ -37,14 +37,6 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /\/auth\//, /\/supabase\//],
         runtimeCaching: [
-          // Network First for HTML to ensure users always get the latest version
-          {
-            urlPattern: ({ request }) => request.destination === 'document',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'html-cache',
-            },
-          },
           // Stale While Revalidate for static assets
           {
             urlPattern: ({ request, url }) =>
