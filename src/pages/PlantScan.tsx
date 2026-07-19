@@ -26,26 +26,45 @@ export const PlantScan: React.FC = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraRequestRef = useRef(0);
+  const scanRequestRef = useRef(false);
+  const streamRef = useRef<MediaStream | null>(null);
+  const uploadRequestRef = useRef<{ abort?: () => void } | null>(null);
+  const mountedRef = useRef(true);
   const [uploadPlantScan] = useUploadPlantScanMutation();
 
   const stopCamera = useCallback(() => {
+    cameraRequestRef.current += 1;
+
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
+      videoRef.current.onloadedmetadata = null;
+    }
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+
     setStream((prevStream) => {
       if (prevStream) {
         prevStream.getTracks().forEach((track) => track.stop());
       }
       return null;
     });
+    setIsCameraReady(false);
   }, []);
 
   const startCamera = useCallback(async () => {
+    stopCamera();
     const requestId = cameraRequestRef.current + 1;
     cameraRequestRef.current = requestId;
-    stopCamera();
     
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -56,11 +75,12 @@ export const PlantScan: React.FC = () => {
         },
       });
 
-      if (cameraRequestRef.current !== requestId) {
+      if (!mountedRef.current || cameraRequestRef.current !== requestId) {
         mediaStream.getTracks().forEach((track) => track.stop());
         return;
       }
 
+      streamRef.current = mediaStream;
       setStream(mediaStream);
     } catch (err) {
       if (cameraRequestRef.current !== requestId) return;
@@ -70,6 +90,17 @@ export const PlantScan: React.FC = () => {
   }, [facingMode, stopCamera]);
 
   useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      uploadRequestRef.current?.abort?.();
+      uploadRequestRef.current = null;
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  useEffect(() => {
     if (scanState === 'viewfinder') {
       startCamera();
     } else {
@@ -77,6 +108,27 @@ export const PlantScan: React.FC = () => {
     }
     return () => stopCamera();
   }, [scanState, startCamera, stopCamera]);
+
+  useEffect(() => {
+    const handlePageHide = () => {
+      uploadRequestRef.current?.abort?.();
+      stopCamera();
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        uploadRequestRef.current?.abort?.();
+        stopCamera();
+      }
+    };
+
+    window.addEventListener('pagehide', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('pagehide', handlePageHide);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [stopCamera]);
 
   useEffect(() => {
     if (scanState === 'viewfinder' && stream && videoRef.current) {
@@ -104,6 +156,10 @@ export const PlantScan: React.FC = () => {
   }, [previewUrl]);
 
   const processScanFile = async (file: File) => {
+    if (scanRequestRef.current) return;
+    scanRequestRef.current = true;
+    setIsProcessing(true);
+
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     stopCamera();
@@ -114,7 +170,10 @@ export const PlantScan: React.FC = () => {
     formData.append('crop_type', selectedCrop);
 
     try {
-      const response = await uploadPlantScan(formData).unwrap();
+      const uploadRequest = uploadPlantScan(formData);
+      uploadRequestRef.current = uploadRequest;
+      const response = await uploadRequest.unwrap();
+      if (!mountedRef.current) return;
       setScanResult(response);
       if (response.image_url || response.thumbnail_url) {
         setPreviewUrl(response.image_url || response.thumbnail_url || null);
@@ -123,19 +182,18 @@ export const PlantScan: React.FC = () => {
     } catch (error) {
       const errorCode = extractPlantScanErrorCode(error);
       setScanState('viewfinder');
-      startCamera();
       switch (errorCode) {
         case 'SCAN_IMAGE_BLURRY':
-          toast.error('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
+          toast.error('Ảnh quá mờ. Hãy giữ chắc tay, đưa lá vào khung rồi chụp lại.');
           break;
         case 'NOT_A_PLANT_IMAGE':
-          toast.error('Bé Thóc chỉ có thể phân tích ảnh cây trồng. Vui lòng thử lại.');
+          toast.error('Ảnh chưa thấy cây trồng. Hãy chụp sát lá/cành bị bệnh, không chụp người hoặc cảnh phòng.');
           break;
         case 'SCAN_QUOTA_EXCEEDED':
-          toast.error('Bạn đã hết lượt quét trong ngày hôm nay.');
+          toast.error('Bạn đã hết lượt quét hôm nay. Hãy thử lại vào ngày mai.');
           break;
         case 'AI_SCAN_QUOTA_BUSY':
-          toast.error('Hệ thống AI đang quá tải. Vui lòng thử lại sau vài phút.');
+          toast.error('Hệ thống AI đang quá tải. Vui lòng đợi vài phút rồi thử lại, đừng bấm liên tục.');
           break;
         case 'PLANT_SCAN_PERSISTENCE_FAILED':
           toast.error('Lỗi lưu trữ dữ liệu. Vui lòng thử lại.');
@@ -144,12 +202,20 @@ export const PlantScan: React.FC = () => {
         case 'INVALID_IMAGE_TYPE':
           toast.error('Vui lòng tải lên file ảnh hợp lệ (JPG, PNG, WebP) dưới 5MB.');
           break;
+        case 'INVALID_JSON':
+        case 'INVALID_SCHEMA':
+          toast.error('Bé Thóc chưa đọc được ảnh này. Hãy thử một ảnh rõ hơn nhé.');
+          break;
         case 'UNKNOWN':
         case 'LLM_ERROR':
         default:
           toast.error('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
           break;
       }
+    } finally {
+      uploadRequestRef.current = null;
+      scanRequestRef.current = false;
+      setIsProcessing(false);
     }
   };
 
@@ -163,7 +229,8 @@ export const PlantScan: React.FC = () => {
   };
 
   const handleCaptureClick = () => {
-    if (!videoRef.current || !canvasRef.current || !isCameraReady) return;
+    if (!videoRef.current || !canvasRef.current || !isCameraReady || scanRequestRef.current) return;
+    setIsProcessing(true);
     const video = videoRef.current;
     const canvas = canvasRef.current;
     
@@ -187,7 +254,10 @@ export const PlantScan: React.FC = () => {
     canvas.width = Math.round(sw);
     canvas.height = Math.round(sh);
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      setIsProcessing(false);
+      return;
+    }
 
     if (facingMode === 'user') {
       ctx.translate(canvas.width, 0);
@@ -197,6 +267,7 @@ export const PlantScan: React.FC = () => {
 
     canvas.toBlob((blob) => {
       if (!blob) {
+        setIsProcessing(false);
         toast.error('Lỗi chụp ảnh. Vui lòng thử lại.');
         return;
       }
@@ -217,6 +288,25 @@ export const PlantScan: React.FC = () => {
   const toggleCamera = () => {
     setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
   };
+
+  const scanImageUrl = previewUrl || scanResult?.image_url || scanResult?.thumbnail_url || null;
+  const scanDiagnosis = scanResult?.diagnosis;
+  const scanConfidence = scanDiagnosis?.confidence ?? 0;
+  const isScanUncertain = !scanDiagnosis || scanConfidence < 0.5 || Boolean(scanDiagnosis.low_confidence_warning);
+  const diagnosisTitle = !scanDiagnosis
+    ? 'Kết quả chưa sẵn sàng'
+    : scanDiagnosis.is_plant === false
+      ? 'Ảnh không phải cây trồng'
+      : scanDiagnosis.disease_name && !isScanUncertain
+        ? scanDiagnosis.disease_name
+        : 'Cần kiểm tra thêm';
+  const mascotMessage = !scanDiagnosis
+    ? 'Bé Thóc đang xem xét lá cây.'
+    : scanDiagnosis.is_plant === false
+      ? 'Đây có vẻ chưa phải cây trồng.'
+      : isScanUncertain
+        ? 'Ảnh này chưa đủ chắc chắn, cần kiểm tra thêm.'
+        : 'Mình đã thấy dấu hiệu rõ hơn rồi.';
 
   return (
     <div className="w-full h-full min-h-[100svh] bg-bg-surface-1 relative text-left font-sans flex flex-col">
@@ -288,7 +378,8 @@ export const PlantScan: React.FC = () => {
             <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8 z-10">
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="w-12 h-12 flex justify-center items-center rounded-full bg-black/50 backdrop-blur-md border border-white/20 active:scale-95 text-white"
+                disabled={isProcessing}
+                className="w-12 h-12 flex justify-center items-center rounded-full bg-black/50 backdrop-blur-md border border-white/20 active:scale-95 text-white disabled:opacity-50"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -297,10 +388,10 @@ export const PlantScan: React.FC = () => {
 
               <button 
                 onClick={handleCaptureClick}
-                disabled={!isCameraReady}
-                className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all group ${isCameraReady ? 'border-white/50 hover:scale-105 active:scale-95 cursor-pointer' : 'border-white/30 opacity-50'}`}
+                disabled={!isCameraReady || scanRequestRef.current || isProcessing}
+                className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all group ${isCameraReady && !scanRequestRef.current && !isProcessing ? 'border-white/50 hover:scale-105 active:scale-95 cursor-pointer' : 'border-white/30 opacity-50'}`}
               >
-                <div className={`w-16 h-16 rounded-full transition-colors ${isCameraReady ? 'bg-white group-hover:bg-gray-200' : 'bg-white/50'}`}></div>
+                <div className={`w-16 h-16 rounded-full transition-colors ${isCameraReady && !isProcessing ? 'bg-white group-hover:bg-gray-200' : 'bg-white/50'}`}></div>
               </button>
               
               <div className="w-12 h-12" /> {/* Spacer */}
@@ -340,11 +431,9 @@ export const PlantScan: React.FC = () => {
                   <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
                 </div>
                 {/* Speech Bubble */}
-                <div className="bg-white border border-border-main/50 rounded-[20px] rounded-bl-sm p-3 shadow-sm relative max-w-[250px] mb-2">
+              <div className="bg-white border border-border-main/50 rounded-[20px] rounded-bl-sm p-3 shadow-sm relative max-w-[250px] mb-2">
                   <p className="font-bold text-sm text-text-main">
-                    {scanResult.diagnosis?.disease_name 
-                      ? "Oh no! Looks like we found something." 
-                      : "Cây của bạn có vẻ khỏe mạnh!"}
+                    {mascotMessage}
                   </p>
                 </div>
               </div>
@@ -359,12 +448,12 @@ export const PlantScan: React.FC = () => {
                     )}
                   </span>
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-text-h mt-1 tracking-tight">
-                    {scanResult.diagnosis?.disease_name || 'Không phát hiện bệnh'}
+                    {diagnosisTitle}
                   </h2>
                 </div>
                 
                 {/* Confidence Bar */}
-                {scanResult.diagnosis?.confidence && (
+                {scanResult.diagnosis?.confidence !== undefined && scanResult.diagnosis?.confidence !== null && (
                   <div className="flex flex-col gap-2 mt-2">
                     <div className="flex justify-between items-end">
                       <span className="font-bold text-sm text-text-main/70">Confidence</span>
@@ -450,7 +539,12 @@ export const PlantScan: React.FC = () => {
               </button>
               
               <button 
-                onClick={() => navigate('/chat/active')}
+                onClick={() => navigate('/chat/active', {
+                  state: {
+                    initialMessage: 'Hãy phân tích lá cây này, cho tôi biết có dấu hiệu bệnh hay stress nào không, mức độ rủi ro và cách xử lý ngắn gọn.',
+                    initialImage: scanImageUrl,
+                  },
+                })}
                 className="w-full md:flex-1 bg-white text-text-main font-bold text-lg md:text-xl py-4 md:py-5 px-6 rounded-full md:rounded-[20px] border border-border-main/50 active:scale-95 transition-all flex justify-center items-center gap-2 shadow-sm hover:bg-bg-surface-1 hover:scale-[1.02] cursor-pointer"
               >
                 Ask AI advice

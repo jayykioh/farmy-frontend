@@ -13,6 +13,8 @@ export type PlantScanErrorCode =
   | 'PLANT_SCAN_PERSISTENCE_FAILED'
   | 'SCAN_NOT_FOUND'
   | 'INVALID_IMAGE_TYPE'
+  | 'INVALID_JSON'
+  | 'INVALID_SCHEMA'
   | 'LLM_ERROR'
   | 'UNKNOWN';
 

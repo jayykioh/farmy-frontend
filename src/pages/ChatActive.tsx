@@ -329,17 +329,41 @@ export const ChatActive: React.FC = () => {
             Đang tải trò chuyện...
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
-            <div className="w-28 h-28 mb-4">
-              <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={112} />
-            </div>
-            <h2 className="text-[24px] font-bold text-[#1d1d1f] mb-2 tracking-tight">
-              Hỏi Bé Thóc về ruộng vườn
-            </h2>
-            <p className="text-[#86868b] font-medium text-[15px] max-w-sm leading-relaxed">
-              Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý
-              tình huống ngoài đồng.
-            </p>
+          <div className={`flex-1 flex flex-col px-6 py-12 ${attachedImage ? "justify-end gap-8" : "items-center justify-center text-center"}`}>
+            {attachedImage ? (
+              <>
+                <div className="flex items-center gap-3 self-start rounded-3xl bg-[#f5f5f7] px-4 py-3 text-left">
+                  <div className="w-12 h-12 rounded-full bg-white shadow-sm border border-black/[0.02] flex items-center justify-center overflow-hidden shrink-0 p-0.5">
+                    <PetMascot className="w-full h-full -mt-0.5" status={petStatus} size={48} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-extrabold text-[#1d1d1f]">Bé Thóc đã nhận ảnh cây.</p>
+                    <p className="text-xs font-semibold text-[#86868b]">Bạn có thể sửa tin nhắn mẫu rồi bấm gửi.</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col w-full items-end">
+                  <div className="bg-[#34C759] text-white rounded-[20px] rounded-br-[4px] p-4 max-w-[85%] shadow-sm">
+                    <div className="font-medium text-[15px] whitespace-pre-wrap leading-relaxed">
+                      {parseMessageContent(`${inputValue || "Bạn có thể phân tích bức ảnh này giúp tôi được không?"}\n\n[IMAGE:${attachedImage}]`)}
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-28 h-28 mb-4">
+                  <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={112} />
+                </div>
+                <h2 className="text-[24px] font-bold text-[#1d1d1f] mb-2 tracking-tight">
+                  Hỏi Bé Thóc về ruộng vườn
+                </h2>
+                <p className="text-[#86868b] font-medium text-[15px] max-w-sm leading-relaxed">
+                  Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý
+                  tình huống ngoài đồng.
+                </p>
+              </>
+            )}
           </div>
         ) : (
           messages.map((message) => (
@@ -367,10 +391,10 @@ export const ChatActive: React.FC = () => {
                 {message.role === "assistant" && message.citations && message.citations.length > 0 && (
                   <ChatSourceCards citations={message.citations} />
                 )}
-                <p className="font-medium text-[15px] whitespace-pre-wrap leading-relaxed">
+                <div className="font-medium text-[15px] whitespace-pre-wrap leading-relaxed">
                   {message.content ? parseMessageContent(message.content) :
                     (message.streaming ? "Đang suy nghĩ..." : "")}
-                </p>
+                </div>
 
                 {message.role === "assistant" &&
                 message.status === "completed" ? (

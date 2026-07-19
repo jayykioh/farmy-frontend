@@ -15,6 +15,15 @@ describe('extractPlantScanErrorCode', () => {
     expect(extractPlantScanErrorCode(error)).toBe('SCAN_IMAGE_BLURRY');
   });
 
+  it('should return snake_case error_code for RTK Query shape', () => {
+    const error = {
+      data: {
+        error_code: 'INVALID_JSON',
+      },
+    };
+    expect(extractPlantScanErrorCode(error)).toBe('INVALID_JSON');
+  });
+
   it('should return errorCode for Axios shape', () => {
     const error = {
       response: {
@@ -24,6 +33,17 @@ describe('extractPlantScanErrorCode', () => {
       },
     };
     expect(extractPlantScanErrorCode(error)).toBe('AI_SCAN_QUOTA_BUSY');
+  });
+
+  it('should return snake_case error_code for Axios shape', () => {
+    const error = {
+      response: {
+        data: {
+          error_code: 'INVALID_SCHEMA',
+        },
+      },
+    };
+    expect(extractPlantScanErrorCode(error)).toBe('INVALID_SCHEMA');
   });
 
   it('should return UNKNOWN for missing errorCode', () => {
