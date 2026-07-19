@@ -30,6 +30,17 @@ import FarmFeed from './pages/FarmFeed';
 import SnapDetail from './pages/SnapDetail';
 import Insights from './pages/Insights';
 
+// Admin Pages
+import AdminLayout from './components/layout/AdminLayout';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import AdminRag from './pages/AdminRag';
+import AdminScans from './pages/AdminScans';
+import AdminSettings from './pages/AdminSettings';
+import AdminReminders from './pages/AdminReminders';
+import AdminChangePassword from './pages/AdminChangePassword';
+import AdminSkins from './pages/AdminSkins';
+
 // Error & Status Pages
 import NotFound404 from './pages/NotFound404';
 import LoadingScreen from './pages/LoadingScreen';
@@ -108,6 +119,18 @@ export function App() {
                 <Route path="/celebration" element={<Celebration />} />
                 <Route path="/farm-feed" element={<FarmFeed />} />
                 <Route path="/snap/:id" element={<SnapDetail />} />
+
+                {/* Admin Routes */}
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/users" element={<AdminUsers />} />
+                  <Route path="/admin/rag" element={<AdminRag />} />
+                  <Route path="/admin/scans" element={<AdminScans />} />
+                  <Route path="/admin/settings" element={<AdminSettings />} />
+                  <Route path="/admin/reminders" element={<AdminReminders />} />
+                  <Route path="/admin/change-password" element={<AdminChangePassword />} />
+                  <Route path="/admin/skins" element={<AdminSkins />} />
+                </Route>
               </Route>
 
               {/* Error & Status Pages - Outside MainLayout */}

@@ -53,7 +53,12 @@ export const WelcomeAuth: React.FC = () => {
 
     try {
       await login(credentials);
-      navigate('/home');
+      const user = useAuthStore.getState().user;
+      if (user && (user.role === 'admin' || user.role === 'moderator')) {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
     } catch (error) {
       setErrorMsg(getErrorMessage(error, 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));
     }

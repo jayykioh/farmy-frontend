@@ -14,12 +14,19 @@ export const ProtectedRoute = () => {
     }
   }, [initialize, status]);
 
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user && (user.role === 'admin' || user.role === 'moderator');
+
   if (status === 'idle' || status === 'checking') {
     return null;
   }
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  if (isAdmin && !location.pathname.startsWith('/admin')) {
+    return <Navigate to="/admin" replace />;
   }
 
   return <Outlet />;
