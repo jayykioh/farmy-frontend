@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getAdminChatSessions, getAdminRAGFiles, deleteAdminRAGFile } from '../api/admin';
+import { getAdminChatSessions, getAdminRAGFiles, deleteAdminRAGFile, validateAdminRAGFile, batchEmbedAdminRAGFiles } from '../api/admin';
 import { Database, MessageSquare, Trash2, Calendar, FileText, CheckCircle2, XCircle, AlertCircle, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { UploadRAGModal } from '../components/admin/rag/UploadRAGModal';
+import { ReviewRAGModal } from '../components/admin/rag/ReviewRAGModal';
 
 type ChatSession = {
   _id: string;
@@ -17,6 +19,7 @@ type RAGFile = {
   category: string;
   embed_status: 'pending' | 'processing' | 'done' | 'error';
   validation_status: 'unvalidated' | 'validating' | 'validated' | 'rejected' | 'confirmed';
+  validation_report?: any;
   created_at: string;
 };
 
@@ -29,6 +32,11 @@ export const AdminRag: React.FC = () => {
   // Pagination for chat sessions
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [reviewFile, setReviewFile] = useState<RAGFile | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchSessions = () => {
     setLoading(true);
@@ -107,6 +115,29 @@ export const AdminRag: React.FC = () => {
     }
   };
 
+  const handleValidate = async (fileId: string) => {
+    setActionLoading(fileId);
+    try {
+      await validateAdminRAGFile(fileId);
+      toast.success('Đã gửi yêu cầu kiểm định AI');
+      fetchFiles();
+    } catch (err: any) {
+      toast.error('Lỗi khi kiểm định: ' + (err.message || 'Unknown error'));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleBatchEmbed = async () => {
+    try {
+      const res = await batchEmbedAdminRAGFiles();
+      toast.success(res.message || 'Đã gửi yêu cầu đồng bộ Vector DB');
+      fetchFiles();
+    } catch (err: any) {
+      toast.error('Lỗi khi đồng bộ: ' + (err.message || 'Unknown error'));
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] overflow-hidden">
       {/* Tab Switcher Header */}
@@ -140,6 +171,23 @@ export const AdminRag: React.FC = () => {
           <span>Tài liệu Tri thức (RAG)</span>
         </button>
       </div>
+
+      {activeTab === 'files' && (
+        <div className="flex justify-end gap-3 p-4 border-b border-black/[0.04]">
+          <button
+            onClick={handleBatchEmbed}
+            className="px-4 py-2 text-[13px] font-bold text-[#08A855] bg-[#08A855]/10 hover:bg-[#08A855]/20 rounded-xl transition-all"
+          >
+            Đồng bộ AI (Batch Embed)
+          </button>
+          <button
+            onClick={() => setIsUploadOpen(true)}
+            className="px-4 py-2 text-[13px] font-bold text-white bg-[#08A855] hover:bg-[#08A855]/90 rounded-xl transition-all shadow-sm"
+          >
+            Tải lên Tri thức
+          </button>
+        </div>
+      )}
 
       {/* Sessions Tab Content */}
       {activeTab === 'sessions' && (
@@ -277,13 +325,35 @@ export const AdminRag: React.FC = () => {
                       </div>
                     </td>
                     <td className="py-4 px-6 text-center">
-                      <button
-                        onClick={() => handleDeleteFile(file._id, file.title)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-full active:scale-95 transition-all inline-flex items-center"
-                        title="Xóa tri thức"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        {file.validation_status === 'unvalidated' && (
+                          <button
+                            onClick={() => handleValidate(file._id)}
+                            disabled={actionLoading === file._id}
+                            className="px-3 py-1.5 text-[12px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all disabled:opacity-50"
+                          >
+                            {actionLoading === file._id ? 'Đang gửi...' : 'Gửi AI Check'}
+                          </button>
+                        )}
+                        {(file.validation_status === 'validated' || file.validation_status === 'rejected') && (
+                          <button
+                            onClick={() => {
+                              setReviewFile(file);
+                              setIsReviewOpen(true);
+                            }}
+                            className="px-3 py-1.5 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all"
+                          >
+                            Xem xét
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteFile(file._id, file.title)}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-full active:scale-95 transition-all inline-flex items-center"
+                          title="Xóa tri thức"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -292,6 +362,22 @@ export const AdminRag: React.FC = () => {
           </table>
         </div>
       )}
+
+      <UploadRAGModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        onSuccess={fetchFiles}
+      />
+      
+      <ReviewRAGModal
+        isOpen={isReviewOpen}
+        onClose={() => {
+          setIsReviewOpen(false);
+          setReviewFile(null);
+        }}
+        file={reviewFile}
+        onSuccess={fetchFiles}
+      />
     </div>
   );
 };
