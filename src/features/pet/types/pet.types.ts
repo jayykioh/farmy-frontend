@@ -37,6 +37,14 @@ export interface PetStatus {
     name: string;
     category: string;
     image_url: string;
+    /** Per-item anchor override — merged with category defaults */
+    anchor?: {
+      top?: string;
+      left?: string;
+      width?: string;
+      transform?: string;
+      zIndex?: number;
+    };
   }>;
   updatedAt?: string;
 }
