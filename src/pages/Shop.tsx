@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
@@ -21,9 +22,10 @@ export const Shop: React.FC = () => {
 
   const [activeCategory, setActiveCategory] = useState<'HAT' | 'OUTFIT' | 'EFFECT' | 'BACKGROUND'>('HAT');
   const [modal, setModal] = useState<ModalConfig | null>(null);
+  const [previewMoodOverride, setPreviewMoodOverride] = useState<'excited' | 'happy' | null>(null);
 
   const categories = [
-    { id: 'HAT', label: 'Mũ' },
+    { id: 'HAT', label: 'Mũ & Phụ kiện' },
     { id: 'OUTFIT', label: 'Trang phục' },
     { id: 'EFFECT', label: 'Hiệu ứng' },
     { id: 'BACKGROUND', label: 'Nền' },
@@ -57,22 +59,24 @@ export const Shop: React.FC = () => {
   };
 
   const handleEquip = (itemId: string) => {
+    const item = items.find(i => i._id === itemId);
+    const isEquipped = petStatus.equippedItems?.includes(itemId);
+
     equipMutation.mutate(itemId, {
-      onSuccess: (res: unknown) => {
-        const successData = res as { message?: string };
-        setModal({
-          type: 'success',
-          title: 'Đã thay đổi trang phục! ✨',
-          message: successData.message || 'Bé Thóc trông thật tuyệt vời trong diện mạo mới!',
-        });
+      onSuccess: () => {
+        if (isEquipped) {
+          toast.success(`Đã tháo ${item?.name || 'phụ kiện'}! ✨`);
+        } else {
+          toast.success(`Đã trang bị ${item?.name || 'phụ kiện'}! 👒`);
+          setPreviewMoodOverride('excited');
+          setTimeout(() => {
+            setPreviewMoodOverride(null);
+          }, 2500);
+        }
       },
       onError: (err: unknown) => {
         const errorResponse = err as { response?: { data?: { message?: string } } };
-        setModal({
-          type: 'error',
-          title: 'Trang bị thất bại ❌',
-          message: errorResponse.response?.data?.message || 'Có lỗi xảy ra khi trang bị món đồ này.',
-        });
+        toast.error(errorResponse.response?.data?.message || 'Có lỗi xảy ra khi trang bị món đồ này.');
       }
     });
   };
@@ -96,7 +100,7 @@ export const Shop: React.FC = () => {
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.2}
-              onDragEnd={(_, info) => {
+              onDragEnd={(_: any, info: any) => {
                 if (info.offset.y > 100) setModal(null);
               }}
               className="bg-white/80 backdrop-blur-xl rounded-[32px] border border-black/[0.04] p-6 max-w-sm w-full shadow-[0_24px_80px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-4 cursor-grab active:cursor-grabbing"
@@ -188,7 +192,14 @@ export const Shop: React.FC = () => {
               <div className="relative w-full h-[220px] rounded-[20px] bg-[#F5F5F7] flex items-end justify-center overflow-hidden">
                 <div className="relative z-10 mb-6 animate-[bounce_4s_ease-in-out_infinite]">
                   <div className="w-32 h-32 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.04)] bg-white border-[6px] border-white overflow-hidden p-2">
-                    <PetMascot className="w-full h-full -mt-2 drop-shadow-md" status={petStatus} size={112} />
+                    <PetMascot 
+                      className="w-full h-full -mt-2 drop-shadow-md" 
+                      status={{
+                        ...petStatus,
+                        mood: previewMoodOverride ?? petStatus.mood
+                      }} 
+                      size={112} 
+                    />
                   </div>
                   {/* Equipped indicator */}
                   {currentlyEquippedInActiveCategory && (
