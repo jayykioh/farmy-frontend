@@ -17,7 +17,7 @@ export const MainLayout = () => {
   const pendingCount = pendingReminders?.length || 0;
 
   return (
-    <div className="flex min-h-[100svh] w-full bg-[#FBFBFD] font-sans relative">
+    <div className="flex min-h-[100svh] w-full overflow-x-hidden bg-[#FBFBFD] font-sans relative">
       {/* Sidebar (Desktop) */}
       {showBottomNav ? <Sidebar /> : null}
       {/* Main Content Wrapper */}

@@ -12,24 +12,24 @@ export const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 w-full left-0 bg-white/80 backdrop-blur-xl border-t border-black/[0.05] pb-safe z-50 md:hidden">
-      <div className="flex justify-around items-center h-[60px] px-2 mb-2">
+    <nav className="fixed bottom-0 left-0 right-0 w-full overflow-x-hidden bg-white/80 backdrop-blur-xl border-t border-black/[0.05] pb-safe z-50 md:hidden">
+      <div className="flex items-center h-[60px] px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink
               key={item.to}
               to={item.to}
-              className="flex flex-col items-center justify-center gap-[3px] w-16 h-full transition-all duration-300 ease-out active:scale-[0.96] outline-none select-none"
+              className="flex flex-1 min-w-0 flex-col items-center justify-center gap-1 h-full transition-all duration-300 ease-out active:scale-[0.96] outline-none select-none"
             >
               {({ isActive }) => (
                 <>
                   <Icon 
-                    size={24} 
+                    size={22} 
                     strokeWidth={isActive ? 2.5 : 2} 
                     className={`transition-colors duration-300 ${isActive ? 'text-slate-800' : 'text-slate-400'}`}
                   />
-                  <span className={`text-[10.5px] leading-none tracking-tight transition-colors duration-300 ${isActive ? 'font-semibold text-slate-800' : 'font-medium text-slate-400'}`}>
+                  <span className={`max-w-full truncate text-[9.5px] leading-none tracking-tight transition-colors duration-300 ${isActive ? 'font-semibold text-slate-800' : 'font-medium text-slate-400'}`}>
                     {item.label}
                   </span>
                 </>

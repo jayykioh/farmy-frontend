@@ -128,50 +128,53 @@ export const ChatList: React.FC = () => {
   return (
     <div className="w-full h-full min-h-[100svh] bg-[#fbfbfd] text-left font-sans pb-[100px] overflow-x-hidden">
       {/* Custom Spotify-Style Header */}
-      <header className="relative w-full h-[300px] md:h-[380px] overflow-hidden mb-0 flex-shrink-0">
-        {/* Background Image — cánh đồng lúa hoàng hôn */}
-        <img 
-          src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=85&w=1600&auto=format&fit=crop&crop=center" 
-          className="absolute inset-0 w-full h-full object-cover object-center scale-105"
-          alt="Farm Background"
-        />
-        {/* Layer 1: top dark for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent"></div>
-        {/* Layer 2: Spotify-style bottom fade into page color */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd]/10 to-transparent"></div>
-        {/* Layer 3: warm tint for brand feel */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1d1d1f]/30 to-transparent"></div>
-        
-        {/* Content — anchored near bottom, before the fade */}
-        <div className="absolute left-0 right-0 bottom-10 px-6 md:px-10 flex items-end justify-between z-10 max-w-4xl mx-auto w-full">
-          <div className="flex flex-col gap-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-black/30 backdrop-blur-sm px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-white/90 w-fit border border-white/10">
-              <Leaf className="h-3 w-3" />
-              Sổ tay đồng áng
+      <header className="relative w-full h-[280px] md:h-[380px] overflow-hidden mb-0 flex-shrink-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.65),_transparent_34%),radial-gradient(circle_at_85%_20%,_rgba(255,255,255,0.35),_transparent_22%),linear-gradient(135deg,_#dbf4d8_0%,_#e9f7d8_40%,_#f8f6d0_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_42%,rgba(251,251,253,0.98)_100%)]" />
+        <div className="absolute -top-10 -left-10 h-36 w-36 rounded-full bg-[#34C759]/10 blur-3xl" />
+        <div className="absolute top-10 right-0 h-44 w-44 rounded-full bg-[#F7C948]/20 blur-3xl" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,rgba(251,251,253,0)_0%,rgba(251,251,253,0.7)_52%,rgba(251,251,253,1)_100%)]" />
+        <div className="absolute inset-x-0 bottom-8 flex justify-center opacity-70">
+          <div className="h-24 w-[28rem] max-w-[90vw] rounded-full bg-[#34C759]/10 blur-2xl" />
+        </div>
+
+        <div className="absolute inset-0 z-10 mx-auto flex w-full max-w-4xl flex-col justify-end gap-4 px-4 sm:px-6 md:px-10 pb-8 md:pb-10">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="flex min-w-0 flex-col gap-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#1d1d1f] w-fit border border-white/60 backdrop-blur-md shadow-sm">
+                <Leaf className="h-3 w-3 text-[#34C759]" />
+                Sổ tay đồng áng
+              </div>
+              <h1 className="max-w-[min(100%,20rem)] text-[32px] md:max-w-none md:text-[52px] font-black leading-[1.05] tracking-[-0.03em] text-[#1d1d1f]">
+                Lịch sử tư vấn
+              </h1>
+              <p className="max-w-[22rem] text-[14px] font-medium text-[#5f6368]">
+                Xem lại các ghi chú canh tác cùng Bé Thóc.
+              </p>
             </div>
-            <h1 className="text-[36px] md:text-[52px] font-black leading-[1.05] tracking-[-0.03em] text-white" style={{textShadow: '0 1px 24px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4)'}}>
-              Lịch sử tư vấn
-            </h1>
-            <p className="text-[14px] font-medium text-white/80" style={{textShadow: '0 1px 8px rgba(0,0,0,0.5)'}}>
-              Xem lại các ghi chú canh tác cùng Bé Thóc.
-            </p>
-          </div>
-          
-          <div className="hidden sm:block w-28 h-28 md:w-36 md:h-36">
-             <PetMascot status={petStatus} size={144} className="drop-shadow-2xl" />
+
+            <div className="hidden sm:flex items-end gap-3 shrink-0">
+              <div className="rounded-[28px] border border-white/70 bg-white/70 px-4 py-3 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-md">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#34C759]">AI Pet</p>
+                <p className="text-sm font-medium text-[#1d1d1f]">Bé Thóc đang chờ bạn hỏi</p>
+              </div>
+              <div className="h-28 w-28 md:h-36 md:w-36 shrink-0 rounded-full bg-white/65 border border-white/60 shadow-[0_16px_40px_rgba(0,0,0,0.08)] backdrop-blur-md flex items-center justify-center">
+                <PetMascot status={petStatus} size={144} className="drop-shadow-2xl" />
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="w-full max-w-4xl mx-auto px-4 md:px-8 pb-12 min-h-[50svh] flex flex-col relative z-20">
-        <div className="flex justify-between items-center mb-6 px-2 md:px-4">
+        <div className="mb-6 flex items-center justify-between gap-3 px-2 md:px-4">
           <h2 className="text-[20px] font-bold text-[#1d1d1f]">Gần đây</h2>
           <button 
             onClick={() => navigate('/chat/active')}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#34C759] text-white rounded-full font-semibold shadow-[0_4px_16px_rgba(52,199,89,0.3)] active:scale-95 transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)] cursor-pointer"
+            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#34C759] px-4 py-2.5 text-[14px] font-semibold text-white shadow-[0_4px_16px_rgba(52,199,89,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)] active:scale-95 cursor-pointer max-[380px]:px-3 max-[380px]:py-2"
           >
-            <Plus className="w-5 h-5" />
-            Chat mới
+            <Plus className="w-5 h-5 shrink-0" />
+            <span className="hidden min-[381px]:inline">Chat mới</span>
           </button>
         </div>
 
@@ -311,24 +314,29 @@ export const ChatList: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="mt-12 flex flex-col items-center text-center">
-            <div className="relative">
-              <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
-                <PetMascot className="w-full h-full drop-shadow-lg" status={petStatus} size={112} />
+          <div className="mt-12 flex flex-col items-center text-center px-4">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative inline-flex items-center justify-center">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[#1d1d1f] shadow-[0_4px_14px_rgba(0,0,0,0.08)] border border-black/[0.04] whitespace-nowrap">
+                  Bé Thóc luôn lắng nghe bạn!
+                </div>
+                <div className="w-32 h-32 flex items-center justify-center overflow-hidden">
+                  <PetMascot className="w-full h-full drop-shadow-lg" status={petStatus} size={112} />
+                </div>
               </div>
-              <div className="bg-white border border-border-main/50 absolute -top-8 left-1/2 -translate-x-1/2 px-5 py-2 rounded-[20px] rounded-br-sm whitespace-nowrap shadow-sm">
-                <p className="text-text-main font-bold text-sm">Bé Thóc luôn lắng nghe bạn!</p>
+              <div className="space-y-2">
+                <h3 className="text-[18px] font-bold text-[#1d1d1f]">Chưa có cuộc trò chuyện nào</h3>
+                <p className="text-text-main/70 text-sm text-center max-w-[280px] leading-6">
+                  Lịch sử trò chuyện của bạn sẽ xuất hiện tại đây sau câu hỏi đầu tiên.
+                </p>
               </div>
+              <button
+                onClick={() => navigate('/chat/active')}
+                className="mt-2 inline-flex items-center justify-center rounded-full bg-[#34C759] px-6 py-3 font-semibold text-white shadow-[0_4px_16px_rgba(52,199,89,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)] active:scale-95 cursor-pointer"
+              >
+                Bắt đầu trò chuyện
+              </button>
             </div>
-            <p className="text-text-main/70 text-sm mt-4 text-center max-w-[260px]">
-              Lịch sử trò chuyện của bạn sẽ xuất hiện tại đây sau câu hỏi đầu tiên.
-            </p>
-            <button
-              onClick={() => navigate('/chat/active')}
-              className="mt-6 px-6 py-3 bg-[#34C759] text-white rounded-full font-semibold shadow-[0_4px_16px_rgba(52,199,89,0.3)] active:scale-95 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)] transition-all cursor-pointer"
-            >
-              Bắt đầu trò chuyện
-            </button>
           </div>
         )}
       </main>

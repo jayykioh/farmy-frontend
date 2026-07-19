@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useGetPlotsQuery,
   useGetDiariesQuery,
@@ -11,6 +12,7 @@ import toast from 'react-hot-toast';
 
 export const CreateReminder: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Helper functions to get local date and time strings
   const getLocalDateString = (d: Date) => {
@@ -82,6 +84,7 @@ export const CreateReminder: React.FC = () => {
         repeat,
       }).unwrap();
 
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] });
       navigate('/reminders');
     } catch (err) {
       console.error(err);

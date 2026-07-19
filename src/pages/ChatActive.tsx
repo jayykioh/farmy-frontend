@@ -315,7 +315,7 @@ export const ChatActive: React.FC = () => {
 
       <main
         ref={scrollRef}
-        className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-white z-0"
+        className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[180px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-white z-0"
       >
         <div className="flex justify-center mt-6">
           <span className="bg-[#f5f5f7] text-[#86868b] font-medium text-[11px] uppercase tracking-wider px-3 py-1 rounded-full">
@@ -443,7 +443,7 @@ export const ChatActive: React.FC = () => {
         <div className="h-[20px]" />
       </main>
 
-      <div className="fixed bottom-0 md:bottom-0 left-0 right-0 w-full pt-10 pb-6 px-4 md:px-8 z-30 flex justify-center pointer-events-none bg-gradient-to-t from-white via-white/95 to-transparent">
+      <div className="fixed left-0 right-0 bottom-[calc(60px+env(safe-area-inset-bottom))] w-full pt-10 pb-4 px-4 md:px-8 z-30 flex justify-center pointer-events-none bg-gradient-to-t from-white via-white/95 to-transparent">
         <div className="w-full max-w-3xl flex flex-col pointer-events-auto">
           {attachedImage && (
             <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-black/[0.04] group animate-in slide-in-from-bottom-2 fade-in mb-3 ml-4">
