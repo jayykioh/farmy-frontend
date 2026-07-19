@@ -84,8 +84,8 @@ export function resolveAnchor(
   // Special case: Glasses are currently categorized as 'HAT' in the backend 
   // but need the GLASSES visual slot positioning
   const isGlasses = 
-    item.name?.toLowerCase().includes('kính') || 
-    item._id?.includes('kinh');
+    (item.name || '').toLowerCase().includes('kính') || 
+    (item._id || '').includes('kinh');
     
   if (isGlasses && slot === 'HAT') {
     slot = 'GLASSES';
