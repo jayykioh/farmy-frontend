@@ -34,6 +34,7 @@ export const PlantScan: React.FC = () => {
   const [uploadPlantScan] = useUploadPlantScanMutation();
 
   const stopCamera = useCallback(() => {
+    cameraRequestRef.current += 1;
     setStream((prevStream) => {
       if (prevStream) {
         prevStream.getTracks().forEach((track) => track.stop());
@@ -43,9 +44,9 @@ export const PlantScan: React.FC = () => {
   }, []);
 
   const startCamera = useCallback(async () => {
+    stopCamera();
     const requestId = cameraRequestRef.current + 1;
     cameraRequestRef.current = requestId;
-    stopCamera();
     
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
