@@ -126,44 +126,72 @@ export const ChatList: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full min-h-[100svh] bg-[#fbfbfd] text-left font-sans pb-[100px] overflow-x-hidden">
-      {/* Custom Spotify-Style Header */}
-      <header className="relative w-full h-[300px] md:h-[380px] overflow-hidden mb-0 flex-shrink-0">
-        {/* Background Image — cánh đồng lúa hoàng hôn */}
-        <img 
-          src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=85&w=1600&auto=format&fit=crop&crop=center" 
-          className="absolute inset-0 w-full h-full object-cover object-center scale-105"
-          alt="Farm Background"
-        />
-        {/* Layer 1: top dark for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent"></div>
-        {/* Layer 2: Spotify-style bottom fade into page color */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd]/10 to-transparent"></div>
-        {/* Layer 3: warm tint for brand feel */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1d1d1f]/30 to-transparent"></div>
-        
-        {/* Content — anchored near bottom, before the fade */}
-        <div className="absolute left-0 right-0 bottom-10 px-6 md:px-10 flex items-end justify-between z-10 max-w-4xl mx-auto w-full">
-          <div className="flex flex-col gap-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-black/30 backdrop-blur-sm px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-white/90 w-fit border border-white/10">
-              <Leaf className="h-3 w-3" />
+    <div className="w-full h-full min-h-[100svh] bg-[#fbfbfd] text-left font-sans pb-[100px] overflow-x-hidden relative">
+      {/* Subtle background glow to reduce emptiness */}
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-[#34C759]/[0.03] to-transparent pointer-events-none" />
+      <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-[#007AFF]/[0.02] blur-[120px] rounded-full pointer-events-none" />
+      
+      {/* Apple-Style Clean Header */}
+      <header className="relative w-full pt-16 md:pt-24 pb-8 md:pb-12 px-6 md:px-10 flex flex-col items-center md:items-start max-w-4xl mx-auto z-10">
+        <div className="flex flex-col md:flex-row items-center md:items-end justify-between w-full gap-6 md:gap-0">
+          <div className="flex flex-col gap-2 items-center md:items-start text-center md:text-left">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-white/80 backdrop-blur-xl border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.04)] px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-[#86868b] w-fit">
+              <Leaf className="h-3.5 w-3.5 text-[#34C759]" />
               Sổ tay đồng áng
             </div>
-            <h1 className="text-[36px] md:text-[52px] font-black leading-[1.05] tracking-[-0.03em] text-white" style={{textShadow: '0 1px 24px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4)'}}>
+            <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight text-[#1d1d1f] leading-tight">
               Lịch sử tư vấn
             </h1>
-            <p className="text-[14px] font-medium text-white/80" style={{textShadow: '0 1px 8px rgba(0,0,0,0.5)'}}>
+            <p className="text-[15px] font-medium text-[#86868b]">
               Xem lại các ghi chú canh tác cùng Bé Thóc.
             </p>
           </div>
           
-          <div className="hidden sm:block w-28 h-28 md:w-36 md:h-36">
-             <PetMascot status={petStatus} size={144} className="drop-shadow-2xl" />
+          <div className="w-24 h-24 md:w-32 md:h-32 bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-[28px] p-2 flex items-center justify-center">
+             <PetMascot status={petStatus} size={110} className="drop-shadow-xl" />
           </div>
         </div>
       </header>
 
       <main className="w-full max-w-4xl mx-auto px-4 md:px-8 pb-12 min-h-[50svh] flex flex-col relative z-20">
+        
+        {/* Quick Suggestions / Layout Enhancement */}
+        <section className="mb-10 px-2 md:px-4">
+          <h2 className="text-[13px] font-bold uppercase tracking-widest text-[#86868b] mb-4">Gợi ý cho bạn</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+            <button 
+              onClick={() => navigate('/chat/active')} 
+              className="group flex flex-col text-left p-4 rounded-[24px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-[14px] bg-[#E8F8F5] flex items-center justify-center mb-3 group-hover:bg-[#34C759] transition-colors duration-300">
+                <Leaf className="w-5 h-5 text-[#248A3D] group-hover:text-white transition-colors duration-300" />
+              </div>
+              <h3 className="text-[16px] font-bold text-[#1d1d1f] mb-1">Cách ủ phân hữu cơ</h3>
+              <p className="text-[13px] text-[#86868b] line-clamp-2">Hướng dẫn chi tiết cách tận dụng phế phẩm nông nghiệp.</p>
+            </button>
+            <button 
+              onClick={() => navigate('/chat/active')} 
+              className="group flex flex-col text-left p-4 rounded-[24px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-[14px] bg-[#FFF3E0] flex items-center justify-center mb-3 group-hover:bg-[#FF9500] transition-colors duration-300">
+                <AlertCircle className="w-5 h-5 text-[#E67300] group-hover:text-white transition-colors duration-300" />
+              </div>
+              <h3 className="text-[16px] font-bold text-[#1d1d1f] mb-1">Bệnh vàng lá thối rễ</h3>
+              <p className="text-[13px] text-[#86868b] line-clamp-2">Dấu hiệu nhận biết sớm và biện pháp xử lý kịp thời.</p>
+            </button>
+            <button 
+              onClick={() => navigate('/chat/active')} 
+              className="group hidden sm:flex flex-col text-left p-4 rounded-[24px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-[14px] bg-[#E5F1FF] flex items-center justify-center mb-3 group-hover:bg-[#007AFF] transition-colors duration-300">
+                <MessageCircle className="w-5 h-5 text-[#0066CC] group-hover:text-white transition-colors duration-300" />
+              </div>
+              <h3 className="text-[16px] font-bold text-[#1d1d1f] mb-1">Tối ưu lịch tưới</h3>
+              <p className="text-[13px] text-[#86868b] line-clamp-2">Lên lịch tưới phù hợp với từng giai đoạn sinh trưởng.</p>
+            </button>
+          </div>
+        </section>
+
         <div className="flex justify-between items-center mb-6 px-2 md:px-4">
           <h2 className="text-[20px] font-bold text-[#1d1d1f]">Gần đây</h2>
           <button 
@@ -186,11 +214,11 @@ export const ChatList: React.FC = () => {
             {errorMessage}
           </div>
         ) : sessions.length > 0 ? (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-3">
             {sessions.map(session => (
               <article
                 key={session._id}
-                className="group relative flex flex-col rounded-[20px] transition-all duration-200 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-transparent hover:border-black/[0.04]"
+                className="group relative flex flex-col rounded-[24px] bg-white/60 backdrop-blur-xl transition-all duration-300 hover:bg-white hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 border border-white/50 hover:border-white"
               >
                 <div className="flex items-center justify-between gap-4 p-4 md:px-5 md:py-4">
                   {editingSessionId === session._id ? (
@@ -241,7 +269,7 @@ export const ChatList: React.FC = () => {
                         className="min-w-0 flex-1 flex flex-col text-left cursor-pointer"
                       >
                         <div className="flex items-center gap-2 mb-1.5">
-                          <span className="inline-flex items-center gap-1.5 rounded-md bg-white border border-black/[0.04] shadow-sm px-2 py-0.5 text-[11px] font-semibold text-[#1d1d1f]">
+                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-black/[0.04] shadow-sm px-2.5 py-1 text-[11px] font-bold text-[#1d1d1f]">
                             <MessageCircle className="h-3.5 w-3.5 text-[#34C759]" />
                             Bé Thóc
                           </span>
@@ -249,7 +277,7 @@ export const ChatList: React.FC = () => {
                             {formatRelativeDate(session.last_message_at ?? session.updated_at ?? session.created_at)}
                           </span>
                         </div>
-                        <h3 className="text-[17px] font-semibold leading-snug tracking-tight text-[#1d1d1f] truncate group-hover:text-[#34C759] transition-colors">
+                        <h3 className="text-[17px] font-bold leading-snug tracking-tight text-[#1d1d1f] truncate transition-colors">
                           {session.title || 'Cuộc trò chuyện với Bé Thóc'}
                         </h3>
                         <p className="mt-1 line-clamp-1 text-[14px] font-medium text-[#86868b] w-full">
@@ -258,12 +286,12 @@ export const ChatList: React.FC = () => {
                       </div>
 
                       {/* Actions show on hover */}
-                      <div className="opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0 bg-[#fbfbfd]/80 backdrop-blur-sm group-hover:bg-white/80 p-1 rounded-full">
+                      <div className="opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0 bg-white/50 backdrop-blur-md group-hover:bg-white shadow-sm border border-black/[0.03] p-1.5 rounded-full">
                         <button
                           type="button"
                           aria-label="Đổi tên cuộc trò chuyện"
                           onClick={(e) => { e.stopPropagation(); startEditingSession(session); }}
-                          className="p-2.5 rounded-full text-[#86868b] transition-all hover:bg-black/[0.04] hover:text-[#1d1d1f] active:scale-95 cursor-pointer"
+                          className="p-2 rounded-full text-[#86868b] transition-all hover:bg-black/[0.04] hover:text-[#1d1d1f] active:scale-95 cursor-pointer"
                         >
                           <Pencil className="h-[18px] w-[18px]" />
                         </button>
@@ -271,7 +299,7 @@ export const ChatList: React.FC = () => {
                           type="button"
                           aria-label="Xóa cuộc trò chuyện"
                           onClick={(e) => { e.stopPropagation(); setConfirmingSessionId(session._id); }}
-                          className="p-2.5 rounded-full text-[#86868b] transition-all hover:bg-red-50 hover:text-[#FF3B30] active:scale-95 cursor-pointer"
+                          className="p-2 rounded-full text-[#86868b] transition-all hover:bg-red-50 hover:text-[#FF3B30] active:scale-95 cursor-pointer"
                         >
                           <Trash2 className="h-[18px] w-[18px]" />
                         </button>

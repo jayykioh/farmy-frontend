@@ -36,7 +36,7 @@ export const PWAInstallBanner: React.FC = () => {
             Cài đặt ứng dụng
           </h4>
           <p className="text-[13px] text-slate-500 font-medium leading-snug pr-4">
-            Thêm FarmDiaries vào màn hình chính để truy cập nhanh chóng.
+            Thêm FARMY vào màn hình chính để truy cập nhanh chóng.
           </p>
           
           <div className="flex gap-2 mt-3">

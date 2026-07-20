@@ -34,6 +34,7 @@ export interface DiaryLog {
   content: string;
   image_url?: string;
   photo_urls?: string[];
+  activity_at?: string;
   created_at: string;
 }
 

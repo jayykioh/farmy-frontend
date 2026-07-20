@@ -34,14 +34,14 @@ export const Sidebar: React.FC = () => {
       ];
 
   return (
-    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-[#fbfbfd] border-r border-black/[0.05] z-50">
+    <aside className="hidden md:flex flex-col w-[260px] h-[100svh] fixed left-0 top-0 bg-[#FBFBFD]/80 backdrop-blur-3xl border-r border-black/[0.05] z-50">
       
       {/* Brand / Logo */}
       <div className="h-16 flex items-center gap-2.5 px-6 mt-4 mb-2">
         <div className="flex items-center justify-center cursor-pointer" onClick={() => navigate('/home')}>
           <Sprout size={24} strokeWidth={2} className="text-[#1d1d1f]" />
         </div>
-        <span className="font-semibold text-[17px] text-[#1d1d1f] tracking-tight cursor-pointer" onClick={() => navigate('/home')}>FarmDiaries</span>
+        <span className="font-semibold text-[17px] text-[#1d1d1f] tracking-tight cursor-pointer" onClick={() => navigate('/home')}>FARMY</span>
       </div>
 
       {/* Navigation Links */}
@@ -54,23 +54,23 @@ export const Sidebar: React.FC = () => {
               to={item.to}
               end={item.to === '/admin' || item.to === '/home'}
               className={({ isActive }) =>
-                `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 outline-none select-none ${
+                `group flex items-center gap-3 px-3.5 py-3 rounded-[14px] transition-all duration-200 outline-none select-none ${
                   isActive
-                    ? 'bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/[0.04] text-[#1d1d1f] font-medium'
-                    : 'text-[#86868b] border border-transparent hover:bg-black/[0.03] hover:text-[#1d1d1f]'
+                    ? 'bg-white/90 backdrop-blur-md shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-white/60 text-[#1d1d1f]'
+                    : 'text-[#86868b] border border-transparent hover:bg-black/[0.04] hover:text-[#1d1d1f]'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <Icon
-                    size={18}
-                    strokeWidth={isActive ? 2 : 1.5}
+                    size={20}
+                    strokeWidth={isActive ? 2.5 : 2}
                     className={`transition-colors duration-200 ${
                       isActive ? 'text-[#1d1d1f]' : 'text-[#86868b] group-hover:text-[#1d1d1f]'
                     }`}
                   />
-                  <span className="text-[14px] leading-none mt-[1px]">{item.label}</span>
+                  <span className={`text-[15px] leading-none mt-[1px] tracking-tight ${isActive ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
                 </>
               )}
             </NavLink>
@@ -79,9 +79,9 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer area inside sidebar */}
-      <div className="p-4 mx-4 mb-6 rounded-2xl bg-white border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex justify-between items-center transition-all duration-300 hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
-        <div className="flex items-center gap-3 cursor-pointer overflow-hidden" onClick={() => navigate('/profile')}>
-          <div className="w-10 h-10 rounded-full bg-[#f5f5f7] border border-black/[0.05] flex items-center justify-center font-semibold text-[#1d1d1f] overflow-hidden shrink-0">
+      <div className="p-4 mx-4 mb-6 rounded-[20px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex justify-between items-center transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5">
+        <div className="flex items-center gap-3 cursor-pointer overflow-hidden group" onClick={() => navigate('/profile')}>
+          <div className="w-10 h-10 rounded-full bg-black/[0.03] border border-black/[0.05] flex items-center justify-center font-bold text-[#1d1d1f] overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (

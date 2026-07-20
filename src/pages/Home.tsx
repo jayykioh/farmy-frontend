@@ -133,15 +133,15 @@ export const Home: React.FC = () => {
             <PetMascot status={{ ...petStatus, bubbleMessage: 'Chào mừng bạn! 🌱' }} size={180} className="relative drop-shadow-xl" />
           </motion.div>
           <div className="flex flex-col gap-2 max-w-xs">
-            <h1 className="text-2xl font-black text-text-h tracking-tight">Chào mừng đến FarmDiaries!</h1>
+            <h1 className="text-2xl font-black text-text-h tracking-tight">Chào mừng đến FARMY!</h1>
             <p className="text-base text-text-main/60 font-medium leading-relaxed">
               Hãy tạo mảnh vườn đầu tiên và bắt đầu vụ mùa để Bé Thóc có thể theo dõi cây trồng cùng bạn.
             </p>
           </div>
           <motion.button
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => openCreateSeason('first-time')}
-            className="flex items-center gap-2 bg-slate-900 text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-shadow duration-200 cursor-pointer"
+            className="flex items-center gap-2 bg-[#1d1d1f] text-white font-extrabold text-[15px] px-8 py-4 rounded-[20px] shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-all duration-300 cursor-pointer"
           >
             <Sprout className="w-5 h-5" />
             Bắt đầu vụ mùa đầu tiên
@@ -175,9 +175,9 @@ export const Home: React.FC = () => {
             {moodReasonMap[petStatus.moodReason] || petStatus.moodReason || '✨ Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.'}
           </p>
           <motion.button
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => openCreateSeason('add-season')}
-            className="flex items-center gap-2 bg-slate-900 text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-shadow duration-200 cursor-pointer"
+            className="flex items-center gap-2 bg-[#1d1d1f] text-white font-extrabold text-[15px] px-8 py-4 rounded-[20px] shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-all duration-300 cursor-pointer"
           >
             <Sprout className="w-5 h-5" />
             Tạo vụ mùa mới
@@ -190,7 +190,7 @@ export const Home: React.FC = () => {
         <>
           {/* Header & Streak */}
           <section className="flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
-            <div className="inline-flex items-center gap-2 bg-white border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.04)] rounded-full px-4 py-1.5 mb-4">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-white/50 shadow-[0_4px_14px_rgba(0,0,0,0.04)] rounded-full px-4 py-1.5 mb-4">
               <Flame className="w-4 h-4 text-[#FF9500] fill-[#FF9500]" />
               <span className="font-semibold text-[#1d1d1f] text-[14px]">{streak} ngày liên tiếp</span>
             </div>
@@ -207,7 +207,7 @@ export const Home: React.FC = () => {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', bounce: 0.4, duration: 0.8 }}
-                className="w-full h-full rounded-[36px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04),0_1px_4px_rgba(0,0,0,0.02)] border border-black/[0.03] flex items-center justify-center p-4 md:p-8"
+                className="w-full h-full rounded-[36px] bg-white/80 backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/60 flex items-center justify-center p-4 md:p-8"
               >
                 <PetMascot status={petStatus} size={220} className="w-full h-full drop-shadow-xl" />
               </motion.div>
@@ -216,7 +216,7 @@ export const Home: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8, x: -20, y: 10 }}
                 animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
                 transition={{ type: 'spring', bounce: 0.5, delay: 0.3 }}
-                className="absolute -top-6 -right-6 md:top-4 md:-right-12 bg-white border border-black/[0.04] rounded-[24px] rounded-bl-sm px-5 py-3.5 shadow-[0_12px_28px_rgba(0,0,0,0.08)] animate-[bounce_4s_ease-in-out_infinite] max-w-[220px] md:max-w-[260px] z-10"
+                className="absolute -top-6 -right-6 md:top-4 md:-right-12 bg-white/90 backdrop-blur-xl border border-white/60 rounded-[24px] rounded-bl-sm px-5 py-3.5 shadow-[0_12px_28px_rgba(0,0,0,0.08)] animate-[bounce_4s_ease-in-out_infinite] max-w-[220px] md:max-w-[260px] z-10"
               >
                 <p className="font-semibold text-[#1d1d1f] text-[13.5px] md:text-[14.5px] leading-snug tracking-tight">
                   {bubbleMessage}
@@ -227,11 +227,14 @@ export const Home: React.FC = () => {
 
           {/* Main CTA Button (Mobile only) */}
           <section className="w-full md:hidden">
-            <Button onClick={() => navigate('/diary/create')} size="lg" fullWidth>
+            <button 
+              onClick={() => navigate('/diary/create')} 
+              className="w-full flex items-center justify-center gap-2 bg-[#1d1d1f] text-white rounded-[20px] py-4 shadow-[0_8px_20px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(0,0,0,0.12)] transition-all duration-300 cursor-pointer active:scale-[0.98]"
+            >
               <PenLine className="w-5 h-5" />
-              <span className="tracking-wide">Ghi nhật ký</span>
-              <span className="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-md text-xs font-semibold border border-white/10">+30XP</span>
-            </Button>
+              <span className="tracking-wide font-extrabold text-[16px]">Ghi nhật ký</span>
+              <span className="ml-1 bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-[8px] text-[11px] font-bold border border-white/10">+30XP</span>
+            </button>
           </section>
 
           {/* 2-column: Reminders + Quick Actions */}
@@ -254,9 +257,9 @@ export const Home: React.FC = () => {
               </div>
 
               {todayReminders.length === 0 ? (
-                <div className="bg-white rounded-[18px] px-4 py-5 border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.02)] text-center flex flex-col items-center justify-center gap-1.5 flex-1 min-h-[220px]">
-                  <span className="text-xl">🌱</span>
-                  <p className="text-[13px] text-[#86868b] font-medium">Hôm nay không có lịch hẹn</p>
+                <div className="bg-white/80 backdrop-blur-xl rounded-[24px] px-4 py-5 border border-white/50 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-center flex flex-col items-center justify-center gap-1.5 flex-1 min-h-[220px]">
+                  <span className="text-2xl drop-shadow-sm">🌱</span>
+                  <p className="text-[14px] text-[#86868b] font-medium">Hôm nay không có lịch hẹn</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -281,46 +284,52 @@ export const Home: React.FC = () => {
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   onClick={() => navigate('/reminders')}
-                  className="group w-full flex items-center gap-4 bg-white rounded-[18px] px-5 py-3.5 border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.02)] cursor-pointer hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:bg-[#f9f9fb] transition-all duration-200 text-left"
+                  className="group w-full flex items-center gap-4 bg-white/80 backdrop-blur-xl rounded-[24px] p-4 border border-white/60 shadow-[0_6px_20px_rgba(0,0,0,0.03)] cursor-pointer hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 text-left"
                 >
-                  <div className="w-10 h-10 rounded-[13px] bg-[#E5F1FF] flex items-center justify-center shrink-0">
-                    <Droplets className="w-5 h-5 text-[#0066CC]" strokeWidth={1.75} />
+                  <div className="w-12 h-12 rounded-[16px] bg-[#007AFF]/10 flex items-center justify-center shrink-0 group-hover:bg-[#007AFF] transition-colors duration-300">
+                    <Droplets className="w-6 h-6 text-[#007AFF] group-hover:text-white transition-colors duration-300" strokeWidth={2} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#1d1d1f] tracking-tight">Tưới nước</p>
-                    <p className="text-[12px] text-[#86868b] font-medium mt-0.5">Đặt lịch tưới hôm nay</p>
+                    <p className="text-[16px] font-bold text-[#1d1d1f] tracking-tight">Tưới nước</p>
+                    <p className="text-[13px] text-[#86868b] font-medium mt-0.5">Đặt lịch tưới hôm nay</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-[#c7c7cc] group-hover:translate-x-0.5 transition-transform shrink-0" />
+                  <div className="w-8 h-8 rounded-full bg-[#f2f2f7] flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all duration-300">
+                    <ChevronRight className="w-4 h-4 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all" />
+                  </div>
                 </motion.button>
 
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   onClick={() => navigate('/scan')}
-                  className="group w-full flex items-center gap-4 bg-white rounded-[18px] px-5 py-3.5 border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.02)] cursor-pointer hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:bg-[#f9f9fb] transition-all duration-200 text-left"
+                  className="group w-full flex items-center gap-4 bg-white/80 backdrop-blur-xl rounded-[24px] p-4 border border-white/60 shadow-[0_6px_20px_rgba(0,0,0,0.03)] cursor-pointer hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 text-left"
                 >
-                  <div className="w-10 h-10 rounded-[13px] bg-[#E8F8F5] flex items-center justify-center shrink-0">
-                    <ScanLine className="w-5 h-5 text-[#248A3D]" strokeWidth={1.75} />
+                  <div className="w-12 h-12 rounded-[16px] bg-[#34C759]/10 flex items-center justify-center shrink-0 group-hover:bg-[#34C759] transition-colors duration-300">
+                    <ScanLine className="w-6 h-6 text-[#34C759] group-hover:text-white transition-colors duration-300" strokeWidth={2} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#1d1d1f] tracking-tight">Quét cây</p>
-                    <p className="text-[12px] text-[#86868b] font-medium mt-0.5">Chẩn đoán sâu bệnh</p>
+                    <p className="text-[16px] font-bold text-[#1d1d1f] tracking-tight">Quét cây</p>
+                    <p className="text-[13px] text-[#86868b] font-medium mt-0.5">Chẩn đoán sâu bệnh</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-[#c7c7cc] group-hover:translate-x-0.5 transition-transform shrink-0" />
+                  <div className="w-8 h-8 rounded-full bg-[#f2f2f7] flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all duration-300">
+                    <ChevronRight className="w-4 h-4 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all" />
+                  </div>
                 </motion.button>
 
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   onClick={() => navigate('/chat')}
-                  className="group w-full flex items-center gap-4 bg-white rounded-[18px] px-5 py-3.5 border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.02)] cursor-pointer hover:shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:bg-[#f9f9fb] transition-all duration-200 text-left"
+                  className="group w-full flex items-center gap-4 bg-white/80 backdrop-blur-xl rounded-[24px] p-4 border border-white/60 shadow-[0_6px_20px_rgba(0,0,0,0.03)] cursor-pointer hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 text-left"
                 >
-                  <div className="w-10 h-10 rounded-[13px] bg-[#FFF3E0] flex items-center justify-center shrink-0">
-                    <MessageSquare className="w-5 h-5 text-[#E67300]" strokeWidth={1.75} />
+                  <div className="w-12 h-12 rounded-[16px] bg-[#1d1d1f]/5 flex items-center justify-center shrink-0 group-hover:bg-[#1d1d1f] transition-colors duration-300">
+                    <MessageSquare className="w-6 h-6 text-[#1d1d1f] group-hover:text-white transition-colors duration-300" strokeWidth={2} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#1d1d1f] tracking-tight">Trợ lý AI</p>
-                    <p className="text-[12px] text-[#86868b] font-medium mt-0.5">Hỏi Bé Thóc ngay</p>
+                    <p className="text-[16px] font-bold text-[#1d1d1f] tracking-tight">Trợ lý</p>
+                    <p className="text-[13px] text-[#86868b] font-medium mt-0.5">Hỏi Bé Thóc ngay</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-[#c7c7cc] group-hover:translate-x-0.5 transition-transform shrink-0" />
+                  <div className="w-8 h-8 rounded-full bg-[#f2f2f7] flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all duration-300">
+                    <ChevronRight className="w-4 h-4 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all" />
+                  </div>
                 </motion.button>
 
               </div>
@@ -341,7 +350,7 @@ export const Home: React.FC = () => {
           </h3>
           <button
             onClick={() => navigate('/farm-feed')}
-            className="group text-[#34C759] font-semibold text-[13px] flex items-center gap-1 active:scale-95 transition-all duration-200 hover:opacity-70"
+            className="group text-[#86868b] hover:text-[#1d1d1f] font-semibold text-[13px] flex items-center gap-1 active:scale-95 transition-all duration-200"
           >
             Xem tất cả
             <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

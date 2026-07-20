@@ -1,6 +1,7 @@
 import type { AppDispatch } from '../store';
 import { baseApi } from '../store/api/baseApi';
 import { api } from '../api/client';
+import { uploadImageToR2 } from '../api/uploads';
 import { queryClient } from './queryClient';
 import { PET_STATUS_QUERY_KEY } from '../features/pet/hooks/usePetStatus';
 import {
@@ -80,12 +81,20 @@ const syncDraft = async (draft: OfflineDiaryDraft, dispatch?: AppDispatch) => {
   }));
 
   try {
+    const uploadedUrls: string[] = [];
+    for (const blob of draft.imageBlobs ?? []) {
+      const upload = await uploadImageToR2('diary', blob);
+      if (upload.publicUrl) uploadedUrls.push(upload.publicUrl);
+    }
+    const imageUrl = uploadedUrls[0] ?? draft.imageUrls?.[0];
+
     const response = await api.post<DiaryLogResponse>(
       `/diaries/${draft.diaryId}/logs`,
       {
         activity_type: draft.activityType,
         content: draft.content,
-        image_url: draft.imageUrls?.[0],
+        activity_at: draft.diaryDate,
+        image_url: imageUrl,
       },
       {
         headers: {

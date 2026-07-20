@@ -26,7 +26,7 @@ export const UploadRAGModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) 
     try {
       if (uploadType === 'file') {
         if (!file) {
-          toast.error('Vui lòng chọn file (.pdf, .docx, .txt, .json)');
+          toast.error('Vui lòng chọn file (.pdf, .docx, .json)');
           setLoading(false);
           return;
         }
@@ -126,7 +126,7 @@ export const UploadRAGModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) 
                       type="file"
                       id="rag-file"
                       className="hidden"
-                      accept=".pdf,.docx,.doc,.txt,.json"
+                      accept=".pdf,.docx,.json"
                       onChange={(e) => setFile(e.target.files?.[0] || null)}
                     />
                     <label htmlFor="rag-file" className="cursor-pointer flex flex-col items-center">
@@ -134,7 +134,7 @@ export const UploadRAGModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) 
                       <span className="text-[14px] font-bold text-[#1d1d1f]">
                         {file ? file.name : 'Nhấn để chọn file'}
                       </span>
-                      <span className="text-[12px] text-[#86868b] mt-1">Hỗ trợ PDF, DOCX, TXT, JSON (Tối đa 10MB)</span>
+                      <span className="text-[12px] text-[#86868b] mt-1">Hỗ trợ PDF, DOCX, JSON (Tối đa 10MB)</span>
                     </label>
                   </div>
                 </div>

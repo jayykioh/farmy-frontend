@@ -90,7 +90,7 @@ export const NotificationConsentOverlay: React.FC<Props> = ({ userId, onDismiss 
       <header className="fixed top-4 left-4 right-4 z-50 flex items-center justify-between mx-auto max-w-[1024px]">
         <div className="w-10 h-10" /> {/* Spacer */}
         <div className="flex h-10 items-center justify-center rounded-full bg-white/80 px-5 backdrop-blur-md shadow-sm border border-slate-200/50">
-          <span className="text-sm font-extrabold text-slate-800 tracking-tight">FarmDiaries</span>
+          <span className="text-sm font-extrabold text-slate-800 tracking-tight">FARMY</span>
         </div>
         <div className="w-10 h-10" /> {/* Spacer */}
       </header>

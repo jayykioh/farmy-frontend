@@ -45,7 +45,7 @@ const unwrapUploadResponse = (response: SignedUploadResponse): SignedUpload => {
   };
 };
 
-export const validateImageFile = (file: File) => {
+export const validateImageFile = (file: File | Blob) => {
   if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
     throw new Error('Chỉ hỗ trợ ảnh JPG, PNG hoặc WebP.');
   }
@@ -55,19 +55,20 @@ export const validateImageFile = (file: File) => {
   }
 };
 
-export const requestSignedUploadUrl = async (target: UploadTarget, file: File) => {
+export const requestSignedUploadUrl = async (target: UploadTarget, file: File | Blob) => {
   validateImageFile(file);
+  const fileName = file instanceof File ? file.name : 'diary-image.jpg';
 
   const endpoint = target === 'diary' ? '/diaries/upload-url' : '/snaps/upload-url';
   const { data } = await api.post<SignedUploadResponse>(endpoint, {
-    filename: file.name,
+    fileName,
     contentType: file.type,
   });
 
   return unwrapUploadResponse(data);
 };
 
-export const uploadImageToR2 = async (target: UploadTarget, file: File) => {
+export const uploadImageToR2 = async (target: UploadTarget, file: File | Blob) => {
   const signedUpload = await requestSignedUploadUrl(target, file);
 
   await axios.put(signedUpload.signedUrl, file, {

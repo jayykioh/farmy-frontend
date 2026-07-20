@@ -16,8 +16,8 @@ export const HelpSupport: React.FC = () => {
     {
       id: 1,
       category: 'Bắt đầu',
-      question: 'FarmDiaries AI là gì?',
-      answer: 'FarmDiaries AI là ứng dụng chăm sóc nông trại toàn diện, giúp bạn ghi nhật ký nông trại, chẩn đoán bệnh cây bằng AI, và nhận tư vấn từ Bé Thóc - trợ lý ảo thông minh của bạn.'
+      question: 'FARMY AI là gì?',
+      answer: 'FARMY AI là ứng dụng chăm sóc nông trại toàn diện, giúp bạn ghi nhật ký nông trại, chẩn đoán bệnh cây bằng AI, và nhận tư vấn từ Bé Thóc - trợ lý ảo thông minh của bạn.'
     },
     {
       id: 2,
@@ -71,7 +71,7 @@ export const HelpSupport: React.FC = () => {
       id: 10,
       category: 'Khác',
       question: 'Dữ liệu của tôi có an toàn không?',
-      answer: 'Có. FarmDiaries AI sử dụng mã hóa tiêu chuẩn để bảo vệ dữ liệu của bạn. Chúng tôi không bao giờ chia sẻ thông tin cá nhân của bạn với bên thứ ba.'
+      answer: 'Có. FARMY AI sử dụng mã hóa tiêu chuẩn để bảo vệ dữ liệu của bạn. Chúng tôi không bao giờ chia sẻ thông tin cá nhân của bạn với bên thứ ba.'
     }
   ];
 
@@ -120,7 +120,7 @@ export const HelpSupport: React.FC = () => {
           <p className="text-base text-text-main/70 mb-4">Không tìm thấy câu trả lời? Liên hệ với chúng tôi qua email hỗ trợ.</p>
           <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
             <a 
-              href="mailto:support@farmdiary.ai"
+              href="mailto:support@farmy.ai"
               className="flex items-center justify-center gap-2 bg-primary text-white font-bold rounded-full px-6 py-3 shadow-sm hover:bg-primary-container transition-colors cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

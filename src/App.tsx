@@ -100,6 +100,7 @@ export function App() {
               <Route element={<ProtectedRoute />}>
                 <Route path="/home" element={<Home />} />
                 <Route path="/diary" element={<DiaryList />} />
+                <Route path="/diary/history/:id" element={<DiaryHistory />} />
                 <Route path="/diary/history" element={<DiaryHistory />} />
                 <Route path="/diary-history" element={<DiaryHistory />} />
                 <Route path="/diary/create" element={<CreateDiary />} />

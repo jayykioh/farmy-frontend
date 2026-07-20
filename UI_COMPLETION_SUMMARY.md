@@ -1,4 +1,4 @@
-# FarmDiaries AI - UI Completion & Fixes Summary
+# FARMY AI - UI Completion & Fixes Summary
 
 ## 🎯 Tasks Completed
 
@@ -74,7 +74,7 @@
   - Khác (Other)
   
 - **10 Pre-loaded FAQs** covering:
-  - What is FarmDiaries AI?
+  - What is FARMY AI?
   - Account creation
   - How to write diary entries
   - PlantScan functionality
@@ -281,7 +281,7 @@ The UI is now ready for backend integration:
 ## ✨ Final Notes
 
 - All pages are fully responsive (mobile-first design)
-- Consistent with FarmDiaries AI brand and design language
+- Consistent with FARMY AI brand and design language
 - Ready for feature flags and A/B testing
 - Follow React best practices with functional components
 - State management using React hooks (useState)

@@ -1,4 +1,4 @@
-# FarmDiaries AI 🌱
+# FARMY AI 🌱
 ### Enterprise-Grade Smart Agriculture & Vision-Powered Farming Platform
 **Capstone Project for Course SDN392** • 
 
@@ -9,7 +9,7 @@
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20First%20%7C%20Vite-green.svg)](https://vitejs.dev/)
 [![Security](https://img.shields.io/badge/Security-Helmet%20%7C%20Supabase%20Auth%20%7C%20AES--256-red.svg)](https://supabase.com/)
 
-**FarmDiaries AI** is a production-grade, AI-driven agricultural diary web application designed specifically for Vietnamese farmers. It combines visual plant disease scanning, smart chat-based agronomy assistance (RAG), gamified farm companion pets to encourage daily logging habits, and Zalo OA messaging integration to deliver real-time notifications and alerts directly into the rural digital ecosystem.
+**FARMY AI** is a production-grade, AI-driven agricultural diary web application designed specifically for Vietnamese farmers. It combines visual plant disease scanning, smart chat-based agronomy assistance (RAG), gamified farm companion pets to encourage daily logging habits, and Zalo OA messaging integration to deliver real-time notifications and alerts directly into the rural digital ecosystem.
 
 ---
 
@@ -88,16 +88,16 @@
 NestJS was chosen to enforce **Modular Clean Architecture** and **Dependency Injection (DI)** across our 4-person team. NestJS enforces code consistency out-of-the-box, ensuring type safety (TypeScript-first), simple mock testing, and a highly scalable modular design that prevents technical debt when scaling the project.
 
 ### MongoDB-First Database Strategy
-The backend is now designed around MongoDB Atlas as the primary application database. Diary entries, users, pet state, plant scans, chat sessions, reminders, insights, audit logs, and RAG chunks are modeled as MongoDB collections. Redis remains dedicated to cache, rate limits, locks, and BullMQ jobs. For the full rationale and feature mapping, see [mongodb_stack_analysis.md](file:///d:/coding/farmdiary/openspec/specs/mongodb_stack_analysis.md).
+The backend is now designed around MongoDB Atlas as the primary application database. Diary entries, users, pet state, plant scans, chat sessions, reminders, insights, audit logs, and RAG chunks are modeled as MongoDB collections. Redis remains dedicated to cache, rate limits, locks, and BullMQ jobs. For the full rationale and feature mapping, see [mongodb_stack_analysis.md](file:///d:/coding/farmy/openspec/specs/mongodb_stack_analysis.md).
 
 ---
 
 ## 📂 Project Structure
 
-This is the frontend repository of the **FarmDiaries AI** ecosystem (`farmdiaries-fe`). The backend has been separated into its own repository.
+This is the frontend repository of the **FARMY AI** ecosystem (`farmy-fe`). The backend has been separated into its own repository.
 
 ```
-farmdiary/
+farmy/
 ├── openspec/                     # Design specs, API schema, & Technical Blueprint
 │   └── specs/mongodb_stack_analysis.md # MongoDB-first backend source of truth
 ├── public/                       # PWA static assets
@@ -118,7 +118,7 @@ farmdiary/
 
 ### Prerequisites
 * Node.js v20.x
-* Backend API service running (refer to [CREATE_BACKEND_REPO.md](file:///d:/coding/farmdiary/CREATE_BACKEND_REPO.md) for backend repository setup)
+* Backend API service running (refer to [CREATE_BACKEND_REPO.md](file:///d:/coding/farmy/CREATE_BACKEND_REPO.md) for backend repository setup)
 
 ### Setup & Run
 1. Install dependencies at the root directory:
