@@ -20,4 +20,29 @@ describe('API client base URL', () => {
 
     expect(api.defaults.baseURL).toBe('http://localhost:3000/api/v1');
   });
+
+  it('disables the default JSON content type for FormData uploads', async () => {
+    const api = await loadClientWithApiUrl('https://farmy-backend.example.com');
+    const formData = new FormData();
+    formData.append('image', new File(['leaf'], 'leaf.png', { type: 'image/png' }));
+    formData.append('crop_type', 'Lúa');
+
+    let capturedContentType: unknown;
+    await api.post('/auth/login', formData, {
+      adapter: async (config) => {
+        capturedContentType = config.headers.get?.('Content-Type');
+
+        return {
+          data: { success: true },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
+          request: {},
+        };
+      },
+    });
+
+    expect(capturedContentType).toBe(false);
+  });
 });

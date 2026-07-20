@@ -19,6 +19,22 @@ const normalizeApiBaseUrl = (apiUrl?: string) => {
 
 const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
 
+export const isFormDataPayload = (data: unknown): data is FormData =>
+  typeof FormData !== 'undefined' && data instanceof FormData;
+
+const removeContentTypeHeader = (headers: InternalAxiosRequestConfig['headers']) => {
+  if (!headers) return;
+
+  if (typeof headers.delete === 'function') {
+    headers.set('Content-Type', false);
+    return;
+  }
+
+  const mutableHeaders = headers as Record<string, unknown>;
+  mutableHeaders['Content-Type'] = false;
+  delete mutableHeaders['content-type'];
+};
+
 // ─── API Logger ──────────────────────────────────────────────────────────────
 // Always-on logger for debugging FE ↔ BE integration across different DNS/envs.
 const LOG_PREFIX = '[API]';
@@ -46,6 +62,16 @@ const logger = {
       console.log('🔍 Params    :', config.params);
     }
     if (config.data) {
+      if (isFormDataPayload(config.data)) {
+        console.log('📦 Body      :', {
+          type: 'FormData',
+          fields: Array.from(config.data.keys()),
+        });
+        console.log('⚙️  Timeout   :', config.timeout, 'ms');
+        console.groupEnd();
+        return;
+      }
+
       try {
         const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
         // mask password fields
@@ -213,6 +239,10 @@ const requestTimestamps = new Map<string, number>();
 
 api.interceptors.request.use(async (config) => {
   const accessToken = getAccessToken();
+
+  if (isFormDataPayload(config.data)) {
+    removeContentTypeHeader(config.headers);
+  }
 
   if (accessToken && config.headers) {
     config.headers.Authorization = `Bearer ${accessToken}`;
