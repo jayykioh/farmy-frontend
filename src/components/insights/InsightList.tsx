@@ -78,7 +78,7 @@ export const InsightList: React.FC = () => {
         message: 'Hệ thống đang thu thập và tổng hợp thông tin từ nhật ký vụ mùa của bạn. Vui lòng đợi trong giây lát.',
       });
     },
-    onSuccess: (result) => {
+    onSuccess: async (result, diaryId) => {
       // Nếu tuần này đã có insight → hiển thị thông báo info
       if (result.already_exists) {
         setIsGenerating(false);
@@ -89,13 +89,38 @@ export const InsightList: React.FC = () => {
         });
         return;
       }
-      // Chờ đủ thời gian BullMQ + Gemini xử lý (~20s) rồi mới refresh
-      setTimeout(() => {
-        void queryClient.invalidateQueries({ queryKey: ['weekly-insights'] }).then(() => {
-          setIsGenerating(false);
-          setModalConfig(null);
-        });
-      }, 20000);
+      try {
+        // Poll kết quả thật thay vì đóng modal sau một timeout cố định.
+        for (let attempt = 0; attempt < 30; attempt += 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 2000));
+          const latestInsights = await fetchWeeklyInsights(20);
+          const generated = latestInsights.some(
+            (insight) =>
+              insight.diary_id === diaryId &&
+              (!result.week_start_date ||
+                insight.week_start_date === result.week_start_date),
+          );
+          if (generated) {
+            queryClient.setQueryData(['weekly-insights'], latestInsights);
+            setIsGenerating(false);
+            setModalConfig({
+              type: 'info',
+              title: 'Báo cáo đã sẵn sàng ✅',
+              message: 'Báo cáo tuần của mùa vụ đã được tạo thành công.',
+            });
+            return;
+          }
+        }
+      } catch (pollError) {
+        console.error('Polling insight failed:', pollError);
+      }
+
+      setIsGenerating(false);
+      setModalConfig({
+        type: 'error',
+        title: 'Chưa tạo được báo cáo',
+        message: 'Hệ thống chưa nhận được kết quả sau 60 giây. Bạn có thể đóng thông báo và thử tạo lại.',
+      });
     },
     onError: (error: any) => {
       console.error('Trigger insight failed:', error);
@@ -187,6 +212,14 @@ export const InsightList: React.FC = () => {
                   className="w-full py-3 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer"
                 >
                   Đóng
+                </button>
+              )}
+              {modalConfig.type === 'loading' && (
+                <button
+                  onClick={() => setModalConfig(null)}
+                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Ẩn và tiếp tục xử lý nền
                 </button>
               )}
             </motion.div>
