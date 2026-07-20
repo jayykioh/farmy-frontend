@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronDown, Camera, Droplets, FlaskConical, BugOff, Save, Sprout, X } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
 import { PetMascot } from '../features/pet/components/PetMascot';
@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 
 export const CreateDiary: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
   const userId = useAuthStore((state) => state.user?.id);
   const { data: diaries = [], isLoading: fetching } = useGetDiariesQuery();
@@ -31,8 +32,9 @@ export const CreateDiary: React.FC = () => {
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showCreateSeason, setShowCreateSeason] = useState(false);
+  const diaryIdParam = searchParams.get('diaryId') || '';
   const activeDiaries = diaries.filter((d) => d.status === 'active');
-  const activeDiaryId = selectedDiaryId || activeDiaries[0]?._id || '';
+  const activeDiaryId = selectedDiaryId || (activeDiaries.some((d) => d._id === diaryIdParam) ? diaryIdParam : '') || activeDiaries[0]?._id || '';
 
   const selectedDiary = useMemo(
     () => diaries.find((diary) => diary._id === activeDiaryId),

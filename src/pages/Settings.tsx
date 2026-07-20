@@ -195,7 +195,7 @@ export const Settings: React.FC = () => {
 
         {/* App Version */}
         <div className="text-center py-6">
-          <p className="text-sm text-text-main/50">FarmDiaries AI v1.0.0</p>
+          <p className="text-sm text-text-main/50">FARMY AI v1.0.0</p>
         </div>
       </main>
     </div>

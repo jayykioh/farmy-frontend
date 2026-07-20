@@ -10,7 +10,7 @@ interface MaintenanceModeProps {
 export const MaintenanceMode: React.FC<MaintenanceModeProps> = ({
   estimatedTime = '30 phút',
   message = 'Bé Thóc đang được cập nhật',
-  contactEmail = 'support@farmdiary.ai',
+  contactEmail = 'support@farmy.ai',
 }) => {
   return (
     <div className="w-full min-h-[100svh] bg-[#FBFBFD] flex flex-col items-center justify-center px-4 py-8">
@@ -80,7 +80,7 @@ export const MaintenanceMode: React.FC<MaintenanceModeProps> = ({
             Gửi email để nhận thông báo khi chúng tôi trở lại online
           </p>
           <a 
-            href={`mailto:${contactEmail}?subject=Notify me when FarmDiary is back online`}
+            href={`mailto:${contactEmail}?subject=Notify me when FARMY is back online`}
             className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
           >
             <Mail className="w-4 h-4" />

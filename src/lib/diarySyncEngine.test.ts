@@ -15,6 +15,10 @@ vi.mock('../store/api/baseApi', () => ({
   },
 }));
 
+vi.mock('../api/uploads', () => ({
+  uploadImageToR2: vi.fn(),
+}));
+
 vi.mock('./indexedDB', () => ({
   DIARY_SYNC_LOCK_KEY: 'diary-sync',
   claimSyncLease: vi.fn(),
@@ -26,6 +30,7 @@ vi.mock('./indexedDB', () => ({
 }));
 
 import { api } from '../api/client';
+import { uploadImageToR2 } from '../api/uploads';
 import { baseApi } from '../store/api/baseApi';
 import {
   claimSyncLease,
@@ -94,6 +99,7 @@ describe('diarySyncEngine', () => {
       {
         activity_type: 'Water',
         content: 'Watered today',
+        activity_at: '2026-07-12T03:30:00.000Z',
         image_url: 'https://example.test/image.jpg',
       },
       {
@@ -120,5 +126,32 @@ describe('diarySyncEngine', () => {
       attemptCount: 0,
       serverLogId: undefined,
     });
+  });
+
+  it('uploads offline image blobs before creating a remote diary log', async () => {
+    const imageDraft = {
+      ...baseDraft,
+      imageBlobs: [new Blob(['image'], { type: 'image/jpeg' })],
+      imageUrls: [],
+    };
+
+    vi.mocked(claimSyncLease).mockResolvedValue(true);
+    vi.mocked(recoverStaleSyncingDrafts).mockResolvedValue(0);
+    vi.mocked(listSyncableDiaryDrafts).mockResolvedValue([imageDraft]);
+    vi.mocked(updateOfflineDiaryDraft).mockImplementation(async (_id, updater) => updater(imageDraft));
+    vi.mocked(uploadImageToR2).mockResolvedValue({
+      signedUrl: 'https://upload.test',
+      publicUrl: 'https://cdn.test/diary.jpg',
+    });
+    vi.mocked(api.post).mockResolvedValue({ data: { data: { _id: 'server-log-1' } } });
+
+    await runDiarySync('user-a', vi.fn());
+
+    expect(uploadImageToR2).toHaveBeenCalledWith('diary', imageDraft.imageBlobs[0]);
+    expect(api.post).toHaveBeenCalledWith(
+      '/diaries/diary-1/logs',
+      expect.objectContaining({ image_url: 'https://cdn.test/diary.jpg' }),
+      expect.any(Object),
+    );
   });
 });
