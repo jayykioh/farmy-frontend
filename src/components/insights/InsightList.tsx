@@ -4,6 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
 import { InsightCard } from './InsightCard';
 import { Loader2, LightbulbOff, Sparkles } from 'lucide-react';
+import { api } from '../../api/client';
+
+interface DiaryOption {
+  _id: string;
+  crop_type: string;
+  season?: string;
+  status: string;
+}
 
 interface ModalConfig {
   type: 'loading' | 'error' | 'info';
@@ -32,6 +40,20 @@ export const InsightList: React.FC = () => {
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+  const [selectedDiaryId, setSelectedDiaryId] = useState('');
+
+  const { data: diaries = [] } = useQuery<DiaryOption[]>({
+    queryKey: ['diaries', 'insight-options'],
+    queryFn: async () => {
+      const response = await api.get('/diaries');
+      return response.data?.data ?? [];
+    },
+  });
+
+  const effectiveDiaryId = selectedDiaryId
+    || diaries.find((diary) => diary.status === 'active')?._id
+    || diaries[0]?._id
+    || '';
 
   const { data: insights, isLoading, isError } = useQuery({
     queryKey: ['weekly-insights'],
@@ -158,8 +180,8 @@ export const InsightList: React.FC = () => {
           <h3 className="text-text-main font-semibold text-lg mb-2">Chưa có Insight nào</h3>
           <p className="text-text-secondary text-sm mb-6">Hãy ghi nhật ký chăm sóc cây thường xuyên để nhận được tổng hợp và lời khuyên hàng tuần nhé!</p>
           <button
-            onClick={() => triggerMutation.mutate()}
-            disabled={isBusy}
+            onClick={() => triggerMutation.mutate(effectiveDiaryId)}
+            disabled={isBusy || !effectiveDiaryId}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-extrabold text-white bg-slate-950 hover:bg-slate-900 shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
@@ -169,9 +191,23 @@ export const InsightList: React.FC = () => {
       ) : (
         <>
           <div className="flex justify-end px-4 mb-4">
-            <button
-              onClick={() => triggerMutation.mutate()}
+            <select
+              value={effectiveDiaryId}
+              onChange={(event) => setSelectedDiaryId(event.target.value)}
               disabled={isBusy}
+              aria-label="Chọn mùa vụ cần phân tích"
+              className="mr-2 min-w-0 max-w-56 rounded-lg border border-border-main bg-white px-3 py-2 text-xs font-bold text-text-main"
+            >
+              {diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
+              {diaries.map((diary) => (
+                <option key={diary._id} value={diary._id}>
+                  {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => triggerMutation.mutate(effectiveDiaryId)}
+              disabled={isBusy || !effectiveDiaryId}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-extrabold text-white bg-slate-950 hover:bg-slate-900 shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
             >
               {isBusy ? (

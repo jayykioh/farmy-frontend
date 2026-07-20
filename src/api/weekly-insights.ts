@@ -6,6 +6,9 @@ export type WeeklyInsight = {
   week_start_date: string;
   insight_text: string;
   created_at: string;
+  diary_id?: string;
+  crop_type?: string;
+  season?: string;
 };
 
 // Check standard response wrapper if applicable. If standard API returns `{ data: T, message: string }`, we adapt it.
@@ -18,7 +21,7 @@ export const fetchWeeklyInsights = async (limit: number = 10): Promise<WeeklyIns
   return data.data ? data.data : data; 
 };
 
-export const triggerWeeklyInsight = async (): Promise<{ success: boolean; already_exists?: boolean; message: string }> => {
-  const { data } = await api.post('/weekly-insights/trigger');
+export const triggerWeeklyInsight = async (diaryId: string): Promise<{ success: boolean; already_exists?: boolean; message: string }> => {
+  const { data } = await api.post('/weekly-insights/trigger', { diary_id: diaryId });
   return data;
 };
