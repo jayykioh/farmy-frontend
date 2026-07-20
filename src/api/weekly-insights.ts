@@ -15,13 +15,20 @@ export type WeeklyInsight = {
 // Here we assume standard axios returns { data: responseBody } and nestjs returns array directly.
 export const fetchWeeklyInsights = async (limit: number = 10): Promise<WeeklyInsight[]> => {
   const { data } = await api.get('/weekly-insights', {
-    params: { limit },
+    params: { limit, _t: Date.now() },
   });
   // Adjust if backend wraps it in { data: ... }
   return data.data ? data.data : data; 
 };
 
-export const triggerWeeklyInsight = async (diaryId: string): Promise<{ success: boolean; already_exists?: boolean; message: string }> => {
+export const triggerWeeklyInsight = async (diaryId: string): Promise<{
+  success: boolean;
+  already_exists?: boolean;
+  processing?: boolean;
+  message: string;
+  week_start_date?: string;
+  diary_id?: string;
+}> => {
   const { data } = await api.post('/weekly-insights/trigger', { diary_id: diaryId });
   return data;
 };
