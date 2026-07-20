@@ -48,6 +48,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
   const cameraRequestRef = useRef(0);
 
   const stopCamera = useCallback(() => {
+    cameraRequestRef.current += 1;
     setStream((prevStream) => {
       if (prevStream) {
         prevStream.getTracks().forEach((track) => track.stop());
@@ -63,9 +64,9 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
   }, [photoUrl]);
 
   const startCamera = useCallback(async () => {
+    stopCamera();
     const requestId = cameraRequestRef.current + 1;
     cameraRequestRef.current = requestId;
-    stopCamera();
     setState('idle');
 
     try {
