@@ -306,7 +306,7 @@ export const ChatActive: React.FC = () => {
   return (
     <div className="w-full h-full min-h-[100svh] bg-white text-left font-sans flex flex-col overflow-hidden">
       <PageHeader
-        title="FarmDiaries AI"
+        title="FARMY AI"
         subtitle={isStreaming ? "Bé Thóc đang trả lời" : "Tri Kỷ AI"}
         leftButton="back"
         rightButton="camera"

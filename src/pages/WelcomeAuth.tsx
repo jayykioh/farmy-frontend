@@ -64,12 +64,6 @@ export const WelcomeAuth: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = () => {
-    void submitLogin({
-      email: 'user@farmy.com',
-      password: 'UserPassword123',
-    });
-  };
 
   const isBusy = isSubmitting;
 
@@ -203,14 +197,7 @@ export const WelcomeAuth: React.FC = () => {
               Continue with Google
             </button>
 
-            <button
-              onClick={handleDemoLogin}
-              type="button"
-              disabled={isBusy}
-              className="w-full cursor-pointer rounded-2xl border border-primary/20 bg-primary/[0.08] px-6 py-3 font-extrabold text-primary-container transition-all hover:-translate-y-0.5 hover:bg-primary/[0.12] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isBusy ? 'Đang kết nối...' : 'Đăng nhập Demo (user@farmy.com)'}
-            </button>
+
           </form>
           <p className="text-sm text-text-main/60 text-center mt-2">
             Chưa có tài khoản? <button onClick={() => navigate('/register')} className="text-primary font-bold hover:underline cursor-pointer">Đăng ký ngay</button>

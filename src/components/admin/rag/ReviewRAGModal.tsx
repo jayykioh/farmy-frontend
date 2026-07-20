@@ -7,9 +7,11 @@ type RAGFile = {
   _id: string;
   title: string;
   validation_report?: {
-    is_valid: boolean;
-    confidence_score: number;
-    reason: string;
+    score: number;
+    is_agriculture_related: boolean;
+    language_detected: string;
+    category_match: boolean;
+    rejection_reason: string | null;
     warnings: string[];
   };
 };
@@ -28,6 +30,7 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
   if (!isOpen || !file) return null;
 
   const report = file.validation_report;
+  const isValid = report ? report.score >= 40 && report.is_agriculture_related : false;
 
   const handleAction = async (action: 'confirm' | 'reject') => {
     setLoading(true);
@@ -65,10 +68,10 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
                 <h3 className="text-[14px] font-bold text-[#1d1d1f]">Báo cáo từ AI (Gemini)</h3>
                 <div
                   className={`px-3 py-1 rounded-full text-[12px] font-bold ${
-                    report.is_valid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                    isValid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
                   }`}
                 >
-                  {report.is_valid ? 'Hợp lệ' : 'Không hợp lệ'}
+                  {isValid ? 'Hợp lệ' : 'Không hợp lệ'}
                 </div>
               </div>
 
@@ -79,18 +82,29 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
                     <div className="flex-1 h-2 bg-black/[0.04] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
-                          report.confidence_score >= 80 ? 'bg-emerald-500' : report.confidence_score >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                          report.score >= 80 ? 'bg-emerald-500' : report.score >= 50 ? 'bg-amber-500' : 'bg-red-500'
                         }`}
-                        style={{ width: `${report.confidence_score}%` }}
+                        style={{ width: `${report.score}%` }}
                       />
                     </div>
-                    <span className="text-[13px] font-bold">{report.confidence_score}%</span>
+                    <span className="text-[13px] font-bold">{report.score}%</span>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px] font-bold">
+                  <span className={report.is_agriculture_related ? 'text-emerald-700' : 'text-red-700'}>
+                    {report.is_agriculture_related ? 'Liên quan nông nghiệp' : 'Không liên quan nông nghiệp'}
+                  </span>
+                  <span className={report.category_match ? 'text-emerald-700' : 'text-amber-700'}>
+                    {report.category_match ? 'Đúng danh mục' : 'Lệch danh mục'}
+                  </span>
                 </div>
 
                 <div>
                   <div className="text-[12px] font-bold text-[#86868b] mb-1">Lý do / Phân tích</div>
-                  <p className="text-[13px] text-[#1d1d1f] leading-relaxed">{report.reason}</p>
+                  <p className="text-[13px] text-[#1d1d1f] leading-relaxed">
+                    {report.rejection_reason || 'Không có lý do từ chối.'}
+                  </p>
                 </div>
 
                 {report.warnings && report.warnings.length > 0 && (

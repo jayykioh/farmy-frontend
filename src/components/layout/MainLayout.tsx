@@ -35,7 +35,7 @@ export const MainLayout = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
             </svg>
           </button>
-          <h1 className="text-[17px] font-bold text-text-main tracking-tight md:hidden">FarmDiaries AI</h1>
+          <h1 className="text-[17px] font-bold text-text-main tracking-tight md:hidden">FARMY AI</h1>
           <div className="hidden md:flex flex-1 items-center max-w-xl relative">
              <svg className="w-5 h-5 absolute left-3 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

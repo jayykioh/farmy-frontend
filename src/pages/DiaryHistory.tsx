@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Activity, Archive, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout, Trash2, WifiOff } from 'lucide-react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
@@ -33,6 +33,7 @@ type TimelineEntry =
       activityType: string;
       content: string;
       createdAt: string;
+      imageUrl?: string;
       statusLabel: string;
       statusClass: string;
     }
@@ -42,6 +43,7 @@ type TimelineEntry =
       activityType: string;
       content: string;
       createdAt: string;
+      imageUrl?: string;
       statusLabel: string;
       statusClass: string;
       draft: OfflineDiaryDraft;
@@ -74,8 +76,9 @@ const getActivityBg = (activityType: string) => {
 
 export const DiaryHistory: React.FC = () => {
   const navigate = useNavigate();
+  const params = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
-  const diaryIdParam = searchParams.get('diaryId');
+  const diaryIdParam = params.id || searchParams.get('diaryId') || '';
   const userId = useAuthStore((state) => state.user?.id);
   const [offlineDrafts, setOfflineDrafts] = useState<OfflineDiaryDraft[]>([]);
 
@@ -83,13 +86,13 @@ export const DiaryHistory: React.FC = () => {
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
 
   const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();
-  const activeDiaryId = diaryIdParam || (diaries.length > 0 ? diaries[0]._id : undefined);
+  const activeDiaryId = diaryIdParam;
 
-  const { data: diary, isLoading: diaryLoading } = useGetDiaryDetailQuery(activeDiaryId || '', {
+  const { data: diary, isLoading: diaryLoading, isError: diaryError } = useGetDiaryDetailQuery(activeDiaryId || '', {
     skip: !activeDiaryId,
   });
 
-  const { data: logs = [], isLoading: logsLoading } = useGetDiaryLogsQuery(activeDiaryId || '', {
+  const { data: logs = [], isLoading: logsLoading, isError: logsError } = useGetDiaryLogsQuery(activeDiaryId || '', {
     skip: !activeDiaryId,
   });
 
@@ -163,7 +166,8 @@ export const DiaryHistory: React.FC = () => {
       id: log._id,
       activityType: log.activity_type,
       content: log.content,
-      createdAt: log.created_at,
+      createdAt: log.activity_at || log.created_at,
+      imageUrl: log.image_url,
       statusLabel: 'Đã ghi',
       statusClass: 'bg-primary/10 text-primary-container',
     }));
@@ -176,6 +180,7 @@ export const DiaryHistory: React.FC = () => {
           activityType: draft.activityType,
           content: draft.content,
           createdAt: draft.diaryDate,
+          imageUrl: draft.imageUrls?.[0],
           statusLabel: meta.label,
           statusClass: meta.className,
           draft,
@@ -237,6 +242,14 @@ export const DiaryHistory: React.FC = () => {
         {loading ? (
           <div className="py-20 text-center font-bold text-text-main/70">
             Đang tải lịch sử chi tiết...
+          </div>
+        ) : diaryError || logsError ? (
+          <div className="py-20 text-center flex flex-col gap-4 items-center">
+            <Sprout className="w-12 h-12 text-text-main/50" />
+            <p className="font-bold text-text-main/70">Không tải được dữ liệu nhật ký. Vui lòng thử lại.</p>
+            <Button onClick={() => navigate('/diary')} className="px-6 py-2">
+              Xem danh sách Nhật ký
+            </Button>
           </div>
         ) : !diary ? (
           <div className="py-20 text-center flex flex-col gap-4 items-center">
@@ -319,6 +332,13 @@ export const DiaryHistory: React.FC = () => {
                           {icon}
                         </div>
                         <div className="flex-1 min-w-0">
+                          {entry.imageUrl ? (
+                            <img
+                              className="mb-3 h-28 w-full rounded-xl object-cover"
+                              src={entry.imageUrl}
+                              alt={`Ảnh hoạt động ${entry.activityType}`}
+                            />
+                          ) : null}
                           <h4 className="text-lg font-bold text-text-main truncate">{entry.activityType}</h4>
                           <p className="text-sm text-text-main/70 truncate">{entry.content}</p>
                         </div>
@@ -337,7 +357,7 @@ export const DiaryHistory: React.FC = () => {
               )}
 
               <div className="flex gap-4 mt-4">
-                <Button onClick={() => navigate('/diary/create')} className="flex-1 py-4 text-lg">
+                <Button onClick={() => navigate(`/diary/create?diaryId=${activeDiaryId}`)} className="flex-1 py-4 text-lg">
                   Thêm hoạt động mới
                 </Button>
                 <Button onClick={() => navigate('/diary')} variant="outline" className="flex-1 py-4 text-lg bg-white">
