@@ -32,6 +32,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 }) => {
   const [state, setState] = useState<CaptureState>('idle');
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -52,12 +53,11 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    setStream((prevStream) => {
-      if (prevStream) {
-        prevStream.getTracks().forEach((track) => track.stop());
-      }
-      return null;
-    });
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setStream(null);
   }, []);
 
   const revokePhotoUrl = useCallback(() => {
@@ -86,6 +86,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
         return;
       }
 
+      streamRef.current = mediaStream;
       setStream(mediaStream);
       setState('camera');
     } catch (err) {

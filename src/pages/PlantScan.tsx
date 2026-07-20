@@ -24,6 +24,7 @@ export const PlantScan: React.FC = () => {
   
   // Camera State
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   
@@ -38,12 +39,11 @@ export const PlantScan: React.FC = () => {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    setStream((prevStream) => {
-      if (prevStream) {
-        prevStream.getTracks().forEach((track) => track.stop());
-      }
-      return null;
-    });
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setStream(null);
   }, []);
 
   const startCamera = useCallback(async () => {
@@ -65,6 +65,7 @@ export const PlantScan: React.FC = () => {
         return;
       }
 
+      streamRef.current = mediaStream;
       setStream(mediaStream);
     } catch (err) {
       if (cameraRequestRef.current !== requestId) return;
