@@ -42,10 +42,18 @@ export const InsightList: React.FC = () => {
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
 
-  const { data: diaries = [] } = useQuery<DiaryOption[]>({
+  const {
+    data: diaries = [],
+    isLoading: isLoadingDiaries,
+    isError: isDiariesError,
+  } = useQuery<DiaryOption[]>({
     queryKey: ['diaries', 'insight-options'],
     queryFn: async () => {
-      const response = await api.get('/diaries');
+      // Cache-bust vì Express ETag có thể trả 304 và làm danh sách lựa chọn
+      // bị rỗng trên lần tải đầu của màn hình insight.
+      const response = await api.get('/diaries', {
+        params: { _t: Date.now() },
+      });
       return response.data?.data ?? [];
     },
   });
@@ -105,6 +113,20 @@ export const InsightList: React.FC = () => {
   });
 
   const isBusy = triggerMutation.isPending || isGenerating;
+
+  const triggerSelectedDiary = () => {
+    if (!effectiveDiaryId) {
+      setModalConfig({
+        type: 'error',
+        title: 'Chưa chọn được mùa vụ',
+        message: isDiariesError
+          ? 'Không thể tải danh sách mùa vụ. Vui lòng tải lại trang và thử lại.'
+          : 'Bạn cần tạo ít nhất một mùa vụ trước khi tạo báo cáo tuần.',
+      });
+      return;
+    }
+    triggerMutation.mutate(effectiveDiaryId);
+  };
 
   if (isLoading) {
     return (
@@ -172,6 +194,27 @@ export const InsightList: React.FC = () => {
         )}
       </AnimatePresence>
 
+      <div className="flex items-center justify-end gap-2 px-4 mb-4">
+        <label htmlFor="insight-diary" className="text-xs font-bold text-text-secondary">
+          Mùa vụ
+        </label>
+        <select
+          id="insight-diary"
+          value={effectiveDiaryId}
+          onChange={(event) => setSelectedDiaryId(event.target.value)}
+          disabled={isBusy || isLoadingDiaries}
+          className="min-w-0 max-w-64 rounded-lg border border-border-main bg-white px-3 py-2 text-xs font-bold text-text-main disabled:opacity-60"
+        >
+          {isLoadingDiaries && <option value="">Đang tải mùa vụ...</option>}
+          {!isLoadingDiaries && diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
+          {diaries.map((diary) => (
+            <option key={diary._id} value={diary._id}>
+              {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {insights.length === 0 && !isBusy ? (
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
           <div className="w-16 h-16 rounded-full bg-bg-surface/80 flex items-center justify-center mb-4 border border-border-main/50">
@@ -180,8 +223,8 @@ export const InsightList: React.FC = () => {
           <h3 className="text-text-main font-semibold text-lg mb-2">Chưa có Insight nào</h3>
           <p className="text-text-secondary text-sm mb-6">Hãy ghi nhật ký chăm sóc cây thường xuyên để nhận được tổng hợp và lời khuyên hàng tuần nhé!</p>
           <button
-            onClick={() => triggerMutation.mutate(effectiveDiaryId)}
-            disabled={isBusy || !effectiveDiaryId}
+            onClick={triggerSelectedDiary}
+            disabled={isBusy || isLoadingDiaries}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-extrabold text-white bg-slate-950 hover:bg-slate-900 shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
@@ -191,23 +234,9 @@ export const InsightList: React.FC = () => {
       ) : (
         <>
           <div className="flex justify-end px-4 mb-4">
-            <select
-              value={effectiveDiaryId}
-              onChange={(event) => setSelectedDiaryId(event.target.value)}
-              disabled={isBusy}
-              aria-label="Chọn mùa vụ cần phân tích"
-              className="mr-2 min-w-0 max-w-56 rounded-lg border border-border-main bg-white px-3 py-2 text-xs font-bold text-text-main"
-            >
-              {diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
-              {diaries.map((diary) => (
-                <option key={diary._id} value={diary._id}>
-                  {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
-                </option>
-              ))}
-            </select>
             <button
-              onClick={() => triggerMutation.mutate(effectiveDiaryId)}
-              disabled={isBusy || !effectiveDiaryId}
+              onClick={triggerSelectedDiary}
+              disabled={isBusy || isLoadingDiaries}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-extrabold text-white bg-slate-950 hover:bg-slate-900 shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
             >
               {isBusy ? (
