@@ -37,13 +37,19 @@ export const PlantScan: React.FC = () => {
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
     if (videoRef.current) {
+      videoRef.current.pause();
       videoRef.current.srcObject = null;
     }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
-    setStream(null);
+    setStream((prevStream) => {
+      if (prevStream) {
+        prevStream.getTracks().forEach((track) => track.stop());
+      }
+      return null;
+    });
   }, []);
 
   const startCamera = useCallback(async () => {
