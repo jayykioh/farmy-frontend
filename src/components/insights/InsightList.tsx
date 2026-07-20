@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
 import { InsightCard } from './InsightCard';
-import { Loader2, FileText, FilePlus } from 'lucide-react';
+import { CheckCircle2, Loader2, FileText, FilePlus } from 'lucide-react';
 import { api } from '../../api/client';
 
 interface DiaryOption {
@@ -68,6 +68,17 @@ export const InsightList: React.FC = () => {
     queryFn: () => fetchWeeklyInsights(10),
   });
 
+  const now = new Date();
+  const daysFromMonday = now.getUTCDay() === 0 ? 6 : now.getUTCDay() - 1;
+  const currentMonday = new Date(now);
+  currentMonday.setUTCDate(now.getUTCDate() - daysFromMonday);
+  currentMonday.setUTCHours(0, 0, 0, 0);
+  const currentWeekInsight = insights?.find(
+    (insight) =>
+      insight.diary_id === effectiveDiaryId &&
+      insight.week_start_date === currentMonday.toISOString(),
+  );
+
   const triggerMutation = useMutation({
     mutationFn: triggerWeeklyInsight,
     onMutate: () => {
@@ -78,7 +89,7 @@ export const InsightList: React.FC = () => {
         message: 'Hệ thống đang thu thập và tổng hợp thông tin từ nhật ký vụ mùa của bạn. Vui lòng đợi trong giây lát.',
       });
     },
-    onSuccess: (result) => {
+    onSuccess: async (result, diaryId) => {
       // Nếu tuần này đã có insight → hiển thị thông báo info
       if (result.already_exists) {
         setIsGenerating(false);
@@ -89,13 +100,38 @@ export const InsightList: React.FC = () => {
         });
         return;
       }
-      // Chờ đủ thời gian BullMQ + Gemini xử lý (~20s) rồi mới refresh
-      setTimeout(() => {
-        void queryClient.invalidateQueries({ queryKey: ['weekly-insights'] }).then(() => {
-          setIsGenerating(false);
-          setModalConfig(null);
-        });
-      }, 20000);
+      try {
+        // Poll kết quả thật thay vì đóng modal sau một timeout cố định.
+        for (let attempt = 0; attempt < 30; attempt += 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 2000));
+          const latestInsights = await fetchWeeklyInsights(20);
+          const generated = latestInsights.some(
+            (insight) =>
+              insight.diary_id === diaryId &&
+              (!result.week_start_date ||
+                insight.week_start_date === result.week_start_date),
+          );
+          if (generated) {
+            queryClient.setQueryData(['weekly-insights'], latestInsights);
+            setIsGenerating(false);
+            setModalConfig({
+              type: 'info',
+              title: 'Báo cáo đã sẵn sàng ✅',
+              message: 'Báo cáo tuần của mùa vụ đã được tạo thành công.',
+            });
+            return;
+          }
+        }
+      } catch (pollError) {
+        console.error('Polling insight failed:', pollError);
+      }
+
+      setIsGenerating(false);
+      setModalConfig({
+        type: 'error',
+        title: 'Chưa tạo được báo cáo',
+        message: 'Hệ thống chưa nhận được kết quả sau 60 giây. Bạn có thể đóng thông báo và thử tạo lại.',
+      });
     },
     onError: (error: any) => {
       console.error('Trigger insight failed:', error);
@@ -115,6 +151,14 @@ export const InsightList: React.FC = () => {
   const isBusy = triggerMutation.isPending || isGenerating;
 
   const triggerSelectedDiary = () => {
+    if (currentWeekInsight) {
+      setModalConfig({
+        type: 'info',
+        title: 'Đã có báo cáo tuần này ✅',
+        message: 'Mùa vụ đang chọn đã có báo cáo. Bạn có thể xem nội dung ngay bên dưới hoặc đợi đến tuần sau để tạo báo cáo mới.',
+      });
+      return;
+    }
     if (!effectiveDiaryId) {
       setModalConfig({
         type: 'error',
@@ -189,6 +233,14 @@ export const InsightList: React.FC = () => {
                   Đóng
                 </button>
               )}
+              {modalConfig.type === 'loading' && (
+                <button
+                  onClick={() => setModalConfig(null)}
+                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                >
+                  Ẩn và tiếp tục xử lý nền
+                </button>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -238,7 +290,11 @@ export const InsightList: React.FC = () => {
             <button
               onClick={triggerSelectedDiary}
               disabled={isBusy || isLoadingDiaries}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#34C759] text-white rounded-full text-[13px] font-bold shadow-[0_4px_16px_rgba(52,199,89,0.3)] active:scale-95 transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)] disabled:opacity-60 cursor-pointer"
+              className={`flex items-center gap-1.5 px-4 py-2 text-white rounded-full text-[13px] font-bold active:scale-95 transition-all disabled:opacity-60 cursor-pointer ${
+                currentWeekInsight
+                  ? 'bg-slate-500 shadow-sm hover:bg-slate-600'
+                  : 'bg-[#34C759] shadow-[0_4px_16px_rgba(52,199,89,0.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)]'
+              }`}
             >
               {isBusy ? (
                 <>
@@ -247,8 +303,12 @@ export const InsightList: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <FilePlus className="w-4 h-4" />
-                  Lập báo cáo ngay
+                  {currentWeekInsight ? (
+                    <CheckCircle2 className="w-4 h-4" />
+                  ) : (
+                    <FilePlus className="w-4 h-4" />
+                  )}
+                  {currentWeekInsight ? 'Đã có báo cáo tuần này' : 'Lập báo cáo ngay'}
                 </>
               )}
             </button>
