@@ -49,6 +49,9 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setStream((prevStream) => {
       if (prevStream) {
         prevStream.getTracks().forEach((track) => track.stop());
