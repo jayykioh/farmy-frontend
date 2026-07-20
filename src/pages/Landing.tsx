@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { 
   Sprout, 
   ChevronRight,
@@ -12,7 +13,7 @@ import {
 import { PetMascot } from '../features/pet/components/PetMascot';
 
 // Animation variants
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -23,7 +24,7 @@ const staggerContainer = {
   },
 };
 
-const fadeUpVariant = {
+const fadeUpVariant: Variants = {
   hidden: { opacity: 0, y: 40 },
   show: { 
     opacity: 1, 
@@ -32,7 +33,7 @@ const fadeUpVariant = {
   },
 };
 
-const hoverCardVariant = {
+const hoverCardVariant: Variants = {
   rest: { y: 0, scale: 1 },
   hover: { 
     y: -8, 
