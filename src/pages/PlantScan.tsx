@@ -450,7 +450,12 @@ export const PlantScan: React.FC = () => {
               </button>
               
               <button 
-                onClick={() => navigate('/chat/active')}
+                onClick={() => navigate('/chat/active', {
+                  state: {
+                    initialMessage: `Tôi muốn hỏi chi tiết về kết quả chẩn đoán: ${scanResult?.diagnosis?.disease_name || 'Cây trồng của tôi'}`,
+                    initialImage: scanResult?.image_url || previewUrl || null,
+                  }
+                })}
                 className="w-full md:flex-1 bg-white text-text-main font-bold text-lg md:text-xl py-4 md:py-5 px-6 rounded-full md:rounded-[20px] border border-border-main/50 active:scale-95 transition-all flex justify-center items-center gap-2 shadow-sm hover:bg-bg-surface-1 hover:scale-[1.02] cursor-pointer"
               >
                 Ask AI advice

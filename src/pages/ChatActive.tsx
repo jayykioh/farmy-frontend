@@ -6,6 +6,7 @@ import {
   Camera,
   Clock,
   Loader2,
+  Paperclip,
   Send,
   ThumbsDown,
   ThumbsUp,
@@ -21,6 +22,7 @@ import {
   submitChatFeedback,
   type ChatMessage,
 } from "../api/chat";
+import { uploadImageToR2 } from "../api/uploads";
 import { ChatSourceCards } from "../components/chat/ChatSourceCards";
 
 type FeedbackValue = "positive" | "negative";
@@ -96,9 +98,27 @@ export const ChatActive: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(Boolean(routeSessionId));
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingImage(true);
+    try {
+      const { publicUrl } = await uploadImageToR2("snap", file);
+      setAttachedImage(publicUrl);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(err instanceof Error ? err.message : "Không thể tải ảnh lên.");
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const { data: petStatusRaw } = usePetStatus();
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
@@ -460,14 +480,31 @@ export const ChatActive: React.FC = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="w-full flex items-center gap-2 bg-white/80 backdrop-blur-xl saturate-150 border border-black/[0.08] rounded-full p-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] focus-within:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all"
+            className="w-full flex items-center gap-1 bg-white/80 backdrop-blur-xl saturate-150 border border-black/[0.08] rounded-full p-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] focus-within:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all"
           >
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploadingImage || isStreaming}
+            title="Đính kèm ảnh"
+            className="p-2 text-[#86868b] hover:text-[#34C759] transition-colors flex items-center justify-center rounded-full hover:bg-black/[0.04] cursor-pointer disabled:opacity-50"
+          >
+            {isUploadingImage ? <Loader2 className="w-[20px] h-[20px] animate-spin text-[#34C759]" /> : <Paperclip className="w-[20px] h-[20px]" />}
+          </button>
           <button
             type="button"
             onClick={() => navigate("/scan")}
-            className="p-2.5 text-[#86868b] hover:text-[#34C759] transition-colors flex items-center justify-center rounded-full hover:bg-black/[0.04] cursor-pointer"
+            title="Chụp ảnh cây trồng (Scan)"
+            className="p-2 text-[#86868b] hover:text-[#34C759] transition-colors flex items-center justify-center rounded-full hover:bg-black/[0.04] cursor-pointer"
           >
-            <Camera className="w-[22px] h-[22px]" />
+            <Camera className="w-[20px] h-[20px]" />
           </button>
 
           <input
@@ -476,7 +513,7 @@ export const ChatActive: React.FC = () => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            disabled={isStreaming}
+            disabled={isStreaming || isUploadingImage}
           />
 
           <button
