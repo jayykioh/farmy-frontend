@@ -6,7 +6,7 @@ import { InsightCard } from './InsightCard';
 import { Loader2, LightbulbOff, Sparkles } from 'lucide-react';
 
 interface ModalConfig {
-  type: 'loading' | 'error';
+  type: 'loading' | 'error' | 'info';
   title: string;
   message: string;
 }
@@ -48,14 +48,24 @@ export const InsightList: React.FC = () => {
         message: 'Trí tuệ nhân tạo đang thu thập và tổng hợp thông tin từ nhật ký vụ mùa của bạn. Vui lòng đợi trong giây lát.',
       });
     },
-    onSuccess: () => {
-      // Wait 2.5 seconds for BullMQ and Gemini to finish writing the database entry
+    onSuccess: (result) => {
+      // Nếu tuần này đã có insight → hiển thị thông báo info
+      if (result.already_exists) {
+        setIsGenerating(false);
+        setModalConfig({
+          type: 'info',
+          title: 'Đã có báo cáo tuần này ✅',
+          message: result.message || 'Tuần này đã có báo cáo phân tích rồi! Hãy xem lại báo cáo hiện có hoặc đợi đến tuần sau.',
+        });
+        return;
+      }
+      // Chờ đủ thời gian BullMQ + Gemini xử lý (~20s) rồi mới refresh
       setTimeout(() => {
         void queryClient.invalidateQueries({ queryKey: ['weekly-insights'] }).then(() => {
           setIsGenerating(false);
           setModalConfig(null);
         });
-      }, 2500);
+      }, 20000);
     },
     onError: (error: any) => {
       console.error('Trigger insight failed:', error);
@@ -113,6 +123,10 @@ export const InsightList: React.FC = () => {
                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                   <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
+              ) : modalConfig.type === 'info' ? (
+                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-3xl">
+                  ✅
+                </div>
               ) : (
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl">
                   ⚠️
@@ -123,7 +137,7 @@ export const InsightList: React.FC = () => {
                 <p className="text-sm text-slate-500 leading-relaxed">{modalConfig.message}</p>
               </div>
               
-              {modalConfig.type === 'error' && (
+              {(modalConfig.type === 'error' || modalConfig.type === 'info') && (
                 <button
                   onClick={() => setModalConfig(null)}
                   className="w-full py-3 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer"

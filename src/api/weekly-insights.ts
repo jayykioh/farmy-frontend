@@ -18,7 +18,7 @@ export const fetchWeeklyInsights = async (limit: number = 10): Promise<WeeklyIns
   return data.data ? data.data : data; 
 };
 
-export const triggerWeeklyInsight = async (): Promise<{ success: boolean; message: string }> => {
+export const triggerWeeklyInsight = async (): Promise<{ success: boolean; already_exists?: boolean; message: string }> => {
   const { data } = await api.post('/weekly-insights/trigger');
   return data;
 };
