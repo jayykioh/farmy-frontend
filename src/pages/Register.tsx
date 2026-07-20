@@ -51,7 +51,6 @@ export const Register: React.FC = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      // @ts-ignore - for zod literal true init
       acceptPolicy: false,
     },
   });
