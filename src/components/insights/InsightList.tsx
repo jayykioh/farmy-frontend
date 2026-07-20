@@ -4,6 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
 import { InsightCard } from './InsightCard';
 import { Loader2, FileText, FilePlus } from 'lucide-react';
+import { api } from '../../api/client';
+
+interface DiaryOption {
+  _id: string;
+  crop_type: string;
+  season?: string;
+  status: string;
+}
 
 interface ModalConfig {
   type: 'loading' | 'error' | 'info';
@@ -32,6 +40,28 @@ export const InsightList: React.FC = () => {
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+  const [selectedDiaryId, setSelectedDiaryId] = useState('');
+
+  const {
+    data: diaries = [],
+    isLoading: isLoadingDiaries,
+    isError: isDiariesError,
+  } = useQuery<DiaryOption[]>({
+    queryKey: ['diaries', 'insight-options'],
+    queryFn: async () => {
+      // Cache-bust vì Express ETag có thể trả 304 và làm danh sách lựa chọn
+      // bị rỗng trên lần tải đầu của màn hình insight.
+      const response = await api.get('/diaries', {
+        params: { _t: Date.now() },
+      });
+      return response.data?.data ?? [];
+    },
+  });
+
+  const effectiveDiaryId = selectedDiaryId
+    || diaries.find((diary) => diary.status === 'active')?._id
+    || diaries[0]?._id
+    || '';
 
   const { data: insights, isLoading, isError } = useQuery({
     queryKey: ['weekly-insights'],
@@ -83,6 +113,20 @@ export const InsightList: React.FC = () => {
   });
 
   const isBusy = triggerMutation.isPending || isGenerating;
+
+  const triggerSelectedDiary = () => {
+    if (!effectiveDiaryId) {
+      setModalConfig({
+        type: 'error',
+        title: 'Chưa chọn được mùa vụ',
+        message: isDiariesError
+          ? 'Không thể tải danh sách mùa vụ. Vui lòng tải lại trang và thử lại.'
+          : 'Bạn cần tạo ít nhất một mùa vụ trước khi tạo báo cáo tuần.',
+      });
+      return;
+    }
+    triggerMutation.mutate(effectiveDiaryId);
+  };
 
   if (isLoading) {
     return (
@@ -150,6 +194,27 @@ export const InsightList: React.FC = () => {
         )}
       </AnimatePresence>
 
+      <div className="flex items-center justify-end gap-2 px-4 mb-4">
+        <label htmlFor="insight-diary" className="text-xs font-bold text-text-secondary">
+          Mùa vụ
+        </label>
+        <select
+          id="insight-diary"
+          value={effectiveDiaryId}
+          onChange={(event) => setSelectedDiaryId(event.target.value)}
+          disabled={isBusy || isLoadingDiaries}
+          className="min-w-0 max-w-64 rounded-lg border border-border-main bg-white px-3 py-2 text-xs font-bold text-text-main disabled:opacity-60"
+        >
+          {isLoadingDiaries && <option value="">Đang tải mùa vụ...</option>}
+          {!isLoadingDiaries && diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
+          {diaries.map((diary) => (
+            <option key={diary._id} value={diary._id}>
+              {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {insights.length === 0 && !isBusy ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center max-w-lg mx-auto">
           <div className="w-20 h-20 rounded-3xl bg-white/80 backdrop-blur-xl flex items-center justify-center mb-6 border border-white/60 shadow-sm">
@@ -158,8 +223,8 @@ export const InsightList: React.FC = () => {
           <h3 className="text-[#1d1d1f] font-bold text-[20px] mb-2">Chưa có báo cáo nào</h3>
           <p className="text-[#86868b] text-[15px] mb-8 font-medium">Hãy ghi nhật ký chăm sóc cây thường xuyên để nhận được báo cáo tổng hợp và lời khuyên hàng tuần nhé!</p>
           <button
-            onClick={() => triggerMutation.mutate()}
-            disabled={isBusy}
+            onClick={triggerSelectedDiary}
+            disabled={isBusy || isLoadingDiaries}
             className="flex items-center gap-2 px-6 py-3.5 rounded-full text-[15px] font-bold text-white bg-[#1d1d1f] hover:bg-black shadow-[0_4px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
           >
             <FilePlus className="w-4 h-4" />
@@ -171,8 +236,8 @@ export const InsightList: React.FC = () => {
           <div className="flex justify-between items-center px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
             <h2 className="text-[20px] font-bold text-[#1d1d1f]">Các tuần gần đây</h2>
             <button
-              onClick={() => triggerMutation.mutate()}
-              disabled={isBusy}
+              onClick={triggerSelectedDiary}
+              disabled={isBusy || isLoadingDiaries}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#34C759] text-white rounded-full text-[13px] font-bold shadow-[0_4px_16px_rgba(52,199,89,0.3)] active:scale-95 transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)] disabled:opacity-60 cursor-pointer"
             >
               {isBusy ? (
