@@ -14,7 +14,7 @@ interface StoryRingCreateButtonProps {
 
 export const StoryRingCreateButton: React.FC<StoryRingCreateButtonProps> = ({ onClick }) => {
   const { user } = useAuthStore();
-  const avatarSrc = user?.avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${user?.id ?? 'me'}`;
+  const avatarSrc = `https://api.dicebear.com/9.x/thumbs/svg?seed=${user?.id ?? 'me'}`;
 
   return (
     <motion.button

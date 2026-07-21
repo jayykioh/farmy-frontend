@@ -163,33 +163,33 @@ export const ChatList: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
             <button 
               onClick={() => navigate('/chat/active')} 
-              className="card-bubble card-bubble--pear group flex flex-col text-left p-5 cursor-pointer select-none active:scale-95 transition-all"
+              className="group flex flex-col text-left p-5 cursor-pointer select-none active:scale-95 transition-all bg-white rounded-[20px] border border-black/[0.04] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
             >
-              <div className="w-10 h-10 rounded-[14px] bg-[#E8F8F5] border border-border-main/50 flex items-center justify-center mb-3 transition-colors duration-300">
-                <Leaf className="w-5 h-5 text-[#248A3D] transition-colors duration-300" weight="duotone" />
+              <div className="w-10 h-10 rounded-[12px] bg-black/5 flex items-center justify-center mb-3 transition-colors duration-300 group-hover:bg-black/10">
+                <Leaf className="w-5 h-5 text-text-main transition-colors duration-300" weight="regular" />
               </div>
-              <h3 className="text-[16px] font-extrabold text-text-h mb-1">Cách ủ phân hữu cơ</h3>
-              <p className="text-[13px] text-text-secondary line-clamp-2 font-medium">Hướng dẫn chi tiết cách tận dụng phế phẩm nông nghiệp.</p>
+              <h3 className="text-[15px] font-bold text-text-main mb-1">Cách ủ phân hữu cơ</h3>
+              <p className="text-[13px] text-text-secondary line-clamp-2 leading-relaxed">Hướng dẫn chi tiết cách tận dụng phế phẩm nông nghiệp.</p>
             </button>
             <button 
               onClick={() => navigate('/chat/active')} 
-              className="card-bubble card-bubble--coral group flex flex-col text-left p-5 cursor-pointer select-none active:scale-95 transition-all"
+              className="group flex flex-col text-left p-5 cursor-pointer select-none active:scale-95 transition-all bg-white rounded-[20px] border border-black/[0.04] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
             >
-              <div className="w-10 h-10 rounded-[14px] bg-[#FFF3E0] border border-border-main/50 flex items-center justify-center mb-3 transition-colors duration-300">
-                <WarningCircle className="w-5 h-5 text-[#E67300] transition-colors duration-300" weight="duotone" />
+              <div className="w-10 h-10 rounded-[12px] bg-black/5 flex items-center justify-center mb-3 transition-colors duration-300 group-hover:bg-black/10">
+                <WarningCircle className="w-5 h-5 text-text-main transition-colors duration-300" weight="regular" />
               </div>
-              <h3 className="text-[16px] font-extrabold text-text-h mb-1">Bệnh vàng lá thối rễ</h3>
-              <p className="text-[13px] text-text-secondary line-clamp-2 font-medium">Dấu hiệu nhận biết sớm và biện pháp xử lý kịp thời.</p>
+              <h3 className="text-[15px] font-bold text-text-main mb-1">Bệnh vàng lá thối rễ</h3>
+              <p className="text-[13px] text-text-secondary line-clamp-2 leading-relaxed">Dấu hiệu nhận biết sớm và biện pháp xử lý kịp thời.</p>
             </button>
             <button 
               onClick={() => navigate('/chat/active')} 
-              className="card-bubble card-bubble--cyan group hidden sm:flex flex-col text-left p-5 cursor-pointer select-none active:scale-95 transition-all"
+              className="group hidden sm:flex flex-col text-left p-5 cursor-pointer select-none active:scale-95 transition-all bg-white rounded-[20px] border border-black/[0.04] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
             >
-              <div className="w-10 h-10 rounded-[14px] bg-[#E5F1FF] border border-border-main/50 flex items-center justify-center mb-3 transition-colors duration-300">
-                <ChatCircleText className="w-5 h-5 text-[#0066CC] transition-colors duration-300" weight="duotone" />
+              <div className="w-10 h-10 rounded-[12px] bg-black/5 flex items-center justify-center mb-3 transition-colors duration-300 group-hover:bg-black/10">
+                <ChatCircleText className="w-5 h-5 text-text-main transition-colors duration-300" weight="regular" />
               </div>
-              <h3 className="text-[16px] font-extrabold text-text-h mb-1">Tối ưu lịch tưới</h3>
-              <p className="text-[13px] text-text-secondary line-clamp-2 font-medium">Lên lịch tưới phù hợp với từng giai đoạn sinh trưởng.</p>
+              <h3 className="text-[15px] font-bold text-text-main mb-1">Tối ưu lịch tưới</h3>
+              <p className="text-[13px] text-text-secondary line-clamp-2 leading-relaxed">Lên lịch tưới phù hợp với từng giai đoạn sinh trưởng.</p>
             </button>
           </div>
         </section>
@@ -216,13 +216,13 @@ export const ChatList: React.FC = () => {
             {errorMessage}
           </div>
         ) : sessions.length > 0 ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
             {sessions.map(session => (
               <article
                 key={session._id}
-                className="card-bubble bg-white/70 hover:bg-white text-left cursor-pointer transition-all shadow-sm"
+                className="group bg-transparent hover:bg-black/[0.03] text-left cursor-pointer transition-all rounded-[16px]"
               >
-                <div className="flex items-center justify-between gap-4 p-4 md:px-5 md:py-4">
+                <div className="flex items-center justify-between gap-4 p-3 md:px-4 md:py-3">
                   {editingSessionId === session._id ? (
                     <div className="min-w-0 flex-1 w-full">
                       <label className="text-[11px] font-bold uppercase tracking-wider text-text-secondary ml-1" htmlFor={`chat-title-${session._id}`}>
@@ -235,21 +235,21 @@ export const ChatList: React.FC = () => {
                         onChange={(event) => setDraftTitle(event.target.value)}
                         maxLength={60}
                         autoFocus
-                        className="mt-1.5 w-full rounded-[16px] border-2 border-border-main bg-white px-4 py-3 text-[15px] font-bold text-text-main outline-none transition focus:border-primary focus:ring-4 focus:ring-primary-light/20 shadow-sm"
+                        className="mt-1.5 w-full rounded-[12px] border border-border-main bg-white px-4 py-2 text-[15px] font-medium text-text-main outline-none transition focus:border-black shadow-sm"
                       />
                       <div className="mt-3 flex flex-wrap gap-2 ml-1">
                         <button
                           type="button"
                           onClick={() => void handleRenameSession(session._id)}
                           disabled={savingSessionId === session._id}
-                          className="btn btn--cyan px-4 py-2 text-xs font-extrabold cursor-pointer flex items-center gap-1.5 active:scale-95"
+                          className="px-3 py-1.5 rounded-lg bg-black text-white text-xs font-bold cursor-pointer flex items-center gap-1.5 active:scale-95 hover:bg-black/80 transition-colors"
                         >
                           {savingSessionId === session._id ? (
-                            <CircleNotch className="h-3.5 w-3.5 animate-spin" weight="bold" />
+                            <CircleNotch className="h-3.5 w-3.5 animate-spin" />
                           ) : (
                             <Check className="h-3.5 w-3.5" weight="bold" />
                           )}
-                          Lưu tên
+                          Lưu
                         </button>
                         <button
                           type="button"
@@ -257,7 +257,7 @@ export const ChatList: React.FC = () => {
                             setEditingSessionId(null);
                             setDraftTitle('');
                           }}
-                          className="btn btn--soft px-4 py-2 text-xs font-bold cursor-pointer flex items-center gap-1.5 active:scale-95"
+                          className="px-3 py-1.5 rounded-lg text-text-secondary bg-black/5 hover:bg-black/10 text-xs font-bold cursor-pointer flex items-center gap-1.5 active:scale-95 transition-colors"
                         >
                           <X className="h-3.5 w-3.5" weight="bold" />
                           Hủy
@@ -270,40 +270,35 @@ export const ChatList: React.FC = () => {
                         onClick={() => navigate(`/chat/active/${session._id}`)}
                         className="min-w-0 flex-1 flex flex-col text-left cursor-pointer"
                       >
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-bg-surface-2 border border-border-main/50 px-2.5 py-1 text-[11px] font-bold text-text-main">
-                            <ChatCircleText className="h-3.5 w-3.5 text-[#008A5E]" weight="duotone" />
-                            Bé Thóc
-                          </span>
-                          <span className="text-[13px] font-bold text-text-secondary font-mono">
-                            {formatRelativeDate(session.last_message_at ?? session.updated_at ?? session.created_at)}
-                          </span>
-                        </div>
-                        <h3 className="text-[18px] font-extrabold leading-snug tracking-tight text-text-h truncate">
+                        <h3 className="text-[15px] font-bold text-text-main truncate">
                           {session.title || 'Cuộc trò chuyện với Bé Thóc'}
                         </h3>
-                        <p className="mt-1 line-clamp-1 text-[14px] font-medium text-text-secondary w-full">
-                          Mở lại mạch tư vấn cũ, giữ nguyên bối cảnh nông trại.
-                        </p>
+                        <span className="text-[12px] text-text-secondary">
+                          {formatRelativeDate(session.last_message_at ?? session.updated_at ?? session.created_at)}
+                        </span>
                       </div>
 
-                      {/* Actions show on hover */}
-                      <div className="opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0 bg-white/50 backdrop-blur-md group-hover:bg-white shadow-sm border border-border-main/50 p-1.5 rounded-full">
+                      <div className="opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0 bg-transparent p-1.5">
                         <button
                           type="button"
                           aria-label="Đổi tên cuộc trò chuyện"
                           onClick={(e) => { e.stopPropagation(); startEditingSession(session); }}
-                          className="p-2 rounded-full text-text-secondary transition-all hover:bg-bg-surface-2 hover:text-text-main active:scale-95 cursor-pointer"
+                          className="p-2 rounded-lg text-text-secondary transition-all hover:bg-black/5 hover:text-text-main active:scale-95 cursor-pointer"
                         >
-                          <NotePencil className="h-[18px] w-[18px]" weight="bold" />
+                          <NotePencil className="h-4 w-4" weight="bold" />
                         </button>
                         <button
                           type="button"
                           aria-label="Xóa cuộc trò chuyện"
-                          onClick={(e) => { e.stopPropagation(); setConfirmingSessionId(session._id); }}
-                          className="p-2 rounded-full text-text-secondary transition-all hover:bg-red-50 hover:text-[#FF3B30] active:scale-95 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Bạn có chắc chắn muốn xóa cuộc trò chuyện này?')) {
+                              void handleDeleteSession(session._id);
+                            }
+                          }}
+                          className="p-2 rounded-lg text-text-secondary transition-all hover:bg-red-50 hover:text-red-600 active:scale-95 cursor-pointer"
                         >
-                          <Trash className="h-[18px] w-[18px]" weight="bold" />
+                          <Trash className="h-4 w-4" weight="bold" />
                         </button>
                       </div>
                     </>

@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
 import { InsightCard } from './InsightCard';
-import { CheckCircle, CircleNotch, FileText, FilePlus } from '@phosphor-icons/react';
+import { CheckCircle, CircleNotch, FileText, FilePlus, Plant, Plus, SortDescending, SortAscending } from '@phosphor-icons/react';
 import { api } from '../../api/client';
+import { CreateSeasonModal } from '../modals/CreateSeasonModal';
 
 interface DiaryOption {
   _id: string;
@@ -42,6 +43,8 @@ export const InsightList: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
+  const [showCreateSeason, setShowCreateSeason] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   const {
     data: diaries = [],
@@ -250,26 +253,69 @@ export const InsightList: React.FC = () => {
         document.body
       )}
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <label htmlFor="insight-diary" className="text-[13px] font-bold text-[#86868b]">
-            Mùa vụ:
-          </label>
-          <select
-            id="insight-diary"
-            value={effectiveDiaryId}
-            onChange={(event) => setSelectedDiaryId(event.target.value)}
-            disabled={isBusy || isLoadingDiaries}
-            className="min-w-[140px] max-w-[200px] rounded-xl border border-black/[0.08] bg-white/80 backdrop-blur-md px-3 py-2 text-[14px] font-bold text-[#1d1d1f] disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#34C759]/30 shadow-sm"
-          >
-            {isLoadingDiaries && <option value="">Đang tải mùa vụ...</option>}
-            {!isLoadingDiaries && diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
-            {diaries.map((diary) => (
-              <option key={diary._id} value={diary._id}>
-                {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
-              </option>
-            ))}
-          </select>
+      <CreateSeasonModal
+        isOpen={showCreateSeason}
+        onClose={() => setShowCreateSeason(false)}
+        mode="add-season"
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['diaries', 'insight-options'] });
+          setShowCreateSeason(false);
+        }}
+      />
+
+      <div className="flex flex-col gap-3 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
+        <label className="text-[14px] font-bold text-[#1d1d1f]">Mùa vụ đang xem:</label>
+        <div className="flex overflow-x-auto fade-edges-x gap-3 pb-2 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-1 items-stretch">
+          {isLoadingDiaries && (
+            <>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="min-w-[160px] h-16 bg-black/5 rounded-2xl animate-pulse flex-shrink-0" />
+              ))}
+            </>
+          )}
+          {!isLoadingDiaries && diaries.map((diary) => {
+            const isActive = diary._id === effectiveDiaryId;
+            return (
+              <div
+                key={diary._id}
+                onClick={() => !isBusy && setSelectedDiaryId(diary._id)}
+                className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start border ${
+                  isActive
+                    ? 'bg-white border-[#34C759]/30 shadow-[0_8px_24px_rgba(52,199,89,0.12)] ring-1 ring-[#34C759]'
+                    : 'bg-white/50 border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-sm'
+                } ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isActive ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-black/5 text-[#86868b]'}`}>
+                  <Plant size={20} weight={isActive ? "fill" : "duotone"} />
+                </div>
+                <div className="flex flex-col pr-2">
+                  <span className={`text-[14px] font-bold ${isActive ? 'text-[#1d1d1f]' : 'text-[#48484a]'}`}>
+                    {diary.crop_type || 'Nông sản'}
+                  </span>
+                  {diary.season && (
+                    <span className="text-[12px] font-medium text-[#86868b]">
+                      {diary.season}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          
+          {/* Nút Tạo Mùa vụ */}
+          {!isLoadingDiaries && (
+            <div
+              onClick={() => !isBusy && setShowCreateSeason(true)}
+              className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start bg-transparent border-2 border-dashed border-black/10 hover:border-black/20 hover:bg-black/5 ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 text-[#86868b]">
+                <Plus size={20} weight="bold" />
+              </div>
+              <div className="flex flex-col pr-2">
+                <span className="text-[14px] font-bold text-[#48484a]">Tạo mùa vụ</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -292,7 +338,16 @@ export const InsightList: React.FC = () => {
       ) : (
         <>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
-            <h2 className="text-[20px] font-bold text-[#1d1d1f]">Các tuần gần đây</h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-[20px] font-bold text-[#1d1d1f]">Các tuần gần đây</h2>
+              <button
+                onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 hover:bg-black/10 text-[13px] font-bold text-[#48484a] transition-colors cursor-pointer"
+              >
+                {sortOrder === 'desc' ? <SortDescending size={16} weight="bold" /> : <SortAscending size={16} weight="bold" />}
+                {sortOrder === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
+              </button>
+            </div>
             <button
               onClick={triggerSelectedDiary}
               disabled={isBusy || isLoadingDiaries}
@@ -320,7 +375,11 @@ export const InsightList: React.FC = () => {
           </div>
           <div className="flex flex-col gap-6 px-6 md:px-10 pb-12 max-w-4xl mx-auto w-full">
             {isBusy && <SkeletonCard />}
-            {insights.map((insight) => (
+            {[...insights].sort((a, b) => {
+              const timeA = new Date(a.week_start_date).getTime();
+              const timeB = new Date(b.week_start_date).getTime();
+              return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
+            }).map((insight) => (
               <InsightCard key={insight.id} insight={insight} />
             ))}
           </div>

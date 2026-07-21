@@ -347,94 +347,101 @@ export const ChatActive: React.FC = () => {
           </div>
         ) : (
           messages.map((message) => (
+          messages.map((message) => (
             <div
               key={message.localId ?? message._id}
-              className={`flex flex-col w-full ${message.role === "user" ? "items-end" : "items-start"}`}
+              className={`flex w-full ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              {message.role === "assistant" ? (
-                <div className="flex items-end gap-2 mb-1.5 ml-1">
-                  <div className="w-9 h-9 rounded-full bg-white border-2 border-border-main flex items-center justify-center overflow-hidden shrink-0 p-0.5 shadow-sm">
+              <div className={`flex gap-2 max-w-[90%] md:max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                
+                {message.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full border border-border-main/50 flex items-center justify-center overflow-hidden shrink-0 mt-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] bg-white">
                     <PetMascot
                       className={`w-full h-full -mt-0.5 ${message.streaming ? "animate-pulse" : ""}`}
-                      status={petStatus} size={36}
+                      status={petStatus} size={32}
                     />
                   </div>
-                  <span className="font-bold text-[13px] text-text-secondary ml-1 mb-1">
-                    Bé Thóc
-                  </span>
-                </div>
-              ) : null}
-
-              <div
-                className={`${message.role === "user" ? "bg-[#008A5E] text-white rounded-[20px] rounded-br-[4px] border border-[#008A5E]/10 font-bold" : "bg-white text-text-main rounded-[20px] rounded-bl-[4px] border-2 border-border-main ml-12 shadow-sm"} p-4 max-w-[85%]`}
-              >
-                {message.role === "assistant" && message.citations && message.citations.length > 0 && (
-                  <ChatSourceCards citations={message.citations} />
                 )}
-                <p className="font-bold text-[15px] whitespace-pre-wrap leading-relaxed">
-                  {message.content ? parseMessageContent(message.content) :
-                    (message.streaming ? "Đang suy nghĩ..." : "")}
-                </p>
 
-                {message.role === "assistant" &&
-                message.status === "completed" ? (
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    <button
-                      type="button"
-                      onClick={() => void handleFeedback(message, "positive")}
-                      disabled={message.feedbackSubmitting}
-                      aria-pressed={message.feedback === "positive"}
-                      aria-label="Đánh giá phản hồi hữu ích"
-                      className={`bg-white border-2 px-3 py-1.5 rounded-full font-bold text-[13px] shadow-sm transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
-                        message.feedback === "positive"
-                          ? "text-[#008A5E] border-[#008A5E]/30 bg-[#E8F8F5]"
-                          : "text-text-secondary border-border-main hover:bg-bg-surface-2"
-                      }`}
-                    >
-                      {message.feedbackSubmitting &&
-                      message.feedback === "positive" ? (
-                        <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
-                      ) : (
-                        <ThumbsUp className="w-3.5 h-3.5" weight="duotone" />
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void handleFeedback(message, "negative")}
-                      disabled={message.feedbackSubmitting}
-                      aria-pressed={message.feedback === "negative"}
-                      aria-label="Đánh giá phản hồi chưa hữu ích"
-                      className={`bg-white border-2 px-3 py-1.5 rounded-full font-bold text-[13px] shadow-sm transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
-                        message.feedback === "negative"
-                          ? "text-[#FF3B30] border-[#FF3B30]/30 bg-[#FF3B30]/5"
-                          : "text-text-secondary border-border-main hover:bg-bg-surface-2"
-                      }`}
-                    >
-                      {message.feedbackSubmitting &&
-                      message.feedback === "negative" ? (
-                        <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
-                      ) : (
-                        <ThumbsDown className="w-3.5 h-3.5" weight="duotone" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => navigate("/diary/create")}
-                      className="bg-white text-text-main border-2 border-border-main px-3 py-1.5 rounded-full font-bold text-[13px] hover:bg-bg-surface-2 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <BookOpen className="w-3.5 h-3.5 text-[#008A5E]" weight="duotone" />
-                      Ghi nhật ký
-                    </button>
-                    <button
-                      onClick={() => navigate("/reminder/create")}
-                      className="bg-white text-text-main border-2 border-border-main px-3 py-1.5 rounded-full font-bold text-[13px] hover:bg-bg-surface-2 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Clock className="w-3.5 h-3.5 text-secondary" weight="duotone" />
-                      Đặt nhắc nhở
-                    </button>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  {message.role === "assistant" && (
+                     <span className="font-bold text-[13px] text-text-secondary">
+                        Bé Thóc
+                     </span>
+                  )}
+                  <div
+                    className={`${
+                      message.role === "user"
+                        ? "bg-[#f4f4f5] text-[#1d1d1f] rounded-[20px] px-5 py-3"
+                        : "text-[#1d1d1f] py-1"
+                    }`}
+                  >
+                    {message.role === "assistant" && message.citations && message.citations.length > 0 && (
+                      <div className="mb-3">
+                        <ChatSourceCards citations={message.citations} />
+                      </div>
+                    )}
+                    <div className="font-medium text-[15px] whitespace-pre-wrap leading-[1.6]">
+                      {message.content ? parseMessageContent(message.content) :
+                        (message.streaming ? "Đang suy nghĩ..." : "")}
+                    </div>
+
+                    {message.role === "assistant" && message.status === "completed" && (
+                      <div className="flex flex-wrap items-center gap-1 mt-3 opacity-60 hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => void handleFeedback(message, "positive")}
+                          disabled={message.feedbackSubmitting}
+                          title="Phản hồi tốt"
+                          className={`p-1.5 rounded-lg hover:bg-black/5 transition-colors ${
+                            message.feedback === "positive" ? "text-[#008A5E]" : "text-text-secondary"
+                          }`}
+                        >
+                          {message.feedbackSubmitting && message.feedback === "positive" ? (
+                            <CircleNotch className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <ThumbsUp className="w-4 h-4" weight={message.feedback === "positive" ? "fill" : "regular"} />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleFeedback(message, "negative")}
+                          disabled={message.feedbackSubmitting}
+                          title="Phản hồi chưa tốt"
+                          className={`p-1.5 rounded-lg hover:bg-black/5 transition-colors ${
+                            message.feedback === "negative" ? "text-[#FF3B30]" : "text-text-secondary"
+                          }`}
+                        >
+                          {message.feedbackSubmitting && message.feedback === "negative" ? (
+                            <CircleNotch className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <ThumbsDown className="w-4 h-4" weight={message.feedback === "negative" ? "fill" : "regular"} />
+                          )}
+                        </button>
+                        <div className="w-px h-3 bg-border-main mx-1"></div>
+                        <button
+                          onClick={() => navigate("/diary/create")}
+                          title="Ghi nhật ký"
+                          className="px-2 py-1.5 rounded-lg hover:bg-black/5 transition-colors text-text-secondary flex items-center gap-1.5 text-xs font-bold"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>Ghi nhật ký</span>
+                        </button>
+                        <button
+                          onClick={() => navigate("/reminder/create")}
+                          title="Đặt nhắc nhở"
+                          className="px-2 py-1.5 rounded-lg hover:bg-black/5 transition-colors text-text-secondary flex items-center gap-1.5 text-xs font-bold"
+                        >
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>Đặt nhắc nhở</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                ) : null}
+                </div>
               </div>
             </div>
+          ))
           ))
         )}
 
@@ -464,7 +471,7 @@ export const ChatActive: React.FC = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="w-full flex items-center gap-1.5 bg-white border-2 border-border-main rounded-full p-2 shadow-sm focus-within:border-primary-light transition-all"
+            className="w-full flex items-center gap-2 bg-white rounded-2xl p-2 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all focus-within:shadow-[0_4px_32px_rgba(0,0,0,0.1)] focus-within:border-black/[0.08]"
           >
             <input
               type="file"
@@ -478,21 +485,21 @@ export const ChatActive: React.FC = () => {
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingImage || isStreaming}
               title="Đính kèm ảnh"
-              className="p-2.5 text-text-secondary hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 active:scale-95 cursor-pointer disabled:opacity-50"
+              className="p-2.5 text-text-secondary hover:text-text-main transition-colors flex items-center justify-center rounded-xl hover:bg-bg-surface-1 cursor-pointer disabled:opacity-50"
             >
-              {isUploadingImage ? <CircleNotch className="w-[20px] h-[20px] animate-spin text-primary" weight="bold" /> : <Paperclip className="w-[20px] h-[20px]" weight="duotone" />}
+              {isUploadingImage ? <CircleNotch className="w-[22px] h-[22px] animate-spin text-text-main" weight="bold" /> : <Paperclip className="w-[22px] h-[22px]" weight="regular" />}
             </button>
             <button
               type="button"
               onClick={() => navigate("/scan")}
               title="Chụp ảnh cây trồng (Scan)"
-              className="p-2.5 text-text-secondary hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 active:scale-95 cursor-pointer"
+              className="p-2 text-text-secondary hover:text-text-main transition-colors flex items-center justify-center rounded-xl hover:bg-bg-surface-1 cursor-pointer"
             >
-              <Camera className="w-[20px] h-[20px]" weight="duotone" />
+              <Camera className="w-[22px] h-[22px]" weight="regular" />
             </button>
 
             <input
-              className="flex-1 bg-transparent border-none focus:ring-0 font-bold text-[15px] text-text-main placeholder:text-text-secondary/60 h-full py-2.5 outline-none min-w-0"
+              className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-[16px] text-text-main placeholder:text-text-secondary/50 h-full py-2.5 outline-none min-w-0 mx-1"
               placeholder="Nhắn tin Bé Thóc..."
               type="text"
               value={inputValue}
@@ -503,12 +510,12 @@ export const ChatActive: React.FC = () => {
             <button
               type="submit"
               disabled={!inputValue.trim() || isStreaming}
-              className="p-3 text-white bg-[#008A5E] rounded-full hover:bg-[#248A3D] transition-colors flex items-center justify-center mr-1 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:bg-bg-surface-2 disabled:text-text-secondary"
+              className="p-2.5 text-white bg-black rounded-xl hover:bg-black/80 transition-colors flex items-center justify-center mr-0.5 shadow-sm active:scale-95 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {isStreaming ? (
                 <CircleNotch className="w-5 h-5 animate-spin" weight="bold" />
               ) : (
-                <PaperPlaneRight className="w-[20px] h-[20px] ml-0.5" weight="bold" />
+                <PaperPlaneRight className="w-5 h-5 ml-0.5" weight="fill" />
               )}
             </button>
           </form>
