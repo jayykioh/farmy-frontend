@@ -71,6 +71,10 @@ export const CreateReminder: React.FC = () => {
       toast.error('Vui lòng nhập hoạt động vườn!');
       return;
     }
+    if (!diaryId) {
+      toast.error('Vui lòng chọn mùa vụ liên kết!');
+      return;
+    }
 
     try {
       // Parse local date & time strings back to a Date object
@@ -87,7 +91,7 @@ export const CreateReminder: React.FC = () => {
       await createReminder({
         title: titleVal,
         remind_at: remindAt.toISOString(),
-        diary_id: diaryId || undefined,
+        diary_id: diaryId,
         repeat,
       }).unwrap();
 
@@ -170,16 +174,16 @@ export const CreateReminder: React.FC = () => {
 
           {/* Selector: Vụ mùa liên kết */}
           <div className="mb-6">
-            <label className="font-extrabold text-sm text-text-secondary mb-2 block">Vụ mùa liên kết (Không bắt buộc)</label>
+            <label className="font-extrabold text-sm text-text-secondary mb-2 block">Vụ mùa liên kết (Bắt buộc)</label>
             <select
               value={diaryId}
               onChange={(e) => setDiaryId(e.target.value)}
               className="w-full px-6 py-4 bg-bg-surface-1 rounded-[20px] border-2 border-border-main focus:border-[#008A5E] font-bold text-base text-text-main shadow-sm transition-all outline-none cursor-pointer"
             >
-              <option value="">-- Không liên kết --</option>
+              <option value="">-- Chọn một vụ mùa --</option>
               {diaries.map(d => (
                 <option key={d._id} value={d._id}>
-                  {d.crop_type} ({d.plot_name})
+                  {d.crop_type} · {d.season} ({d.plot_name})
                 </option>
               ))}
             </select>

@@ -65,6 +65,15 @@ export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDone, on
             {reminder.title}
           </p>
 
+          {reminder.diary && (
+            <p
+              className="mt-1 truncate text-[12px] font-bold text-[#007A54]"
+              title={[reminder.diary.crop_type, reminder.diary.season].filter(Boolean).join(' · ')}
+            >
+              Mùa vụ: {[reminder.diary.crop_type, reminder.diary.season].filter(Boolean).join(' · ')}
+            </p>
+          )}
+
           <div className="flex items-center gap-2 mt-0.5">
             <span className={`text-[12px] font-semibold flex items-center gap-1 ${isPast ? 'text-red-500' : 'text-[var(--color-ink-2)]'}`}>
               <Clock size={12} weight="bold" />
