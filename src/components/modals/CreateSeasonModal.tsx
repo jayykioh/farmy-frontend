@@ -73,6 +73,16 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
     skip: mode === 'first-time',
   });
 
+  // Khi danh sách vườn tải xong, nếu chưa có vườn nào thì tự động chuyển sang form Tạo vườn mới
+  // Nếu có vườn và chưa chọn thì tự động chọn vườn đầu tiên cho tiện
+  React.useEffect(() => {
+    if (plots.length === 0 && !initialPlotId) {
+      setUseExistingPlot(false);
+    } else if (plots.length > 0 && !selectedExistingPlotId && !initialPlotId) {
+      setSelectedExistingPlotId(plots[0]?._id ?? '');
+    }
+  }, [plots, initialPlotId, selectedExistingPlotId]);
+
   // ─── Submit progress (idempotent retry state) ──────────────────
   const [progress, setProgress] = useState<SetupProgress>({ status: 'idle' });
 
@@ -81,7 +91,8 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   // ─── Validation ────────────────────────────────────────────────
   const validatePlotStep = (): boolean => {
     const e: Record<string, string> = {};
-    if (useExistingPlot) {
+    const isChoosingExisting = useExistingPlot && plots.length > 0 && mode !== 'first-time';
+    if (isChoosingExisting) {
       if (!selectedExistingPlotId) e.existingPlot = 'Vui lòng chọn mảnh vườn.';
     } else {
       if (!plotName.trim()) e.plotName = 'Vui lòng nhập tên mảnh vườn.';
@@ -110,7 +121,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   };
 
   const handleBack = () => {
-    if (step === 'season_info' && mode === 'first-time') {
+    if (step === 'season_info') {
       setStep('plot_info');
     }
   };
@@ -124,7 +135,8 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
 
     try {
       // Step A: Create Plot (nếu chưa tạo)
-      let plotId = progress.createdPlotId ?? (useExistingPlot ? selectedExistingPlotId : undefined);
+      const isChoosingExisting = useExistingPlot && plots.length > 0 && mode !== 'first-time';
+      let plotId = progress.createdPlotId ?? (isChoosingExisting ? selectedExistingPlotId : undefined);
       let createdPlot: FarmPlot | undefined;
 
       if (!plotId) {
@@ -200,7 +212,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-main/40">
           <div className="flex items-center gap-3">
-            {step === 'season_info' && mode === 'first-time' && (
+            {step === 'season_info' && (
               <button
                 onClick={handleBack}
                 disabled={isBusy}
@@ -304,7 +316,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
               )}
 
               {/* New Plot Form */}
-              {(!useExistingPlot || mode === 'first-time') && (
+              {(!useExistingPlot || mode === 'first-time' || plots.length === 0) && (
                 <>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-bold text-text-main ml-1">Tên mảnh vườn</label>
