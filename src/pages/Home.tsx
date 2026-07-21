@@ -7,7 +7,8 @@ import { PetMascot } from '../features/pet/components/PetMascot';
 import { SnapCard } from '../components/SnapCard';
 import { useReminders } from '../hooks/useReminders';
 import { ReminderCard } from '../components/ReminderCard';
-import { completeReminder } from '../api/reminders';
+import { completeReminder, getReminderCompletionMessage } from '../api/reminders';
+import type { Reminder } from '../api/reminders';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isToday } from 'date-fns';
 import { fetchSnapFeed } from '../api/snaps';
@@ -20,6 +21,7 @@ import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Button } from '../components/ui/Button';
 import { useGetPlotsQuery, useGetDiariesQuery } from '../store/api/farmApi';
 import { CreateSeasonModal } from '../components/modals';
+import toast from 'react-hot-toast';
 
 type SetupState = 'loading' | 'NO_PLOT' | 'NO_ACTIVE_DIARY' | 'READY';
 
@@ -55,8 +57,12 @@ export const Home: React.FC = () => {
   const todayReminders = pendingReminders.filter(r => isToday(new Date(r.remind_at)) || new Date(r.remind_at) < new Date());
 
   const completeMutation = useMutation({
-    mutationFn: completeReminder,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reminders'] }); },
+    mutationFn: (reminder: Reminder) => completeReminder(reminder._id),
+    onSuccess: (_result, reminder) => {
+      queryClient.invalidateQueries({ queryKey: ['reminders'] });
+      toast.success(getReminderCompletionMessage(reminder));
+    },
+    onError: () => toast.error('Không thể hoàn thành nhắc nhở. Vui lòng thử lại!'),
   });
 
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
@@ -191,7 +197,7 @@ export const Home: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {todayReminders.slice(0, 3).map(r => (<ReminderCard key={r._id} reminder={r} onDone={() => completeMutation.mutate(r._id)} />))}
+                  {todayReminders.slice(0, 3).map(r => (<ReminderCard key={r._id} reminder={r} onDone={() => completeMutation.mutate(r)} />))}
                 </div>
               )}
             </section>

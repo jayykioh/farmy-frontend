@@ -10,6 +10,11 @@ export type Reminder = {
   title: string;
   remind_at: string;
   diary_id?: string;
+  diary?: {
+    _id: string;
+    crop_type: string;
+    season?: string;
+  };
   type?: ReminderType;
   schedule_slot?: ScheduleSlot;
   action_type?: string;
@@ -24,7 +29,7 @@ export type Reminder = {
 export type CreateReminderPayload = {
   title: string;
   remind_at: string;
-  diary_id?: string;
+  diary_id: string;
   type?: ReminderType;
   schedule_slot?: ScheduleSlot;
   action_type?: string;
@@ -33,6 +38,13 @@ export type CreateReminderPayload = {
 };
 
 export type UpdateReminderPayload = Partial<CreateReminderPayload>;
+
+export const getReminderCompletionMessage = (reminder: Reminder) => {
+  const season = reminder.diary
+    ? [reminder.diary.crop_type, reminder.diary.season].filter(Boolean).join(' · ')
+    : 'mùa vụ đã liên kết';
+  return `Đã hoàn thành "${reminder.title}" ở mùa vụ ${season} hôm nay!`;
+};
 
 export const fetchReminders = async (params?: { status?: string }) => {
   const { data } = await api.get<ApiResponse<Reminder[]>>('/reminders', { params });

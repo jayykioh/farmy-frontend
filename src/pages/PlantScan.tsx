@@ -9,16 +9,18 @@ import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { PageHeader } from '../components/PageHeader';
-import { useUploadPlantScanMutation } from '../store/api/farmApi';
+import { useGetPlantScansQuery, useUploadPlantScanMutation } from '../store/api/farmApi';
 import { extractPlantScanErrorCode } from '../api/plantScan';
 import type { PlantScanResult } from '../types/plantScan';
 import toast from 'react-hot-toast';
 
 type ScanState = 'viewfinder' | 'analyzing' | 'result';
+type ScanView = 'scan' | 'history';
 
 export const PlantScan: React.FC = () => {
   const navigate = useNavigate();
   const [scanState, setScanState] = useState<ScanState>('viewfinder');
+  const [activeView, setActiveView] = useState<ScanView>('scan');
   
   const { data: petStatusRaw } = usePetStatus();
   const petStatus = petStatusRaw ?? PET_STATUS_FALLBACK;
@@ -38,6 +40,12 @@ export const PlantScan: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraRequestRef = useRef(0);
   const [uploadPlantScan] = useUploadPlantScanMutation();
+  const {
+    data: scanHistory,
+    isLoading: isHistoryLoading,
+    isError: isHistoryError,
+    refetch: refetchHistory,
+  } = useGetPlantScansQuery(undefined, { skip: activeView !== 'history' });
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -86,16 +94,16 @@ export const PlantScan: React.FC = () => {
   }, [facingMode, stopCamera]);
 
   useEffect(() => {
-    if (scanState === 'viewfinder') {
+    if (activeView === 'scan' && scanState === 'viewfinder') {
       startCamera();
     } else {
       stopCamera();
     }
     return () => stopCamera();
-  }, [scanState, startCamera, stopCamera]);
+  }, [activeView, scanState, startCamera, stopCamera]);
 
   useEffect(() => {
-    if (scanState === 'viewfinder' && stream && videoRef.current) {
+    if (activeView === 'scan' && scanState === 'viewfinder' && stream && videoRef.current) {
       const video = videoRef.current;
       video.srcObject = stream;
       video.onloadedmetadata = () => {
@@ -108,7 +116,15 @@ export const PlantScan: React.FC = () => {
     } else {
       setIsCameraReady(false);
     }
-  }, [scanState, stream]);
+  }, [activeView, scanState, stream]);
+
+  const openHistoryItem = (item: PlantScanResult) => {
+    setScanResult(item);
+    setSelectedCrop(item.crop_type);
+    setPreviewUrl(item.image_url || item.thumbnail_url || null);
+    setScanState('result');
+    setActiveView('scan');
+  };
 
   // Cleanup object URL
   useEffect(() => {
@@ -246,7 +262,25 @@ export const PlantScan: React.FC = () => {
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Main Content Canvas */}
-      <main className={`flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-8 flex flex-col ${scanState === 'result' ? 'md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 mt-4' : 'mt-4'}`}>
+      <main className={`flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 pt-24 pb-8 flex flex-col ${activeView === 'scan' && scanState === 'result' ? 'md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 mt-4' : 'mt-4'}`}>
+        <div className={`${scanState === 'result' && activeView === 'scan' ? 'col-span-12' : ''} w-full max-w-md mx-auto mb-6 grid grid-cols-2 gap-2 rounded-[18px] border-2 border-border-main bg-white p-1.5 shadow-sm`}>
+          <button
+            type="button"
+            onClick={() => setActiveView('scan')}
+            aria-pressed={activeView === 'scan'}
+            className={`rounded-[13px] px-4 py-2.5 text-sm font-black transition-all cursor-pointer ${activeView === 'scan' ? 'bg-[#008A5E] text-white shadow-sm' : 'text-text-secondary hover:bg-bg-surface-1'}`}
+          >
+            Quét cây
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveView('history')}
+            aria-pressed={activeView === 'history'}
+            className={`rounded-[13px] px-4 py-2.5 text-sm font-black transition-all cursor-pointer ${activeView === 'history' ? 'bg-[#008A5E] text-white shadow-sm' : 'text-text-secondary hover:bg-bg-surface-1'}`}
+          >
+            Lịch sử ({scanHistory?.total ?? 0})
+          </button>
+        </div>
         
         {/* Hidden File Input */}
         <input 
@@ -257,7 +291,67 @@ export const PlantScan: React.FC = () => {
           onChange={handleFileSelect} 
         />
 
-        {scanState === 'viewfinder' ? (
+        {activeView === 'history' ? (
+          <section className="w-full max-w-4xl mx-auto" aria-label="Lịch sử quét cây">
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-black text-text-h">Lịch sử PlantScan</h2>
+                <p className="mt-1 text-sm font-bold text-text-secondary">Xem lại chẩn đoán và hướng xử lý đã lưu.</p>
+              </div>
+              <button type="button" onClick={() => refetchHistory()} className="btn btn--soft px-4 py-2 text-sm font-bold cursor-pointer">
+                Làm mới
+              </button>
+            </div>
+
+            {isHistoryLoading ? (
+              <div className="card-bubble flex min-h-48 items-center justify-center bg-white border-2 border-border-main">
+                <div className="h-9 w-9 animate-spin rounded-full border-4 border-primary/20 border-t-[#008A5E]" aria-label="Đang tải lịch sử" />
+              </div>
+            ) : isHistoryError ? (
+              <div className="card-bubble bg-white border-2 border-red-200 p-8 text-center">
+                <p className="font-black text-red-700">Không thể tải lịch sử quét.</p>
+                <button type="button" onClick={() => refetchHistory()} className="btn btn--coral mt-4 px-5 py-2.5 font-bold cursor-pointer">Thử lại</button>
+              </div>
+            ) : !scanHistory?.items.length ? (
+              <div className="card-bubble bg-white border-2 border-border-main p-10 text-center">
+                <p className="text-lg font-black text-text-h">Chưa có lần quét nào</p>
+                <p className="mt-2 text-sm font-bold text-text-secondary">Ảnh và kết quả quét thành công sẽ tự động xuất hiện tại đây.</p>
+                <button type="button" onClick={() => setActiveView('scan')} className="btn btn--cyan mt-5 px-6 py-3 font-black cursor-pointer">Quét cây đầu tiên</button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {scanHistory.items.map((item) => (
+                  <button
+                    type="button"
+                    key={item.scan_id}
+                    onClick={() => openHistoryItem(item)}
+                    className="card-bubble overflow-hidden bg-white border-2 border-border-main text-left cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md"
+                  >
+                    <div className="aspect-[4/3] bg-bg-surface-2 overflow-hidden">
+                      {item.thumbnail_url || item.image_url ? (
+                        <img src={item.thumbnail_url || item.image_url} alt={`Ảnh quét ${item.crop_type}`} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm font-bold text-text-secondary">Không có ảnh</div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="rounded-full bg-primary-light/20 px-2.5 py-1 text-[11px] font-black text-[#008A5E]">{item.crop_type}</span>
+                        <span className="text-[11px] font-bold text-text-secondary">
+                          {item.created_at ? new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(new Date(item.created_at)) : ''}
+                        </span>
+                      </div>
+                      <h3 className="mt-3 line-clamp-2 text-base font-black text-text-h">{item.diagnosis?.disease_name || 'Không phát hiện bệnh'}</h3>
+                      <p className="mt-1 text-sm font-bold text-text-secondary">Độ chính xác: {Math.round((item.diagnosis?.confidence ?? 0) * 100)}%</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
+        ) : null}
+
+        {activeView === 'scan' && scanState === 'viewfinder' ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full w-full max-w-md mx-auto gap-6 relative">
             {/* Viewfinder Area */}
             <div className="relative w-full aspect-[3/4] bg-black rounded-[32px] overflow-hidden shadow-xl border-4 border-border-main flex flex-col">
@@ -328,7 +422,7 @@ export const PlantScan: React.FC = () => {
           </div>
         ) : null}
 
-        {scanState === 'analyzing' ? (
+        {activeView === 'scan' && scanState === 'analyzing' ? (
           <div className="flex-1 flex flex-col items-center justify-center h-full w-full max-w-md mx-auto gap-6">
             <div className="w-48 h-48 relative flex items-center justify-center">
               <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
@@ -339,7 +433,7 @@ export const PlantScan: React.FC = () => {
           </div>
         ) : null}
 
-        {scanState === 'result' && scanResult ? (
+        {activeView === 'scan' && scanState === 'result' && scanResult ? (
           <>
             {/* Left Column: Scan Preview Area */}
             <section className="col-span-12 md:col-span-6 lg:col-span-5 h-fit relative w-full aspect-[4/3] md:aspect-[3/4] lg:aspect-square rounded-[32px] border-2 border-border-main bg-white overflow-hidden flex items-center justify-center shadow-sm">

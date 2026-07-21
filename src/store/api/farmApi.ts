@@ -1,6 +1,6 @@
 import { baseApi } from './baseApi';
 import type { FarmPlot, Diary, DiaryLog, Reminder } from '../../api/farm';
-import type { PlantScanResult } from '../../types/plantScan';
+import type { PlantScanHistoryResponse, PlantScanResult } from '../../types/plantScan';
 
 export const farmApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -43,7 +43,7 @@ export const farmApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: Diary }) => response.data,
       providesTags: (_result, _error, id) => [{ type: 'Diary', id }],
     }),
-    createDiary: builder.mutation<Diary, { plot_id: string; crop_type: string; start_date: string }>({
+    createDiary: builder.mutation<Diary, { plot_id: string; crop_type: string; season: string; start_date: string }>({
       query: (diary) => ({
         url: '/diaries',
         method: 'POST',
@@ -52,7 +52,7 @@ export const farmApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: Diary }) => response.data,
       invalidatesTags: [{ type: 'Diary', id: 'LIST' }],
     }),
-    updateDiary: builder.mutation<Diary, { id: string; data: Partial<{ plot_id: string; crop_type: string; start_date: string; status: string }> }>({
+    updateDiary: builder.mutation<Diary, { id: string; data: Partial<{ plot_id: string; crop_type: string; season: string; start_date: string; status: string }> }>({
       query: ({ id, data }) => ({
         url: `/diaries/${id}`,
         method: 'PUT',
@@ -156,7 +156,7 @@ export const farmApi = baseApi.injectEndpoints({
     }),
     createReminder: builder.mutation<
       Reminder,
-      { title: string; remind_at: string; diary_id?: string; repeat?: 'none' | 'daily' | 'weekly' }
+      { title: string; remind_at: string; diary_id: string; repeat?: 'none' | 'daily' | 'weekly' }
     >({
       query: (reminder) => ({
         url: '/reminders',
@@ -176,6 +176,12 @@ export const farmApi = baseApi.injectEndpoints({
         data: formData,
       }),
       transformResponse: (response: { data: PlantScanResult }) => response.data,
+      invalidatesTags: [{ type: 'PlantScan', id: 'LIST' }],
+    }),
+    getPlantScans: builder.query<PlantScanHistoryResponse, void>({
+      query: () => ({ url: '/plant-scans', params: { limit: 30 } }),
+      transformResponse: (response: { data: PlantScanHistoryResponse }) => response.data,
+      providesTags: [{ type: 'PlantScan', id: 'LIST' }],
     }),
 
   }),
@@ -196,6 +202,7 @@ export const {
   useCancelReminderMutation,
   useCreateReminderMutation,
   useUploadPlantScanMutation,
+  useGetPlantScansQuery,
   useUpdateDiaryMutation,
   useDeleteDiaryMutation,
 } = farmApi;

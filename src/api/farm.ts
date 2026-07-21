@@ -13,6 +13,7 @@ export interface Diary {
   _id: string;
   plot_id: string;
   crop_type: string;
+  season: string;
   start_date: string;
   status: 'active' | 'archived' | 'deleted';
   metadata?: Record<string, any>;
@@ -42,6 +43,7 @@ export interface Reminder {
   _id: string;
   user_id: string;
   diary_id?: string;
+  diary?: Pick<Diary, '_id' | 'crop_type' | 'season'>;
   title: string;
   remind_at: string;
   is_sent: boolean;
@@ -70,7 +72,7 @@ export const getDiaryDetail = async (id: string): Promise<Diary> => {
   return data.data;
 };
 
-export const createDiary = async (diary: { plot_id: string; crop_type: string; start_date: string }): Promise<Diary> => {
+export const createDiary = async (diary: { plot_id: string; crop_type: string; season: string; start_date: string }): Promise<Diary> => {
   const { data } = await api.post<{ data: Diary }>('/diaries', diary);
   return data.data;
 };

@@ -1,0 +1,298 @@
+{
+  "lua-nuoc": {
+    "crop": "Lúa nước",
+    "file": "lua-nuoc.png",
+    "source": "User-provided attachment",
+    "artist": "User-provided",
+    "license": "User-provided asset",
+    "licenseUrl": null
+  },
+  "lua-nep": {
+    "crop": "glutinous rice grains",
+    "file": "File:Red glutinous rice (1).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Red_glutinous_rice_(1).jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Fumikas_Sagisavas\" title=\"User:Fumikas Sagisavas\">Fumikas Sagisavas</a>",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  },
+  "lua-thom": {
+    "crop": "Lúa thơm",
+    "file": "lua-thom.png",
+    "source": "User-provided attachment",
+    "artist": "User-provided",
+    "license": "User-provided asset",
+    "licenseUrl": null
+  },
+  "robusta": {
+    "crop": "Coffea canephora robusta coffee cherries",
+    "file": "File:Coffea canephora 1 at Aanakkulam.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coffea_canephora_1_at_Aanakkulam.jpg",
+    "artist": "<div class=\"fn value\">\n<a href=\"//commons.wikimedia.org/wiki/User:Jkadavoor\" title=\"User:Jkadavoor\">Jeevan Jose, Kerala, India</a></div>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "arabica": {
+    "crop": "Coffea arabica coffee cherries",
+    "file": "File:Coffea Arabica.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coffea_Arabica.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Aldrina_A_Manashe\" title=\"User:Aldrina A Manashe\">Aldrina A Manashe</a>",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  },
+  "liberica": {
+    "crop": "Coffea liberica plant",
+    "file": "File:Coffee tree chary.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coffee_tree_chary.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:DXLINH&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:DXLINH (page does not exist)\">DXLINH</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "buoi": {
+    "crop": "pomelo Citrus maxima fruit",
+    "file": "File:Pomelo fruit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Pomelo_fruit.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Iifar\" title=\"User:Iifar\">Ivar Leidus</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "cam": {
+    "crop": "orange fruit Citrus sinensis",
+    "file": "File:Oranges - whole-halved-segment.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Oranges_-_whole-halved-segment.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Iifar\" title=\"User:Iifar\">Ivar Leidus</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "xoai": {
+    "crop": "mango fruit Mangifera indica",
+    "file": "File:Mangifera indica var. José.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Mangifera_indica_var._Jos%C3%A9.JPG",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:B.navez\" title=\"User:B.navez\">B.navez</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "sau-rieng": {
+    "crop": "durian fruit Durio zibethinus",
+    "file": "File:A durian (Durio zibethinus); an entire and sectioned fruit. Wellcome V0044772.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:A_durian_(Durio_zibethinus);_an_entire_and_sectioned_fruit._Wellcome_V0044772.jpg",
+    "artist": "Wikimedia Commons contributor",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0"
+  },
+  "thanh-long": {
+    "crop": "dragon fruit Hylocereus",
+    "file": "File:Hylocereus undatus-fruit20180201 118(07,24,36).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Hylocereus_undatus-fruit20180201_118(07,24,36).jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Bff\" title=\"User:Bff\">Bff</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "chom-chom": {
+    "crop": "rambutan fruit Nephelium lappaceum",
+    "file": "File:Rambutan fruit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Rambutan_fruit.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Challiyan\" title=\"User:Challiyan\">Challiyan</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "mit": {
+    "crop": "jackfruit Artocarpus heterophyllus fruit",
+    "file": "File:Jackfruit Flesh.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Jackfruit_Flesh.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Mullookkaaran&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Mullookkaaran (page does not exist)\">Mullookkaaran</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "nhan": {
+    "crop": "longan fruit Dimocarpus longan",
+    "file": "File:Dimocarpus longan (4).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Dimocarpus_longan_(4).jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Dinkun_Chen\" title=\"User:Dinkun Chen\">Dinkun Chen</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "ca-chua": {
+    "crop": "tomato fruit plant Solanum lycopersicum",
+    "file": "File:Bright red tomato and cross section02.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bright_red_tomato_and_cross_section02.jpg",
+    "artist": "<p><br style=\"clear:both\">\n</p>\n<table align=\"CENTER\" style=\"width:80%; background-color:#f7f8ff; border:2px solid #8888aa; padding:5px;\">\n\n<tbody><tr>\n<td><table border=\"0\" width=\"100%\" style=\"background-color:#f7f8ff;\">\n\t<tbody><tr style=\"font-family: Segoe UI, Trebuchet MS, serif;\">\n\t\t<td align=\"center\" valign=\"top\">\n\t\t<div style=\"padding-bottom:25px;\"><span style=\"font-size:large\"><b><a href=\"https://en.wikipedia.org/wiki/User:Fir0002\" class=\"extiw\" title=\"en:User:Fir0002\">fir0002</a> <br> flagstaffotos [at] gmail.com</b></span></div>\n\t\t<div style=\"font-size:11pt\">Canon 20D + Sigma 150mm f/2.8</div>\n</td>\n\t\t<td valign=\"top\" align=\"left\">\n                    <table border=\"0\" width=\"240\" style=\"background-color:#f7f8ff;\">\n                         <tbody><tr>\n                         <td valign=\"top\"><figure class=\"mw-halign-left\" typeof=\"mw:File\"><a href=\"//commons.wikimedia.org/wiki/File:Sigma_150_macro.jpg\" class=\"mw-file-description\"><img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Sigma_150_macro.jpg/120px-Sigma_150_macro.jpg\" decoding=\"async\" width=\"120\" height=\"80\" class=\"mw-file-element\" srcset=\"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Sigma_150_macro.jpg/250px-Sigma_150_macro.jpg 2x\" data-file-width=\"1600\" data-file-height=\"1067\"></a><figcaption></figcaption></figure></td>\n                         <td valign=\"top\"><figure class=\"mw-halign-left\" typeof=\"mw:File\"><a href=\"//commons.wikimedia.org/wiki/File:Sigma_150_macro02.jpg\" class=\"mw-file-description\"><img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Sigma_150_macro02.jpg/120px-Sigma_150_macro02.jpg\" decoding=\"async\" width=\"120\" height=\"80\" class=\"mw-file-element\" srcset=\"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Sigma_150_macro02.jpg/250px-Sigma_150_macro02.jpg 2x\" data-file-width=\"1600\" data-file-height=\"1067\"></a><figcaption></figcaption></figure></td>\n                         <td valign=\"top\"><figure class=\"mw-halign-left\" typeof=\"mw:File\"><a href=\"//commons.wikimedia.org/wiki/File:Sigma_150_macro03.jpg\" class=\"mw-file-description\"><img src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Sigma_150_macro03.jpg/120px-Sigma_150_macro03.jpg\" decoding=\"async\" width=\"120\" height=\"80\" class=\"mw-file-element\" srcset=\"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Sigma_150_macro03.jpg/250px-Sigma_150_macro03.jpg 2x\" data-file-width=\"1600\" data-file-height=\"1067\"></a><figcaption></figcaption></figure></td>\n                         </tr>\n                         </tbody></table>\n\t\t</td>\n\t</tr>\n</tbody></table>\n</td></tr></tbody></table>",
+    "license": "GFDL 1.2",
+    "licenseUrl": "http://www.gnu.org/licenses/old-licenses/fdl-1.2.html"
+  },
+  "bap-cai": {
+    "crop": "cabbage Brassica oleracea head",
+    "file": "File:Brassica oleracea var. capitata (4170722993).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Brassica_oleracea_var._capitata_(4170722993).jpg",
+    "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/91314344@N00\">Dinesh Valke</a> from Thane, India",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0"
+  },
+  "dua-leo": {
+    "crop": "fresh cucumber Cucumis sativus",
+    "file": "File:Плід огірка звичайного.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:%D0%9F%D0%BB%D1%96%D0%B4_%D0%BE%D0%B3%D1%96%D1%80%D0%BA%D0%B0_%D0%B7%D0%B2%D0%B8%D1%87%D0%B0%D0%B9%D0%BD%D0%BE%D0%B3%D0%BE.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:%D0%A1%D0%B0%D1%80%D0%B0%D0%BF%D1%83%D0%BB%D0%BE%D0%B2\" title=\"User:Сарапулов\">Сарапулов</a>",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0"
+  },
+  "ot": {
+    "crop": "red chili pepper Capsicum annuum",
+    "file": "File:Dried Capsicum annuum-Red Chilli Pepper on Nanglo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Dried_Capsicum_annuum-Red_Chilli_Pepper_on_Nanglo.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Sabina_Bajracharya\" title=\"User:Sabina Bajracharya\">Sabina Bajracharya</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "hanh": {
+    "crop": "onion Allium cepa bulbs",
+    "file": "File:Allium cepa viviparum 003.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Allium_cepa_viviparum_003.JPG",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Llez\" title=\"User:Llez\">H. Zell</a>",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+  },
+  "rau-muong": {
+    "crop": "water spinach Ipomoea aquatica",
+    "file": "File:N Ipoa D1600.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:N_Ipoa_D1600.JPG",
+    "artist": "Eric Guinther",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  "tieu": {
+    "crop": "black pepper Piper nigrum plant berries",
+    "file": "File:Black Pepper (Piper nigrum) fruits.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Black_Pepper_(Piper_nigrum)_fruits.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Kallidaimaniac&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Kallidaimaniac (page does not exist)\">K Hari Krishnan</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "dieu": {
+    "crop": "cashew Anacardium occidentale fruit",
+    "file": "File:முந்திரி பழம் cashew fruit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:%E0%AE%AE%E0%AF%81%E0%AE%A8%E0%AF%8D%E0%AE%A4%E0%AE%BF%E0%AE%B0%E0%AE%BF_%E0%AE%AA%E0%AE%B4%E0%AE%AE%E0%AF%8D_cashew_fruit.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:TNSE_NEETHI_VPM\" class=\"mw-redirect\" title=\"User:TNSE NEETHI VPM\">TNSE NEETHI VPM</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "cao-su": {
+    "crop": "rubber tree plantation Hevea brasiliensis",
+    "file": "File:Rubber Plantation.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Rubber_Plantation.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Andreaskrappweis&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Andreaskrappweis (page does not exist)\">Andreaskrappweis</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "mia": {
+    "crop": "sugarcane Saccharum officinarum field",
+    "file": "File:Starr-060416-7685-Saccharum officinarum-remnant in abandoned field-Paia-Maui (24861689745).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Starr-060416-7685-Saccharum_officinarum-remnant_in_abandoned_field-Paia-Maui_(24861689745).jpg",
+    "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/97499887@N06\">Forest and Kim Starr</a>",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  },
+  "khac": {
+    "crop": "green seedling growing in soil plant",
+    "file": "File:Seedling in soil.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Seedling_in_soil.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Picturesque64&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Picturesque64 (page does not exist)\">Picturesque64</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "chuoi": {
+    "crop": "banana plant fruit Musa",
+    "file": "File:Cavendish banana from Maracaibo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Cavendish_banana_from_Maracaibo.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Wilfredor\" class=\"mw-redirect\" title=\"User:Wilfredor\">Wilfredor</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "dua": {
+    "crop": "coconut palm fruit Cocos nucifera",
+    "file": "File:Coconuts - single and cracked open.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coconuts_-_single_and_cracked_open.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Iifar\" title=\"User:Iifar\">Ivar Leidus</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "du-du": {
+    "crop": "papaya fruit tree Carica papaya",
+    "file": "File:Carica papaya 14 7 2012.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Carica_papaya_14_7_2012.jpg",
+    "artist": "<p><a href=\"//commons.wikimedia.org/wiki/User:Joydeep\" title=\"User:Joydeep\">Joydeep</a>\n</p>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "oi": {
+    "crop": "guava fruit Psidium guajava",
+    "file": "File:Guava - Psidium guajava fruit of Cuba.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Guava_-_Psidium_guajava_fruit_of_Cuba.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Sarang\" title=\"User:Sarang\">Sarang</a>",
+    "license": "Public domain",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:Guava_-_Psidium_guajava_fruit_of_Cuba.jpg"
+  },
+  "bo": {
+    "crop": "avocado fruit Persea americana",
+    "file": "File:Avocado with cross section edit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Avocado_with_cross_section_edit.jpg",
+    "artist": "<b><a href=\"https://en.wikipedia.org/wiki/User:Muhammad_Mahdi_Karim\" class=\"extiw\" title=\"w:User:Muhammad Mahdi Karim\">Muhammad Mahdi Karim</a></b>",
+    "license": "GFDL 1.2",
+    "licenseUrl": "http://www.gnu.org/licenses/old-licenses/fdl-1.2.html"
+  },
+  "ngo": {
+    "crop": "maize corn cobs Zea mays",
+    "file": "File:Zea mays 005.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Zea_mays_005.JPG",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Llez\" title=\"User:Llez\">H. Zell</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0"
+  },
+  "khoai-tay": {
+    "crop": "potato tubers Solanum tuberosum",
+    "file": "File:Solanales - Solanum tuberosum - 5.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Solanales_-_Solanum_tuberosum_-_5.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:DenesFeri\" title=\"User:DenesFeri\">DenesFeri</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "khoai-lang": {
+    "crop": "sweet potato tubers Ipomoea batatas",
+    "file": "File:Ipomoea batatas - Tubers.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Ipomoea_batatas_-_Tubers.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:Filo_g%C3%A8n%27\" title=\"User:Filo gèn'\">Filo gèn'</a>",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+  },
+  "lac": {
+    "crop": "peanut pods Arachis hypogaea",
+    "file": "File:Peanut 9417.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Peanut_9417.jpg",
+    "artist": "<a href=\"https://en.wikipedia.org/wiki/User:Pollinator\" class=\"extiw\" title=\"en:User:Pollinator\">Pollinator</a>",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  "dau-nanh": {
+    "crop": "soybean pods Glycine max",
+    "file": "File:Closeup of Soybean Pods (10060092536).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Closeup_of_Soybean_Pods_(10060092536).jpg",
+    "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/95352257@N06\">United Soybean Board</a>",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  },
+  "che": {
+    "crop": "tea plant Camellia sinensis leaves",
+    "file": "File:Tea Leaves. Also known as \"Camellia Sinensis\".jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Tea_Leaves._Also_known_as_%22Camellia_Sinensis%22.jpg",
+    "artist": "<a href=\"//commons.wikimedia.org/wiki/User:VickyOmondi\" title=\"User:VickyOmondi\">VickyOmondi</a>",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  },
+  "san": {
+    "crop": "cassava roots Manihot esculenta",
+    "file": "File:Manihot esculenta, the Cassava plant (17254469394).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Manihot_esculenta,_the_Cassava_plant_(17254469394).jpg",
+    "artist": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/92252798@N07\">Dick Culbert</a> from Gibsons, B.C., Canada",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  }
+}
