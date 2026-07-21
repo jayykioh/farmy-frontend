@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Reminder } from '../api/reminders';
-import { CheckCircle, Clock, Drop, Flask, Bug, Plant, NotePencil, ChartBar, Trophy, Warning } from '@phosphor-icons/react';
+import { CheckCircle, Clock, Drop, Flask, Bug, Plant, Leaf, NotePencil, ChartBar, Trophy, Warning } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale/vi';
 import { motion } from 'framer-motion';
@@ -15,6 +15,7 @@ const activityConfig: Record<string, { icon: React.ReactNode; bg: string; iconBg
   water:            { icon: <Drop size={20} weight="duotone" />,        bg: 'bg-[#EDF8FF]',  iconBg: 'bg-[#C6EEFF] text-[#0284C7]', accent: 'text-[#0284C7]' },
   fertilize:        { icon: <Flask size={20} weight="duotone" />,       bg: 'bg-[#F5F3FF]',  iconBg: 'bg-[#EDE9FE] text-[#7C3AED]', accent: 'text-[#7C3AED]' },
   pesticide:        { icon: <Bug size={20} weight="duotone" />,         bg: 'bg-[#FFF7ED]',  iconBg: 'bg-[#FED7AA] text-[#C2410C]', accent: 'text-[#C2410C]' },
+  weeding:          { icon: <Leaf size={20} weight="duotone" />,        bg: 'bg-[#F0FDF4]',  iconBg: 'bg-[#DCFCE7] text-[#16803C]', accent: 'text-[#16803C]' },
   harvest:          { icon: <Plant size={20} weight="duotone" />,       bg: 'bg-[#F0FDF4]',  iconBg: 'bg-[#BBF7D0] text-[#15803D]', accent: 'text-[#15803D]' },
   diary:            { icon: <NotePencil size={20} weight="duotone" />,  bg: 'bg-[#FFFBEB]',  iconBg: 'bg-[#FDE68A] text-[#B45309]', accent: 'text-[#B45309]' },
   plant_alert:      { icon: <Warning size={20} weight="duotone" />,     bg: 'bg-[#FFF1F2]',  iconBg: 'bg-[#FFE4E6] text-[#BE123C]', accent: 'text-[#BE123C]' },
@@ -23,12 +24,22 @@ const activityConfig: Record<string, { icon: React.ReactNode; bg: string; iconBg
   other:            { icon: <NotePencil size={20} weight="duotone" />,  bg: 'bg-[var(--color-paper-2)]', iconBg: 'bg-[var(--color-paper-3)] text-[var(--color-ink-2)]', accent: 'text-[var(--color-ink-2)]' },
 };
 
+const getActivityKey = (reminder: Reminder) => {
+  if (reminder.action_type && activityConfig[reminder.action_type]) return reminder.action_type;
+  const normalizedTitle = reminder.title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (normalizedTitle.includes('tuoi')) return 'water';
+  if (normalizedTitle.includes('bon phan')) return 'fertilize';
+  if (normalizedTitle.includes('phun') || normalizedTitle.includes('thuoc')) return 'pesticide';
+  if (normalizedTitle.includes('lam co') || normalizedTitle.includes('nhat co')) return 'weeding';
+  return reminder.type || 'other';
+};
+
 export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDone, onSnooze }) => {
   const remindAtDate = new Date(reminder.remind_at);
   const isPast = remindAtDate < new Date() && reminder.status !== 'completed';
   const isCompleted = reminder.status === 'completed';
 
-  const config = activityConfig[reminder.type || 'other'] ?? activityConfig['other'];
+  const config = activityConfig[getActivityKey(reminder)] ?? activityConfig['other'];
 
   return (
     <motion.div
