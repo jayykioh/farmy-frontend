@@ -16,6 +16,7 @@ export type CropOption = {
   color: string;
   /** Màu ring khi selected */
   ringColor: string;
+  aliases?: string[];
 };
 
 export type CropCategory = {
@@ -95,10 +96,77 @@ export const CROP_CATEGORIES: CropCategory[] = [
   },
 ];
 
+/** Cây phổ biến được nhận diện khi người dùng nhập trong mục "Khác". */
+export const DETECTABLE_CROPS: CropOption[] = [
+  { id: 'chuoi', label: 'Chuối', emoji: '🍌', color: 'bg-yellow-50', ringColor: 'ring-yellow-400', aliases: ['cây chuối', 'banana'] },
+  { id: 'dua', label: 'Dừa', emoji: '🥥', color: 'bg-emerald-50', ringColor: 'ring-emerald-400', aliases: ['cây dừa', 'coconut'] },
+  { id: 'du-du', label: 'Đu đủ', emoji: '🍈', color: 'bg-orange-50', ringColor: 'ring-orange-400', aliases: ['cây đu đủ', 'papaya'] },
+  { id: 'oi', label: 'Ổi', emoji: '🍐', color: 'bg-green-50', ringColor: 'ring-green-400', aliases: ['cây ổi', 'guava'] },
+  { id: 'bo', label: 'Bơ', emoji: '🥑', color: 'bg-lime-50', ringColor: 'ring-lime-500', aliases: ['cây bơ', 'avocado'] },
+  { id: 'ngo', label: 'Ngô', emoji: '🌽', color: 'bg-yellow-50', ringColor: 'ring-yellow-500', aliases: ['bắp', 'cây ngô', 'cây bắp', 'corn', 'maize'] },
+  { id: 'khoai-tay', label: 'Khoai tây', emoji: '🥔', color: 'bg-amber-50', ringColor: 'ring-amber-400', aliases: ['potato'] },
+  { id: 'khoai-lang', label: 'Khoai lang', emoji: '🍠', color: 'bg-purple-50', ringColor: 'ring-purple-400', aliases: ['sweet potato'] },
+  { id: 'lac', label: 'Lạc', emoji: '🥜', color: 'bg-amber-50', ringColor: 'ring-amber-500', aliases: ['đậu phộng', 'dau phong', 'peanut'] },
+  { id: 'dau-nanh', label: 'Đậu nành', emoji: '🫘', color: 'bg-green-50', ringColor: 'ring-green-500', aliases: ['đậu tương', 'dau tuong', 'soybean'] },
+  { id: 'che', label: 'Chè', emoji: '🍃', color: 'bg-emerald-50', ringColor: 'ring-emerald-500', aliases: ['trà', 'cây chè', 'tea'] },
+  { id: 'san', label: 'Sắn', emoji: '🌿', color: 'bg-lime-50', ringColor: 'ring-lime-500', aliases: ['khoai mì', 'khoai mi', 'cassava'] },
+];
+
 /** Map từ crop id → label để dùng khi gửi API */
 const CROP_LABEL_MAP: Record<string, string> = Object.fromEntries(
   CROP_CATEGORIES.flatMap((cat) => cat.crops.map((c) => [c.id, c.label]))
 );
+
+const normalizeCropName = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]/g, '');
+
+/** Một nguồn dữ liệu duy nhất cho hình đại diện ở picker và kết quả diary. */
+export const getCropOption = (cropType: string): CropOption | undefined => {
+  const normalized = normalizeCropName(cropType);
+  const crops = [...CROP_CATEGORIES.flatMap((category) => category.crops), ...DETECTABLE_CROPS];
+  const aliases: Record<string, string> = {
+    lua: 'luanuoc',
+    caphe: 'arabica',
+    cayankhai: 'khac',
+    caykhac: 'khac',
+  };
+  const resolved = aliases[normalized] ?? normalized;
+  const exactMatch = crops.find(
+    (crop) =>
+      normalizeCropName(crop.label) === resolved ||
+      normalizeCropName(crop.id) === resolved ||
+      crop.aliases?.some((alias) => normalizeCropName(alias) === resolved),
+  );
+  if (exactMatch) return exactMatch;
+
+  const searchableNames = (crop: CropOption) => [crop.label, crop.id, ...(crop.aliases ?? [])]
+    .map(normalizeCropName)
+    .filter((name) => name.length >= 3);
+  return crops
+    .map((crop) => ({
+      crop,
+      score: Math.max(
+        0,
+        ...searchableNames(crop)
+          .filter((name) => resolved.includes(name))
+          .map((name) => name.length),
+      ),
+    }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)[0]?.crop;
+};
+
+export const getCropImagePath = (cropType: string): string | undefined => {
+  const crop = getCropOption(cropType);
+  if (!crop) return undefined;
+  const pngOverrides = new Set(['lua-nuoc', 'lua-thom']);
+  return `/crops/${crop.id}.${pngOverrides.has(crop.id) ? 'png' : 'webp'}`;
+};
 
 type Props = {
   value: string; // crop id hoặc rỗng
@@ -107,6 +175,7 @@ type Props = {
 };
 
 export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
+  const [customCropLabel, setCustomCropLabel] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(() => {
     // Nếu đã có value, tự tìm category tương ứng
     if (!value) return null;
@@ -177,7 +246,11 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
                     </svg>
                   </div>
                 )}
-                <span className="text-2xl" role="img" aria-label={crop.label}>{crop.emoji}</span>
+                <img
+                  src={getCropImagePath(crop.id)}
+                  alt={crop.label}
+                  className="h-14 w-14 rounded-xl object-cover shadow-sm"
+                />
                 <span className="text-xs font-bold text-center text-text-main leading-tight">{crop.label}</span>
               </button>
             );
@@ -190,10 +263,31 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
         <div className="mt-1">
           <input
             type="text"
-            placeholder="Nhập tên cây trồng của bạn..."
+            placeholder="VD: Chuối, Dừa, Đu đủ, Ngô, Khoai tây..."
             className="w-full rounded-2xl border border-border-main/55 bg-white py-3 px-4 text-sm font-semibold outline-none transition-all placeholder:text-text-main/40 focus:border-primary/45 focus:ring-4 focus:ring-primary/10"
-            onChange={(e) => onChange('khac', e.target.value.trim() || 'Cây khác')}
+            value={customCropLabel}
+            onChange={(e) => {
+              const label = e.target.value;
+              setCustomCropLabel(label);
+              onChange('khac', label.trim() || 'Cây khác');
+            }}
           />
+          {customCropLabel.trim() && getCropOption(customCropLabel)?.id !== 'khac' && (
+            <div className="mt-3 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+              <img
+                src={getCropImagePath(customCropLabel)}
+                alt={customCropLabel}
+                className="h-14 w-14 rounded-xl object-cover"
+              />
+              <div>
+                <p className="text-xs font-black uppercase tracking-wide text-emerald-700">Đã nhận diện cây</p>
+                <p className="text-sm font-bold text-text-h">{getCropOption(customCropLabel)?.label}</p>
+              </div>
+            </div>
+          )}
+          {customCropLabel.trim() && (!getCropOption(customCropLabel) || getCropOption(customCropLabel)?.id === 'khac') && (
+            <p className="mt-2 text-xs font-semibold text-text-main/50">Chưa có ảnh riêng cho cây này, hệ thống sẽ dùng ảnh cây giống.</p>
+          )}
         </div>
       )}
 

@@ -11,6 +11,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useGetDiariesQuery } from '../store/api/farmApi';
 import { CreateSeasonModal } from '../components/modals/CreateSeasonModal';
 import { Funnel, ArrowsDownUp, MagnifyingGlass, Plus } from '@phosphor-icons/react';
+import { getCropImagePath, getCropOption } from '../components/ui/CropPicker';
 
 type FilterType = 'all' | 'active' | 'archived' | 'lua' | 'ca-phe' | 'cay-an-trai' | 'rau-mau' | 'other';
 type SortType = 'recent_activity' | 'newest_start' | 'oldest_start';
@@ -213,6 +214,8 @@ export const DiaryList: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-2">
             {processedDiaries.map(diary => {
               const cropImg = getCropImage(diary.crop_type);
+              const cropOption = getCropOption(diary.crop_type);
+              const catalogImage = getCropImagePath(diary.crop_type);
               const isActiveCrop = diary.status === 'active';
               return (
                 <article
@@ -224,7 +227,14 @@ export const DiaryList: React.FC = () => {
                     {isActiveCrop && (
                       <div className="absolute top-1.5 right-1.5 w-3 h-3 rounded-full bg-[#30d158] border-2 border-white z-10 shadow-sm"></div>
                     )}
-                    {cropImg ? (
+                    {cropOption && catalogImage ? (
+                      <img
+                        alt={cropOption.label}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        src={catalogImage}
+                        title={cropOption.label}
+                      />
+                    ) : cropImg ? (
                       <img alt={diary.crop_type} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src={cropImg} />
                     ) : (
                       <span className="text-2xl">🌱</span>
@@ -234,6 +244,9 @@ export const DiaryList: React.FC = () => {
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <div className="flex justify-between items-center mb-0.5">
                       <h3 className="text-[18px] font-extrabold text-text-h truncate tracking-tight">{diary.crop_type}</h3>
+                      {diary.season && diary.season !== 'Chưa xác định' && (
+                        <p className="text-xs font-semibold text-text-main/55 truncate mt-0.5">{diary.season}</p>
+                      )}
                     </div>
                     
                     <p className="text-[14px] text-text-secondary line-clamp-1 mb-2.5">
