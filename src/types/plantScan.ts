@@ -47,4 +47,10 @@ export interface PlantScanResult {
   image_url?: string;
   thumbnail_url?: string;
   cache_hit_from_scan_id?: string | null;
+  created_at?: string;
+}
+
+export interface PlantScanHistoryResponse {
+  items: PlantScanResult[];
+  total: number;
 }
