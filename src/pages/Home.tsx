@@ -17,6 +17,7 @@ import { SnapFAB } from '../components/SnapFAB';
 import { SnapCaptureModal } from '../components/SnapCaptureModal';
 import { StoryRingCreateButton } from '../components/StoryRingCreateButton';
 import { Flame, Drop, Scan, ChatCircleText, PencilSimpleLine, Plant, CaretRight, Camera, Plus, Lightbulb, Users, UserPlus } from '@phosphor-icons/react';
+import { HomeEcoSection } from '../components/HomeEcoSection';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Button } from '../components/ui/Button';
 import { useGetPlotsQuery, useGetDiariesQuery } from '../store/api/farmApi';
@@ -155,9 +156,9 @@ export const Home: React.FC = () => {
               <span className="font-mono text-xs font-bold text-[var(--color-ink)]">{streak} ngày liên tiếp</span>
             </div>
             <h2 className="text-[32px] md:text-[44px] font-extrabold text-[var(--color-ink)] tracking-tight leading-tight">
-              Chào buổi sáng,<br /> <span className="hl">{(user as any)?.displayName || user?.email?.split('@')[0] || 'Nông Dân'}</span>!
+              {(() => { const h = new Date().getHours(); return h < 12 ? 'Chào buổi sáng,' : h < 18 ? 'Chào buổi chiều,' : 'Chào buổi tối,'; })()}<br /> <span className="hl">{(user as any)?.displayName || user?.email?.split('@')[0] || 'Nông Dân'}</span>!
             </h2>
-            <p className="text-[var(--color-ink-2)] mt-2 font-medium text-[16px]">Bạn đã sẵn sàng để chăm sóc nông trại hôm nay chưa?</p>
+            <p className="text-[var(--color-ink-2)] mt-2 font-medium text-[16px]">Bạn đã sẵn sàng để chăm sóc nông trại hôm nay chưa? 🌾</p>
           </section>
 
           <section className="flex flex-col items-center justify-center w-full mt-4 md:mt-2 mb-8 md:mb-6">
@@ -175,7 +176,7 @@ export const Home: React.FC = () => {
           <section className="w-full md:hidden">
             <button onClick={(e) => { triggerStarburst(e); setTimeout(() => navigate('/diary/create'), 350); }} className="btn btn--cyan w-full py-4 text-base relative cursor-pointer active:scale-95">
               <PencilSimpleLine size={20} weight="bold" />
-              <span>Ghi nhat ky</span>
+              <span>Ghi nhật ký</span>
               <span className="ml-1 bg-white/20 px-2 py-0.5 rounded-[8px] text-[10px] font-bold border border-white/10">+30XP</span>
               {starBursts.map(burst => (<span key={burst.id} className="star-burst" style={{ left: burst.x, top: burst.y }} />))}
             </button>
@@ -193,7 +194,7 @@ export const Home: React.FC = () => {
               {todayReminders.length === 0 ? (
                 <div className="card-bubble bg-white rounded-[24px] px-4 py-5 flex flex-col items-center justify-center gap-1.5 flex-1 min-h-[220px]">
                   <span className="text-2xl">🌱</span>
-                  <p className="text-[14px] text-[var(--color-ink-2)] font-medium">Hom nay khong co lich hen</p>
+                  <p className="text-[14px] text-[var(--color-ink-2)] font-medium">Hôm nay không có lịch hẹn</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -203,7 +204,7 @@ export const Home: React.FC = () => {
             </section>
 
             <section className="flex flex-col gap-3">
-              <div className="px-1"><h3 className="text-[15px] font-bold text-[var(--color-ink)]">Thao tac nhanh</h3></div>
+              <div className="px-1"><h3 className="text-[15px] font-bold text-[var(--color-ink)]">Thao tác nhanh</h3></div>
               <div className="flex flex-col gap-3">
                 <div onClick={() => navigate('/reminders')} className="card-bubble card-bubble--cyan bg-white p-4 cursor-pointer flex items-center gap-4 text-left select-none">
                   <div className="w-12 h-12 rounded-[16px] bg-[var(--color-accent-2)]/10 flex items-center justify-center shrink-0"><Drop size={24} weight="duotone" className="text-[var(--color-accent-2)]" /></div>
@@ -297,22 +298,29 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Farming Fun Fact Section */}
-      <section className="w-full mt-4 mb-8 text-left">
-        <div className="card-bubble border border-[var(--color-border-main)] bg-gradient-to-r from-amber-50 to-orange-50 p-5 relative overflow-hidden flex flex-col md:flex-row items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 z-10">
-            <Lightbulb size={28} weight="duotone" className="text-amber-500" />
+      {/* Farming Fun Fact Section — enhanced */}
+      <section className="w-full mt-4 text-left">
+        <div className="card-bubble border border-amber-200 bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 p-5 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center shrink-0 z-10">
+              <Lightbulb size={28} weight="duotone" className="text-amber-500" />
+            </div>
+            <div className="z-10 flex-1">
+              <div className="flex items-center gap-2 mb-1.5">
+                <h3 className="font-extrabold text-[15px] text-amber-900">Mẹo nhà nông hôm nay</h3>
+                <span className="text-[10px] font-bold bg-amber-200 text-amber-800 rounded-full px-2 py-0.5">Tip</span>
+              </div>
+              <p className="text-[14px] text-amber-800 leading-relaxed font-medium">
+                Tưới nước vào buổi sáng sớm (5h–7h) giúp rễ cây hấp thụ tốt nhất và hạn chế nấm bệnh phát triển so với tưới vào chiều tối.
+              </p>
+            </div>
           </div>
-          <div className="z-10 flex-1">
-            <h3 className="font-bold text-[15px] text-amber-900 mb-1">Mẹo nhà nông hôm nay</h3>
-            <p className="text-[14px] text-amber-800 leading-relaxed font-medium">
-              Tưới nước vào buổi sáng sớm (5h-7h) giúp rễ cây hấp thụ tốt nhất và hạn chế nấm bệnh phát triển so với tưới vào chiều tối.
-            </p>
-          </div>
-          {/* Decorative background element */}
-          <Plant size={120} weight="duotone" className="absolute -bottom-8 -right-4 text-amber-500/10 rotate-12" />
+          <Plant size={120} weight="duotone" className="absolute -bottom-8 -right-4 text-amber-500/10 rotate-12 pointer-events-none" />
         </div>
       </section>
+
+      {/* ── Enhanced Eco + Social Sections ─────────────────────────── */}
+      <HomeEcoSection />
 
       <SnapCaptureModal 
         isOpen={isCaptureOpen} 
