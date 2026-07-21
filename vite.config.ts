@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons.svg'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png'],
       devOptions: {
         enabled: false, // Ensure PWA is NOT active in dev to prevent HMR caching bugs
       },
@@ -24,11 +24,16 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
+            src: '/logo192.png',
+            sizes: '192x192',
+            type: 'image/png'
           },
+          {
+            src: '/logo512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
         ],
       },
       workbox: {

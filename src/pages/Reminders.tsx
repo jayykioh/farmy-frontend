@@ -159,7 +159,7 @@ const Reminders: React.FC = () => {
       <div className="fixed bottom-[90px] md:bottom-8 right-4 md:right-8 z-30">
         <Link 
           to="/reminder/create"
-          className="btn btn--cyan w-14 h-14 rounded-full flex items-center justify-center shadow-lg font-black cursor-pointer active:scale-95"
+          className="btn btn--cyan !p-0 w-14 h-14 rounded-full flex items-center justify-center shadow-lg font-black cursor-pointer active:scale-95"
         >
           <Plus className="w-6 h-6 text-white" weight="bold" />
         </Link>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
@@ -136,11 +137,11 @@ export const InsightList: React.FC = () => {
     onError: (error: any) => {
       console.error('Trigger insight failed:', error);
       const errMsg = error.response?.data?.message || error.message || '';
-      
+
       setModalConfig({
         type: 'error',
         title: 'Lập báo cáo thất bại ❌',
-        message: errMsg.includes('csrf') 
+        message: errMsg.includes('csrf')
           ? 'Lỗi bảo mật (invalid CSRF token). Vui lòng cấu hình COOKIE_SAME_SITE=none trên máy chủ Backend của bạn hoặc liên hệ quản trị viên.'
           : 'Không thể lập báo cáo tuần mới. Vui lòng thử lại sau.',
       });
@@ -192,79 +193,84 @@ export const InsightList: React.FC = () => {
   return (
     <div className="w-full overflow-hidden relative">
       {/* Framer Motion Modals */}
-      <AnimatePresence>
-        {modalConfig && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white rounded-[28px] border border-black/[0.04] p-6 max-w-sm w-full shadow-[0_24px_80px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-4"
+      {createPortal(
+        <AnimatePresence>
+          {modalConfig && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
             >
-              {modalConfig.type === 'loading' ? (
-                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-                  <CircleNotch className="w-8 h-8 animate-spin" weight="bold" />
+              <motion.div
+                initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="bg-white rounded-[28px] border border-black/[0.04] p-6 max-w-sm w-full shadow-[0_24px_80px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-4"
+              >
+                {modalConfig.type === 'loading' ? (
+                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                    <CircleNotch className="w-8 h-8 animate-spin" weight="bold" />
+                  </div>
+                ) : modalConfig.type === 'info' ? (
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-3xl">
+                    ✅
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl">
+                    ⚠️
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-800 mb-1">{modalConfig.title}</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed">{modalConfig.message}</p>
                 </div>
-              ) : modalConfig.type === 'info' ? (
-                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-3xl">
-                  ✅
-                </div>
-              ) : (
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl">
-                  ⚠️
-                </div>
-              )}
-              <div>
-                <h3 className="text-lg font-extrabold text-slate-800 mb-1">{modalConfig.title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed">{modalConfig.message}</p>
-              </div>
-              
-              {(modalConfig.type === 'error' || modalConfig.type === 'info') && (
-                <button
-                  onClick={() => setModalConfig(null)}
-                  className="w-full py-3 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-slate-800 transition-all active:scale-95 cursor-pointer"
-                >
-                  Đóng
-                </button>
-              )}
-              {modalConfig.type === 'loading' && (
-                <button
-                  onClick={() => setModalConfig(null)}
-                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors active:scale-95"
-                >
-                  Ẩn và tiếp tục xử lý nền
-                </button>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      <div className="flex items-center justify-end gap-2 px-4 mb-4">
-        <label htmlFor="insight-diary" className="text-xs font-bold text-text-secondary">
-          Mùa vụ
-        </label>
-        <select
-          id="insight-diary"
-          value={effectiveDiaryId}
-          onChange={(event) => setSelectedDiaryId(event.target.value)}
-          disabled={isBusy || isLoadingDiaries}
-          className="min-w-0 max-w-64 rounded-lg border border-border-main bg-white px-3 py-2 text-xs font-bold text-text-main disabled:opacity-60"
-        >
-          {isLoadingDiaries && <option value="">Đang tải mùa vụ...</option>}
-          {!isLoadingDiaries && diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
-          {diaries.map((diary) => (
-            <option key={diary._id} value={diary._id}>
-              {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
-            </option>
-          ))}
-        </select>
+                {(modalConfig.type === 'error' || modalConfig.type === 'info') && (
+                  <button
+                    onClick={() => setModalConfig(null)}
+                    className="w-full py-3 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    Đóng
+                  </button>
+                )}
+                {modalConfig.type === 'loading' && (
+                  <button
+                    onClick={() => setModalConfig(null)}
+                    className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                  >
+                    Ẩn và tiếp tục xử lý nền
+                  </button>
+                )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
+        <div className="flex items-center gap-2">
+          <label htmlFor="insight-diary" className="text-[13px] font-bold text-[#86868b]">
+            Mùa vụ:
+          </label>
+          <select
+            id="insight-diary"
+            value={effectiveDiaryId}
+            onChange={(event) => setSelectedDiaryId(event.target.value)}
+            disabled={isBusy || isLoadingDiaries}
+            className="min-w-[140px] max-w-[200px] rounded-xl border border-black/[0.08] bg-white/80 backdrop-blur-md px-3 py-2 text-[14px] font-bold text-[#1d1d1f] disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#34C759]/30 shadow-sm"
+          >
+            {isLoadingDiaries && <option value="">Đang tải mùa vụ...</option>}
+            {!isLoadingDiaries && diaries.length === 0 && <option value="">Chưa có mùa vụ</option>}
+            {diaries.map((diary) => (
+              <option key={diary._id} value={diary._id}>
+                {diary.crop_type}{diary.season ? ` · ${diary.season}` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {insights.length === 0 && !isBusy ? (
@@ -285,16 +291,15 @@ export const InsightList: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="flex justify-between items-center px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
             <h2 className="text-[20px] font-bold text-[#1d1d1f]">Các tuần gần đây</h2>
             <button
               onClick={triggerSelectedDiary}
               disabled={isBusy || isLoadingDiaries}
-              className={`flex items-center gap-1.5 px-4 py-2 text-white rounded-full text-[13px] font-bold active:scale-95 transition-all disabled:opacity-60 cursor-pointer ${
-                currentWeekInsight
+              className={`flex items-center gap-1.5 px-4 py-2 text-white rounded-full text-[13px] font-bold active:scale-95 transition-all disabled:opacity-60 cursor-pointer ${currentWeekInsight
                   ? 'bg-slate-500 shadow-sm hover:bg-slate-600'
                   : 'bg-[#34C759] shadow-[0_4px_16px_rgba(52,199,89,0.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)]'
-              }`}
+                }`}
             >
               {isBusy ? (
                 <>
