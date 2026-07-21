@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { updatePushSubscription } from '../api/auth';
+import { registerPushSubscription } from '../utils/push';
 import toast from 'react-hot-toast';
 
 export const Settings: React.FC = () => {
@@ -19,22 +20,22 @@ export const Settings: React.FC = () => {
 
     setIsPushLoading(true);
     try {
-      // In a real app, this would use navigator.serviceWorker and pushManager.subscribe()
-      // with a VAPID public key. For this integration, we mock the subscription payload.
-      const mockSubscription = {
-        endpoint: 'https://fcm.googleapis.com/fcm/send/mock-endpoint-id',
-        keys: {
-          p256dh: 'mock-p256dh-key',
-          auth: 'mock-auth-key'
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          toast.error('Vui lòng cho phép trình duyệt gửi thông báo để sử dụng tính năng này.');
+          setIsPushLoading(false);
+          return;
         }
-      };
+      }
 
-      await updatePushSubscription(mockSubscription);
+      const subscription = await registerPushSubscription();
+      await updatePushSubscription(subscription);
       setPushNotifications(true);
       toast.success('Đã đăng ký nhận thông báo Push thành công!');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to subscribe to push notifications:', err);
-      toast.error('Lỗi đăng ký thông báo Push. Vui lòng thử lại!');
+      toast.error(err.message || 'Lỗi đăng ký thông báo Push. Vui lòng thử lại!');
     } finally {
       setIsPushLoading(false);
     }

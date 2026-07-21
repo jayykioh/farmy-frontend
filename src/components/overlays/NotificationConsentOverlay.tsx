@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { PetMascot } from '../../features/pet/components/PetMascot';
 import { updatePushSubscription } from '../../api/auth';
+import { registerPushSubscription } from '../../utils/push';
 
 // ────────────────────────────────────────────────────────────────
 //  Notification Consent Overlay
@@ -27,32 +28,6 @@ const markNotificationOnboardingSeen = (userId: string) => {
   localStorage.setItem(getNotificationSeenKey(userId), 'true');
 };
 
-const registerPushSubscription = async () => {
-  try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-
-    const registration = await navigator.serviceWorker.ready;
-    const VAPID_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-    if (!VAPID_KEY) return;
-
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: VAPID_KEY,
-    });
-
-    const { endpoint, keys } = subscription.toJSON() as {
-      endpoint: string;
-      keys: { p256dh: string; auth: string };
-    };
-
-    if (endpoint && keys?.p256dh && keys?.auth) {
-      await updatePushSubscription({ endpoint, keys });
-    }
-  } catch (err) {
-    // User denied or browser doesn't support — non-fatal
-    console.warn('[Push] Could not subscribe:', err);
-  }
-};
 
 export const NotificationConsentOverlay: React.FC<Props> = ({ userId, onDismiss }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -69,7 +44,12 @@ export const NotificationConsentOverlay: React.FC<Props> = ({ userId, onDismiss 
       if ('Notification' in window) {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-          await registerPushSubscription();
+          try {
+            const subscription = await registerPushSubscription();
+            await updatePushSubscription(subscription);
+          } catch (err) {
+            console.warn('[Push] Could not subscribe:', err);
+          }
         }
       }
     } finally {
