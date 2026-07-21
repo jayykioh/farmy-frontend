@@ -1,7 +1,7 @@
  
 import React from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { AlertCircle, X, RefreshCw, ArrowLeft } from 'lucide-react';
+import { WarningCircle, X, ArrowsClockwise, CaretLeft } from '@phosphor-icons/react';
 
 interface Props {
   children: ReactNode;
@@ -57,11 +57,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
             {/* Error Icon */}
             <div className="relative w-32 h-32 flex items-center justify-center">
               <div className="w-32 h-32 bg-error-container/20 rounded-full flex items-center justify-center animate-pulse">
-                <AlertCircle className="w-20 h-20 text-error" />
+                <WarningCircle size={80} weight="duotone" className="text-error" />
               </div>
               {/* Broken icon */}
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-error rounded-full flex items-center justify-center shadow-md">
-                <X className="w-5 h-5 text-white" />
+                <X size={20} weight="bold" className="text-white" />
               </div>
             </div>
 
@@ -91,9 +91,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <div className="w-full flex flex-col gap-3">
               <button
                 onClick={this.handleReset}
-                className="w-full bg-primary text-white font-bold text-base py-3 rounded-full shadow-md hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="btn btn--cyan active:scale-95 rounded-full w-full py-3 flex items-center justify-center gap-2"
               >
-                <RefreshCw className="w-5 h-5" />
+                <ArrowsClockwise size={20} weight="bold" />
                 Thử Lại
               </button>
               <button
@@ -104,9 +104,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
                     window.location.href = '/';
                   }
                 }}
-                className="w-full bg-white border border-border-main/50 text-text-main font-bold text-base py-3 rounded-full shadow-sm hover:bg-bg-surface-1 hover:shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                className="btn btn--outline active:scale-95 rounded-full w-full py-3 flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <CaretLeft size={20} weight="bold" />
                 Quay Lại
               </button>
             </div>

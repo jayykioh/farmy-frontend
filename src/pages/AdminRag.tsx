@@ -1,6 +1,11 @@
+/* Hallmark · page: admin-rag · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useEffect, useState } from 'react';
 import { getAdminChatSessions, getAdminRAGFiles, deleteAdminRAGFile, validateAdminRAGFile, batchEmbedAdminRAGFiles } from '../api/admin';
-import { Database, MessageSquare, Trash2, Calendar, FileText, CheckCircle2, XCircle, AlertCircle, HelpCircle } from 'lucide-react';
+import { Database, ChatText, Trash, Calendar, FileText, CheckCircle, XCircle, WarningCircle, Question, UploadSimple, Checks, Play } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 import { UploadRAGModal } from '../components/admin/rag/UploadRAGModal';
 import { ReviewRAGModal } from '../components/admin/rag/ReviewRAGModal';
@@ -91,13 +96,13 @@ export const AdminRag: React.FC = () => {
   const getEmbedStatusIcon = (status: string) => {
     switch (status) {
       case 'done':
-        return <span title="Đã Vector hóa"><CheckCircle2 size={16} className="text-emerald-500" /></span>;
+        return <span title="Đã Vector hóa"><CheckCircle size={18} weight="bold" className="text-emerald-600" /></span>;
       case 'processing':
-        return <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" title="Đang xử lý..." />;
+        return <div className="animate-spin rounded-full h-4 w-4 border-2 border-border-main border-t-[#008A5E]" title="Đang xử lý..." />;
       case 'error':
-        return <span title="Lỗi Vector hóa"><XCircle size={16} className="text-red-500" /></span>;
+        return <span title="Lỗi Vector hóa"><XCircle size={18} weight="bold" className="text-red-500" /></span>;
       default:
-        return <span title="Chờ xử lý"><HelpCircle size={16} className="text-slate-400" /></span>;
+        return <span title="Chờ xử lý"><Question size={18} weight="bold" className="text-text-secondary" /></span>;
     }
   };
 
@@ -105,279 +110,296 @@ export const AdminRag: React.FC = () => {
     switch (status) {
       case 'confirmed':
       case 'validated':
-        return <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full text-[11px] font-bold">Hợp lệ</span>;
-      case 'validating':
-        return <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-[11px] font-bold">Đang kiểm định</span>;
+        return <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-xs font-black">Đã kiểm duyệt</span>;
       case 'rejected':
-        return <span className="bg-red-50 text-red-700 px-2 py-0.5 rounded-full text-[11px] font-bold">Bị từ chối</span>;
+        return <span className="px-2.5 py-0.5 bg-red-100 text-red-800 border border-red-300 rounded-full text-xs font-black">Từ chối</span>;
+      case 'validating':
+        return <span className="px-2.5 py-0.5 bg-blue-100 text-blue-800 border border-blue-300 rounded-full text-xs font-black">Đang kiểm duyệt...</span>;
       default:
-        return <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[11px] font-bold">Chưa kiểm định</span>;
+        return <span className="px-2.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-xs font-black">Chưa kiểm duyệt</span>;
     }
   };
 
-  const handleValidate = async (fileId: string) => {
+  const handleValidateFile = (fileId: string) => {
     setActionLoading(fileId);
-    try {
-      await validateAdminRAGFile(fileId);
-      toast.success('Đã gửi yêu cầu kiểm định AI');
-      fetchFiles();
-    } catch (err: any) {
-      toast.error('Lỗi khi kiểm định: ' + (err.message || 'Unknown error'));
-    } finally {
-      setActionLoading(null);
-    }
+    validateAdminRAGFile(fileId)
+      .then((res) => {
+        toast.success(res.message || 'Kiểm duyệt hoàn tất!');
+        fetchFiles();
+      })
+      .catch((err) => {
+        toast.error('Lỗi kiểm duyệt: ' + (err.message || err));
+      })
+      .finally(() => {
+        setActionLoading(null);
+      });
   };
 
-  const handleBatchEmbed = async () => {
-    try {
-      const res = await batchEmbedAdminRAGFiles();
-      toast.success(res.message || 'Đã gửi yêu cầu đồng bộ Vector DB');
-      fetchFiles();
-    } catch (err: any) {
-      toast.error('Lỗi khi đồng bộ: ' + (err.message || 'Unknown error'));
-    }
+  const handleBatchEmbed = () => {
+    setActionLoading('batch_embed');
+    batchEmbedAdminRAGFiles()
+      .then((res) => {
+        toast.success(res.message || 'Đã bắt đầu nhúng Vector hàng loạt!');
+        fetchFiles();
+      })
+      .catch((err) => {
+        toast.error('Lỗi nhúng hàng loạt: ' + (err.message || err));
+      })
+      .finally(() => {
+        setActionLoading(null);
+      });
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] overflow-hidden">
-      {/* Tab Switcher Header */}
-      <div className="flex border-b border-black/[0.04]">
-        <button
-          onClick={() => {
-            setActiveTab('sessions');
-            setPage(1);
-          }}
-          className={`flex items-center gap-2 px-6 py-4 text-[14px] font-bold border-b-2 transition-all ${
-            activeTab === 'sessions'
-              ? 'border-[#08A855] text-[#08A855]'
-              : 'border-transparent text-[#86868b] hover:text-[#1d1d1f]'
-          }`}
-        >
-          <MessageSquare size={16} />
-          <span>Phiên Chat AI</span>
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab('files');
-            setPage(1);
-          }}
-          className={`flex items-center gap-2 px-6 py-4 text-[14px] font-bold border-b-2 transition-all ${
-            activeTab === 'files'
-              ? 'border-[#08A855] text-[#08A855]'
-              : 'border-transparent text-[#86868b] hover:text-[#1d1d1f]'
-          }`}
-        >
-          <Database size={16} />
-          <span>Tài liệu Tri thức (RAG)</span>
-        </button>
+    <div className="flex flex-col gap-6 w-full text-left font-sans">
+      {/* Tabs & Header Controls */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 card-bubble bg-white p-4 border-2 border-border-main shadow-xs rounded-3xl">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setActiveTab('sessions');
+              setPage(1);
+            }}
+            className={`btn active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer ${
+              activeTab === 'sessions' ? 'btn--cyan' : 'btn--soft border-2 border-border-main'
+            }`}
+          >
+            <ChatText size={16} weight="bold" />
+            Hội thoại AI ({sessions.length})
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('files');
+              setPage(1);
+            }}
+            className={`btn active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer ${
+              activeTab === 'files' ? 'btn--cyan' : 'btn--soft border-2 border-border-main'
+            }`}
+          >
+            <Database size={16} weight="bold" />
+            Kho Tri Thức RAG ({files.length})
+          </button>
+        </div>
+
+        {activeTab === 'files' && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBatchEmbed}
+              disabled={actionLoading === 'batch_embed'}
+              className="btn active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <Play size={16} weight="bold" />
+              Nhúng Vector hàng loạt
+            </button>
+            <button
+              onClick={() => setIsUploadOpen(true)}
+              className="btn btn--cyan active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs"
+            >
+              <UploadSimple size={16} weight="bold" />
+              Tải tài liệu lên
+            </button>
+          </div>
+        )}
       </div>
 
-      {activeTab === 'files' && (
-        <div className="flex justify-end gap-3 p-4 border-b border-black/[0.04]">
-          <button
-            onClick={handleBatchEmbed}
-            className="px-4 py-2 text-[13px] font-bold text-[#08A855] bg-[#08A855]/10 hover:bg-[#08A855]/20 rounded-xl transition-all"
-          >
-            Đồng bộ AI (Batch Embed)
-          </button>
-          <button
-            onClick={() => setIsUploadOpen(true)}
-            className="px-4 py-2 text-[13px] font-bold text-white bg-[#08A855] hover:bg-[#08A855]/90 rounded-xl transition-all shadow-sm"
-          >
-            Tải lên Tri thức
-          </button>
-        </div>
-      )}
-
-      {/* Sessions Tab Content */}
-      {activeTab === 'sessions' && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#fcfcfd] border-b border-black/[0.03] text-[#86868b] text-[12px] font-bold uppercase tracking-wider">
-                <th className="py-4 px-6">Tiêu đề cuộc hội thoại</th>
-                <th className="py-4 px-6">Nông dân</th>
-                <th className="py-4 px-6">Hoạt động cuối</th>
-                <th className="py-4 px-6">Ngày khởi tạo</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/[0.03]">
-              {loading ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#08A855] mx-auto"></div>
-                  </td>
+      {/* Main Content Area */}
+      <div className="card-bubble bg-white rounded-3xl border-2 border-border-main shadow-xs overflow-hidden">
+        {activeTab === 'sessions' ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-bg-surface-1 border-b-2 border-border-main text-text-secondary text-xs font-black uppercase tracking-wider">
+                  <th className="py-4 px-6">Tiêu đề hội thoại</th>
+                  <th className="py-4 px-6">Nông dân</th>
+                  <th className="py-4 px-6">Tin nhắn cuối</th>
+                  <th className="py-4 px-6">Ngày khởi tạo</th>
                 </tr>
-              ) : sessions.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center">
-                    <AlertCircle size={28} className="text-[#86868b] mx-auto mb-2" />
-                    <p className="text-[#86868b] text-[14px]">Chưa có phiên chat AI nào được thực hiện</p>
-                  </td>
-                </tr>
-              ) : (
-                sessions.map((session) => (
-                  <tr key={session._id} className="hover:bg-black/[0.01] transition-all text-[#1d1d1f] text-[14px]">
-                    <td className="py-4 px-6 font-bold flex items-center gap-2">
-                      <MessageSquare size={16} className="text-[#86868b]" />
-                      <span>{session.title || 'Hội thoại chưa đặt tên'}</span>
-                    </td>
-                    <td className="py-4 px-6">
-                      {session.user_id ? (
-                        <div className="flex flex-col">
-                          <span className="font-semibold">{session.user_id.name}</span>
-                          <span className="text-[12px] text-[#86868b] font-medium">{session.user_id.email}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[#86868b] font-medium">Ẩn danh</span>
-                      )}
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-1.5 text-[#86868b] text-[13px] font-medium">
-                        <Calendar size={14} />
-                        <span>{new Date(session.last_message_at).toLocaleString('vi-VN')}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-1.5 text-[#86868b] text-[13px] font-medium">
-                        <Calendar size={14} />
-                        <span>{new Date(session.created_at).toLocaleDateString('vi-VN')}</span>
-                      </div>
+              </thead>
+              <tbody className="divide-y-2 divide-border-main/40">
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-border-main border-t-[#008A5E] mx-auto"></div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-
-          {/* Pagination Footer */}
-          {!loading && totalPages > 1 && (
-            <div className="p-5 border-t border-black/[0.03] flex items-center justify-end gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={page === 1}
-                className="px-3.5 py-1.5 border border-black/[0.08] text-[13px] font-bold rounded-xl hover:bg-black/[0.02] disabled:opacity-40 disabled:hover:bg-transparent transition-all"
-              >
-                Trang trước
-              </button>
-              <span className="text-[13px] text-[#1d1d1f] font-bold px-2">
-                Trang {page} / {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                disabled={page === totalPages}
-                className="px-3.5 py-1.5 border border-black/[0.08] text-[13px] font-bold rounded-xl hover:bg-black/[0.02] disabled:opacity-40 disabled:hover:bg-transparent transition-all"
-              >
-                Trang sau
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Files Tab Content */}
-      {activeTab === 'files' && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#fcfcfd] border-b border-black/[0.03] text-[#86868b] text-[12px] font-bold uppercase tracking-wider">
-                <th className="py-4 px-6">Tiêu đề tài liệu</th>
-                <th className="py-4 px-6">Danh mục</th>
-                <th className="py-4 px-6">Kiểm định</th>
-                <th className="py-4 px-6">Trạng thái Vector</th>
-                <th className="py-4 px-6">Ngày cập nhật</th>
-                <th className="py-4 px-6 text-center">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/[0.03]">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#08A855] mx-auto"></div>
-                  </td>
-                </tr>
-              ) : files.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center">
-                    <AlertCircle size={28} className="text-[#86868b] mx-auto mb-2" />
-                    <p className="text-[#86868b] text-[14px]">Không có tài liệu tri thức RAG nào</p>
-                  </td>
-                </tr>
-              ) : (
-                files.map((file) => (
-                  <tr key={file._id} className="hover:bg-black/[0.01] transition-all text-[#1d1d1f] text-[14px]">
-                    <td className="py-4 px-6 font-bold flex items-center gap-2">
-                      <FileText size={16} className="text-indigo-500" />
-                      <span className="line-clamp-1">{file.title}</span>
+                ) : sessions.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-12 text-center">
+                      <WarningCircle size={32} weight="duotone" className="text-text-secondary mx-auto mb-2" />
+                      <p className="text-text-secondary font-bold text-sm">Chưa có phiên trò chuyện nào</p>
                     </td>
-                    <td className="py-4 px-6 font-semibold text-slate-500">{file.category}</td>
-                    <td className="py-4 px-6">{getValidationBadge(file.validation_status)}</td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-2 font-medium">
-                        {getEmbedStatusIcon(file.embed_status)}
-                        <span className="capitalize text-[13px]">{file.embed_status}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-1.5 text-[#86868b] text-[13px] font-medium">
-                        <Calendar size={14} />
-                        <span>{new Date(file.created_at).toLocaleDateString('vi-VN')}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        {file.validation_status === 'unvalidated' && (
-                          <button
-                            onClick={() => handleValidate(file._id)}
-                            disabled={actionLoading === file._id}
-                            className="px-3 py-1.5 text-[12px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all disabled:opacity-50"
-                          >
-                            {actionLoading === file._id ? 'Đang gửi...' : 'Gửi AI Check'}
-                          </button>
+                  </tr>
+                ) : (
+                  sessions.map((session) => (
+                    <tr key={session._id} className="hover:bg-bg-surface-1/50 transition-colors text-text-main text-sm font-bold">
+                      <td className="py-4 px-6">
+                        <span className="font-black text-text-h flex items-center gap-2">
+                          <ChatText size={16} weight="duotone" className="text-[#008A5E]" />
+                          {session.title || 'Hội thoại không tên'}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        {session.user_id ? (
+                          <div className="flex flex-col">
+                            <span className="font-black text-text-h">{session.user_id.name}</span>
+                            <span className="text-xs text-text-secondary font-bold">{session.user_id.email}</span>
+                          </div>
+                        ) : (
+                          <span className="text-text-secondary italic text-xs font-bold">Khách vãng lai</span>
                         )}
-                        {(file.validation_status === 'validated' || file.validation_status === 'rejected') && (
+                      </td>
+                      <td className="py-4 px-6 text-xs font-bold text-text-secondary">
+                        {new Date(session.last_message_at).toLocaleString('vi-VN')}
+                      </td>
+                      <td className="py-4 px-6 text-xs font-bold text-text-secondary">
+                        {new Date(session.created_at).toLocaleDateString('vi-VN')}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-bg-surface-1 border-b-2 border-border-main text-text-secondary text-xs font-black uppercase tracking-wider">
+                  <th className="py-4 px-6">Tài liệu tri thức</th>
+                  <th className="py-4 px-6">Danh mục</th>
+                  <th className="py-4 px-6">Trạng thái Nhúng Vector</th>
+                  <th className="py-4 px-6">Kiểm duyệt AI</th>
+                  <th className="py-4 px-6 text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y-2 divide-border-main/40">
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-border-main border-t-[#008A5E] mx-auto"></div>
+                    </td>
+                  </tr>
+                ) : files.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center">
+                      <WarningCircle size={32} weight="duotone" className="text-text-secondary mx-auto mb-2" />
+                      <p className="text-text-secondary font-bold text-sm">Chưa có tài liệu RAG nào được tải lên</p>
+                    </td>
+                  </tr>
+                ) : (
+                  files.map((file) => (
+                    <tr key={file._id} className="hover:bg-bg-surface-1/50 transition-colors text-text-main text-sm font-bold">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2">
+                          <FileText size={18} weight="duotone" className="text-[#008A5E] shrink-0" />
+                          <span className="font-black text-text-h">{file.title}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="px-2.5 py-1 bg-bg-surface-2 border border-border-main rounded-xl text-xs font-black text-text-secondary">
+                          {file.category || 'Nông nghiệp chung'}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2">
+                          {getEmbedStatusIcon(file.embed_status)}
+                          <span className="text-xs font-black uppercase text-text-secondary">{file.embed_status}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        {getValidationBadge(file.validation_status)}
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => {
                               setReviewFile(file);
                               setIsReviewOpen(true);
                             }}
-                            className="px-3 py-1.5 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all"
+                            className="btn btn--soft active:scale-95 rounded-2xl px-2.5 py-1 text-xs font-black border border-border-main cursor-pointer"
                           >
-                            Xem xét
+                            Xem báo cáo
                           </button>
-                        )}
-                        <button
-                          onClick={() => handleDeleteFile(file._id, file.title)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-full active:scale-95 transition-all inline-flex items-center"
-                          title="Xóa tri thức"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                          <button
+                            onClick={() => handleValidateFile(file._id)}
+                            disabled={actionLoading === file._id}
+                            className="p-1.5 text-emerald-800 bg-emerald-100 border border-emerald-300 rounded-2xl hover:bg-emerald-200 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                            title="Chạy kiểm duyệt RAG"
+                          >
+                            <Checks size={16} weight="bold" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFile(file._id, file.title)}
+                            className="p-1.5 text-red-800 bg-red-100 border border-red-300 rounded-2xl hover:bg-red-200 active:scale-95 transition-all cursor-pointer"
+                            title="Xóa tài liệu"
+                          >
+                            <Trash size={16} weight="bold" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination Footer for Sessions */}
+        {activeTab === 'sessions' && !loading && totalPages > 1 && (
+          <div className="p-5 border-t-2 border-border-main flex items-center justify-between">
+            <span className="text-xs font-bold text-text-secondary">
+              Hiển thị {sessions.length} phiên trò chuyện
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="btn btn--soft active:scale-95 rounded-2xl px-3.5 py-1.5 text-xs font-black border-2 border-border-main cursor-pointer disabled:opacity-40"
+              >
+                Trang trước
+              </button>
+              <span className="text-xs text-text-h font-black px-2">
+                Trang {page} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                disabled={page === totalPages}
+                className="btn btn--soft active:scale-95 rounded-2xl px-3.5 py-1.5 text-xs font-black border-2 border-border-main cursor-pointer disabled:opacity-40"
+              >
+                Trang sau
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Upload Modal */}
+      {isUploadOpen && (
+        <UploadRAGModal
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+          onSuccess={() => {
+            fetchFiles();
+            setIsUploadOpen(false);
+          }}
+        />
       )}
 
-      <UploadRAGModal
-        isOpen={isUploadOpen}
-        onClose={() => setIsUploadOpen(false)}
-        onSuccess={fetchFiles}
-      />
-      
-      <ReviewRAGModal
-        isOpen={isReviewOpen}
-        onClose={() => {
-          setIsReviewOpen(false);
-          setReviewFile(null);
-        }}
-        file={reviewFile}
-        onSuccess={fetchFiles}
-      />
+      {/* Review Modal */}
+      {isReviewOpen && reviewFile && (
+        <ReviewRAGModal
+          isOpen={isReviewOpen}
+          file={reviewFile}
+          onClose={() => {
+            setIsReviewOpen(false);
+            setReviewFile(null);
+          }}
+          onSuccess={() => {
+            fetchFiles();
+          }}
+        />
+      )}
     </div>
   );
 };

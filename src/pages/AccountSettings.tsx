@@ -1,3 +1,8 @@
+/* Hallmark · page: account-settings · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageHeader } from '../components/PageHeader';
@@ -104,7 +109,7 @@ export const AccountSettings: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[100svh] bg-[#FBFBFD] text-left font-sans pb-24 md:pb-8">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main text-left font-sans pb-24 relative">
       <input
         type="file"
         ref={avatarInputRef}
@@ -114,21 +119,21 @@ export const AccountSettings: React.FC = () => {
       />
       
       <PageHeader 
-        title="Account Settings"
-        subtitle="Thông tin tài khoản"
+        title="Thông tin tài khoản"
+        subtitle="Quản lý hồ sơ cá nhân & vùng canh tác"
         leftButton="back"
       />
 
       {/* Main Content */}
-      <main className="w-full max-w-3xl mx-auto pt-24 md:pt-20 px-4 md:px-8 flex flex-col gap-4">
+      <main className="w-full max-w-3xl mx-auto pt-24 px-4 md:px-8 flex flex-col gap-4">
         
         {/* Profile Avatar Section */}
-        <div className="bg-white rounded-[24px] border border-black/[0.04] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-[#F5F5F7] flex items-center justify-center border-2 border-white overflow-hidden relative group shadow-sm">
+        <div className="card-bubble bg-white p-6 shadow-sm border-2 border-border-main text-center">
+          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-bg-surface-2 flex items-center justify-center border-4 border-border-main overflow-hidden relative shadow-sm">
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <svg className="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 text-[#008A5E]" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
             )}
@@ -138,12 +143,12 @@ export const AccountSettings: React.FC = () => {
               </div>
             )}
           </div>
-          <p className="text-lg font-bold text-text-main">{name}</p>
-          <p className="text-sm text-text-main/60">Nông dân Siêng năng</p>
+          <p className="text-xl font-black text-text-h">{name}</p>
+          <p className="text-sm font-bold text-text-secondary">Nông dân Siêng năng</p>
           <button 
             onClick={handleAvatarClick}
             disabled={isUploading}
-            className="mt-4 bg-primary text-white px-4 py-2 rounded-full font-semibold text-sm hover:bg-primary-container transition-colors cursor-pointer disabled:opacity-50"
+            className="btn btn--cyan mt-4 px-5 py-2.5 rounded-full font-bold text-sm cursor-pointer disabled:opacity-50 active:scale-95"
           >
             {isUploading ? 'Đang tải...' : 'Thay đổi ảnh đại diện'}
           </button>
@@ -158,29 +163,29 @@ export const AccountSettings: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm"
+              className="card-bubble bg-white p-6 shadow-sm border-2 border-border-main"
             >
-              <h2 className="text-lg font-bold text-text-main mb-4">Chỉnh sửa thông tin</h2>
+              <h2 className="text-xl font-black text-text-h mb-4">Chỉnh sửa thông tin</h2>
               
-              <div className="bg-bg-surface-1 rounded-[16px] overflow-hidden border border-black/[0.04]">
+              <div className="bg-bg-surface-1 rounded-[20px] overflow-hidden border-2 border-border-main">
                 {/* Name Field */}
-                <div className="p-4 border-b border-black/[0.04]">
-                  <label className="block text-xs font-semibold text-text-main/60 uppercase mb-1">Tên</label>
+                <div className="p-4 border-b border-border-main/50">
+                  <label className="block text-xs font-black text-text-secondary uppercase mb-1">Tên</label>
                   <input 
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full bg-transparent text-base font-semibold text-text-main focus:outline-none"
+                    className="w-full bg-transparent text-base font-extrabold text-text-main focus:outline-none"
                   />
                 </div>
 
                 {/* Region Field */}
                 <div className="p-4">
-                  <label className="block text-xs font-semibold text-text-main/60 uppercase mb-1">Khu vực</label>
+                  <label className="block text-xs font-black text-text-secondary uppercase mb-1">Khu vực</label>
                   <select 
                     value={editRegion}
                     onChange={(e) => setEditRegion(e.target.value)}
-                    className="w-full bg-transparent text-base font-semibold text-text-main focus:outline-none appearance-none"
+                    className="w-full bg-transparent text-base font-extrabold text-text-main focus:outline-none appearance-none cursor-pointer"
                   >
                     {PROVINCES.map((prov) => (
                       <option key={prov} value={prov}>{prov}</option>
@@ -191,20 +196,18 @@ export const AccountSettings: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3 mt-6">
-                <motion.button 
-                  whileTap={{ scale: 0.96 }}
+                <button 
                   onClick={handleSaveName}
-                  className="flex-1 bg-primary text-white font-bold rounded-[16px] px-4 py-3 hover:bg-primary-container transition-colors shadow-sm"
+                  className="btn btn--cyan flex-1 py-3 font-extrabold text-sm cursor-pointer active:scale-95"
                 >
-                  Lưu
-                </motion.button>
-                <motion.button 
-                  whileTap={{ scale: 0.96 }}
+                  Lưu thay đổi
+                </button>
+                <button 
                   onClick={handleCancel}
-                  className="flex-1 bg-white border border-border-main/50 text-text-main font-bold rounded-[16px] px-4 py-3 hover:bg-bg-surface-1 transition-colors shadow-sm"
+                  className="btn btn--soft flex-1 py-3 font-bold text-sm text-text-secondary cursor-pointer border-2 border-border-main/50 active:scale-95"
                 >
                   Hủy
-                </motion.button>
+                </button>
               </div>
             </motion.div>
           ) : (
@@ -214,101 +217,98 @@ export const AccountSettings: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm"
+              className="card-bubble bg-white p-6 shadow-sm border-2 border-border-main"
             >
-              <h2 className="text-lg font-bold text-text-main mb-4">Thông tin cá nhân</h2>
+              <h2 className="text-xl font-black text-text-h mb-4">Thông tin cá nhân</h2>
               
-              <div className="bg-bg-surface-1 rounded-[16px] overflow-hidden border border-black/[0.04]">
+              <div className="bg-bg-surface-1 rounded-[20px] overflow-hidden border-2 border-border-main">
                 {/* Name Info */}
-                <div className="flex items-center justify-between p-4 border-b border-black/[0.04]">
+                <div className="flex items-center justify-between p-4 border-b border-border-main/50">
                   <div>
-                    <p className="text-xs text-text-main/60 font-semibold uppercase">Tên</p>
-                    <p className="text-base font-semibold text-text-main">{name}</p>
+                    <p className="text-xs text-text-secondary font-black uppercase">Tên nông dân</p>
+                    <p className="text-base font-extrabold text-text-h">{name}</p>
                   </div>
                 </div>
 
                 {/* Region Info */}
-                <div className="flex items-center justify-between p-4 border-b border-black/[0.04]">
+                <div className="flex items-center justify-between p-4 border-b border-border-main/50">
                   <div>
-                    <p className="text-xs text-text-main/60 font-semibold uppercase">Khu vực</p>
-                    <p className="text-base font-semibold text-text-main">{region}</p>
+                    <p className="text-xs text-text-secondary font-black uppercase">Vùng canh tác</p>
+                    <p className="text-base font-extrabold text-text-h">{region}</p>
                   </div>
                 </div>
 
                 {/* Email Info */}
                 <div className="flex items-center justify-between p-4">
                   <div>
-                    <p className="text-xs text-text-main/60 font-semibold uppercase">Email</p>
-                    <p className="text-base font-semibold text-text-main">{user?.email || 'N/A'}</p>
+                    <p className="text-xs text-text-secondary font-black uppercase">Email liên hệ</p>
+                    <p className="text-base font-extrabold text-text-h font-mono">{user?.email || 'N/A'}</p>
                   </div>
                 </div>
               </div>
 
               {/* Edit Button */}
-              <motion.button 
-                whileTap={{ scale: 0.96 }}
+              <button 
                 onClick={() => {
                   setIsEditingName(true);
                   setEditName(name);
                   setEditRegion(region);
                 }}
-                className="w-full mt-4 bg-primary text-white font-bold rounded-[16px] px-4 py-3 hover:bg-primary-container transition-colors shadow-sm"
+                className="btn btn--cyan w-full mt-4 py-3 font-extrabold text-sm cursor-pointer"
               >
                 Chỉnh sửa thông tin
-              </motion.button>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Account Status Section */}
-        <div className="bg-white rounded-[24px] border border-border-main/50 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-text-main mb-4">Trạng thái tài khoản</h2>
+        <div className="card-bubble bg-white p-6 shadow-sm border-2 border-border-main">
+          <h2 className="text-xl font-black text-text-h mb-4">Trạng thái tài khoản</h2>
           
-          <div className="bg-bg-surface-1 rounded-[16px] overflow-hidden border border-black/[0.04]">
+          <div className="bg-bg-surface-1 rounded-[20px] overflow-hidden border-2 border-border-main">
             {/* Account Created */}
-            <div className="p-4 border-b border-black/[0.04]">
-              <p className="text-xs text-text-main/60 font-semibold uppercase">Ngày tạo tài khoản</p>
-              <p className="text-base font-semibold text-text-main">15 tháng 5 năm 2024</p>
+            <div className="p-4 border-b border-border-main/50">
+              <p className="text-xs text-text-secondary font-black uppercase">Ngày tạo tài khoản</p>
+              <p className="text-base font-extrabold text-text-h">15 tháng 5 năm 2024</p>
             </div>
 
             {/* Account Status */}
-            <div className="p-4 border-b border-black/[0.04]">
-              <p className="text-xs text-text-main/60 font-semibold uppercase">Trạng thái</p>
+            <div className="p-4 border-b border-border-main/50">
+              <p className="text-xs text-text-secondary font-black uppercase">Trạng thái</p>
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-2 h-2 rounded-full bg-success-main"></div>
-                <p className="text-base font-semibold text-text-main">Hoạt động</p>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#008A5E]"></div>
+                <p className="text-base font-extrabold text-[#008A5E]">Đang hoạt động</p>
               </div>
             </div>
 
             {/* Subscription Plan */}
             <div className="p-4">
-              <p className="text-xs text-text-main/60 font-semibold uppercase">Gói</p>
-              <p className="text-base font-semibold text-text-main">Miễn phí</p>
+              <p className="text-xs text-text-secondary font-black uppercase">Gói thành viên</p>
+              <p className="text-base font-extrabold text-text-h">Miễn phí trọn đời</p>
             </div>
           </div>
         </div>
 
         {/* Privacy & Danger Zone */}
-        <div className="bg-white rounded-[24px] border border-error-main/20 p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-text-main mb-4">Dữ liệu & Quyền riêng tư</h2>
+        <div className="card-bubble bg-white p-6 shadow-sm border-2 border-red-200">
+          <h2 className="text-xl font-black text-text-h mb-3">Dữ liệu & Quyền riêng tư</h2>
           
-          <motion.button 
-            whileTap={{ scale: 0.96 }}
+          <button 
             onClick={handleExportData}
-            className="w-full bg-bg-surface-1 border border-border-main/50 text-text-main font-bold rounded-[16px] px-4 py-3 hover:bg-bg-surface transition-colors shadow-sm mb-4"
+            className="btn btn--soft w-full py-3 font-bold text-sm text-text-main cursor-pointer border-2 border-border-main/50 mb-4 active:scale-95"
           >
-            Xuất dữ liệu của tôi
-          </motion.button>
+            Xuất tập dữ liệu cá nhân (JSON)
+          </button>
 
-          <h2 className="text-lg font-bold text-error-main mb-4 mt-6">Vùng nguy hiểm</h2>
-          <motion.button 
-            whileTap={{ scale: 0.96 }}
+          <h2 className="text-xl font-black text-red-600 mb-3 mt-4">Vùng nguy hiểm</h2>
+          <button 
             onClick={handleDeleteAccount}
-            className="w-full bg-error-light text-error-main font-bold rounded-[16px] px-4 py-3 hover:bg-error-light/80 transition-colors shadow-sm"
+            className="btn btn--coral w-full py-3 font-extrabold text-sm cursor-pointer active:scale-95"
           >
-            Xóa tài khoản
-          </motion.button>
-          <p className="text-xs text-error-main/70 mt-2 text-center">Hành động này không thể hoàn tác</p>
+            Xóa vĩnh viễn tài khoản
+          </button>
+          <p className="text-xs font-bold text-red-500/80 mt-2 text-center">Lưu ý: Hành động này không thể phục hồi lại dữ liệu cũ</p>
         </div>
 
       </main>

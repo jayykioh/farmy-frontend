@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
 import { InsightCard } from './InsightCard';
-import { CheckCircle2, Loader2, FileText, FilePlus } from 'lucide-react';
+import { CheckCircle, CircleNotch, FileText, FilePlus } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 
 interface DiaryOption {
@@ -175,7 +175,7 @@ export const InsightList: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-3">
-        <Loader2 className="w-8 h-8 text-primary-main animate-spin" />
+        <CircleNotch className="w-8 h-8 text-primary-main animate-spin" weight="bold" />
         <p className="text-text-muted text-sm font-medium animate-pulse">Đang tải insights...</p>
       </div>
     );
@@ -209,7 +209,7 @@ export const InsightList: React.FC = () => {
             >
               {modalConfig.type === 'loading' ? (
                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-                  <Loader2 className="w-8 h-8 animate-spin" />
+                  <CircleNotch className="w-8 h-8 animate-spin" weight="bold" />
                 </div>
               ) : modalConfig.type === 'info' ? (
                 <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-3xl">
@@ -228,7 +228,7 @@ export const InsightList: React.FC = () => {
               {(modalConfig.type === 'error' || modalConfig.type === 'info') && (
                 <button
                   onClick={() => setModalConfig(null)}
-                  className="w-full py-3 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-slate-800 transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-3 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-slate-800 transition-all active:scale-95 cursor-pointer"
                 >
                   Đóng
                 </button>
@@ -236,7 +236,7 @@ export const InsightList: React.FC = () => {
               {modalConfig.type === 'loading' && (
                 <button
                   onClick={() => setModalConfig(null)}
-                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                  className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors active:scale-95"
                 >
                   Ẩn và tiếp tục xử lý nền
                 </button>
@@ -277,9 +277,9 @@ export const InsightList: React.FC = () => {
           <button
             onClick={triggerSelectedDiary}
             disabled={isBusy || isLoadingDiaries}
-            className="flex items-center gap-2 px-6 py-3.5 rounded-full text-[15px] font-bold text-white bg-[#1d1d1f] hover:bg-black shadow-[0_4px_16px_rgba(0,0,0,0.1)] active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
+            className="flex items-center gap-2 px-6 py-3.5 rounded-full text-[15px] font-bold text-white bg-[#1d1d1f] hover:bg-black shadow-[0_4px_16px_rgba(0,0,0,0.1)] active:scale-95 transition-all disabled:opacity-60 cursor-pointer"
           >
-            <FilePlus className="w-4 h-4" />
+            <FilePlus className="w-4 h-4" weight="bold" />
             Lập báo cáo tuần
           </button>
         </div>
@@ -298,15 +298,15 @@ export const InsightList: React.FC = () => {
             >
               {isBusy ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
                   Đang tổng hợp...
                 </>
               ) : (
                 <>
                   {currentWeekInsight ? (
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle className="w-4 h-4" weight="duotone" />
                   ) : (
-                    <FilePlus className="w-4 h-4" />
+                    <FilePlus className="w-4 h-4" weight="bold" />
                   )}
                   {currentWeekInsight ? 'Đã có báo cáo tuần này' : 'Lập báo cáo ngay'}
                 </>

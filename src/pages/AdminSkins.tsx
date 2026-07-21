@@ -1,6 +1,11 @@
+/* Hallmark · page: admin-skins · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useEffect, useState } from 'react';
 import { getAdminSkins, createAdminSkin, updateAdminSkin, deleteAdminSkin } from '../api/admin';
-import { Plus, Edit2, Trash2, X, Tag, ShieldAlert, Image, Layers, Sparkles } from 'lucide-react';
+import { Plus, NotePencil, Trash, X, Tag, ShieldWarning, Image, Stack, Sparkle } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 
 export type ShopItemInfo = {
@@ -110,7 +115,6 @@ export const AdminSkins: React.FC = () => {
       return;
     }
 
-    // Build anchor object dynamically if any field is filled
     const anchor: any = {};
     if (anchorTop) anchor.top = anchorTop;
     if (anchorLeft) anchor.left = anchorLeft;
@@ -166,52 +170,52 @@ export const AdminSkins: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 text-left font-sans">
       {/* Header section with add button */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between card-bubble bg-white p-5 border-2 border-border-main shadow-xs rounded-3xl">
         <div>
-          <h2 className="text-xl font-bold text-[#1d1d1f] tracking-tight">Quản lý Cửa hàng (Skins)</h2>
-          <p className="text-sm text-[#86868b] font-medium">Quản lý danh sách phụ kiện cho thú cưng, cấu hình giá EXP và cấp độ yêu cầu.</p>
+          <h2 className="text-xl font-black text-text-h tracking-tight">Cửa hàng vật phẩm Bé Thóc</h2>
+          <p className="text-xs text-text-secondary font-bold mt-0.5">Quản lý trang phục, mũ nón và hiệu ứng cho mascot nông trại.</p>
         </div>
         <button
           onClick={openAddModal}
-          className="flex items-center gap-2 bg-[#08A855] text-white px-4 py-2.5 rounded-xl text-[14px] font-bold shadow-md hover:bg-[#07964b] active:scale-[0.98] transition-all cursor-pointer"
+          className="btn btn--cyan active:scale-95 rounded-2xl px-5 py-3 text-xs font-black flex items-center gap-2 cursor-pointer shadow-md"
         >
-          <Plus size={16} /> Thêm phụ kiện
+          <Plus size={18} weight="bold" /> Thêm phụ kiện mới
         </button>
       </div>
 
       {/* Grid List */}
       {loading ? (
         <div className="py-20 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#08A855] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-4 border-border-main border-t-[#008A5E] mx-auto"></div>
         </div>
       ) : skins.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-black/[0.04] p-12 text-center text-[#86868b]">
-          Chưa có phụ kiện nào trong cửa hàng. Nhấn "Thêm phụ kiện" để bắt đầu.
+        <div className="card-bubble bg-white rounded-3xl border-2 border-border-main p-12 text-center text-text-secondary font-bold">
+          Chưa có phụ kiện nào trong cửa hàng. Nhấn "Thêm phụ kiện mới" để tạo vật phẩm đầu tiên!
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {skins.map((skin) => (
             <div
               key={skin._id}
-              className="bg-white rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] hover:shadow-md transition-all overflow-hidden flex flex-col relative group"
+              className="card-bubble bg-white rounded-3xl border-2 border-border-main shadow-xs overflow-hidden flex flex-col relative"
             >
               {/* Image Preview Container */}
-              <div className="bg-[#f5f5f7] p-6 flex items-center justify-center h-48 border-b border-black/[0.02] relative">
+              <div className="bg-bg-surface-1 p-6 flex items-center justify-center h-48 border-b-2 border-border-main relative">
                 {skin.image_url ? (
                   <img
                     src={skin.image_url}
                     alt={skin.name}
-                    className="max-h-36 max-w-[80%] object-contain drop-shadow-sm"
+                    className="max-h-36 max-w-[80%] object-contain drop-shadow-md"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'https://placehold.co/150?text=No+Image';
                     }}
                   />
                 ) : (
-                  <Image className="w-12 h-12 text-[#86868b]" />
+                  <Image size={32} weight="duotone" className="text-text-secondary" />
                 )}
-                <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm border border-black/[0.04] text-[11px] font-bold text-[#1d1d1f] px-2.5 py-1 rounded-full shadow-sm">
+                <span className="absolute top-3 left-3 bg-white border-2 border-border-main text-xs font-black text-[#008A5E] px-3 py-1 rounded-full shadow-xs">
                   {getCategoryLabel(skin.category)}
                 </span>
               </div>
@@ -219,34 +223,34 @@ export const AdminSkins: React.FC = () => {
               {/* Information */}
               <div className="p-4 flex-1 flex flex-col justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-[#1d1d1f] text-[15px] line-clamp-1">{skin.name}</h3>
-                  <div className="flex flex-col gap-1 mt-2 text-[13px] text-[#86868b] font-medium">
+                  <h3 className="font-black text-text-h text-base line-clamp-1">{skin.name}</h3>
+                  <div className="flex flex-col gap-1.5 mt-2 text-xs font-bold text-text-secondary">
                     <div className="flex items-center gap-1.5">
-                      <Tag size={13} className="text-slate-400" />
-                      <span>Giá: <strong className="text-[#08A855] font-semibold">{skin.price} XP</strong></span>
+                      <Tag size={14} weight="bold" className="text-[#008A5E]" />
+                      <span>Giá bán: <strong className="text-[#008A5E] font-black">{skin.price} XP</strong></span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Layers size={13} className="text-slate-400" />
-                      <span>Cấp độ yêu cầu: <strong className="text-slate-700 font-semibold">{skin.required_level}</strong></span>
+                      <Stack size={14} weight="bold" className="text-amber-600" />
+                      <span>Cấp mở khóa: <strong className="text-text-h font-black">{skin.required_level}</strong></span>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-2 border-t border-black/[0.03] pt-3 mt-1">
+                <div className="flex items-center justify-end gap-2 border-t-2 border-border-main/50 pt-3 mt-1">
                   <button
                     onClick={() => openEditModal(skin)}
-                    className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-all cursor-pointer"
+                    className="btn btn--soft active:scale-95 rounded-2xl p-2 text-text-main border border-border-main cursor-pointer"
                     title="Chỉnh sửa"
                   >
-                    <Edit2 size={15} />
+                    <NotePencil size={16} weight="bold" />
                   </button>
                   <button
                     onClick={() => handleDelete(skin._id, skin.name)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
-                    title="Xóa"
+                    className="btn btn--coral active:scale-95 rounded-2xl p-2 text-red-800 border border-red-300 cursor-pointer"
+                    title="Xóa phụ kiện"
                   >
-                    <Trash2 size={15} />
+                    <Trash size={16} weight="bold" />
                   </button>
                 </div>
               </div>
@@ -257,51 +261,51 @@ export const AdminSkins: React.FC = () => {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white border border-border-main/55 rounded-[28px] max-w-lg w-full shadow-2xl overflow-hidden my-8">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="card-bubble bg-white rounded-3xl border-2 border-border-main max-w-lg w-full shadow-2xl overflow-hidden my-8 text-left">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-black/[0.05]">
-              <h3 className="text-lg font-bold text-[#1d1d1f] flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#08A855]" />
+            <div className="flex items-center justify-between px-6 py-5 border-b-2 border-border-main">
+              <h3 className="text-lg font-black text-text-h flex items-center gap-2">
+                <Sparkle size={20} weight="duotone" className="text-[#008A5E]" />
                 {editingSkin ? 'Cập nhật phụ kiện' : 'Thêm phụ kiện mới'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#86868b] hover:text-[#1d1d1f] p-1 hover:bg-black/[0.04] rounded-full transition-all cursor-pointer"
+                className="p-1.5 text-text-secondary hover:text-text-main bg-bg-surface-2 rounded-full border border-border-main/50 active:scale-95 transition-all cursor-pointer"
               >
-                <X size={20} />
+                <X size={20} weight="bold" />
               </button>
             </div>
 
             {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
               <div className="space-y-1">
-                <label className="text-[13px] font-bold text-[#1d1d1f]" htmlFor="skinName">
+                <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="skinName">
                   Tên phụ kiện *
                 </label>
                 <input
                   id="skinName"
                   type="text"
-                  placeholder="Ví dụ: Vương Miện Hoàng Gia, Kính Râm..."
+                  placeholder="Ví dụ: Nón lá Nam Bộ, Kính mát ngầu..."
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-black/[0.08] px-3.5 py-2.5 text-[14px] font-semibold outline-none focus:border-[#08A855] focus:ring-2 focus:ring-[#08A855]/10 transition-all"
+                  className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 px-4 py-3 text-sm font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[13px] font-bold text-[#1d1d1f]" htmlFor="skinCategory">
-                    Thể loại *
+                  <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="skinCategory">
+                    Phân loại *
                   </label>
                   <select
                     id="skinCategory"
                     value={category}
                     onChange={(e) => setCategory(e.target.value as any)}
-                    className="w-full bg-white rounded-xl border border-black/[0.08] px-3.5 py-2.5 text-[14px] font-semibold outline-none focus:border-[#08A855] focus:ring-2 focus:ring-[#08A855]/10 transition-all"
+                    className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 px-4 py-3 text-xs font-black text-text-main outline-none focus:bg-white focus:border-[#008A5E] cursor-pointer transition-all"
                   >
-                    <option value="HAT">Nón/Mũ (HAT)</option>
+                    <option value="HAT">Nón / Mũ (HAT)</option>
                     <option value="OUTFIT">Trang phục (OUTFIT)</option>
                     <option value="EFFECT">Hiệu ứng (EFFECT)</option>
                     <option value="BACKGROUND">Nền cảnh (BACKGROUND)</option>
@@ -309,8 +313,8 @@ export const AdminSkins: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[13px] font-bold text-[#1d1d1f]" htmlFor="skinPrice">
-                    Giá bán (EXP) *
+                  <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="skinPrice">
+                    Giá mua (XP) *
                   </label>
                   <input
                     id="skinPrice"
@@ -319,14 +323,14 @@ export const AdminSkins: React.FC = () => {
                     required
                     value={price}
                     onChange={(e) => setPrice(Number(e.target.value))}
-                    className="w-full rounded-xl border border-black/[0.08] px-3.5 py-2.5 text-[14px] font-semibold outline-none focus:border-[#08A855] focus:ring-2 focus:ring-[#08A855]/10 transition-all"
+                    className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 px-4 py-3 text-sm font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[13px] font-bold text-[#1d1d1f]" htmlFor="skinReqLevel">
+                  <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="skinReqLevel">
                     Cấp độ yêu cầu *
                   </label>
                   <input
@@ -336,12 +340,12 @@ export const AdminSkins: React.FC = () => {
                     required
                     value={requiredLevel}
                     onChange={(e) => setRequiredLevel(Number(e.target.value))}
-                    className="w-full rounded-xl border border-black/[0.08] px-3.5 py-2.5 text-[14px] font-semibold outline-none focus:border-[#08A855] focus:ring-2 focus:ring-[#08A855]/10 transition-all"
+                    className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 px-4 py-3 text-sm font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] transition-all"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[13px] font-bold text-[#1d1d1f]" htmlFor="skinImageUrl">
+                  <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="skinImageUrl">
                     URL hình ảnh *
                   </label>
                   <input
@@ -351,103 +355,103 @@ export const AdminSkins: React.FC = () => {
                     required
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full rounded-xl border border-black/[0.08] px-3.5 py-2.5 text-[14px] font-semibold outline-none focus:border-[#08A855] focus:ring-2 focus:ring-[#08A855]/10 transition-all"
+                    className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 px-4 py-3 text-sm font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] transition-all"
                   />
                 </div>
               </div>
 
               {/* Anchor Settings */}
-              <div className="mt-2 border-t border-black/[0.05] pt-4">
-                <h4 className="text-[13px] font-bold text-[#1d1d1f] mb-3 flex items-center gap-1.5">
-                  <Layers size={14} className="text-[#86868b]" />
-                  Tùy chỉnh Anchor (Tọa độ/kích thước hiển thị)
+              <div className="mt-2 border-t-2 border-border-main/50 pt-4">
+                <h4 className="text-xs font-black text-text-h mb-3 flex items-center gap-1.5">
+                  <Stack size={16} weight="bold" className="text-[#008A5E]" />
+                  Tùy chỉnh Anchor (Căn chỉnh Tọa độ Bé Thóc)
                 </h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[11.5px] font-semibold text-[#86868b]" htmlFor="anchorWidth">
-                      Width (ví dụ: 80%)
+                    <label className="text-[11px] font-black uppercase text-text-secondary" htmlFor="anchorWidth">
+                      Width (e.g. 80%)
                     </label>
                     <input
                       id="anchorWidth"
                       type="text"
-                      placeholder="e.g. 80%"
+                      placeholder="80%"
                       value={anchorWidth}
                       onChange={(e) => setAnchorWidth(e.target.value)}
-                      className="w-full rounded-xl border border-black/[0.08] px-3 py-2 text-[12.5px] font-semibold outline-none focus:border-[#08A855] transition-all"
+                      className="w-full rounded-xl border-2 border-border-main bg-bg-surface-1 px-3 py-2 text-xs font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[11.5px] font-semibold text-[#86868b]" htmlFor="anchorTop">
-                      Top (ví dụ: -15%)
+                    <label className="text-[11px] font-black uppercase text-text-secondary" htmlFor="anchorTop">
+                      Top (e.g. -15%)
                     </label>
                     <input
                       id="anchorTop"
                       type="text"
-                      placeholder="e.g. -15%"
+                      placeholder="-15%"
                       value={anchorTop}
                       onChange={(e) => setAnchorTop(e.target.value)}
-                      className="w-full rounded-xl border border-black/[0.08] px-3 py-2 text-[12.5px] font-semibold outline-none focus:border-[#08A855] transition-all"
+                      className="w-full rounded-xl border-2 border-border-main bg-bg-surface-1 px-3 py-2 text-xs font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[11.5px] font-semibold text-[#86868b]" htmlFor="anchorLeft">
-                      Left (ví dụ: 50%)
+                    <label className="text-[11px] font-black uppercase text-text-secondary" htmlFor="anchorLeft">
+                      Left (e.g. 50%)
                     </label>
                     <input
                       id="anchorLeft"
                       type="text"
-                      placeholder="e.g. 50%"
+                      placeholder="50%"
                       value={anchorLeft}
                       onChange={(e) => setAnchorLeft(e.target.value)}
-                      className="w-full rounded-xl border border-black/[0.08] px-3 py-2 text-[12.5px] font-semibold outline-none focus:border-[#08A855] transition-all"
+                      className="w-full rounded-xl border-2 border-border-main bg-bg-surface-1 px-3 py-2 text-xs font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div className="space-y-1">
-                    <label className="text-[11.5px] font-semibold text-[#86868b]" htmlFor="anchorTransform">
-                      Transform (ví dụ: translateX(-50%))
+                    <label className="text-[11px] font-black uppercase text-text-secondary" htmlFor="anchorTransform">
+                      Transform (e.g. translateX(-50%))
                     </label>
                     <input
                       id="anchorTransform"
                       type="text"
-                      placeholder="e.g. translateX(-50%)"
+                      placeholder="translateX(-50%)"
                       value={anchorTransform}
                       onChange={(e) => setAnchorTransform(e.target.value)}
-                      className="w-full rounded-xl border border-black/[0.08] px-3 py-2 text-[12.5px] font-semibold outline-none focus:border-[#08A855] transition-all"
+                      className="w-full rounded-xl border-2 border-border-main bg-bg-surface-1 px-3 py-2 text-xs font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[11.5px] font-semibold text-[#86868b]" htmlFor="anchorZIndex">
-                      Z-Index (ví dụ: 5)
+                    <label className="text-[11px] font-black uppercase text-text-secondary" htmlFor="anchorZIndex">
+                      Z-Index (e.g. 5)
                     </label>
                     <input
                       id="anchorZIndex"
                       type="number"
-                      placeholder="e.g. 5"
+                      placeholder="5"
                       value={anchorZIndex}
                       onChange={(e) => setAnchorZIndex(e.target.value)}
-                      className="w-full rounded-xl border border-black/[0.08] px-3 py-2 text-[12.5px] font-semibold outline-none focus:border-[#08A855] transition-all"
+                      className="w-full rounded-xl border-2 border-border-main bg-bg-surface-1 px-3 py-2 text-xs font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E]"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex justify-end gap-3 border-t border-black/[0.05] pt-5 mt-4">
+              <div className="flex justify-end gap-3 border-t-2 border-border-main/50 pt-5 mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-black/[0.08] text-[13.5px] font-bold text-[#86868b] hover:bg-black/[0.03] active:scale-[0.98] transition-all cursor-pointer"
+                  className="btn btn--soft active:scale-95 rounded-2xl px-5 py-2.5 text-xs font-black border-2 border-border-main cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#08A855] text-white text-[13.5px] font-bold hover:bg-[#07964b] active:scale-[0.98] transition-all cursor-pointer shadow-md"
+                  className="btn btn--cyan active:scale-95 rounded-2xl px-6 py-2.5 text-xs font-black shadow-md cursor-pointer"
                 >
-                  {editingSkin ? 'Lưu thay đổi' : 'Thêm phụ kiện'}
+                  {editingSkin ? 'Lưu thay đổi' : 'Thêm phụ kiện mới'}
                 </button>
               </div>
             </form>

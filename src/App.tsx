@@ -67,7 +67,7 @@ export function App() {
           },
           success: {
             iconTheme: {
-              primary: '#08A855',
+              primary: '#008A5E',
               secondary: '#ffffff',
             },
             style: {

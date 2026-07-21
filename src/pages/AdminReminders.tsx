@@ -1,6 +1,11 @@
+/* Hallmark · page: admin-reminders · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useEffect, useState } from 'react';
 import { getAdminReminders, sendAdminManualNotification } from '../api/admin';
-import { Bell, Calendar, CheckCircle2, XCircle, Clock, AlertCircle, Send, Users, AlertTriangle } from 'lucide-react';
+import { Bell, Calendar, CheckCircle, XCircle, Clock, WarningCircle, PaperPlaneRight, Users, Warning } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 
 type Reminder = {
@@ -83,22 +88,22 @@ export const AdminReminders: React.FC = () => {
     switch (status) {
       case 'completed':
         return (
-          <span className="flex items-center gap-1 w-fit bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-full text-[12px] font-semibold">
-            <CheckCircle2 size={12} />
+          <span className="flex items-center gap-1 w-fit bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-full text-xs font-black">
+            <CheckCircle size={12} weight="bold" />
             Đã xong
           </span>
         );
       case 'canceled':
         return (
-          <span className="flex items-center gap-1 w-fit bg-red-50 text-red-700 border border-red-100 px-2 py-0.5 rounded-full text-[12px] font-semibold">
-            <XCircle size={12} />
+          <span className="flex items-center gap-1 w-fit bg-red-100 text-red-800 border border-red-300 px-2.5 py-0.5 rounded-full text-xs font-black">
+            <XCircle size={12} weight="bold" />
             Đã hủy
           </span>
         );
       default:
         return (
-          <span className="flex items-center gap-1 w-fit bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-full text-[12px] font-semibold">
-            <Clock size={12} />
+          <span className="flex items-center gap-1 w-fit bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full text-xs font-black">
+            <Clock size={12} weight="bold" />
             Đang chờ
           </span>
         );
@@ -106,16 +111,16 @@ export const AdminReminders: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 text-left font-sans">
       {/* Reminders List Table */}
-      <div className="lg:col-span-2 bg-white rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] overflow-hidden">
-        <div className="p-6 border-b border-black/[0.04]">
-          <h3 className="font-bold text-[#1d1d1f] text-[16px]">Danh sách nhắc nhở</h3>
+      <div className="lg:col-span-2 card-bubble bg-white rounded-3xl border-2 border-border-main shadow-xs overflow-hidden">
+        <div className="p-6 border-b-2 border-border-main">
+          <h3 className="font-black text-text-h text-lg">Danh sách nhắc nhở hệ thống</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#fcfcfd] border-b border-black/[0.03] text-[#86868b] text-[12px] font-bold uppercase tracking-wider">
+              <tr className="bg-bg-surface-1 border-b-2 border-border-main text-text-secondary text-xs font-black uppercase tracking-wider">
                 <th className="py-4 px-6">Nông dân</th>
                 <th className="py-4 px-6">Công việc</th>
                 <th className="py-4 px-6">Trạng thái</th>
@@ -123,43 +128,43 @@ export const AdminReminders: React.FC = () => {
                 <th className="py-4 px-6 text-center">Gửi tin</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black/[0.03]">
+            <tbody className="divide-y-2 divide-border-main/40">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#08A855] mx-auto"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-border-main border-t-[#008A5E] mx-auto"></div>
                   </td>
                 </tr>
               ) : reminders.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center">
-                    <AlertCircle size={28} className="text-[#86868b] mx-auto mb-2" />
-                    <p className="text-[#86868b] text-[14px]">Không có nhắc nhở nào trong hệ thống</p>
+                    <WarningCircle size={32} weight="duotone" className="text-text-secondary mx-auto mb-2" />
+                    <p className="text-text-secondary font-bold text-sm">Không có nhắc nhở nào trong hệ thống</p>
                   </td>
                 </tr>
               ) : (
                 reminders.map((reminder) => (
-                  <tr key={reminder._id} className="hover:bg-black/[0.01] transition-all text-[#1d1d1f] text-[14px]">
+                  <tr key={reminder._id} className="hover:bg-bg-surface-1/50 transition-colors text-text-main text-sm font-bold">
                     <td className="py-4 px-6">
                       {reminder.user_id ? (
                         <div className="flex flex-col">
-                          <span className="font-bold">{reminder.user_id.name}</span>
-                          <span className="text-[12px] text-[#86868b] font-medium">{reminder.user_id.email}</span>
+                          <span className="font-black text-text-h">{reminder.user_id.name}</span>
+                          <span className="text-xs text-text-secondary font-bold">{reminder.user_id.email}</span>
                         </div>
                       ) : (
-                        <span className="text-[#86868b]">Ẩn danh</span>
+                        <span className="text-text-secondary italic text-xs font-bold">Khách vãng lai</span>
                       )}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex flex-col">
-                        <span className="font-bold">{reminder.title}</span>
-                        <span className="text-[12px] text-[#86868b] font-medium uppercase tracking-wider">{reminder.type}</span>
+                        <span className="font-black text-text-h">{reminder.title}</span>
+                        <span className="text-xs text-[#008A5E] font-black uppercase">{reminder.type}</span>
                       </div>
                     </td>
                     <td className="py-4 px-6">{getStatusBadge(reminder.status)}</td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-1.5 text-[#86868b] text-[13px] font-medium">
-                        <Calendar size={14} />
+                    <td className="py-4 px-6 text-xs font-bold text-text-secondary">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar size={14} weight="bold" />
                         <span>{new Date(reminder.remind_at).toLocaleString('vi-VN')}</span>
                       </div>
                     </td>
@@ -170,10 +175,10 @@ export const AdminReminders: React.FC = () => {
                             setTargetUserId(reminder.user_id?._id || '');
                             setTargetUserName(reminder.user_id?.name || '');
                           }}
-                          className="p-2 text-[#08A855] hover:bg-[#e6f7ee] rounded-full active:scale-95 transition-all inline-flex items-center"
+                          className="p-2 text-[#008A5E] bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 rounded-2xl active:scale-95 transition-all inline-flex items-center cursor-pointer"
                           title="Gửi thông báo đẩy"
                         >
-                          <Send size={14} />
+                          <PaperPlaneRight size={14} weight="bold" />
                         </button>
                       )}
                     </td>
@@ -186,25 +191,25 @@ export const AdminReminders: React.FC = () => {
 
         {/* Pagination Footer */}
         {!loading && totalPages > 1 && (
-          <div className="p-5 border-t border-black/[0.03] flex items-center justify-between">
-            <span className="text-[13.5px] text-[#86868b] font-medium">
+          <div className="p-5 border-t-2 border-border-main flex items-center justify-between">
+            <span className="text-xs font-bold text-text-secondary">
               Hiển thị {reminders.length} trên {total} nhắc nhở
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
                 disabled={page === 1}
-                className="px-3.5 py-1.5 border border-black/[0.08] text-[13px] font-bold rounded-xl hover:bg-black/[0.02] disabled:opacity-40 disabled:hover:bg-transparent transition-all"
+                className="btn btn--soft active:scale-95 rounded-2xl px-3.5 py-1.5 text-xs font-black border-2 border-border-main cursor-pointer disabled:opacity-40"
               >
                 Trang trước
               </button>
-              <span className="text-[13px] text-[#1d1d1f] font-bold px-2">
+              <span className="text-xs text-text-h font-black px-2">
                 Trang {page} / {totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                 disabled={page === totalPages}
-                className="px-3.5 py-1.5 border border-black/[0.08] text-[13px] font-bold rounded-xl hover:bg-black/[0.02] disabled:opacity-40 disabled:hover:bg-transparent transition-all"
+                className="btn btn--soft active:scale-95 rounded-2xl px-3.5 py-1.5 text-xs font-black border-2 border-border-main cursor-pointer disabled:opacity-40"
               >
                 Trang sau
               </button>
@@ -214,24 +219,24 @@ export const AdminReminders: React.FC = () => {
       </div>
 
       {/* Send Manual Notification Form */}
-      <div className="bg-white p-6 rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] h-fit flex flex-col gap-5">
+      <div className="card-bubble bg-white p-6 rounded-3xl border-2 border-border-main shadow-xs h-fit flex flex-col gap-5">
         <div>
-          <h3 className="font-bold text-[#1d1d1f] text-[16px] flex items-center gap-1.5">
-            <Bell size={18} className="text-[#08A855]" />
-            Gửi thông báo đẩy thủ công
+          <h3 className="font-black text-text-h text-lg flex items-center gap-2">
+            <Bell size={20} weight="duotone" className="text-[#008A5E]" />
+            Gửi thông báo thủ công
           </h3>
-          <p className="text-[#86868b] text-[12.5px] mt-1">
-            Gửi trực tiếp một cảnh báo/tin nhắn nhắc nhở đến thiết bị nông dân đã đăng ký Push Notification.
+          <p className="text-text-secondary text-xs font-bold mt-1 leading-relaxed">
+            Gửi trực tiếp một cảnh báo/tin nhắn nhắc nhở đến thiết bị nông dân đã bật Push Notification.
           </p>
         </div>
 
         <form onSubmit={handleSendNotification} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-bold text-[#1d1d1f]">Người nhận</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-black uppercase text-text-secondary">Người nhận</label>
             {targetUserName ? (
-              <div className="flex items-center justify-between bg-[#e6f7ee] border border-[#a2e3be] rounded-xl px-4 py-2.5">
-                <span className="text-[13.5px] text-[#067a3d] font-bold flex items-center gap-1.5">
-                  <Users size={14} />
+              <div className="flex items-center justify-between bg-emerald-50 border-2 border-emerald-300 rounded-2xl px-4 py-2.5">
+                <span className="text-xs text-emerald-900 font-black flex items-center gap-2">
+                  <Users size={16} weight="bold" />
                   {targetUserName}
                 </span>
                 <button
@@ -240,52 +245,52 @@ export const AdminReminders: React.FC = () => {
                     setTargetUserId('');
                     setTargetUserName('');
                   }}
-                  className="text-[#86868b] hover:text-red-500 font-bold text-[13px]"
+                  className="text-red-600 hover:underline font-black text-xs cursor-pointer active:scale-95 transition-transform"
                 >
                   Đổi
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-[12.5px]">
-                <AlertTriangle size={16} className="shrink-0 text-amber-600" />
-                <span>Nhấn nút gửi tin (<Send size={10} className="inline" />) ở dòng tương ứng của nông dân trong bảng để chọn.</span>
+              <div className="flex items-center gap-2 p-3 bg-amber-50 border-2 border-amber-300 rounded-2xl text-amber-900 text-xs font-bold">
+                <Warning size={16} weight="bold" className="shrink-0 text-amber-600" />
+                <span>Nhấn nút icon máy bay (<PaperPlaneRight size={10} weight="bold" className="inline" />) ở cột Thao tác trong danh sách để chọn nông dân.</span>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-bold text-[#1d1d1f]">Tiêu đề thông báo</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-black uppercase text-text-secondary">Tiêu đề thông báo</label>
             <input
               type="text"
-              placeholder="e.g. Cảnh báo thời tiết, Tưới nước cây..."
+              placeholder="Ví dụ: Cảnh báo sương muối, Tưới vườn lá..."
               value={notificationTitle}
               onChange={(e) => setNotificationTitle(e.target.value)}
-              className="bg-[#f5f5f7] border border-black/[0.04] rounded-xl px-4 py-2.5 text-[13.5px] text-[#1d1d1f] focus:outline-none focus:bg-white focus:border-[#08A855] focus:ring-1 focus:ring-[#08A855] transition-all"
+              className="bg-bg-surface-1 border-2 border-border-main rounded-2xl px-4 py-2.5 text-sm font-bold text-text-main outline-none focus:bg-white focus:border-[#008A5E] transition-all"
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-bold text-[#1d1d1f]">Nội dung thông báo</label>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-black uppercase text-text-secondary">Nội dung thông báo</label>
             <textarea
-              placeholder="Nhập nội dung tin nhắn gửi tới nông dân..."
+              placeholder="Nhập chi tiết nội dung tin nhắn cần gửi đến nông dân..."
               rows={4}
               value={notificationBody}
               onChange={(e) => setNotificationBody(e.target.value)}
-              className="bg-[#f5f5f7] border border-black/[0.04] rounded-xl px-4 py-2.5 text-[13.5px] text-[#1d1d1f] focus:outline-none focus:bg-white focus:border-[#08A855] focus:ring-1 focus:ring-[#08A855] transition-all resize-none"
+              className="bg-bg-surface-1 border-2 border-border-main rounded-2xl px-4 py-2.5 text-sm font-bold text-text-main outline-none focus:bg-white focus:border-[#008A5E] transition-all resize-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={sending || !targetUserId}
-            className="flex items-center justify-center gap-2 bg-[#08A855] text-white py-2.5 rounded-xl text-[14px] font-bold shadow-[0_4px_12px_rgba(8,168,85,0.15)] hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:active:scale-100 transition-all mt-2"
+            className="btn btn--cyan active:scale-95 rounded-2xl w-full py-3.5 text-sm font-black flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50 mt-2"
           >
             {sending ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white"></div>
             ) : (
-              <Send size={14} />
+              <PaperPlaneRight size={16} weight="bold" />
             )}
-            <span>Gửi thông báo</span>
+            <span>Bắt đầu gửi thông báo</span>
           </button>
         </form>
       </div>

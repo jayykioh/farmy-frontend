@@ -1,6 +1,14 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PlantScan from './PlantScan';
+import toast from 'react-hot-toast';
+
+vi.mock('react-hot-toast', () => ({
+  default: {
+    error: vi.fn(),
+    success: vi.fn(),
+  },
+}));
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter } from 'react-router-dom';
@@ -172,7 +180,7 @@ describe('PlantScan Component', () => {
     });
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
+      expect(toast.error).toHaveBeenCalledWith('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
       expect(screen.getByText('Giữ camera sát lá bị bệnh để AI chẩn đoán tốt nhất')).toBeInTheDocument(); // back to viewfinder
     });
   });
@@ -191,7 +199,7 @@ describe('PlantScan Component', () => {
     });
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
+      expect(toast.error).toHaveBeenCalledWith('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
       expect(screen.getByText('Giữ camera sát lá bị bệnh để AI chẩn đoán tốt nhất')).toBeInTheDocument();
     });
   });
@@ -223,7 +231,7 @@ describe('PlantScan Component', () => {
       expect(screen.getByText('Test')).toBeInTheDocument();
     });
 
-    const retakeBtn = screen.getByText('Chụp lại');
+    const retakeBtn = screen.getByText('Quét ảnh khác');
     fireEvent.click(retakeBtn);
 
     expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:test-url');

@@ -1,277 +1,311 @@
-import React, { useEffect, useState } from 'react';
+/* Hallmark · page: landing · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass
+ */
+
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import type { Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Sprout, 
-  ChevronRight,
-  ScanLine,
-  MessageSquare,
-  Activity,
-  ArrowRight
-} from 'lucide-react';
+  Plant, 
+  Scan,
+  ChatCircleText,
+  Pulse as ActivityIcon,
+  ArrowRight,
+  Flame,
+  Heart,
+  CaretRight
+} from '@phosphor-icons/react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 
-// Animation variants
-const staggerContainer: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2,
-    },
-  },
-};
-
-const fadeUpVariant: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { type: 'spring', stiffness: 70, damping: 20 }
-  },
-};
-
-const hoverCardVariant: Variants = {
-  rest: { y: 0, scale: 1 },
-  hover: { 
-    y: -8, 
-    scale: 1.01,
-    transition: { type: 'spring', stiffness: 300, damping: 20 }
-  }
-};
+interface StarBurst {
+  id: number;
+  x: number;
+  y: number;
+}
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  
-  // Parallax effect for the hero background
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 1000], [0, -150]);
-  const y2 = useTransform(scrollY, [0, 1000], [0, 150]);
+  const [starBursts, setStarBursts] = useState<StarBurst[]>([]);
+  const nextStarburstId = useRef(0);
+  const [bubbleText, setBubbleText] = useState("Chào mừng bạn! Hãy chăm sóc cây cùng mình nhé 🌿");
+
+  const bubbleTips = [
+    "Hôm nay trời rất đẹp, hãy kiểm tra lá cây nhé! ☀️",
+    "Ghi nhật ký mỗi ngày giúp Bé Thóc nhanh lên cấp lắm đó! 🌱",
+    "Theo dõi nhật ký thường xuyên để phát hiện sâu bệnh kịp thời! 🌾",
+    "Nếu thấy lá có đốm nâu, hãy dùng tính năng Quét cây ngay nhé! 🔍",
+    "Đất khô hay ẩm? Hãy chạm nhẹ vào đất để cảm nhận độ ẩm. 💧"
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Rotate bubble tips periodically
+    const interval = setInterval(() => {
+      const randomTip = bubbleTips[Math.floor(Math.random() * bubbleTips.length)];
+      setBubbleText(randomTip);
+    }, 8000);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearInterval(interval);
+    };
   }, []);
 
-  return (
-    <div className="min-h-screen bg-[#fbfbfd] font-sans text-[#1d1d1f] selection:bg-[#34C759]/20 selection:text-[#1d1d1f] overflow-x-hidden relative">
-      
-      {/* Ambient Animated Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.div 
-          style={{ y: y1 }}
-          className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#34C759]/[0.04] blur-[140px] rounded-full"
-        />
-        <motion.div 
-          style={{ y: y2 }}
-          className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] bg-[#007AFF]/[0.03] blur-[120px] rounded-full"
-        />
-      </div>
+  const triggerStarburst = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const newBurst: StarBurst = {
+      id: nextStarburstId.current++,
+      x,
+      y
+    };
+    
+    setStarBursts(prev => [...prev, newBurst]);
+    setTimeout(() => {
+      setStarBursts(prev => prev.filter(b => b.id !== newBurst.id));
+    }, 420);
+  };
 
-      {/* Navigation Bar */}
+  return (
+    <div className="min-h-screen bg-[var(--color-paper)] font-sans text-[var(--color-ink)] selection:bg-[var(--color-accent-2)]/30 overflow-x-hidden relative flex flex-col justify-between">
+      
+      {/* Navigation Bar (Clean bubble pill style) */}
       <motion.nav 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-4 ${
           scrolled 
-            ? 'bg-white/70 backdrop-blur-2xl border-b border-black/[0.04] shadow-[0_4px_30px_rgba(0,0,0,0.03)]' 
+            ? 'bg-white/80 backdrop-blur-2xl border-b border-[var(--color-border-main)] shadow-[0_4px_30px_rgba(0,0,0,0.02)]' 
             : 'bg-transparent'
         }`}
       >
-        <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
-          <div className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80" onClick={() => window.scrollTo(0, 0)}>
-            <Sprout className="w-7 h-7 text-[#1d1d1f]" strokeWidth={2.5} />
-            <span className="text-xl font-bold tracking-tight">FARMY</span>
+        <div className="flex items-center justify-between px-6 md:px-12 max-w-7xl mx-auto">
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <Plant size={26} weight="duotone" className="text-[#008A5E]" />
+            <span className="text-xl font-black tracking-tight uppercase">FARMY</span>
           </div>
-          <div className="flex items-center gap-6 text-[15px] font-semibold">
+
+          <div className="flex items-center gap-4 text-sm font-bold">
             <button 
               onClick={() => navigate('/login')}
-              className="hidden md:block text-[#48484a] hover:text-[#1d1d1f] transition-colors"
+              className="text-[var(--color-ink-2)] hover:text-[var(--color-ink)] transition-colors px-3 py-2 cursor-pointer"
             >
               Đăng nhập
             </button>
             <button 
               onClick={() => navigate('/register')}
-              className="bg-[#1d1d1f] text-white px-5 py-2.5 rounded-full hover:bg-black hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="btn py-2 px-5 text-xs cursor-pointer"
             >
-              Bắt đầu ngay
+              Đăng ký
             </button>
           </div>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-44 pb-28 px-6 max-w-7xl mx-auto flex flex-col items-center text-center z-10">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-          className="flex flex-col items-center"
-        >
-          <motion.div variants={fadeUpVariant} className="inline-flex items-center gap-2 px-3 py-1.5 mb-10 rounded-full bg-white/60 border border-black/[0.05] shadow-sm backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34C759] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34C759]"></span>
-            </span>
-            <span className="text-[11px] font-bold tracking-widest text-[#1d1d1f] uppercase">Phiên bản 1.0 đã ra mắt</span>
-          </motion.div>
-          
-          <motion.h1 variants={fadeUpVariant} className="text-[40px] md:text-[64px] lg:text-[80px] font-black leading-[1.05] tracking-tight mb-8 max-w-5xl">
-            Tương lai của <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1d1d1f] via-[#48484a] to-[#86868b]">
-              nông nghiệp thông minh.
-            </span>
-          </motion.h1>
-          
-          <motion.p variants={fadeUpVariant} className="text-[18px] md:text-[22px] font-medium leading-relaxed text-[#86868b] max-w-2xl mb-12">
-            Đơn giản hóa việc quản lý nông trại. Ghi chép nhật ký, theo dõi thời tiết và phân tích dữ liệu trên một nền tảng tinh gọn, tập trung vào điều quan trọng nhất: cây trồng của bạn.
-          </motion.p>
+      <section className="relative pt-40 pb-24 px-6 max-w-7xl mx-auto flex flex-col items-center text-center z-10 w-full">
+        {/* Glow behind hero */}
+        <div className="absolute top-10 w-[70%] h-[200px] bg-[var(--color-accent)]/10 blur-[100px] rounded-full -z-10 pointer-events-none" />
 
-          <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <button 
-              onClick={() => navigate('/register')}
-              className="group flex items-center justify-center gap-2 bg-[#1d1d1f] text-white px-8 py-4 rounded-full text-[17px] font-semibold hover:bg-black hover:shadow-[0_12px_30px_rgba(0,0,0,0.2)] active:scale-95 transition-all duration-300"
-            >
-              Trải nghiệm miễn phí
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button 
-              onClick={() => navigate('/login')}
-              className="flex items-center justify-center bg-white text-[#1d1d1f] px-8 py-4 rounded-full text-[17px] font-semibold border border-black/[0.08] hover:border-black/[0.15] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300"
-            >
-              Tìm hiểu thêm
-            </button>
-          </motion.div>
-        </motion.div>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-8 rounded-full bg-white/70 border border-[var(--color-border-main)] shadow-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent-3)] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-accent-3)]"></span>
+          </span>
+          <span className="text-[10px] font-bold tracking-widest text-[var(--color-ink-2)] uppercase font-mono">NÔNG NGHIỆP THÔNG MINH</span>
+        </div>
+        
+        <h1 className="text-[42px] md:text-[68px] lg:text-[84px] font-extrabold leading-[1.05] tracking-tight mb-8 max-w-5xl">
+          Nông nghiệp thông minh <br />
+          <span className="hl">trở nên thú vị hơn.</span>
+        </h1>
+        
+        <p className="text-[17px] md:text-[20px] font-medium leading-relaxed text-[var(--color-ink-2)] max-w-2xl mb-12">
+          Đơn giản hóa việc quản lý vườn tược. Ghi chép nhật ký sinh trưởng, quét bệnh AI và đồng hành cùng thú cưng ảo Bé Thóc đáng yêu.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto mb-20">
+          <button 
+            onClick={(e) => {
+              triggerStarburst(e);
+              setTimeout(() => navigate('/register'), 350);
+            }}
+            className="btn btn--coral px-8 py-4 text-base relative cursor-pointer"
+          >
+            Trải nghiệm miễn phí
+            <ArrowRight size={20} weight="bold" />
+            
+            {starBursts.map(burst => (
+              <span
+                key={burst.id}
+                className="star-burst"
+                style={{ left: burst.x, top: burst.y }}
+              />
+            ))}
+          </button>
+        </div>
+
+        {/* Mascot Mascot Showcase (Character moment) */}
+        <div className="w-full max-w-md mx-auto relative mb-28">
+          <div className="absolute inset-0 bg-[var(--color-accent)]/8 blur-[80px] rounded-full -z-10" />
+          <div 
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              setStarBursts(prev => [...prev, { id: nextStarburstId.current++, x, y }]);
+              // Poke pet interaction
+              const tips = [
+                "Ouch! Bạn chọc mình à? 🌾",
+                "Hihi vui quá, tiếp tục chọc đi! ⭐",
+                "Bé Thóc đang đói, hãy ghi nhật ký để cho mình ăn nhé! 🥦",
+                "Hãy ghi chép bón phân hôm nay nhé! 🌾",
+                "Chăm chỉ ghi chép là chìa khóa nông dân giỏi! 🥇"
+              ];
+              setBubbleText(tips[Math.floor(Math.random() * tips.length)]);
+            }}
+            className="card-bubble p-10 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center relative cursor-pointer group"
+          >
+            <div className="absolute top-[-44px] bg-white border border-[var(--color-border-main)] rounded-2xl px-5 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.04)] text-xs font-bold leading-relaxed max-w-[280px]">
+              <p className="m-0 text-[var(--color-ink)]">{bubbleText}</p>
+              <div className="absolute bottom-[-6px] left-[50%] translate-x-[-50%] w-3 h-3 bg-white border-r border-b border-[var(--color-border-main)] rotate-45" />
+            </div>
+
+            <div className="transform group-hover:scale-105 transition-transform duration-500 my-4">
+              <PetMascot staticMood="happy" size={150} className="drop-shadow-xl" />
+            </div>
+            
+            <span className="text-[10px] font-bold font-mono tracking-widest text-[var(--color-ink-2)] bg-[var(--color-paper-2)] border border-[var(--color-border-main)] px-3.5 py-1 rounded-full uppercase flex items-center gap-1.5">
+              <ActivityIcon size={14} weight="duotone" className="text-[var(--color-accent-2)]" />
+              Chạm vào Bé Thóc
+            </span>
+
+            {starBursts.map(burst => (
+              <span
+                key={burst.id}
+                className="star-burst"
+                style={{ left: burst.x, top: burst.y }}
+              />
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* Features Showcase */}
-      <section className="relative px-6 pb-32 pt-10 max-w-7xl mx-auto w-full z-10">
-        <motion.div 
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
+      {/* Features Showcase (Color-shift Card Grid) */}
+      <section className="px-6 py-28 max-w-7xl mx-auto w-full z-10">
+        <div className="text-center max-w-xl mx-auto mb-16">
+          <span className="eyebrow block mb-3 font-mono font-bold text-xs uppercase text-[var(--color-accent-2)]">TÍNH NĂNG CỐT LÕI</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+            Được xây dựng cho nông trại của bạn.
+          </h2>
+          <p className="text-sm text-[var(--color-ink-2)]">
+            Bộ công cụ trực quan hóa giúp biến các ghi chép khô khan thành trải nghiệm sinh động.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* AI Feature */}
-          <motion.div 
-            variants={fadeUpVariant}
-            whileHover="hover"
-            initial="rest"
-            className="lg:col-span-2 rounded-[32px] bg-white p-10 flex flex-col justify-between border border-black/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
-          >
+          <div className="card-bubble card-bubble--cyan p-8 flex flex-col justify-between min-h-[260px] text-left">
             <div>
-              <div className="w-14 h-14 rounded-[20px] bg-[#f5f5f7] flex items-center justify-center mb-6">
-                <ScanLine className="w-7 h-7 text-[#1d1d1f]" strokeWidth={2} />
+              <div className="w-12 h-12 rounded-2xl bg-[var(--color-accent-2)]/10 flex items-center justify-center mb-6">
+                <Scan size={24} weight="duotone" className="text-[var(--color-accent-2)]" />
               </div>
-              <h3 className="text-[28px] font-bold tracking-tight text-[#1d1d1f] mb-3">Nhận diện bệnh AI.</h3>
-              <p className="text-[#86868b] leading-relaxed text-[17px] font-medium">
-                Chụp ảnh lá cây, phân tích tức thời và đưa ra hướng dẫn điều trị chính xác với độ tin cậy cao từ hệ thống chuyên gia.
+              <h3 className="text-xl font-bold tracking-tight text-[var(--color-ink)] mb-2">Nhận diện sâu bệnh AI.</h3>
+              <p className="text-xs text-[var(--color-ink-2)] leading-relaxed">
+                Chụp ảnh lá cây bị bệnh, hệ thống AI sẽ phân tích tức thời và đưa ra hướng dẫn điều trị hữu cơ an toàn.
               </p>
             </div>
-          </motion.div>
+          </div>
 
           {/* Gamified Farm with Pet Mascot */}
-          <motion.div 
-            variants={fadeUpVariant}
-            whileHover="hover"
-            initial="rest"
-            className="lg:col-span-2 rounded-[32px] bg-gradient-to-br from-[#f5f5f7] to-[#e8e8ed] p-10 flex flex-col items-center justify-center text-center shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/[0.02]"
-          >
-            <div className="mb-6 bg-white/60 backdrop-blur-xl p-4 rounded-full shadow-sm">
-              <PetMascot staticMood="happy" size={120} className="drop-shadow-xl hover:scale-110 transition-transform duration-500" />
+          <div className="card-bubble card-bubble--pear p-8 flex flex-col justify-between min-h-[260px] text-left">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-[var(--color-accent)]/20 flex items-center justify-center mb-6">
+                <Heart size={24} weight="duotone" className="text-[var(--color-accent-3)]" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-[var(--color-ink)] mb-2">Thú cưng đồng hành.</h3>
+              <p className="text-xs text-[var(--color-ink-2)] leading-relaxed">
+                Nuôi nấng Bé Thóc lớn lên bằng việc ghi nhật ký canh tác. Thú cưng vui vẻ khi bạn chăm chỉ!
+              </p>
             </div>
-            <h3 className="text-[24px] font-bold tracking-tight text-[#1d1d1f] mb-2">Thú cưng đồng hành.</h3>
-            <p className="text-[#86868b] leading-relaxed text-[16px] font-medium max-w-[320px]">
-              Tâm trạng thú cưng phản ánh tần suất bạn chăm sóc nông trại, biến công việc ghi chép thành niềm vui.
-            </p>
-          </motion.div>
+          </div>
 
           {/* AI Assistant */}
-          <motion.div 
-            variants={fadeUpVariant}
-            whileHover="hover"
-            initial="rest"
-            className="lg:col-span-2 rounded-[32px] bg-white p-10 border border-black/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
-          >
-            <div className="w-14 h-14 rounded-[20px] bg-[#f5f5f7] flex items-center justify-center mb-6">
-              <MessageSquare className="w-7 h-7 text-[#1d1d1f]" strokeWidth={2} />
+          <div className="card-bubble card-bubble--pear p-8 flex flex-col justify-between min-h-[260px] text-left">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-[var(--color-accent)]/20 flex items-center justify-center mb-6">
+                <ChatCircleText size={24} weight="duotone" className="text-[var(--color-ink)]" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-[var(--color-ink)] mb-2">Trợ lý ảo thông minh.</h3>
+              <p className="text-xs text-[var(--color-ink-2)] leading-relaxed">
+                Hỏi đáp trực tiếp với trợ lý về cây trồng dựa trên chính lịch sử ghi chép nông trại của bạn.
+              </p>
             </div>
-            <h3 className="text-[28px] font-bold tracking-tight text-[#1d1d1f] mb-3">Trợ lý ảo.</h3>
-            <p className="text-[#86868b] leading-relaxed text-[17px] font-medium mb-8">
-              Hỏi đáp mọi vấn đề nông nghiệp dựa trên lịch sử nông trại của bạn.
-            </p>
-            <div className="bg-[#f5f5f7] rounded-[20px] p-5 border border-black/[0.03]">
-              <p className="text-[15px] text-[#48484a] font-medium italic">"Cà chua của tôi bị vàng lá phần gốc, tôi nên làm gì?"</p>
-            </div>
-          </motion.div>
+          </div>
 
           {/* Diary Tracking */}
-          <motion.div 
-            variants={fadeUpVariant}
-            whileHover="hover"
-            initial="rest"
-            className="lg:col-span-2 rounded-[32px] bg-white p-10 border border-black/[0.04] shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
-          >
-            <div className="w-14 h-14 rounded-[20px] bg-[#f5f5f7] flex items-center justify-center mb-6">
-              <Activity className="w-7 h-7 text-[#1d1d1f]" strokeWidth={2} />
-            </div>
-            <h3 className="text-[28px] font-bold tracking-tight text-[#1d1d1f] mb-3">Theo dõi Nhật ký.</h3>
-            <p className="text-[#86868b] leading-relaxed text-[17px] font-medium mb-8">
-              Ghi chép sinh trưởng, tưới tiêu một cách có hệ thống và khoa học.
-            </p>
-            <div className="flex gap-4">
-              <div className="bg-[#E8F8F5] px-5 py-4 rounded-[20px] border border-[#34C759]/20 w-full sm:w-auto">
-                 <p className="text-[11px] font-bold text-[#248A3D] uppercase tracking-widest mb-1">Tưới nước</p>
-                 <p className="text-[16px] font-bold text-[#1d1d1f]">Hoàn thành 8:00 AM</p>
+          <div className="card-bubble card-bubble--coral p-8 flex flex-col justify-between min-h-[260px] text-left">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-[var(--color-accent-3)]/10 flex items-center justify-center mb-6">
+                <ActivityIcon size={24} weight="duotone" className="text-[var(--color-accent-3)]" />
               </div>
+              <h3 className="text-xl font-bold tracking-tight text-[var(--color-ink)] mb-2">Ghi chép Sinh trưởng.</h3>
+              <p className="text-xs text-[var(--color-ink-2)] leading-relaxed">
+                Quản lý tiến độ tưới tiêu, bón phân một cách khoa học. Đo lường chuỗi ngày liên tiếp chăm chỉ.
+              </p>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section className="relative px-6 py-24 mb-12 max-w-5xl mx-auto z-10 text-center">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, type: 'spring' }}
-          className="bg-[#1d1d1f] rounded-[40px] p-12 md:p-20 overflow-hidden relative"
-        >
-          <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[150%] bg-gradient-to-br from-[#34C759]/20 to-transparent blur-[100px] pointer-events-none" />
+      {/* Call to Action Section (Statement layout) */}
+      <section className="px-6 py-20 mb-12 max-w-5xl mx-auto w-full text-center">
+        <div className="card-bubble card-bubble--pear p-12 md:p-20 overflow-hidden relative border-2 border-border-main shadow-md">
+          <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[150%] bg-gradient-to-br from-[#008A5E]/10 to-transparent blur-[100px] pointer-events-none" />
           
-          <h2 className="text-[32px] md:text-[48px] font-bold text-white mb-6 tracking-tight relative z-10">
-            Sẵn sàng để bắt đầu?
+          <h2 className="text-3xl md:text-5xl font-black mb-6 tracking-tight relative z-10 text-[#1d1d1f]">
+            Sẵn sàng canh tác vui vẻ?
           </h2>
-          <p className="text-[17px] text-[#a1a1a6] font-medium mb-10 max-w-2xl mx-auto relative z-10">
+          <p className="text-base md:text-lg text-[#2d3748] font-extrabold mb-10 max-w-2xl mx-auto relative z-10 leading-relaxed">
             Tham gia cùng hàng ngàn nông dân Việt Nam đang ứng dụng công nghệ để nâng cao năng suất và chất lượng mùa vụ mỗi ngày.
           </p>
           <button 
-            onClick={() => navigate('/register')}
-            className="relative z-10 bg-white text-[#1d1d1f] px-10 py-5 rounded-full text-[17px] font-bold hover:scale-105 shadow-[0_8px_30px_rgba(255,255,255,0.2)] transition-all duration-300"
+            onClick={(e) => {
+              triggerStarburst(e);
+              setTimeout(() => navigate('/register'), 350);
+            }}
+            className="btn btn--coral relative z-10 px-10 py-5 text-md hover:scale-105"
           >
-            Tạo tài khoản miễn phí
+            Đăng ký tài khoản miễn phí
+            
+            {starBursts.map(burst => (
+              <span
+                key={burst.id}
+                className="star-burst"
+                style={{ left: burst.x, top: burst.y }}
+              />
+            ))}
           </button>
-        </motion.div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-white py-12 border-t border-black/[0.04] relative z-10">
+      <footer className="bg-white py-12 border-t border-[var(--color-border-main)] relative z-10 w-full">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Sprout className="w-5 h-5 text-[#86868b]" />
-            <span className="font-bold text-[#86868b] tracking-tight text-[15px]">FARMY</span>
+            <Plant size={20} weight="duotone" className="text-[#008A5E]" />
+            <span className="font-extrabold text-[var(--color-ink)] tracking-tight text-sm uppercase">FARMY</span>
           </div>
-          <div className="text-[#86868b] text-[14px] font-medium flex items-center gap-4">
+          <div className="text-[var(--color-ink-2)] text-xs font-bold font-mono flex items-center gap-4">
             <span>© 2026 FARMY.</span>
             <span>All rights reserved.</span>
           </div>

@@ -1,10 +1,15 @@
+/* Hallmark · page: welcome-auth · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import axios from 'axios';
-import { ArrowRight, LockKeyhole, Mail, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, LockKey, EnvelopeSimple, Sparkle, Eye, EyeSlash } from '@phosphor-icons/react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { useAuthStore } from '../store/authStore';
 
@@ -27,8 +32,6 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
   return fallback;
 };
-
-
 
 export const WelcomeAuth: React.FC = () => {
   const navigate = useNavigate();
@@ -64,103 +67,106 @@ export const WelcomeAuth: React.FC = () => {
     }
   };
 
-
   const isBusy = isSubmitting;
 
   return (
-    <div className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-[#FBFBFD] md:items-center md:justify-center">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.4] [background-image:radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] [background-size:24px_24px]" />
-
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden md:h-auto md:grid md:grid-cols-[0.95fr_1.05fr] md:rounded-[36px] md:border md:border-black/[0.04] md:bg-white/80 md:shadow-[0_24px_80px_rgba(0,0,0,0.04)] md:backdrop-blur-xl">
-        <main className="relative flex flex-1 flex-col items-center justify-center px-6 pb-4 pt-10 md:items-start md:bg-transparent md:px-10 md:py-12 md:text-left">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-black/[0.02] px-3.5 py-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
-            <Sparkles className="h-3.5 w-3.5" />
-            Farm companion
+    <div className="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-bg-main text-left font-sans md:items-center md:justify-center p-0 md:p-6">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden md:h-auto md:grid md:grid-cols-[0.95fr_1.05fr] card-bubble bg-white shadow-xl border-2 border-border-main">
+        <main className="relative flex flex-1 flex-col items-center justify-center px-6 pb-6 pt-10 md:items-start md:bg-bg-surface-1 md:px-10 md:py-12 md:text-left">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-border-main bg-white px-4 py-2 text-xs font-black uppercase tracking-wider text-[#008A5E] shadow-xs">
+            <Sparkle size={16} weight="duotone" className="text-[#008A5E]" />
+            Bé Thóc - Trợ lý Nông trại
           </div>
-          <div className="w-32 h-32 mb-4 relative flex items-center justify-center md:h-44 md:w-44">
-            <PetMascot staticMood="happy" className="w-full h-full drop-shadow-md" size={176} />
+          <div className="w-36 h-36 mb-4 relative flex items-center justify-center md:h-48 md:w-48">
+            <PetMascot staticMood="happy" className="w-full h-full animate-bounce" size={192} />
           </div>
-          <div className="flex w-full max-w-[360px] flex-col gap-3 text-center md:text-left">
-            <h1 className="text-4xl font-black leading-tight tracking-tight text-text-h md:text-5xl">Grow better, every day.</h1>
-            <p className="text-base font-semibold leading-7 text-text-main/65">Track your farm, build reliable habits, and care for crops with an AI assistant that remembers your field context.</p>
-            <div className="mt-2 hidden grid-cols-2 gap-3 text-left md:grid">
-              <div className="rounded-2xl border border-white/80 bg-white/70 p-3 shadow-sm">
-                <p className="text-xs font-black uppercase tracking-wider text-text-main/40">Streak</p>
-                <p className="text-sm font-extrabold text-text-h">Daily care loop</p>
+          <div className="flex w-full max-w-[380px] flex-col gap-3 text-center md:text-left">
+            <h1 className="text-3xl font-black leading-tight tracking-tight text-text-h md:text-4xl">
+              Chăm cây thông minh mỗi ngày!
+            </h1>
+            <p className="text-sm font-bold leading-relaxed text-text-secondary">
+              Ghi nhật ký ruộng vườn, chẩn đoán bệnh nông nghiệp bằng AI và chăm sóc cây trồng cùng Bé Thóc.
+            </p>
+            <div className="mt-3 hidden grid-cols-2 gap-3 text-left md:grid">
+              <div className="card-bubble bg-white p-3 border-2 border-border-main">
+                <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary">Duy trì Chuỗi</p>
+                <p className="text-xs font-black text-text-h">Thói quen canh tác</p>
               </div>
-              <div className="rounded-2xl border border-white/80 bg-white/70 p-3 shadow-sm">
-                <p className="text-xs font-black uppercase tracking-wider text-text-main/40">AI</p>
-                <p className="text-sm font-extrabold text-text-h">Crop diagnosis</p>
+              <div className="card-bubble bg-white p-3 border-2 border-border-main">
+                <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary">Trí tuệ nhân tạo</p>
+                <p className="text-xs font-black text-text-h">Chẩn đoán PlantScan</p>
               </div>
             </div>
           </div>
         </main>
 
-        <div className="flex w-full flex-col gap-4 rounded-t-[32px] border-t border-black/[0.04] bg-white px-6 pb-8 pt-6 shadow-[0_-20px_40px_rgba(0,0,0,0.02)] md:rounded-none md:border-l md:border-t-0 md:bg-white/95 md:px-10 md:py-12 md:shadow-none backdrop-blur-2xl">
+        <div className="flex w-full flex-col gap-4 bg-white px-6 pb-8 pt-6 md:px-10 md:py-12 border-t-2 md:border-t-0 md:border-l-2 border-border-main">
           <div className="mb-2 text-left">
-            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400">Secure sign in</p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight text-text-h">Chào mừng trở lại</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-[#008A5E]">Đăng nhập an toàn</p>
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-text-h">Chào mừng nông dân trở lại!</h2>
           </div>
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit(submitLogin)}>
-            {errorMsg ? (<div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-xs font-extrabold text-red-600 shadow-sm">
-              {errorMsg}
-            </div>) : null}
+          <form className="flex flex-col gap-3.5" onSubmit={handleSubmit(submitLogin)}>
+            {errorMsg ? (
+              <div className="rounded-2xl border-2 border-red-300 bg-red-50 px-4 py-3 text-center text-xs font-extrabold text-red-600 shadow-xs">
+                {errorMsg}
+              </div>
+            ) : null}
             <div className="space-y-1">
-              <label className="text-sm font-bold text-text-main ml-2" htmlFor="email">Email</label>
+              <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="email">Email tài khoản</label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-main/35" />
+                <EnvelopeSimple size={20} weight="bold" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" />
                 <input
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="farmer@example.com"
+                  placeholder="nongdan@farmy.vn"
                   disabled={isBusy}
-                  className="w-full rounded-2xl border border-border-main/55 bg-white py-3.5 pl-12 pr-5 text-base font-semibold shadow-[0_8px_24px_rgba(20,30,23,0.04)] outline-none transition-all placeholder:text-text-main/30 focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
+                  className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 py-3.5 pl-12 pr-5 text-base font-extrabold text-text-main shadow-xs outline-none transition-all placeholder:text-text-secondary/60 focus:bg-white focus:border-[#008A5E] disabled:opacity-60"
                   {...registerField('email')}
                 />
               </div>
-              {errors.email ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.email.message}</p> : null}
+              {errors.email ? <p className="ml-1 text-xs font-bold text-red-600">{errors.email.message}</p> : null}
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-bold text-text-main ml-2" htmlFor="password">Mật khẩu</label>
+              <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="password">Mật khẩu</label>
               <div className="relative">
-                <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-main/35" />
+                <LockKey size={20} weight="bold" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  placeholder="Nhập mật khẩu"
+                  placeholder="Nhập mật khẩu bí mật..."
                   disabled={isBusy}
-                  className="w-full rounded-2xl border border-border-main/55 bg-white py-3.5 pl-12 pr-12 text-base font-semibold shadow-[0_8px_24px_rgba(20,30,23,0.04)] outline-none transition-all placeholder:text-text-main/30 focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
+                  className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 py-3.5 pl-12 pr-12 text-base font-extrabold text-text-main shadow-xs outline-none transition-all placeholder:text-text-secondary/60 focus:bg-white focus:border-[#008A5E] disabled:opacity-60"
                   {...registerField('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-main/40 hover:text-text-main/70 transition-colors focus:outline-none cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main transition-colors focus:outline-none cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
                 </button>
               </div>
-              {errors.password ? <p className="ml-2 text-xs font-semibold text-red-600">{errors.password.message}</p> : null}
+              {errors.password ? <p className="ml-1 text-xs font-bold text-red-600">{errors.password.message}</p> : null}
             </div>
 
-            <div className="flex items-center justify-between mt-1 mb-2 px-1">
+            <div className="flex items-center justify-between mt-1 mb-1 px-1">
               <label className="flex items-center gap-2.5 cursor-pointer group">
                 <div className="relative flex items-center justify-center">
                   <input
                     type="checkbox"
-                    className="peer appearance-none w-5 h-5 rounded-[6px] border-2 border-border-main/55 bg-white checked:bg-primary checked:border-primary transition-all cursor-pointer shadow-sm hover:border-primary/50"
+                    className="peer appearance-none w-5 h-5 rounded-lg border-2 border-border-main bg-white checked:bg-[#008A5E] checked:border-[#008A5E] transition-all cursor-pointer shadow-xs"
                     {...registerField('rememberMe')}
                   />
                   <svg className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2.5 7.5L5.5 10.5L11.5 3.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span className="text-sm font-semibold text-text-main/70 group-hover:text-text-main/90 transition-colors">Ghi nhớ đăng nhập</span>
+                <span className="text-xs font-bold text-text-secondary group-hover:text-text-main transition-colors">Ghi nhớ đăng nhập</span>
               </label>
-              <button type="button" className="text-sm font-bold text-primary hover:text-primary-dark hover:underline transition-colors focus:outline-none cursor-pointer">
+              <button type="button" className="text-xs font-bold text-[#008A5E] hover:underline transition-colors focus:outline-none cursor-pointer">
                 Quên mật khẩu?
               </button>
             </div>
@@ -168,17 +174,17 @@ export const WelcomeAuth: React.FC = () => {
             <button
               type="submit"
               disabled={isBusy}
-              className="group mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary-container px-6 py-3.5 font-extrabold text-white shadow-[0_16px_34px_rgba(0,109,53,0.24)] transition-all hover:-translate-y-0.5 hover:bg-primary hover:shadow-[0_20px_42px_rgba(8,168,85,0.28)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn btn--cyan w-full py-4 text-base font-black flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50 active:scale-95"
             >
-              <span className="relative">{isBusy ? 'Đang đăng nhập...' : 'Đăng nhập'}</span>
-              {!isBusy ? <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" /> : null}
+              <span>{isBusy ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
+              {!isBusy ? <ArrowRight className="h-5 w-5" weight="bold" /> : null}
             </button>
 
             <div className="relative flex items-center justify-center my-1">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border-main/50"></div>
+                <div className="w-full border-t-2 border-border-main/50"></div>
               </div>
-              <div className="relative bg-bg-main px-4 text-xs text-text-main/50 font-bold">HOẶC</div>
+              <div className="relative bg-white px-4 text-xs text-text-secondary font-black">HOẶC</div>
             </div>
 
             <button
@@ -186,7 +192,7 @@ export const WelcomeAuth: React.FC = () => {
               onClick={() => {
                 window.location.href = 'http://localhost:3000/api/v1/auth/google';
               }}
-              className="flex h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border border-border-main/45 bg-white text-base font-extrabold text-text-main shadow-[0_10px_26px_rgba(20,30,23,0.05)] transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-[0_16px_34px_rgba(20,30,23,0.09)] active:scale-[0.98]"
+              className="btn btn--soft w-full py-3.5 text-base font-black flex items-center justify-center gap-3 border-2 border-border-main shadow-xs cursor-pointer"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -194,13 +200,12 @@ export const WelcomeAuth: React.FC = () => {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              Continue with Google
+              Đăng nhập bằng Google
             </button>
 
-
           </form>
-          <p className="text-sm text-text-main/60 text-center mt-2">
-            Chưa có tài khoản? <button onClick={() => navigate('/register')} className="text-primary font-bold hover:underline cursor-pointer">Đăng ký ngay</button>
+          <p className="text-sm font-bold text-text-secondary text-center mt-2">
+            Chưa có tài khoản? <button onClick={() => navigate('/register')} className="text-[#008A5E] font-black hover:underline cursor-pointer">Tạo tài khoản ngay</button>
           </p>
         </div>
       </div>
