@@ -238,7 +238,7 @@ export const getCsrfToken = async () => {
 
 export const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 60000, // Increased to 60s to allow Render free tier to wake up from sleep
   headers: {
     'Content-Type': 'application/json',
   },
