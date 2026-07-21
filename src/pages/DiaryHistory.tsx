@@ -178,13 +178,21 @@ export const DiaryHistory: React.FC = () => {
 
     const localEntries: TimelineEntry[] = filterVisibleOfflineDrafts(visibleOfflineDrafts, logs).map((draft) => {
         const meta = localStatusMeta[draft.status];
+        
+        let localImageUrl = undefined;
+        if (draft.imageUrls?.[0]) {
+          localImageUrl = draft.imageUrls[0];
+        } else if (draft.imageBlobs?.[0]) {
+          localImageUrl = URL.createObjectURL(draft.imageBlobs[0]);
+        }
+
         return {
           kind: 'local',
           id: draft.id,
           activityType: draft.activityType,
           content: draft.content,
           createdAt: draft.diaryDate,
-          imageUrl: draft.imageUrls?.[0],
+          imageUrl: localImageUrl,
           statusLabel: meta.label,
           statusClass: meta.className,
           draft,
@@ -331,14 +339,19 @@ export const DiaryHistory: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {entries.map((entry) => {
-                    const icon = entry.kind === 'local' ? <WifiSlash className="w-6 h-6 text-amber-500" weight="duotone" /> : getActivityIcon(entry.activityType);
-                    const bg = entry.kind === 'local' ? 'bg-amber-50' : getActivityBg(entry.activityType);
+                    const icon = getActivityIcon(entry.activityType);
+                    const bg = getActivityBg(entry.activityType);
 
                     return (
                       <div
                         key={`${entry.kind}-${entry.id}`}
-                        className="card-bubble p-4 flex flex-col gap-3 text-left"
+                        className="card-bubble p-4 flex flex-col gap-3 text-left relative"
                       >
+                        {entry.kind === 'local' && (
+                          <div className="absolute top-4 right-4 bg-amber-50 p-1.5 rounded-full border border-amber-200">
+                            <WifiSlash className="w-3.5 h-3.5 text-amber-500" weight="bold" />
+                          </div>
+                        )}
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-full ${bg} border border-border-main/30 flex items-center justify-center shrink-0`}>
                             {icon}

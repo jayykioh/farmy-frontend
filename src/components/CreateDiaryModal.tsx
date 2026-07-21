@@ -63,16 +63,25 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-      <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-xl">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Bắt đầu vụ mùa mới</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Loại cây trồng *</label>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md px-4 text-[var(--color-ink)] font-sans">
+      <div className="bg-[var(--color-paper)] border-2 border-[var(--color-border-main)] rounded-[32px] p-6 w-full max-w-md shadow-[0_24px_64px_rgba(0,0,0,0.16)] flex flex-col gap-4">
+        <div className="flex items-center justify-between border-b border-[var(--color-border-main)] pb-3">
+          <h2 className="text-xl font-extrabold text-[var(--color-ink)] tracking-tight">🌱 Bắt đầu vụ mùa mới</h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-[var(--color-paper-2)] border border-[var(--color-border-main)] flex items-center justify-center text-[var(--color-ink-2)] hover:bg-[var(--color-paper-3)] transition-colors cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-[var(--color-ink)] ml-1">Loại cây trồng *</label>
             <select
               value={selectedCropType}
               onChange={(e) => setSelectedCropType(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+              className="w-full bg-white border border-[var(--color-border-main)] rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink)] outline-none focus:border-[var(--color-accent-2)] focus:ring-4 focus:ring-[var(--color-accent-2)]/20 appearance-none cursor-pointer"
             >
               <option value="Lúa">Lúa</option>
               <option value="Bưởi">Bưởi</option>
@@ -82,45 +91,59 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
               <option value="Khác...">Khác...</option>
             </select>
           </div>
+
           {selectedCropType === 'Khác...' && (
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Tên cây trồng *</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-[var(--color-ink)] ml-1">Tên cây trồng *</label>
               <input
                 type="text"
                 value={customCropType}
                 onChange={(e) => setCustomCropType(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary"
+                className="w-full bg-white border border-[var(--color-border-main)] rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink)] outline-none focus:border-[var(--color-accent-2)] focus:ring-4 focus:ring-[var(--color-accent-2)]/20"
                 placeholder="VD: Chanh dây, Bơ Booth..."
                 required={selectedCropType === 'Khác...'}
               />
             </div>
           )}
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Tên mùa vụ *</label>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-[var(--color-ink)] ml-1">Tên mùa vụ *</label>
             <input
               type="text"
               value={seasonName}
               onChange={(e) => setSeasonName(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full bg-white border border-[var(--color-border-main)] rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink)] outline-none focus:border-[var(--color-accent-2)] focus:ring-4 focus:ring-[var(--color-accent-2)]/20"
               placeholder={`${selectedCropType} · ${startDate.slice(0, 4)}`}
               maxLength={100}
             />
           </div>
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Ngày bắt đầu</label>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-[var(--color-ink)] ml-1">Ngày bắt đầu</label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full bg-white border border-[var(--color-border-main)] rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink)] outline-none focus:border-[var(--color-accent-2)] focus:ring-4 focus:ring-[var(--color-accent-2)]/20 cursor-pointer"
               required
             />
           </div>
-          <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" fullWidth onClick={onClose}>Hủy</Button>
-            <Button type="submit" fullWidth disabled={isLoading}>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn--soft flex-1 py-3 text-sm font-bold cursor-pointer"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn btn--cyan flex-1 py-3 text-sm font-bold cursor-pointer disabled:opacity-50"
+            >
               {isLoading ? 'Đang tạo...' : 'Tạo mới'}
-            </Button>
+            </button>
           </div>
         </form>
       </div>
