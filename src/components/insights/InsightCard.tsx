@@ -5,9 +5,10 @@ import ReactMarkdown from 'react-markdown';
 
 interface InsightCardProps {
   insight: WeeklyInsight;
+  diaryName?: string;
 }
 
-export const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
+export const InsightCard: React.FC<InsightCardProps> = ({ insight, diaryName }) => {
   const date = new Date(insight.week_start_date);
   const formattedDate = date.toLocaleDateString('vi-VN', {
     day: '2-digit',
@@ -15,16 +16,25 @@ export const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
     year: 'numeric'
   });
 
+  const cropDisplayName = insight.crop_type
+    ? `${insight.crop_type}${insight.season ? ` · ${insight.season}` : ''}`
+    : diaryName || 'Mùa vụ canh tác';
+
   return (
     <div className="w-full bg-white rounded-[32px] p-6 sm:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/[0.04] text-left flex flex-col mb-2">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-black/[0.04]">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#34C759]/20 to-[#34C759]/5 flex items-center justify-center flex-shrink-0 ring-1 ring-[#34C759]/20">
             <FileText className="text-[#34C759]" size={26} weight="duotone" />
           </div>
           <div>
-            <h3 className="font-extrabold text-[#1d1d1f] text-[20px] tracking-tight">Báo cáo canh tác</h3>
-            <div className="flex items-center gap-1.5 text-[#86868b] mt-0.5">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <h3 className="font-extrabold text-[#1d1d1f] text-[20px] tracking-tight">Báo cáo canh tác</h3>
+              <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[12px] font-bold bg-emerald-100/80 text-emerald-800 border border-emerald-300/60 shadow-2xs">
+                🌱 {cropDisplayName}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[#86868b]">
               <Calendar size={15} weight="duotone" />
               <span className="text-[14px] font-semibold">Tuần {formattedDate}</span>
             </div>
