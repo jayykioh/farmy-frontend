@@ -534,28 +534,28 @@ export const HomeEcoSection: React.FC = () => {
                 <span className="text-[11px] font-bold !text-emerald-900">Phong trào cộng đồng</span>
               </div>
               <h3 className="text-[22px] font-extrabold leading-tight tracking-tight mb-1.5 !text-[var(--color-ink)]">
-                Cùng trồng 10.000 cây! 🌳
+                Cùng trồng 10.000 cây xanh! 🌳
               </h3>
               <p className="text-[13.5px] !text-[var(--color-ink-2)] font-medium leading-relaxed mb-4">
-                Mỗi cây bạn trồng và ghi nhật ký sẽ được tính vào mục tiêu cộng đồng. Hãy cùng Farmy làm xanh Việt Nam!
+                Mỗi cây bạn trồng và ghi nhật ký sẽ là 1 mầm xanh đóng góp vào mục tiêu chung. Hãy cùng Farmy phủ xanh đất nước!
               </p>
 
               {/* Progress bar */}
               <div className="mb-3 bg-white/90 border border-emerald-200 rounded-2xl p-3.5 shadow-xs">
                 <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-[12px] font-extrabold !text-[var(--color-ink)]">Đã trồng: 3.247 cây</span>
-                  <span className="text-[12px] font-bold !text-emerald-800">Mục tiêu: 10.000</span>
+                  <span className="text-[12px] font-extrabold !text-[var(--color-ink)]">🌱 Đang khởi động cùng cộng đồng</span>
+                  <span className="text-[12px] font-bold !text-emerald-800">Mục tiêu: 10.000 cây</span>
                 </div>
                 <div className="w-full h-3.5 bg-emerald-100 rounded-full overflow-hidden border border-emerald-200">
                   <motion.div
                     initial={{ width: 0 }}
-                    whileInView={{ width: '32.47%' }}
+                    whileInView={{ width: '45%' }}
                     viewport={{ once: true }}
                     transition={{ duration: 1.5, ease: 'easeOut', delay: 0.3 }}
                     className="h-full bg-gradient-to-r from-emerald-500 to-green-600 rounded-full shadow-xs"
                   />
                 </div>
-                <p className="text-[11px] !text-emerald-800 font-bold mt-1 text-right">32% hoàn thành</p>
+                <p className="text-[11px] !text-emerald-800 font-bold mt-1 text-right">Hãy là những người đầu tiên tham gia 🚀</p>
               </div>
 
               <button
@@ -572,41 +572,41 @@ export const HomeEcoSection: React.FC = () => {
         </motion.div>
       </section>
 
-      {/* ── 5. Community Impact Stats ──────────────────────────────────── */}
+      {/* ── 5. Community Impact Targets ──────────────────────────────────── */}
       <section className="w-full text-left mb-4">
         <div className="px-1 mb-4">
           <h3 className="text-[18px] font-extrabold text-[var(--color-ink)] tracking-tight flex items-center gap-2">
-            Tác động của cộng đồng
+            Mục tiêu tác động xanh 🎯
             <Heart size={20} weight="fill" className="text-[var(--color-accent-3)]" />
           </h3>
           <p className="text-[13px] text-[var(--color-ink-2)] font-medium mt-0.5">
-            Cùng nhau chúng ta đã làm được điều này 💪
+            Cùng hướng tới một nền nông nghiệp bền vững & phủ xanh đất nước ✨
           </p>
         </div>
 
         <div className="card-bubble bg-white border border-[var(--color-border-main)] p-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <StatCounter
-              value={3247}
-              label="Cây đã trồng"
+              value={10000}
+              label="Cây xanh mục tiêu"
               suffix=""
               icon={<Tree size={24} weight="duotone" className="text-emerald-600" />}
             />
             <StatCounter
-              value={1284}
-              label="Nông dân tham gia"
-              suffix=""
+              value={5000}
+              label="Nông dân đồng hành"
+              suffix="+"
               icon={<Globe size={24} weight="duotone" className="text-sky-500" />}
             />
             <StatCounter
-              value={52}
-              label="Tấn CO₂ hấp thụ"
+              value={100}
+              label="Ước tính giảm CO₂"
               suffix="T"
               icon={<Wind size={24} weight="duotone" className="text-indigo-500" />}
             />
             <StatCounter
-              value={9800}
-              label="Lít nước tiết kiệm"
+              value={50000}
+              label="Lít nước kỳ vọng tiết kiệm"
               suffix="L"
               icon={<Drop size={24} weight="duotone" className="text-cyan-500" />}
             />

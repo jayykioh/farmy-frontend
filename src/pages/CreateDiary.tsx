@@ -54,9 +54,11 @@ export const CreateDiary: React.FC = () => {
   };
 
   const activityType = useMemo(() => {
-    if (activeActivities.includes('water')) return 'Tưới nước';
-    if (activeActivities.includes('fertilizer')) return 'Bón phân';
-    if (activeActivities.includes('pest')) return 'Phun thuốc';
+    const types: string[] = [];
+    if (activeActivities.includes('water')) types.push('Tưới nước');
+    if (activeActivities.includes('fertilizer')) types.push('Bón phân');
+    if (activeActivities.includes('pest')) types.push('Phun thuốc');
+    if (types.length > 0) return types.join(', ');
     return 'Chăm sóc định kỳ';
   }, [activeActivities]);
 

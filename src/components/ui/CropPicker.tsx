@@ -197,32 +197,42 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="text-sm font-bold text-text-main ml-1">Loại cây trồng</label>
+      <div className="flex items-center justify-between px-1">
+        <label className="text-sm font-bold text-[var(--color-ink)] flex items-center gap-1.5">
+          <span>🌾</span> Chọn loại cây trồng
+        </label>
+        <span className="text-[11px] font-semibold text-[var(--color-ink-2)]">
+          {selectedCategory ? 'Chọn cụ thể bên dưới' : 'Chọn nhóm cây'}
+        </span>
+      </div>
 
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2">
-        {CROP_CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            onClick={() => handleCategoryClick(cat.id)}
-            className={`
-              flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold border transition-all duration-150 cursor-pointer
-              ${selectedCategory === cat.id
-                ? 'bg-primary-container text-white border-primary-container shadow-md scale-105'
-                : 'bg-white border-border-main/50 text-text-main hover:border-primary/40 hover:bg-primary/5'
-              }
-            `}
-          >
-            <span>{cat.emoji}</span>
-            <span>{cat.label}</span>
-          </button>
-        ))}
+        {CROP_CATEGORIES.map((cat) => {
+          const isActive = selectedCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => handleCategoryClick(cat.id)}
+              className={`
+                flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer select-none
+                ${isActive
+                  ? 'bg-[var(--color-ink)] text-white shadow-md scale-[1.03] ring-2 ring-[var(--color-accent)]'
+                  : 'bg-[var(--color-paper-2)] text-[var(--color-ink)] border border-[var(--color-border-main)] hover:bg-[var(--color-paper-3)] hover:scale-[1.02]'
+                }
+              `}
+            >
+              <span className="text-sm">{cat.emoji}</span>
+              <span>{cat.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Crop Grid — animated expand */}
       {selectedCategory && activeCrops.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 pt-1 animate-in slide-in-from-top-2 duration-200">
+        <div className="grid grid-cols-3 gap-2.5 pt-1 animate-in slide-in-from-top-2 duration-200">
           {activeCrops.map((crop) => {
             const isSelected = value === crop.id;
             return (
@@ -231,17 +241,16 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
                 type="button"
                 onClick={() => handleCropClick(crop)}
                 className={`
-                  relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border-2 transition-all duration-150 cursor-pointer
-                  ${crop.color}
+                  relative flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none active:scale-95
                   ${isSelected
-                    ? `border-primary-container ring-2 ring-primary/30 shadow-lg scale-105`
-                    : `border-transparent hover:border-primary/30 hover:scale-105`
+                    ? `bg-white border-[var(--color-accent-deep)] ring-4 ring-[var(--color-accent)]/30 shadow-md`
+                    : `bg-white border-[var(--color-border-main)] hover:border-[var(--color-outline-main)] hover:shadow-xs`
                   }
                 `}
               >
                 {isSelected && (
-                  <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-primary-container rounded-full flex items-center justify-center">
-                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-[var(--color-accent-3)] rounded-full flex items-center justify-center shadow-xs">
+                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
@@ -249,9 +258,9 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
                 <img
                   src={getCropImagePath(crop.id)}
                   alt={crop.label}
-                  className="h-14 w-14 rounded-xl object-cover shadow-sm"
+                  className="h-12 w-12 rounded-xl object-cover shadow-xs border border-slate-100"
                 />
-                <span className="text-xs font-bold text-center text-text-main leading-tight">{crop.label}</span>
+                <span className="text-[12px] font-bold text-center text-[var(--color-ink)] leading-tight">{crop.label}</span>
               </button>
             );
           })}
@@ -260,11 +269,11 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
 
       {/* Custom input when "Khác" selected */}
       {value === 'khac' && (
-        <div className="mt-1">
+        <div className="mt-1 flex flex-col gap-2">
           <input
             type="text"
             placeholder="VD: Chuối, Dừa, Đu đủ, Ngô, Khoai tây..."
-            className="w-full rounded-2xl border border-border-main/55 bg-white py-3 px-4 text-sm font-semibold outline-none transition-all placeholder:text-text-main/40 focus:border-primary/45 focus:ring-4 focus:ring-primary/10"
+            className="w-full rounded-2xl border border-[var(--color-border-main)] bg-white py-3.5 px-4 text-sm font-semibold text-[var(--color-ink)] outline-none transition-all placeholder:text-[var(--color-ink-2)]/40 focus:border-[var(--color-accent-2)] focus:ring-4 focus:ring-[var(--color-accent-2)]/20"
             value={customCropLabel}
             onChange={(e) => {
               const label = e.target.value;
@@ -273,26 +282,26 @@ export const CropPicker: React.FC<Props> = ({ value, onChange, error }) => {
             }}
           />
           {customCropLabel.trim() && getCropOption(customCropLabel)?.id !== 'khac' && (
-            <div className="mt-3 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+            <div className="flex items-center gap-3 rounded-2xl border border-emerald-300 bg-emerald-50 p-3 shadow-xs">
               <img
                 src={getCropImagePath(customCropLabel)}
                 alt={customCropLabel}
-                className="h-14 w-14 rounded-xl object-cover"
+                className="h-12 w-12 rounded-xl object-cover shadow-xs"
               />
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-emerald-700">Đã nhận diện cây</p>
-                <p className="text-sm font-bold text-text-h">{getCropOption(customCropLabel)?.label}</p>
+                <p className="text-[10px] font-extrabold uppercase tracking-wide text-emerald-700 font-[var(--font-label)]">Đã nhận diện cây trồng</p>
+                <p className="text-sm font-bold text-[var(--color-ink)]">{getCropOption(customCropLabel)?.label}</p>
               </div>
             </div>
           )}
           {customCropLabel.trim() && (!getCropOption(customCropLabel) || getCropOption(customCropLabel)?.id === 'khac') && (
-            <p className="mt-2 text-xs font-semibold text-text-main/50">Chưa có ảnh riêng cho cây này, hệ thống sẽ dùng ảnh cây giống.</p>
+            <p className="text-xs font-semibold text-[var(--color-ink-2)] ml-1">Hệ thống sẽ dùng ảnh biểu tượng cây trồng chung cho vụ mùa này.</p>
           )}
         </div>
       )}
 
       {error && (
-        <p className="text-xs font-semibold text-red-600 ml-1">{error}</p>
+        <p className="text-xs font-bold text-[var(--color-accent-3)] ml-1">⚠️ {error}</p>
       )}
     </div>
   );
