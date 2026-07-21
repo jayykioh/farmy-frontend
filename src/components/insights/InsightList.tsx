@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchWeeklyInsights, triggerWeeklyInsight } from '../../api/weekly-insights';
 import { InsightCard } from './InsightCard';
-import { CheckCircle, CircleNotch, FileText, FilePlus, Plant, Plus, SortDescending, SortAscending } from '@phosphor-icons/react';
+import {
+  CheckCircle,
+  CircleNotch,
+  FileText,
+  FilePlus,
+  Funnel,
+  X,
+  Plant,
+  Plus,
+  SortDescending,
+  SortAscending,
+  CaretLeft,
+  CaretRight,
+} from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { CreateSeasonModal } from '../modals/CreateSeasonModal';
 
@@ -46,6 +59,20 @@ export const InsightList: React.FC = () => {
   const [showCreateSeason, setShowCreateSeason] = useState(false);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
+  // Filter state
+  const [filterDiaryId, setFilterDiaryId] = useState<string>('all');
+  const [filterWeekDate, setFilterWeekDate] = useState<string>('all');
+
+  // Ref for season scroll container
+  const seasonScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollSeasonContainer = (direction: 'left' | 'right') => {
+    if (seasonScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      seasonScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   const {
     data: diaries = [],
     isLoading: isLoadingDiaries,
@@ -53,8 +80,6 @@ export const InsightList: React.FC = () => {
   } = useQuery<DiaryOption[]>({
     queryKey: ['diaries', 'insight-options'],
     queryFn: async () => {
-      // Cache-bust vì Express ETag có thể trả 304 và làm danh sách lựa chọn
-      // bị rỗng trên lần tải đầu của màn hình insight.
       const response = await api.get('/diaries', {
         params: { _t: Date.now() },
       });
@@ -67,21 +92,64 @@ export const InsightList: React.FC = () => {
     || diaries[0]?._id
     || '';
 
-  const { data: insights, isLoading, isError } = useQuery({
+  const { data: insights = [], isLoading, isError } = useQuery({
     queryKey: ['weekly-insights'],
-    queryFn: () => fetchWeeklyInsights(10),
+    queryFn: () => fetchWeeklyInsights(20),
   });
+
+  // Extract unique week dates for the currently selected diary filter
+  const uniqueWeeks = useMemo(() => {
+    const relevantInsights = insights.filter((i) =>
+      filterDiaryId === 'all' ? true : i.diary_id === filterDiaryId
+    );
+    const dates = relevantInsights.map((i) => i.week_start_date);
+    const unique = Array.from(new Set(dates));
+    return unique.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  }, [insights, filterDiaryId]);
+
+  // Tự động chuyển tuần về 'all' nếu tuần đang chọn không có dữ liệu trong mùa vụ mới lọc
+  React.useEffect(() => {
+    if (filterWeekDate !== 'all' && !uniqueWeeks.includes(filterWeekDate)) {
+      setFilterWeekDate('all');
+    }
+  }, [filterDiaryId, uniqueWeeks, filterWeekDate]);
+
+  // Filtered list based on week & diary filters
+  const filteredInsights = useMemo(() => {
+    return insights.filter((insight) => {
+      const matchDiary = filterDiaryId === 'all' || insight.diary_id === filterDiaryId;
+      const matchWeek = filterWeekDate === 'all' || insight.week_start_date === filterWeekDate;
+      return matchDiary && matchWeek;
+    });
+  }, [insights, filterDiaryId, filterWeekDate]);
+
+  const sortedFilteredInsights = useMemo(() => {
+    return [...filteredInsights].sort((a, b) => {
+      const timeA = new Date(a.week_start_date).getTime();
+      const timeB = new Date(b.week_start_date).getTime();
+      return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
+    });
+  }, [filteredInsights, sortOrder]);
+
+  const hasActiveFilter = filterDiaryId !== 'all' || filterWeekDate !== 'all';
 
   const now = new Date();
   const daysFromMonday = now.getUTCDay() === 0 ? 6 : now.getUTCDay() - 1;
   const currentMonday = new Date(now);
   currentMonday.setUTCDate(now.getUTCDate() - daysFromMonday);
   currentMonday.setUTCHours(0, 0, 0, 0);
-  const currentWeekInsight = insights?.find(
+
+  const currentWeekInsight = insights.find(
     (insight) =>
       insight.diary_id === effectiveDiaryId &&
       insight.week_start_date === currentMonday.toISOString(),
   );
+
+  const handleSelectDiary = (diaryId: string) => {
+    if (isBusy) return;
+    setSelectedDiaryId(diaryId);
+    setFilterDiaryId(diaryId);
+  };
 
   const triggerMutation = useMutation({
     mutationFn: triggerWeeklyInsight,
@@ -94,7 +162,6 @@ export const InsightList: React.FC = () => {
       });
     },
     onSuccess: async (result, diaryId) => {
-      // Nếu tuần này đã có insight → hiển thị thông báo info
       if (result.already_exists) {
         setIsGenerating(false);
         setModalConfig({
@@ -105,7 +172,6 @@ export const InsightList: React.FC = () => {
         return;
       }
       try {
-        // Poll kết quả thật thay vì đóng modal sau một timeout cố định.
         for (let attempt = 0; attempt < 30; attempt += 1) {
           await new Promise((resolve) => window.setTimeout(resolve, 2000));
           const latestInsights = await fetchWeeklyInsights(20);
@@ -263,61 +329,220 @@ export const InsightList: React.FC = () => {
         }}
       />
 
+      {/* Season Selector Pills & Create Season */}
       <div className="flex flex-col gap-3 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
-        <label className="text-[14px] font-bold text-[#1d1d1f]">Mùa vụ đang xem:</label>
-        <div className="flex overflow-x-auto fade-edges-x gap-3 pb-2 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-1 items-stretch">
-          {isLoadingDiaries && (
-            <>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="min-w-[160px] h-16 bg-black/5 rounded-2xl animate-pulse flex-shrink-0" />
-              ))}
-            </>
+        <div className="flex items-center justify-between gap-4">
+          <label className="text-[14px] font-bold text-[#1d1d1f]">🌱 Chọn mùa vụ lập báo cáo:</label>
+          <button
+            onClick={triggerSelectedDiary}
+            disabled={isBusy || isLoadingDiaries}
+            className={`flex items-center gap-1.5 px-4 py-2 text-white rounded-full text-[13px] font-bold active:scale-95 transition-all disabled:opacity-60 cursor-pointer ${
+              currentWeekInsight
+                ? 'bg-slate-600 shadow-sm hover:bg-slate-700'
+                : 'bg-[#34C759] shadow-[0_4px_16px_rgba(52,199,89,0.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)]'
+            }`}
+          >
+            {isBusy ? (
+              <>
+                <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
+                Đang tổng hợp...
+              </>
+            ) : (
+              <>
+                {currentWeekInsight ? (
+                  <CheckCircle className="w-4 h-4" weight="duotone" />
+                ) : (
+                  <FilePlus className="w-4 h-4" weight="bold" />
+                )}
+                {currentWeekInsight ? 'Đã có báo cáo tuần này' : 'Lập báo cáo ngay'}
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="relative group">
+          {/* Nút cuộn trái */}
+          {diaries.length > 1 && (
+            <button
+              onClick={() => scrollSeasonContainer('left')}
+              className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md shadow-md border border-black/10 items-center justify-center text-slate-700 hover:bg-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
+              title="Cuộn sang trái"
+            >
+              <CaretLeft size={18} weight="bold" />
+            </button>
           )}
-          {!isLoadingDiaries && diaries.map((diary) => {
-            const isActive = diary._id === effectiveDiaryId;
-            return (
+
+          {/* Nút cuộn phải */}
+          {diaries.length > 1 && (
+            <button
+              onClick={() => scrollSeasonContainer('right')}
+              className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md shadow-md border border-black/10 items-center justify-center text-slate-700 hover:bg-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
+              title="Cuộn sang phải"
+            >
+              <CaretRight size={18} weight="bold" />
+            </button>
+          )}
+
+          <div
+            ref={seasonScrollRef}
+            className="flex overflow-x-auto gap-3 pb-3 snap-x snap-mandatory scroll-smooth custom-scrollbar -mx-4 px-4 md:mx-0 md:px-1 items-stretch"
+          >
+            {isLoadingDiaries && (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="min-w-[160px] h-16 bg-black/5 rounded-2xl animate-pulse flex-shrink-0" />
+                ))}
+              </>
+            )}
+
+            {/* Pill Tất cả mùa vụ */}
+            {!isLoadingDiaries && diaries.length > 0 && (
               <div
-                key={diary._id}
-                onClick={() => !isBusy && setSelectedDiaryId(diary._id)}
+                onClick={() => {
+                  if (isBusy) return;
+                  setFilterDiaryId('all');
+                }}
                 className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start border ${
-                  isActive
+                  filterDiaryId === 'all'
                     ? 'bg-white border-[#34C759]/30 shadow-[0_8px_24px_rgba(52,199,89,0.12)] ring-1 ring-[#34C759]'
                     : 'bg-white/50 border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-sm'
-                } ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
+                }`}
               >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isActive ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-black/5 text-[#86868b]'}`}>
-                  <Plant size={20} weight={isActive ? "fill" : "duotone"} />
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${filterDiaryId === 'all' ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-black/5 text-[#86868b]'}`}>
+                  <Plant size={20} weight={filterDiaryId === 'all' ? "fill" : "duotone"} />
                 </div>
                 <div className="flex flex-col pr-2">
-                  <span className={`text-[14px] font-bold ${isActive ? 'text-[#1d1d1f]' : 'text-[#48484a]'}`}>
-                    {diary.crop_type || 'Nông sản'}
+                  <span className={`text-[14px] font-bold ${filterDiaryId === 'all' ? 'text-[#1d1d1f]' : 'text-[#48484a]'}`}>
+                    Tất cả mùa vụ
                   </span>
-                  {diary.season && (
-                    <span className="text-[12px] font-medium text-[#86868b]">
-                      {diary.season}
-                    </span>
-                  )}
+                  <span className="text-[12px] font-medium text-[#86868b]">
+                    {diaries.length} mùa vụ
+                  </span>
                 </div>
               </div>
-            );
-          })}
-          
-          {/* Nút Tạo Mùa vụ */}
-          {!isLoadingDiaries && (
-            <div
-              onClick={() => !isBusy && setShowCreateSeason(true)}
-              className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start bg-transparent border-2 border-dashed border-black/10 hover:border-black/20 hover:bg-black/5 ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
-            >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 text-[#86868b]">
-                <Plus size={20} weight="bold" />
+            )}
+
+            {!isLoadingDiaries && diaries.map((diary) => {
+              const isActive = diary._id === (filterDiaryId === 'all' ? effectiveDiaryId : filterDiaryId);
+              return (
+                <div
+                  key={diary._id}
+                  onClick={() => handleSelectDiary(diary._id)}
+                  className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start border ${
+                    isActive
+                      ? 'bg-white border-[#34C759]/30 shadow-[0_8px_24px_rgba(52,199,89,0.12)] ring-1 ring-[#34C759]'
+                      : 'bg-white/50 border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-sm'
+                  } ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isActive ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-black/5 text-[#86868b]'}`}>
+                    <Plant size={20} weight={isActive ? "fill" : "duotone"} />
+                  </div>
+                  <div className="flex flex-col pr-2">
+                    <span className={`text-[14px] font-bold ${isActive ? 'text-[#1d1d1f]' : 'text-[#48484a]'}`}>
+                      {diary.crop_type || 'Nông sản'}
+                    </span>
+                    {diary.season && (
+                      <span className="text-[12px] font-medium text-[#86868b]">
+                        {diary.season}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            
+            {/* Nút Tạo Mùa vụ */}
+            {!isLoadingDiaries && (
+              <div
+                onClick={() => !isBusy && setShowCreateSeason(true)}
+                className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start bg-transparent border-2 border-dashed border-black/10 hover:border-black/20 hover:bg-black/5 ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 text-[#86868b]">
+                  <Plus size={20} weight="bold" />
+                </div>
+                <div className="flex flex-col pr-2">
+                  <span className="text-[14px] font-bold text-[#48484a]">Tạo mùa vụ</span>
+                </div>
               </div>
-              <div className="flex flex-col pr-2">
-                <span className="text-[14px] font-bold text-[#48484a]">Tạo mùa vụ</span>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Filter Bar: Lọc báo cáo theo Tuần & Mùa Vụ */}
+      {insights.length > 0 && (
+        <div className="bg-slate-100/90 backdrop-blur-md rounded-2xl p-3.5 mb-6 max-w-4xl mx-auto w-full flex flex-wrap items-center justify-between gap-3 border border-slate-200/80 shadow-2xs">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <Funnel size={16} weight="bold" className="text-emerald-600" />
+            <span>Lọc danh sách:</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 flex-1 max-w-2xl">
+            {/* Filter 1: Theo Tuần */}
+            <div className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs">
+              <span className="text-xs font-semibold text-slate-500">Tuần:</span>
+              <select
+                value={filterWeekDate}
+                onChange={(e) => setFilterWeekDate(e.target.value)}
+                className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+              >
+                <option value="all">Tất cả các tuần ({uniqueWeeks.length})</option>
+                {uniqueWeeks.map((weekIso) => {
+                  const formatted = new Date(weekIso).toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                  });
+                  return (
+                    <option key={weekIso} value={weekIso}>
+                      Tuần {formatted}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            {/* Filter 2: Theo Mùa vụ */}
+            <div className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs">
+              <span className="text-xs font-semibold text-slate-500">Mùa vụ:</span>
+              <select
+                value={filterDiaryId}
+                onChange={(e) => setFilterDiaryId(e.target.value)}
+                className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer"
+              >
+                <option value="all">Tất cả mùa vụ ({diaries.length})</option>
+                {diaries.map((d) => (
+                  <option key={d._id} value={d._id}>
+                    {d.crop_type}{d.season ? ` · ${d.season}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Reset Filter Button */}
+            {hasActiveFilter && (
+              <button
+                onClick={() => {
+                  setFilterDiaryId('all');
+                  setFilterWeekDate('all');
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#E53935] bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 transition-colors cursor-pointer"
+              >
+                <X size={14} weight="bold" />
+                Bỏ lọc
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
+          >
+            {sortOrder === 'desc' ? <SortDescending size={16} weight="bold" /> : <SortAscending size={16} weight="bold" />}
+            {sortOrder === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
+          </button>
+        </div>
+      )}
 
       {insights.length === 0 && !isBusy ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center max-w-lg mx-auto">
@@ -335,56 +560,34 @@ export const InsightList: React.FC = () => {
             Lập báo cáo tuần
           </button>
         </div>
+      ) : sortedFilteredInsights.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 px-6 text-center max-w-lg mx-auto bg-white/50 backdrop-blur-md rounded-3xl border border-slate-200/60 my-6">
+          <Funnel className="w-10 h-10 text-slate-400 mb-3" weight="duotone" />
+          <h4 className="text-slate-800 font-bold text-base mb-1">Không tìm thấy báo cáo phù hợp</h4>
+          <p className="text-slate-500 text-sm mb-4">Không có báo cáo nào khớp với tuần hoặc mùa vụ đã chọn.</p>
+          <button
+            onClick={() => {
+              setFilterDiaryId('all');
+              setFilterWeekDate('all');
+            }}
+            className="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 transition-colors"
+          >
+            Hiển thị tất cả báo cáo
+          </button>
+        </div>
       ) : (
-        <>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-6 md:px-10 mb-6 max-w-4xl mx-auto w-full">
-            <div className="flex items-center gap-4">
-              <h2 className="text-[20px] font-bold text-[#1d1d1f]">Các tuần gần đây</h2>
-              <button
-                onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 hover:bg-black/10 text-[13px] font-bold text-[#48484a] transition-colors cursor-pointer"
-              >
-                {sortOrder === 'desc' ? <SortDescending size={16} weight="bold" /> : <SortAscending size={16} weight="bold" />}
-                {sortOrder === 'desc' ? 'Mới nhất' : 'Cũ nhất'}
-              </button>
-            </div>
-            <button
-              onClick={triggerSelectedDiary}
-              disabled={isBusy || isLoadingDiaries}
-              className={`flex items-center gap-1.5 px-4 py-2 text-white rounded-full text-[13px] font-bold active:scale-95 transition-all disabled:opacity-60 cursor-pointer ${currentWeekInsight
-                  ? 'bg-slate-500 shadow-sm hover:bg-slate-600'
-                  : 'bg-[#34C759] shadow-[0_4px_16px_rgba(52,199,89,0.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(52,199,89,0.4)]'
-                }`}
-            >
-              {isBusy ? (
-                <>
-                  <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
-                  Đang tổng hợp...
-                </>
-              ) : (
-                <>
-                  {currentWeekInsight ? (
-                    <CheckCircle className="w-4 h-4" weight="duotone" />
-                  ) : (
-                    <FilePlus className="w-4 h-4" weight="bold" />
-                  )}
-                  {currentWeekInsight ? 'Đã có báo cáo tuần này' : 'Lập báo cáo ngay'}
-                </>
-              )}
-            </button>
-          </div>
-          <div className="flex flex-col gap-6 px-6 md:px-10 pb-12 max-w-4xl mx-auto w-full">
-            {isBusy && <SkeletonCard />}
-            {[...insights].sort((a, b) => {
-              const timeA = new Date(a.week_start_date).getTime();
-              const timeB = new Date(b.week_start_date).getTime();
-              return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
-            }).map((insight) => (
-              <InsightCard key={insight.id} insight={insight} />
-            ))}
-          </div>
-        </>
+        <div className="flex flex-col gap-6 px-6 md:px-10 pb-12 max-w-4xl mx-auto w-full">
+          {isBusy && <SkeletonCard />}
+          {sortedFilteredInsights.map((insight) => {
+            const diary = diaries.find((d) => d._id === insight.diary_id);
+            const diaryName = diary
+              ? `${diary.crop_type}${diary.season ? ` · ${diary.season}` : ''}`
+              : undefined;
+            return <InsightCard key={insight.id} insight={insight} diaryName={diaryName} />;
+          })}
+        </div>
       )}
     </div>
   );
 };
+
