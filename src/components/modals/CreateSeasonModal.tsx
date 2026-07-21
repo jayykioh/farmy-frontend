@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, CaretLeft, CircleNotch, MapPin, ArrowsOut, Calendar, CheckCircle, Warning } from '@phosphor-icons/react';
-import { useCreatePlotMutation, useCreateDiaryMutation, useGetPlotsQuery } from '../../store/api/farmApi';
-import { CropPicker } from '../ui/CropPicker';
+import { useCreatePlotMutation, useCreateDiaryMutation, useGetDiariesQuery, useGetPlotsQuery } from '../../store/api/farmApi';
+import { CropPicker, getCropImagePath } from '../ui/CropPicker';
 import type { Diary, FarmPlot } from '../../api/farm';
 
 // ────────────────────────────────────────────────────────────────
@@ -61,6 +61,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   // ─── Diary form state ──────────────────────────────────────────
   const [cropId, setCropId] = useState('');
   const [cropLabel, setCropLabel] = useState('');
+  const [seasonName, setSeasonName] = useState('');
   const [startDate, setStartDate] = useState(today());
 
   // ─── Validation errors ─────────────────────────────────────────
@@ -72,6 +73,20 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   const { data: plots = [] } = useGetPlotsQuery(undefined, {
     skip: mode === 'first-time',
   });
+  const { data: diaries = [] } = useGetDiariesQuery();
+
+  React.useEffect(() => {
+    if (!cropLabel) return;
+    const year = Number(startDate.slice(0, 4)) || new Date().getFullYear();
+    const plotId = selectedExistingPlotId || initialPlotId;
+    const existingCount = diaries.filter((diary) =>
+      (!plotId || diary.plot_id === plotId) &&
+      diary.crop_type.trim().toLocaleLowerCase('vi-VN') === cropLabel.trim().toLocaleLowerCase('vi-VN') &&
+      String(diary.start_date).startsWith(String(year)) &&
+      diary.status !== 'deleted'
+    ).length;
+    setSeasonName(`${cropLabel} · Vụ ${existingCount + 1} · ${year}`);
+  }, [cropLabel, startDate, selectedExistingPlotId, initialPlotId, diaries]);
 
   // Khi danh sách vườn tải xong, nếu chưa có vườn nào thì tự động chuyển sang form Tạo vườn mới
   // Nếu có vườn và chưa chọn thì tự động chọn vườn đầu tiên cho tiện
@@ -105,6 +120,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
   const validateSeasonStep = (): boolean => {
     const e: Record<string, string> = {};
     if (!cropId) e.crop = 'Vui lòng chọn loại cây trồng.';
+    if (!seasonName.trim()) e.seasonName = 'Vui lòng nhập tên mùa vụ.';
     if (!startDate) e.startDate = 'Vui lòng chọn ngày bắt đầu.';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -157,6 +173,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
       const diary = await createDiary({
         plot_id: plotId,
         crop_type: cropLabel || cropId,
+        season: seasonName.trim(),
         start_date: startDate,
       }).unwrap();
 
@@ -391,6 +408,23 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
               />
 
               <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-bold text-text-main ml-1">Tên mùa vụ</label>
+                <input
+                  type="text"
+                  value={seasonName}
+                  onChange={(e) => {
+                    setSeasonName(e.target.value);
+                    setErrors((current) => ({ ...current, seasonName: '' }));
+                  }}
+                  placeholder="VD: Lúa thơm · Vụ 1 · 2026"
+                  maxLength={100}
+                  className="w-full rounded-2xl border border-border-main/55 bg-white py-3.5 px-4 text-sm font-semibold outline-none transition-all placeholder:text-text-main/30 focus:border-primary/45 focus:ring-4 focus:ring-primary/10"
+                />
+                <p className="text-xs text-text-main/45 font-medium ml-1">Tên được gợi ý tự động; bạn có thể sửa để dễ phân biệt các vụ.</p>
+                {errors.seasonName && <p className="text-xs text-red-600 font-semibold ml-1">{errors.seasonName}</p>}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-bold text-text-main ml-1">Ngày bắt đầu vụ mùa</label>
                 <div className="relative">
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" weight="duotone" />
@@ -408,7 +442,21 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
               {cropLabel && (
                 <div className="bg-primary/5 rounded-2xl px-4 py-3.5 flex flex-col gap-1.5">
                   <p className="text-xs font-bold text-primary-container uppercase tracking-wide">Tóm tắt vụ mùa</p>
-                  <p className="text-sm font-bold text-text-h">🌱 {cropLabel}</p>
+                  <div className="flex items-center gap-3">
+                    {getCropImagePath(cropLabel) ? (
+                      <img
+                        src={getCropImagePath(cropLabel)}
+                        alt={cropLabel}
+                        className="h-12 w-12 rounded-xl object-cover shadow-sm"
+                      />
+                    ) : (
+                      <span className="text-2xl">🌱</span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-text-h">{cropLabel}</p>
+                      <p className="text-xs text-text-main/60 truncate">{seasonName}</p>
+                    </div>
+                  </div>
                   <p className="text-xs text-text-main/60 font-medium">Bắt đầu: {new Date(startDate).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                 </div>
               )}

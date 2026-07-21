@@ -237,4 +237,45 @@ describe('PlantScan Component', () => {
     expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:test-url');
     expect(screen.getByText('Giữ camera sát lá bị bệnh để AI chẩn đoán tốt nhất')).toBeInTheDocument();
   });
+
+  it('loads saved scans and opens a history result', async () => {
+    vi.mocked(api).mockResolvedValueOnce({
+      data: {
+        success: true,
+        data: {
+          total: 1,
+          items: [
+            {
+              scan_id: 'scan-history-1',
+              status: 'completed',
+              crop_type: 'Lúa',
+              created_at: '2026-07-21T08:00:00.000Z',
+              thumbnail_url: 'https://example.test/scan.webp',
+              diagnosis: {
+                is_plant: true,
+                disease_name: 'Đạo ôn lá',
+                confidence: 0.92,
+                symptoms: [],
+                treatment: {},
+                disclaimer: 'Kết quả tham khảo',
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    renderComponent();
+    fireEvent.click(screen.getByRole('button', { name: 'Lịch sử (0)' }));
+
+    expect(await screen.findByText('Đạo ôn lá')).toBeInTheDocument();
+    expect(screen.getByText('Độ chính xác: 92%')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Ảnh quét Lúa/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Quét thành công')).toBeInTheDocument();
+      expect(screen.getByText('92%')).toBeInTheDocument();
+    });
+  });
 });

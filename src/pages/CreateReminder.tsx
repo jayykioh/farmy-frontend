@@ -8,13 +8,15 @@ import { useNavigate } from 'react-router-dom';
 import {
   useGetPlotsQuery,
   useGetDiariesQuery,
-  useCreateReminderMutation,
 } from '../store/api/farmApi';
-import { ChatCircleText, Bell } from '@phosphor-icons/react';
+import { ChatCircleText, Bell, Drop, Flask, Bug, Leaf, NotePencil } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createReminder, type CreateReminderPayload, type Reminder } from '../api/reminders';
 
 export const CreateReminder: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Helper functions to get local date and time strings
   const getLocalDateString = (d: Date) => {
@@ -50,7 +52,8 @@ export const CreateReminder: React.FC = () => {
 
   const { data: plotsData = [] } = useGetPlotsQuery();
   const { data: diariesData = [] } = useGetDiariesQuery();
-  const [createReminder, { isLoading: loading }] = useCreateReminderMutation();
+  const createMutation = useMutation({ mutationFn: (payload: CreateReminderPayload) => createReminder(payload) });
+  const loading = createMutation.isPending;
 
   const diaries = React.useMemo(() => {
     const plotMap: Record<string, string> = {};
@@ -71,6 +74,10 @@ export const CreateReminder: React.FC = () => {
       toast.error('Vui lòng nhập hoạt động vườn!');
       return;
     }
+    if (!diaryId) {
+      toast.error('Vui lòng chọn mùa vụ liên kết!');
+      return;
+    }
 
     try {
       // Parse local date & time strings back to a Date object
@@ -84,12 +91,33 @@ export const CreateReminder: React.FC = () => {
 
       const remindAt = new Date(year, month - 1, day, hours, minutes);
  
-      await createReminder({
+      const activity = activityOptions.find((option) => option.value === selectedActivity) ?? activityOptions[4];
+      const created = await createMutation.mutateAsync({
         title: titleVal,
         remind_at: remindAt.toISOString(),
-        diary_id: diaryId || undefined,
+        diary_id: diaryId,
+        type: activity.type,
+        action_type: activity.actionType,
+        action_detail: titleVal,
         repeat,
-      }).unwrap();
+      });
+
+      const selectedDiary = diariesData.find((diary) => diary._id === diaryId);
+      const hydratedReminder: Reminder = {
+        ...created,
+        diary: selectedDiary ? {
+          _id: selectedDiary._id,
+          crop_type: selectedDiary.crop_type,
+          season: selectedDiary.season,
+        } : created.diary,
+      };
+      queryClient.setQueryData<Reminder[]>(['reminders', { status: 'pending' }], (current = []) => {
+        const withoutDuplicate = current.filter((reminder) => reminder._id !== hydratedReminder._id);
+        return [...withoutDuplicate, hydratedReminder].sort(
+          (a, b) => new Date(a.remind_at).getTime() - new Date(b.remind_at).getTime(),
+        );
+      });
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] });
 
       navigate('/reminders');
     } catch (err) {
@@ -98,12 +126,18 @@ export const CreateReminder: React.FC = () => {
     }
   };
 
-  const activityOptions = [
-    { value: 'Tưới nước', label: 'Tưới nước' },
-    { value: 'Bón phân', label: 'Bón phân' },
-    { value: 'Phun thuốc', label: 'Phun thuốc' },
-    { value: 'Làm cỏ', label: 'Làm cỏ' },
-    { value: 'custom', label: 'Khác (Nhập thủ công...)' },
+  const activityOptions: Array<{
+    value: string;
+    label: string;
+    type: CreateReminderPayload['type'];
+    actionType: string;
+    icon: React.ReactNode;
+  }> = [
+    { value: 'Tưới nước', label: 'Tưới nước', type: 'water', actionType: 'water', icon: <Drop size={20} weight="duotone" /> },
+    { value: 'Bón phân', label: 'Bón phân', type: 'fertilize', actionType: 'fertilize', icon: <Flask size={20} weight="duotone" /> },
+    { value: 'Phun thuốc', label: 'Phun thuốc', type: 'plant_alert', actionType: 'pesticide', icon: <Bug size={20} weight="duotone" /> },
+    { value: 'Làm cỏ', label: 'Làm cỏ', type: 'diary', actionType: 'weeding', icon: <Leaf size={20} weight="duotone" /> },
+    { value: 'custom', label: 'Khác (Nhập thủ công...)', type: 'diary', actionType: 'other', icon: <NotePencil size={20} weight="duotone" /> },
   ];
 
   return (
@@ -137,17 +171,23 @@ export const CreateReminder: React.FC = () => {
           {/* Section 1: Hoạt động vườn */}
           <div className="mb-6">
             <label className="font-extrabold text-sm text-text-secondary mb-2 block">Hoạt động vườn</label>
-            <select
-              value={selectedActivity}
-              onChange={(e) => setSelectedActivity(e.target.value)}
-              className="w-full px-6 py-4 bg-bg-surface-1 rounded-[20px] border-2 border-border-main focus:border-[#008A5E] font-bold text-base text-text-main shadow-sm transition-all outline-none cursor-pointer mb-4"
-            >
-              {activityOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {activityOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setSelectedActivity(option.value)}
+                  className={`flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left font-bold transition-all ${
+                    selectedActivity === option.value
+                      ? 'border-[#008A5E] bg-[#E9F9F3] text-[#007A54] shadow-sm'
+                      : 'border-border-main bg-bg-surface-1 text-text-main hover:border-[#008A5E]/40'
+                  }`}
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">{option.icon}</span>
+                  <span className="text-sm">{option.label}</span>
+                </button>
               ))}
-            </select>
+            </div>
 
             {selectedActivity === 'custom' && (
               <div className="relative animate-in slide-in-from-top-2 duration-200">
@@ -170,16 +210,16 @@ export const CreateReminder: React.FC = () => {
 
           {/* Selector: Vụ mùa liên kết */}
           <div className="mb-6">
-            <label className="font-extrabold text-sm text-text-secondary mb-2 block">Vụ mùa liên kết (Không bắt buộc)</label>
+            <label className="font-extrabold text-sm text-text-secondary mb-2 block">Vụ mùa liên kết (Bắt buộc)</label>
             <select
               value={diaryId}
               onChange={(e) => setDiaryId(e.target.value)}
               className="w-full px-6 py-4 bg-bg-surface-1 rounded-[20px] border-2 border-border-main focus:border-[#008A5E] font-bold text-base text-text-main shadow-sm transition-all outline-none cursor-pointer"
             >
-              <option value="">-- Không liên kết --</option>
+              <option value="">-- Chọn một vụ mùa --</option>
               {diaries.map(d => (
                 <option key={d._id} value={d._id}>
-                  {d.crop_type} ({d.plot_name})
+                  {d.crop_type} · {d.season} ({d.plot_name})
                 </option>
               ))}
             </select>

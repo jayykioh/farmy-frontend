@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { ReminderCard } from '../components/ReminderCard';
 import { useReminders } from '../hooks/useReminders';
-import { completeReminder } from '../api/reminders';
+import { completeReminder, getReminderCompletionMessage } from '../api/reminders';
 import type { Reminder } from '../api/reminders';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Calendar, CheckCircle, Clock } from '@phosphor-icons/react';
@@ -17,6 +17,7 @@ import { vi } from 'date-fns/locale/vi';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
+import toast from 'react-hot-toast';
 
 type Tab = 'today' | 'upcoming' | 'done';
 
@@ -30,14 +31,16 @@ const Reminders: React.FC = () => {
   const { data: reminders = [], isLoading } = useReminders({ status: statusFilter });
 
   const completeMutation = useMutation({
-    mutationFn: completeReminder,
-    onSuccess: () => {
+    mutationFn: (reminder: Reminder) => completeReminder(reminder._id),
+    onSuccess: (_result, reminder) => {
       queryClient.invalidateQueries({ queryKey: ['reminders'] });
+      toast.success(getReminderCompletionMessage(reminder));
     },
+    onError: () => toast.error('Không thể hoàn thành nhắc nhở. Vui lòng thử lại!'),
   });
 
-  const handleDone = (id: string) => {
-    completeMutation.mutate(id);
+  const handleDone = (reminder: Reminder) => {
+    completeMutation.mutate(reminder);
   };
 
   // Lọc và phân nhóm nhắc nhở
@@ -145,7 +148,7 @@ const Reminders: React.FC = () => {
                     <ReminderCard 
                       key={r._id} 
                       reminder={r} 
-                      onDone={r.status !== 'completed' ? () => handleDone(r._id) : undefined} 
+                      onDone={r.status !== 'completed' ? () => handleDone(r) : undefined} 
                     />
                   ))}
                 </div>

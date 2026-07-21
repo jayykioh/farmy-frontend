@@ -14,6 +14,7 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { data: plots = [] } = useGetPlotsQuery(undefined, { skip: !isOpen });
   const [selectedCropType, setSelectedCropType] = useState('Lúa');
   const [customCropType, setCustomCropType] = useState('');
+  const [seasonName, setSeasonName] = useState('');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
 
   if (!isOpen) return null;
@@ -24,6 +25,7 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
     e.preventDefault();
     
     const finalCropType = selectedCropType === 'Khác...' ? customCropType.trim() : selectedCropType;
+    const finalSeasonName = seasonName.trim() || `${finalCropType} · ${startDate.slice(0, 4)}`;
     if (!finalCropType) {
       toast.error('Vui lòng nhập tên cây trồng!');
       return;
@@ -47,8 +49,9 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
       }
 
       await createDiary({
-        plot_id: plots[0]._id,
+        plot_id: activePlotId,
         crop_type: finalCropType,
+        season: finalSeasonName,
         start_date: startDate,
       }).unwrap();
       toast.success('Tạo nhật ký thành công!');
@@ -92,6 +95,17 @@ export const CreateDiaryModal: React.FC<Props> = ({ isOpen, onClose }) => {
               />
             </div>
           )}
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Tên mùa vụ *</label>
+            <input
+              type="text"
+              value={seasonName}
+              onChange={(e) => setSeasonName(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary"
+              placeholder={`${selectedCropType} · ${startDate.slice(0, 4)}`}
+              maxLength={100}
+            />
+          </div>
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-1">Ngày bắt đầu</label>
             <input
