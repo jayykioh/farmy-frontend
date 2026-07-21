@@ -77,6 +77,11 @@ export const CreateReminder: React.FC = () => {
       const [year, month, day] = dateStr.split('-').map(Number);
       const [hours, minutes] = timeStr.split(':').map(Number);
       
+      if (year < 2024 || year > 2100) {
+        toast.error('Năm không hợp lệ (vui lòng chọn từ 2024 đến 2100)!');
+        return;
+      }
+
       const remindAt = new Date(year, month - 1, day, hours, minutes);
  
       await createReminder({

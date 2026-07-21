@@ -31,14 +31,14 @@ export const CreateDiary: React.FC = () => {
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
   const [growthStage, setGrowthStage] = useState('');
   const [notes, setNotes] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [activeActivities, setActiveActivities] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showCreateSeason, setShowCreateSeason] = useState(false);
   const diaryIdParam = searchParams.get('diaryId') || '';
   const activeDiaries = diaries.filter((d) => d.status === 'active');
-  const activeDiaryId = selectedDiaryId || (activeDiaries.some((d) => d._id === diaryIdParam) ? diaryIdParam : '') || activeDiaries[0]?._id || '';
+  const activeDiaryId = selectedDiaryId || (diaries.some((d) => d._id === diaryIdParam) ? diaryIdParam : '') || activeDiaries[0]?._id || diaries[0]?._id || '';
 
   const selectedDiary = useMemo(
     () => diaries.find((diary) => diary._id === activeDiaryId),
@@ -71,6 +71,10 @@ export const CreateDiary: React.FC = () => {
     event.preventDefault();
     if (!activeDiaryId) {
       toast.error('Vui lòng chọn hoặc tạo nhật ký vụ mùa trước.');
+      return;
+    }
+    if (!growthStage.trim()) {
+      toast.error('Vui lòng chọn giai đoạn sinh trưởng của cây!');
       return;
     }
     if (!userId) {
@@ -112,7 +116,7 @@ export const CreateDiary: React.FC = () => {
         requestHash,
         imageBlobs,
         imageDigests,
-        imageUrls: imageUrl.startsWith('http') ? [imageUrl] : [],
+        imageUrls: imageUrls.filter(url => !url.startsWith('blob:')),
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
@@ -137,7 +141,12 @@ export const CreateDiary: React.FC = () => {
     if (files.length === 0) return;
 
     setImageFiles(files);
-    setImageUrl(URL.createObjectURL(files[0]));
+    setImageUrls(files.map(f => URL.createObjectURL(f)));
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -182,7 +191,7 @@ export const CreateDiary: React.FC = () => {
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSave} className="space-y-6">
+            <form id="create-diary-form" onSubmit={handleSave} className="space-y-6">
               <section className="card-bubble p-6 space-y-6 shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className="space-y-2 block">
@@ -286,21 +295,18 @@ export const CreateDiary: React.FC = () => {
                       <span className="text-[8px] font-medium text-text-secondary/60 mt-0.5 text-center leading-tight">PNG, JPG<br/>(Tối đa 5MB)</span>
                     </label>
 
-                    {imageUrl ? (
-                      <div className="aspect-square bg-bg-surface-1 rounded-2xl overflow-hidden shadow-sm border border-border-main/30 relative group">
-                        <img className="w-full h-full object-cover opacity-90" alt="Preview" src={imageUrl} />
+                    {imageUrls.map((url, idx) => (
+                      <div key={idx} className="aspect-square bg-bg-surface-1 rounded-2xl overflow-hidden shadow-sm border border-border-main/30 relative group">
+                        <img className="w-full h-full object-cover opacity-90" alt={`Preview ${idx + 1}`} src={url} />
                         <button
                           type="button"
-                          onClick={() => {
-                            setImageUrl('');
-                            setImageFiles([]);
-                          }}
-                          className="absolute top-1 right-1 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center cursor-pointer"
+                          onClick={() => handleRemoveImage(idx)}
+                          className="absolute top-1 right-1 w-6 h-6 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center cursor-pointer transition-colors"
                         >
                           <X className="w-3 h-3" weight="bold" />
                         </button>
                       </div>
-                    ) : null}
+                    ))}
                   </div>
                 </div>
               </section>
@@ -320,7 +326,8 @@ export const CreateDiary: React.FC = () => {
         {diaries.length > 0 && !fetching ? (
           <footer className="fixed md:static bottom-0 left-0 right-0 w-full max-w-2xl mx-auto p-5 bg-bg-main md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-t-2 border-border-main/50 md:border-t-0 space-y-4 z-50">
             <button
-              onClick={handleSave}
+              type="submit"
+              form="create-diary-form"
               disabled={isSaving}
               className="btn btn--cyan w-full text-base font-extrabold active:scale-95 cursor-pointer"
             >

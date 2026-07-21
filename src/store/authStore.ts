@@ -12,6 +12,8 @@ import {
 import { clearAccessToken, getAccessToken, setAccessToken } from '../api/client';
 import { store } from './index';
 import { baseApi } from './api/baseApi';
+import { queryClient } from '../lib/queryClient';
+import { stopDiarySync } from '../lib/diarySyncEngine';
 
 type AuthStatus = 'idle' | 'checking' | 'authenticated' | 'unauthenticated';
 
@@ -38,6 +40,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
 
   setSession: ({ accessToken, user }) => {
+    const prevUserId = get().user?.id;
+    if (prevUserId && prevUserId !== user.id) {
+      queryClient.clear();
+      store.dispatch(baseApi.util.resetApiState());
+      stopDiarySync();
+    }
+
     if (accessToken) {
       setAccessToken(accessToken);
     }
@@ -88,6 +97,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearSession: () => {
     clearAccessToken();
+    queryClient.clear();
+    stopDiarySync();
     store.dispatch(baseApi.util.resetApiState());
     set({
       accessToken: null,

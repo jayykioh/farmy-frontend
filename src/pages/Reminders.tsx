@@ -49,7 +49,7 @@ const Reminders: React.FC = () => {
     if (tab === 'upcoming') {
       return isFuture(remindDate) && !isToday(remindDate);
     }
-    return true; // cho 'done'
+    return r.status === 'completed'; // cho 'done'
   });
 
   // Group by date
