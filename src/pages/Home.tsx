@@ -13,7 +13,9 @@ import { isToday } from 'date-fns';
 import { fetchSnapFeed } from '../api/snaps';
 import { useQuery } from '@tanstack/react-query';
 import { SnapFAB } from '../components/SnapFAB';
-import { Flame, Drop, Scan, ChatCircleText, PencilSimpleLine, Plant, CaretRight } from '@phosphor-icons/react';
+import { SnapCaptureModal } from '../components/SnapCaptureModal';
+import { StoryRingCreateButton } from '../components/StoryRingCreateButton';
+import { Flame, Drop, Scan, ChatCircleText, PencilSimpleLine, Plant, CaretRight, Camera, Plus, Lightbulb, Users, UserPlus } from '@phosphor-icons/react';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { Button } from '../components/ui/Button';
 import { useGetPlotsQuery, useGetDiariesQuery } from '../store/api/farmApi';
@@ -30,8 +32,23 @@ export const Home: React.FC = () => {
   const nextStarburstId = useRef(0);
   const [starBursts, setStarBursts] = useState<StarBurst[]>([]);
 
-  const { data: snapFeedData } = useQuery({ queryKey: ['snapFeed', { limit: 5 }], queryFn: () => fetchSnapFeed({ limit: 5 }) });
+  const { data: snapFeedData } = useQuery({ queryKey: ['snapFeed', { limit: 10 }], queryFn: () => fetchSnapFeed({ limit: 10 }) });
   const snaps = snapFeedData?.data || [];
+
+  // Extract unique users from feed for social UI
+  const uniqueUsersMap = new Map<string, { id: string, name: string, img: string, cropType: string, snapId: string }>();
+  snaps.forEach(snap => {
+    if (snap.userId !== user?.id && !uniqueUsersMap.has(snap.userId)) {
+      uniqueUsersMap.set(snap.userId, {
+        id: snap.userId,
+        name: snap.userName,
+        img: snap.userAvatar || `https://api.dicebear.com/9.x/thumbs/svg?seed=${snap.userId}`,
+        cropType: snap.cropType || 'Nông sản',
+        snapId: snap.id,
+      });
+    }
+  });
+  const uniqueUsers = Array.from(uniqueUsersMap.values());
 
   const { data: petStatusRaw } = usePetStatus();
   const { data: pendingReminders = [] } = useReminders({ status: 'pending' });
@@ -49,6 +66,7 @@ export const Home: React.FC = () => {
   const [showCreateSeasonModal, setShowCreateSeasonModal] = useState(false);
   const [createSeasonMode, setCreateSeasonMode] = useState<'first-time' | 'add-season'>('first-time');
   const [setupState, setSetupState] = useState<SetupState>('loading');
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
 
   const { data: plots = [], isLoading: plotsLoading } = useGetPlotsQuery();
   const { data: diaries = [], isLoading: diariesLoading } = useGetDiariesQuery();
@@ -73,13 +91,13 @@ export const Home: React.FC = () => {
   };
 
   const moodReasonMap: Record<string, string> = {
-    USER_LOGGED_DIARY_TODAY: 'Da ghi nhat ky hom nay',
-    STREAK_MILESTONE: 'Dat cot moc chuoi ngay!',
-    MISSED_MULTIPLE_DAYS: 'Da bo lo nhieu ngay...',
-    MISSED_ONE_DAY: 'Hom qua quen ghi nhat ky',
-    LATE_DAY_NO_DIARY: 'Hay ghi nhat ky hom nay nhe',
-    NEEDS_DAILY_DIARY: 'Can ghi nhat ky moi ngay',
-    DEFAULT_STATE: 'Gan len cap roi! Tiep tuc ghi nhat ky nhe.',
+    USER_LOGGED_DIARY_TODAY: 'Đã ghi nhật ký hôm nay',
+    STREAK_MILESTONE: 'Đạt cột mốc chuỗi ngày!',
+    MISSED_MULTIPLE_DAYS: 'Đã bỏ lỡ nhiều ngày...',
+    MISSED_ONE_DAY: 'Hôm qua quên ghi nhật ký',
+    LATE_DAY_NO_DIARY: 'Hãy ghi nhật ký hôm nay nhé',
+    NEEDS_DAILY_DIARY: 'Cần ghi nhật ký mỗi ngày',
+    DEFAULT_STATE: 'Gần lên cấp rồi! Tiếp tục ghi nhật ký nhé.',
   };
 
   return (
@@ -96,29 +114,29 @@ export const Home: React.FC = () => {
 
       {setupState === 'NO_PLOT' && (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', damping: 25 }} className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6">
-          <PetMascot status={{ ...petStatus, bubbleMessage: 'Chao mung ban! 🌱' }} size={180} className="relative drop-shadow-xl" />
+          <PetMascot status={{ ...petStatus, bubbleMessage: 'Chào mừng bạn! 🌱' }} size={180} className="relative drop-shadow-xl" />
           <div className="flex flex-col gap-2 max-w-xs">
-            <h1 className="text-2xl font-extrabold text-[var(--color-ink)] tracking-tight">Chao mung den FARMY!</h1>
-            <p className="text-sm text-[var(--color-ink-2)] font-medium leading-relaxed">Hay tao manh vuon dau tien va bat dau vu mua de Be Thoc co the theo doi cay trong cung ban.</p>
+            <h1 className="text-2xl font-extrabold text-[var(--color-ink)] tracking-tight">Chào mừng đến FARMY!</h1>
+            <p className="text-sm text-[var(--color-ink-2)] font-medium leading-relaxed">Hãy tạo mảnh vườn đầu tiên và bắt đầu vụ mùa để Bé Thóc có thể theo dõi cây trồng cùng bạn.</p>
           </div>
           <button onClick={() => openCreateSeason('first-time')} className="btn btn--cyan py-4 px-8 text-[15px] cursor-pointer active:scale-95">
             <Plant size={22} weight="duotone" />
-            Bat dau vu mua dau tien
+            Bắt đầu vụ mùa đầu tiên
           </button>
         </motion.div>
       )}
 
       {setupState === 'NO_ACTIVE_DIARY' && (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', damping: 25 }} className="flex flex-col items-center justify-center min-h-[70svh] text-center gap-6">
-          <PetMascot status={{ ...petStatus, bubbleMessage: 'Vuon cho canh tac! 🌿' }} size={180} className="relative drop-shadow-xl" />
+          <PetMascot status={{ ...petStatus, bubbleMessage: 'Vườn chờ canh tác! 🌿' }} size={180} className="relative drop-shadow-xl" />
           <div className="flex flex-col gap-2 max-w-xs">
-            <h1 className="text-2xl font-extrabold text-[var(--color-ink)] tracking-tight">Chua co vu mua nao</h1>
-            <p className="text-sm text-[var(--color-ink-2)] font-medium leading-relaxed">Ban da co manh vuon roi. Hay tao mot vu mua moi de bat dau ghi nhat ky!</p>
+            <h1 className="text-2xl font-extrabold text-[var(--color-ink)] tracking-tight">Chưa có vụ mùa nào</h1>
+            <p className="text-sm text-[var(--color-ink-2)] font-medium leading-relaxed">Bạn đã có mảnh vườn rồi. Hãy tạo một vụ mùa mới để bắt đầu ghi nhật ký!</p>
           </div>
           <p className="text-xs font-mono font-bold text-[var(--color-ink-2)] mt-1">{moodReasonMap[petStatus.moodReason] || '...'}</p>
           <button onClick={() => openCreateSeason('add-season')} className="btn btn--cyan py-4 px-8 text-[15px] cursor-pointer active:scale-95">
             <Plant size={22} weight="duotone" />
-            Tao vu mua moi
+            Tạo vụ mùa mới
           </button>
         </motion.div>
       )}
@@ -205,24 +223,99 @@ export const Home: React.FC = () => {
       <SnapFAB />
 
       <section className="w-full mt-4 md:mt-8 text-left">
-        <div className="flex justify-between items-end mb-5 px-1">
+        <div className="flex justify-between items-end mb-4 px-1">
           <h3 className="text-[20px] font-bold text-[var(--color-ink)] tracking-tight flex items-center gap-2">
-            Farm Feed gần đây
-            <Plant size={22} weight="duotone" className="text-[#008A5E]" />
+            Khoảnh khắc nhà nông
+            <Camera size={22} weight="duotone" className="text-[#008A5E]" />
           </h3>
-          <button onClick={() => navigate('/farm-feed')} className="text-[var(--color-ink-2)] hover:text-[var(--color-ink)] font-bold text-[13px] flex items-center gap-0.5 cursor-pointer">
-            Xem tất cả
+          <button onClick={() => navigate('/farm-feed')} className="text-[var(--color-ink-2)] hover:text-[var(--color-ink)] font-bold text-[13px] flex items-center gap-0.5 cursor-pointer active:scale-95 transition-transform">
+            Bản tin Vườn
             <CaretRight size={16} weight="bold" />
           </button>
         </div>
-        <div className="flex overflow-x-auto gap-4 md:gap-6 pb-6 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-1">
-          {snaps.length > 0 ? (
-            snaps.map(snap => (<SnapCard key={snap.id} snap={snap} mini={true} onClick={() => navigate(`/snap/${snap.id}`)} />))
-          ) : (
-            <div className="text-[var(--color-ink-2)] text-sm italic py-4">Chưa có ảnh nào. Hãy là người đầu tiên chụp!</div>
+
+        {/* Stories-style Row */}
+        <div className="flex overflow-x-auto fade-edges-x gap-4 pb-2 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-1 mb-3 items-start pt-2">
+          <StoryRingCreateButton onClick={() => setIsCaptureOpen(true)} />
+          {/* Active users from feed for social proof */}
+          {uniqueUsers.map(u => (
+            <div key={u.id} onClick={() => navigate(`/snap/${u.snapId}`)} className="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer group">
+              <div className="w-[68px] h-[68px] rounded-full p-[2px] bg-gradient-to-br from-[#008A5E] to-[#FFC000] opacity-80 group-hover:opacity-100 transition-opacity">
+                <div className="w-full h-full rounded-full bg-white p-0.5">
+                  <img src={u.img} alt={u.name} className="w-full h-full rounded-full object-cover" />
+                </div>
+              </div>
+              <span className="text-[11px] font-medium text-[var(--color-ink-2)] truncate max-w-[64px]">{u.name}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Snap Cards Row */}
+        <div className="flex overflow-x-auto fade-edges-x gap-4 md:gap-6 pb-6 pt-1 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-1">
+          {snaps.map((snap, i) => (
+            <SnapCard key={snap.id} snap={snap} mini={true} index={i} onClick={() => navigate(`/snap/${snap.id}`)} />
+          ))}
+          {snaps.length === 0 && (
+            <div className="text-[var(--color-ink-2)] text-sm italic py-4 w-full text-center">
+              Chưa có ảnh nào. Hãy là người đầu tiên đăng!
+            </div>
           )}
         </div>
       </section>
+
+      {/* Suggested Friends Section */}
+      <section className="w-full mt-2 text-left">
+        <h3 className="text-[17px] font-bold text-[var(--color-ink)] tracking-tight flex items-center gap-2 mb-3 px-1">
+          Gợi ý kết bạn
+          <Users size={20} weight="duotone" className="text-[var(--color-accent)]" />
+        </h3>
+        <div className="flex overflow-x-auto fade-edges-x gap-4 pb-4 pt-1 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-1">
+          {uniqueUsers.length > 0 ? (
+            uniqueUsers.slice(0, 4).map(friend => (
+              <div key={friend.id} className="w-[160px] flex-shrink-0 snap-center card-bubble bg-white border border-[var(--color-border-main)] p-4 flex flex-col items-center justify-center text-center gap-2">
+                <img src={friend.img} className="w-14 h-14 rounded-full border-2 border-slate-100 shadow-sm object-cover" alt={friend.name} />
+                <div>
+                  <p className="font-bold text-[14px] text-[var(--color-ink)] leading-tight truncate max-w-[130px]">{friend.name}</p>
+                  <p className="text-[11px] text-[var(--color-ink-2)] font-medium mt-0.5 truncate max-w-[130px]">Trồng {friend.cropType}</p>
+                </div>
+                <button className="w-full mt-1 bg-emerald-50 hover:bg-emerald-100 text-[#008A5E] font-bold text-[12px] py-1.5 rounded-full flex items-center justify-center gap-1 transition-colors cursor-pointer active:scale-95">
+                  <UserPlus size={14} weight="bold" /> Theo dõi
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="text-[var(--color-ink-2)] text-sm italic py-4 w-full text-center">
+              Chưa có gợi ý mới. Hãy tương tác thêm nhé!
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Farming Fun Fact Section */}
+      <section className="w-full mt-4 mb-8 text-left">
+        <div className="card-bubble border border-[var(--color-border-main)] bg-gradient-to-r from-amber-50 to-orange-50 p-5 relative overflow-hidden flex flex-col md:flex-row items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0 z-10">
+            <Lightbulb size={28} weight="duotone" className="text-amber-500" />
+          </div>
+          <div className="z-10 flex-1">
+            <h3 className="font-bold text-[15px] text-amber-900 mb-1">Mẹo nhà nông hôm nay</h3>
+            <p className="text-[14px] text-amber-800 leading-relaxed font-medium">
+              Tưới nước vào buổi sáng sớm (5h-7h) giúp rễ cây hấp thụ tốt nhất và hạn chế nấm bệnh phát triển so với tưới vào chiều tối.
+            </p>
+          </div>
+          {/* Decorative background element */}
+          <Plant size={120} weight="duotone" className="absolute -bottom-8 -right-4 text-amber-500/10 rotate-12" />
+        </div>
+      </section>
+
+      <SnapCaptureModal 
+        isOpen={isCaptureOpen} 
+        onClose={() => setIsCaptureOpen(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['snapFeed'] });
+          queryClient.invalidateQueries({ queryKey: ['snaps'] });
+        }}
+      />
     </div>
   );
 };

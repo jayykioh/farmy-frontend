@@ -150,29 +150,11 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
       return;
     }
 
-    // Calculate the visible crop to match object-cover viewport
-    const container = video.parentElement;
-    const containerW = container?.clientWidth ?? video.clientWidth;
-    const containerH = container?.clientHeight ?? video.clientHeight;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
 
-    const containerAspect = containerW / containerH;
-    const videoAspect = videoW / videoH;
-
-    let sx = 0, sy = 0, sw = videoW, sh = videoH;
-    if (videoAspect > containerAspect) {
-      // Video is wider than container → crop sides
-      sw = videoH * containerAspect;
-      sx = (videoW - sw) / 2;
-    } else {
-      // Video is taller than container → crop top/bottom
-      sh = videoW / containerAspect;
-      sy = (videoH - sh) / 2;
-    }
-
-    canvas.width = Math.round(sw);
-    canvas.height = Math.round(sh);
+    canvas.width = videoW;
+    canvas.height = videoH;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -183,7 +165,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
       ctx.scale(-1, 1);
     }
 
-    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     cameraRequestRef.current += 1;
 
     canvas.toBlob(
@@ -316,15 +298,15 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
         </div>
       </div>
 
-      <div className="w-full h-full md:max-w-[480px] relative flex flex-col justify-between">
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      <div className="w-full h-full relative flex flex-col justify-between">
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black">
           {state === 'camera' ? (
             <video
               ref={videoRef}
               autoPlay
               playsInline
               muted
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               style={facingMode === 'user' ? { transform: 'scaleX(-1)' } : undefined}
             />
           ) : null}
@@ -346,7 +328,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
           ) : null}
 
           {state === 'preview' && photoUrl ? (
-            <img src={photoUrl} alt="Preview" className="w-full h-full object-cover" />
+            <img src={photoUrl} alt="Preview" className="w-full h-full object-contain" />
           ) : null}
 
           {state === 'error' ? (
@@ -372,10 +354,11 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
           ) : null}
         </div>
 
-        <div className="relative z-10 flex flex-col h-full justify-end pb-8 pt-20 px-4 pointer-events-none">
+        <div className="relative z-10 flex flex-col h-full justify-end pointer-events-none">
           {(state === 'camera' || state === 'preview') ? (
-            <div className="pointer-events-auto bg-gradient-to-t from-black/90 via-black/50 to-transparent -mx-4 px-4 pt-12 pb-4 flex flex-col gap-4">
-              <div className="flex flex-col gap-3 mb-2">
+            <div className="pointer-events-auto bg-gradient-to-t from-black via-black/60 to-transparent w-full">
+              <div className="w-full md:max-w-[600px] mx-auto px-4 pt-24 pb-8 flex flex-col gap-4">
+                <div className="flex flex-col gap-3 mb-2">
                 <div className="flex flex-wrap gap-2 items-center justify-center">
                   <select
                     value={cropType}
@@ -474,6 +457,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
                     </button>
                   </>
                 )}
+              </div>
               </div>
             </div>
           ) : null}

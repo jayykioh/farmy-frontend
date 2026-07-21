@@ -27,6 +27,8 @@ export interface FarmSnap {
   // Engagement
   reactions: { type: SnapReactionType; count: number; userReacted: boolean }[];
   commentCount: number;
+  /** Full comment objects — only present on detail endpoint (/snaps/:id) */
+  comments?: FarmSnapComment[];
 
   createdAt: string;
 }
