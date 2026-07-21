@@ -15,7 +15,7 @@ import type { PlantScanResult, ImageQualityInfo, UserScanContext } from '../type
 import toast from 'react-hot-toast';
 
 import { ImageQualityAssistant } from '../components/plant-scan/ImageQualityAssistant';
-import { GuidedAdditionalCapture, AdditionalAngleSuggestion } from '../components/plant-scan/GuidedAdditionalCapture';
+import { GuidedAdditionalCapture, type AdditionalAngleSuggestion } from '../components/plant-scan/GuidedAdditionalCapture';
 import { ContextFormStep } from '../components/plant-scan/ContextFormStep';
 import { TransparentAnalysisStages } from '../components/plant-scan/TransparentAnalysisStages';
 import { GuidedResultView } from '../components/plant-scan/GuidedResultView';
