@@ -169,6 +169,9 @@ type CsrfTokenResponse = ApiResponse<{
 }>;
 
 let accessToken: string | null = localStorage.getItem('farmy_access_token');
+// Refresh token is kept in-memory only (not localStorage) for security.
+// On every login/register the caller must call setRefreshToken().
+let refreshToken: string | null = null;
 let isRefreshing = false;
 let refreshQueue: TokenRefreshSubscriber[] = [];
 let csrfToken: string | null = null;
@@ -187,6 +190,14 @@ export const setAccessToken = (token: string | null) => {
 export const clearAccessToken = () => {
   accessToken = null;
   localStorage.removeItem('farmy_access_token');
+};
+
+export const setRefreshToken = (token: string | null) => {
+  refreshToken = token;
+};
+
+export const clearRefreshToken = () => {
+  refreshToken = null;
 };
 
 const processRefreshQueue = (error: unknown, accessToken?: string) => {
@@ -315,26 +326,35 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
+      // Send refresh_token in body as fallback in case the HttpOnly cookie
+      // is not present (e.g. after browser data was cleared or session expired).
       const response = await axios.post<RefreshTokenResponse>(
         `${API_BASE_URL}/auth/refresh`,
-        {},
+        refreshToken ? { refresh_token: refreshToken } : {},
         { withCredentials: true },
       );
 
-      const accessToken = response.data.data.access_token ?? response.data.data.accessToken;
+      const newAccessToken = response.data.data.access_token ?? response.data.data.accessToken;
 
-      if (!accessToken) {
+      if (!newAccessToken) {
         throw new Error('Refresh response did not include access token');
       }
 
-      setAccessToken(accessToken);
-      processRefreshQueue(null, accessToken);
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      // Update the in-memory refresh token if the server rotated it
+      const newRefreshToken = (response.data.data as Record<string, unknown>).refresh_token as string | undefined;
+      if (newRefreshToken) {
+        setRefreshToken(newRefreshToken);
+      }
+
+      setAccessToken(newAccessToken);
+      processRefreshQueue(null, newAccessToken);
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
       return api(originalRequest);
     } catch (refreshError) {
       processRefreshQueue(refreshError);
       clearAccessToken();
+      clearRefreshToken();
       window.location.href = '/';
 
       return Promise.reject(refreshError);

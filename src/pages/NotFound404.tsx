@@ -1,54 +1,60 @@
+/* Hallmark · page: not-found-404 · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { House, CaretLeft } from '@phosphor-icons/react';
 
 export const NotFound404: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-h-[100svh] bg-[#FBFBFD] text-left font-sans flex flex-col items-center justify-center px-4 py-8">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main text-left font-sans flex flex-col items-center justify-center px-4 py-8">
       {/* Top spacing */}
       <div className="flex-1" />
 
       {/* Error Container */}
-      <div className="w-full max-w-md flex flex-col items-center gap-8 relative z-10">
+      <div className="w-full max-w-md flex flex-col items-center gap-6 relative z-10">
         
         {/* Animated Error Mascot */}
-        <div className="relative w-48 h-48 flex items-center justify-center -mb-4">
+        <div className="relative w-48 h-48 flex items-center justify-center -mb-2">
           {/* Confused / Crying Bé Thóc Illustration */}
           <img src="/pet/crying.svg" alt="Bé Thóc đang khóc" className="w-full h-full object-contain relative z-10 drop-shadow-xl" draggable={false} />
           
           {/* Question Mark Badge */}
-          <div className="absolute top-2 -right-2 w-14 h-14 bg-error rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(186,26,26,0.3)] z-20 border-[3px] border-white animate-bounce" style={{ animationDuration: '2s' }}>
+          <div className="absolute top-2 -right-2 w-14 h-14 bg-red-500 rounded-full flex items-center justify-center shadow-md z-20 border-4 border-border-main animate-bounce">
             <span className="text-3xl font-black text-white leading-none mb-1">?</span>
           </div>
         </div>
 
         {/* Error Text */}
-        <div className="text-center space-y-4">
-          <h1 className="text-7xl font-extrabold text-slate-900 drop-shadow-sm tracking-tighter">
+        <div className="text-center space-y-2">
+          <h1 className="text-7xl font-black text-text-h tracking-tight">
             404
           </h1>
-          <h2 className="text-2xl md:text-3xl font-black text-text-main tracking-tight">Ôi không! Lạc đường mất rồi</h2>
-          <p className="text-base md:text-lg text-text-main/70 leading-relaxed font-medium max-w-[85%] mx-auto">
-            Bé Thóc đang khóc nhè vì không tìm thấy trang bạn cần. Lối này có vẻ không dẫn đến nông trại của chúng ta đâu.
+          <h2 className="text-2xl font-black text-text-h tracking-tight">Ôi không! Lạc đường mất rồi</h2>
+          <p className="text-sm font-bold text-text-secondary leading-relaxed max-w-[90%] mx-auto">
+            Bé Thóc mải nhìn cây trồng nên đi nhầm lối rồi! Trang này không tồn tại trên bản đồ nông trại.
           </p>
         </div>
 
         {/* Suggestions */}
-        <div className="w-full bg-white rounded-[20px] border border-border-main/50 p-5 space-y-3">
-          <p className="text-sm font-semibold text-text-main/70 uppercase">Điều này có thể xảy ra vì:</p>
-          <ul className="space-y-2 text-sm text-text-main/60">
+        <div className="w-full card-bubble bg-white rounded-3xl border-2 border-border-main p-5 space-y-3 shadow-xs">
+          <p className="text-xs font-black text-text-secondary uppercase">Nguyên nhân có thể do:</p>
+          <ul className="space-y-2 text-xs font-extrabold text-text-main">
             <li className="flex gap-2">
-              <span className="text-primary font-bold">•</span>
-              <span>URL có thể bị sai hoặc đã bị xóa</span>
+              <span className="text-[#008A5E] font-black">•</span>
+              <span>Đường dẫn (URL) bị gõ sai hoặc đã bị thay đổi</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-primary font-bold">•</span>
-              <span>Trang này chưa được phát hành</span>
+              <span className="text-[#008A5E] font-black">•</span>
+              <span>Tính năng này đang trong quá trình phát triển</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-primary font-bold">•</span>
-              <span>Phiên đăng nhập của bạn hết hạn</span>
+              <span className="text-[#008A5E] font-black">•</span>
+              <span>Phiên làm việc tạm thời của bạn đã hết hạn</span>
             </li>
           </ul>
         </div>
@@ -57,20 +63,16 @@ export const NotFound404: React.FC = () => {
         <div className="w-full flex flex-col gap-3 sm:flex-row">
           <button
             onClick={() => navigate('/home')}
-            className="flex-1 bg-primary text-white font-bold text-base py-3 rounded-full shadow-md hover:bg-primary-container hover:shadow-lg active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="btn btn--cyan active:scale-95 rounded-2xl flex-1 py-3.5 text-base font-extrabold flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m0 0l4 4m-4-4v4" />
-            </svg>
+            <House size={20} weight="bold" />
             Về Trang Chủ
           </button>
           <button
             onClick={() => navigate(-1)}
-            className="flex-1 bg-white border border-border-main/50 text-text-main font-bold text-base py-3 rounded-full shadow-sm hover:bg-bg-surface-1 hover:shadow-md active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="btn btn--soft active:scale-95 rounded-2xl flex-1 py-3.5 text-base font-bold text-text-secondary border-2 border-border-main/50 flex items-center justify-center gap-2 cursor-pointer"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <CaretLeft size={20} weight="bold" />
             Quay Lại
           </button>
         </div>
@@ -80,8 +82,8 @@ export const NotFound404: React.FC = () => {
       <div className="flex-1" />
 
       {/* Help Text */}
-      <div className="text-center text-xs text-text-main/40 mt-8">
-        <p>Cần giúp? <a href="/help-support" className="text-primary hover:underline cursor-pointer">Liên hệ Hỗ trợ</a></p>
+      <div className="text-center text-xs font-bold text-text-secondary mt-6">
+        <p>Cần hỗ trợ? <button onClick={() => navigate('/help-support')} className="text-[#008A5E] font-black hover:underline cursor-pointer">Gửi câu hỏi cho kĩ sư</button></p>
       </div>
     </div>
   );

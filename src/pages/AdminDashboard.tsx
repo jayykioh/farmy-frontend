@@ -1,6 +1,11 @@
+/* Hallmark · page: admin-dashboard · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useEffect, useState } from 'react';
 import { getAdminStats } from '../api/admin';
-import { Users, Sprout, BookOpen, MessageSquare, Database, FileSearch, Bell, AlertTriangle } from 'lucide-react';
+import { Users, Plant, BookOpen, ChatText, Database, FileMagnifyingGlass, Bell, Warning } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 
 type StatsOverview = {
@@ -47,17 +52,17 @@ export const AdminDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#08A855]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-border-main border-t-[#008A5E]"></div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white rounded-2xl border border-black/[0.04] text-center">
-        <AlertTriangle size={48} className="text-amber-500 mb-4" />
-        <h3 className="text-lg font-bold text-[#1d1d1f] mb-1">Không có dữ liệu</h3>
-        <p className="text-[#86868b] text-[14px]">Không thể kết nối hoặc truy xuất dữ liệu từ máy chủ.</p>
+      <div className="flex flex-col items-center justify-center p-8 card-bubble bg-white rounded-3xl border-2 border-border-main text-center shadow-xs">
+        <Warning size={48} weight="duotone" className="text-amber-500 mb-4 animate-bounce" />
+        <h3 className="text-xl font-black text-text-h mb-1">Không có dữ liệu</h3>
+        <p className="text-text-secondary font-bold text-sm">Không thể kết nối hoặc truy xuất dữ liệu từ máy chủ.</p>
       </div>
     );
   }
@@ -65,13 +70,13 @@ export const AdminDashboard: React.FC = () => {
   const { overview, charts } = data;
 
   const cards = [
-    { label: 'Thành viên', value: overview.totalUsers, icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Ô đất', value: overview.totalPlots, icon: Sprout, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { label: 'Nhật ký trồng', value: overview.totalDiaries, icon: BookOpen, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: 'Lượt quét sâu', value: overview.totalScans, icon: FileSearch, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'Tài liệu RAG', value: overview.totalRAGFiles, icon: Database, color: 'text-indigo-500', bg: 'bg-indigo-50' },
-    { label: 'Phiên Chat AI', value: overview.totalSessions, icon: MessageSquare, color: 'text-rose-500', bg: 'bg-rose-50' },
-    { label: 'Nhắc nhở', value: overview.totalReminders, icon: Bell, color: 'text-teal-500', bg: 'bg-teal-50' },
+    { label: 'Thành viên', value: overview.totalUsers, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { label: 'Ô đất nông trại', value: overview.totalPlots, icon: Plant, color: 'text-[#008A5E]', bg: 'bg-emerald-100' },
+    { label: 'Nhật ký trồng', value: overview.totalDiaries, icon: BookOpen, color: 'text-amber-600', bg: 'bg-amber-100' },
+    { label: 'Lượt quét PlantScan', value: overview.totalScans, icon: FileMagnifyingGlass, color: 'text-purple-600', bg: 'bg-purple-100' },
+    { label: 'Tài liệu Kĩ thuật RAG', value: overview.totalRAGFiles, icon: Database, color: 'text-indigo-600', bg: 'bg-indigo-100' },
+    { label: 'Hội thoại Bé Thóc AI', value: overview.totalSessions, icon: ChatText, color: 'text-rose-600', bg: 'bg-rose-100' },
+    { label: 'Lịch nhắc nhở', value: overview.totalReminders, icon: Bell, color: 'text-teal-600', bg: 'bg-teal-100' },
   ];
 
   // Helper to draw clean SVG charts
@@ -102,7 +107,7 @@ export const AdminDashboard: React.FC = () => {
     const fillPath = `${linePath} L ${coords[coords.length - 1].x} ${padding + chartHeight} L ${coords[0].x} ${padding + chartHeight} Z`;
 
     return (
-      <div className="w-full relative bg-white p-6 rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all">
+      <div className="w-full relative card-bubble bg-white p-5 rounded-3xl border-2 border-border-main shadow-xs">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
           {/* Grid lines */}
           {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
@@ -115,16 +120,16 @@ export const AdminDashboard: React.FC = () => {
                   y1={y}
                   x2={width - padding}
                   y2={y}
-                  stroke="#f0f0f2"
-                  strokeWidth={1}
+                  stroke="#e2e8f0"
+                  strokeWidth={1.5}
                   strokeDasharray="4 4"
                 />
                 <text
                   x={padding - 6}
                   y={y + 4}
-                  fill="#86868b"
-                  fontSize={10}
-                  fontWeight={500}
+                  fill="#64748b"
+                  fontSize={11}
+                  fontWeight={800}
                   textAnchor="end"
                 >
                   {val}
@@ -134,22 +139,22 @@ export const AdminDashboard: React.FC = () => {
           })}
 
           {/* Area fill */}
-          <path d={fillPath} fill={fillColor} opacity={0.15} />
+          <path d={fillPath} fill={fillColor} opacity={0.2} />
 
           {/* Core line */}
-          <path d={linePath} fill="none" stroke={lineColor} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+          <path d={linePath} fill="none" stroke={lineColor} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
 
           {/* Interaction dots */}
           {coords.map((c, i) => (
             <g key={i}>
-              <circle cx={c.x} cy={c.y} r={4} fill={lineColor} stroke="#ffffff" strokeWidth={1.5} />
+              <circle cx={c.x} cy={c.y} r={5} fill={lineColor} stroke="#ffffff" strokeWidth={2} />
               {/* x-axis labels */}
               <text
                 x={c.x}
                 y={height - 2}
-                fill="#86868b"
-                fontSize={10}
-                fontWeight={500}
+                fill="#64748b"
+                fontSize={11}
+                fontWeight={800}
                 textAnchor="middle"
               >
                 {c.label}
@@ -157,10 +162,10 @@ export const AdminDashboard: React.FC = () => {
               {/* Tooltip value */}
               <text
                 x={c.x}
-                y={c.y - 8}
+                y={c.y - 10}
                 fill={lineColor}
-                fontSize={10}
-                fontWeight={700}
+                fontSize={11}
+                fontWeight={900}
                 textAnchor="middle"
               >
                 {c.value > 0 ? c.value : ''}
@@ -173,7 +178,7 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8 w-full">
+    <div className="flex flex-col gap-8 w-full text-left font-sans">
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {cards.map((card, index) => {
@@ -181,14 +186,14 @@ export const AdminDashboard: React.FC = () => {
           return (
             <div
               key={index}
-              className="bg-white p-5 rounded-2xl border border-black/[0.04] shadow-[0_2px_12px_rgba(0,0,0,0.01)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:-translate-y-[2px] transition-all flex items-center gap-4"
+              className="card-bubble bg-white p-5 border-2 border-border-main shadow-xs flex items-center gap-4"
             >
-              <div className={`p-3.5 rounded-xl ${card.bg} ${card.color} flex items-center justify-center shrink-0`}>
-                <Icon size={20} />
+              <div className={`p-3.5 rounded-2xl ${card.bg} ${card.color} border-2 border-border-main flex items-center justify-center shrink-0`}>
+                <Icon size={22} weight="duotone" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[13px] text-[#86868b] font-medium leading-normal truncate">{card.label}</span>
-                <span className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight">{card.value}</span>
+                <span className="text-xs font-black uppercase text-text-secondary truncate">{card.label}</span>
+                <span className="text-2xl font-black text-text-h tracking-tight">{card.value}</span>
               </div>
             </div>
           );
@@ -198,19 +203,19 @@ export const AdminDashboard: React.FC = () => {
       {/* SVG Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <div className="flex flex-col gap-3">
-          <h2 className="text-[16px] font-bold text-[#1d1d1f] px-1">Lượt quét bệnh (7 ngày gần nhất)</h2>
+          <h2 className="text-lg font-black text-text-h px-1">Lượt quét bệnh PlantScan (7 ngày)</h2>
           {renderSVGLineChart(charts.scanTrends, '#9333ea', '#a855f7')}
         </div>
         <div className="flex flex-col gap-3">
-          <h2 className="text-[16px] font-bold text-[#1d1d1f] px-1">Tài khoản đăng ký mới (7 ngày gần nhất)</h2>
-          {renderSVGLineChart(charts.userTrends, '#3b82f6', '#60a5fa')}
+          <h2 className="text-lg font-black text-text-h px-1">Đăng ký thành viên mới (7 ngày)</h2>
+          {renderSVGLineChart(charts.userTrends, '#2563eb', '#60a5fa')}
         </div>
       </div>
 
       {/* RAG Sessions Trends */}
       <div className="flex flex-col gap-3">
-        <h2 className="text-[16px] font-bold text-[#1d1d1f] px-1">Lượt chat với Trợ lý ảo (7 ngày gần nhất)</h2>
-        {renderSVGLineChart(charts.chatTrends, '#08A855', '#34d399')}
+        <h2 className="text-lg font-black text-text-h px-1">Trò chuyện với Bé Thóc AI (7 ngày)</h2>
+        {renderSVGLineChart(charts.chatTrends, '#008A5E', '#34d399')}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { usePWAInstall } from '../../hooks/usePWAInstall';
-import { X, Download } from 'lucide-react';
+import { X, DownloadSimple } from '@phosphor-icons/react';
 
 export const PWAInstallBanner: React.FC = () => {
   const { isInstallable, promptInstall, dismissPrompt } = usePWAInstall();
@@ -42,9 +42,9 @@ export const PWAInstallBanner: React.FC = () => {
           <div className="flex gap-2 mt-3">
             <button 
               onClick={promptInstall}
-              className="flex-1 bg-slate-900 text-white text-[13px] font-bold py-2 rounded-full hover:bg-slate-800 active:scale-95 transition-all flex items-center justify-center gap-1.5"
+              className="flex-1 bg-slate-900 text-white text-[13px] font-bold py-2 rounded-full hover:bg-slate-800 active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
+              <DownloadSimple className="w-3.5 h-3.5" weight="bold" />
               Cài đặt ngay
             </button>
           </div>
@@ -56,9 +56,9 @@ export const PWAInstallBanner: React.FC = () => {
             setShow(false);
             dismissPrompt();
           }}
-          className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+          className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors active:scale-95 cursor-pointer"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" weight="bold" />
         </button>
       </div>
     </div>

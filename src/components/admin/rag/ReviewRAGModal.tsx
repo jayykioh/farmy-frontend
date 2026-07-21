@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { X, CheckCircle, XCircle, Warning } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 import { confirmAdminRAGFile } from '../../../api/admin';
 
@@ -51,8 +51,8 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between p-6 border-b border-black/[0.04]">
           <h2 className="text-[18px] font-bold text-[#1d1d1f]">Kiểm duyệt Tri thức</h2>
-          <button onClick={onClose} className="p-2 text-[#86868b] hover:bg-black/[0.04] rounded-full transition-all">
-            <X size={20} />
+          <button onClick={onClose} className="p-2 text-[#86868b] hover:bg-black/[0.04] rounded-full transition-all active:scale-95">
+            <X size={20} weight="bold" />
           </button>
         </div>
 
@@ -110,7 +110,7 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
                 {report.warnings && report.warnings.length > 0 && (
                   <div>
                     <div className="text-[12px] font-bold text-[#86868b] mb-2 flex items-center gap-1.5">
-                      <AlertTriangle size={14} className="text-amber-500" /> Cảnh báo
+                      <Warning size={14} weight="bold" className="text-amber-500" /> Cảnh báo
                     </div>
                     <ul className="list-disc pl-4 space-y-1">
                       {report.warnings.map((w, i) => (
@@ -123,7 +123,7 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
             </div>
           ) : (
             <div className="bg-amber-50 text-amber-700 p-4 rounded-xl text-[14px] flex items-center gap-2">
-              <AlertTriangle size={18} />
+              <Warning size={18} weight="bold" />
               <span>Chưa có báo cáo kiểm định từ AI.</span>
             </div>
           )}
@@ -135,7 +135,7 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
               onChange={(e) => setNote(e.target.value)}
               rows={3}
               placeholder="Nhập ghi chú cho quyết định của bạn..."
-              className="w-full px-4 py-3 bg-black/[0.02] border border-black/[0.04] rounded-xl text-[14px] focus:outline-none focus:border-[#08A855] focus:bg-white transition-all resize-none"
+              className="w-full px-4 py-3 bg-bg-surface-1 border-2 border-border-main rounded-2xl text-sm font-medium focus:outline-none focus:border-[#008A5E] focus:bg-white transition-all resize-none"
             />
           </div>
         </div>
@@ -144,16 +144,16 @@ export const ReviewRAGModal: React.FC<Props> = ({ isOpen, onClose, file, onSucce
           <button
             onClick={() => handleAction('reject')}
             disabled={loading}
-            className="px-5 py-2.5 text-[14px] font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
+            className="btn btn--coral active:scale-95 rounded-2xl px-5 py-2.5 text-[14px] disabled:opacity-50 flex items-center gap-2"
           >
-            <XCircle size={18} /> Từ chối
+            <XCircle size={18} weight="bold" /> Từ chối
           </button>
           <button
             onClick={() => handleAction('confirm')}
             disabled={loading}
-            className="px-5 py-2.5 text-[14px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
+            className="btn btn--cyan active:scale-95 rounded-2xl px-5 py-2.5 text-[14px] disabled:opacity-50 flex items-center gap-2"
           >
-            <CheckCircle size={18} /> Phê duyệt
+            <CheckCircle size={18} weight="bold" /> Phê duyệt
           </button>
         </div>
       </div>

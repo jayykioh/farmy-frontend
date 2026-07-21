@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, FileText } from 'lucide-react';
+import { Calendar, FileText } from '@phosphor-icons/react';
 import type { WeeklyInsight } from '../../api/weekly-insights';
 import ReactMarkdown from 'react-markdown';
 
@@ -19,12 +19,12 @@ export const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
     <div className="w-full bg-white/60 backdrop-blur-2xl rounded-[32px] p-6 sm:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-left flex flex-col">
       <div className="flex items-center gap-4 mb-6">
         <div className="w-14 h-14 rounded-[20px] bg-white flex items-center justify-center flex-shrink-0 border border-black/[0.06] shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-          <FileText className="text-[#1d1d1f]" size={26} strokeWidth={2.5} />
+          <FileText className="text-[#1d1d1f]" size={26} weight="duotone" />
         </div>
         <div>
           <h3 className="font-bold text-[#1d1d1f] text-[18px] line-clamp-1">Báo cáo canh tác</h3>
           <div className="flex items-center gap-1.5 text-[#86868b] mt-1">
-            <Calendar size={14} />
+            <Calendar size={14} weight="duotone" />
             <span className="text-[14px] font-medium">Tuần {formattedDate}</span>
           </div>
         </div>

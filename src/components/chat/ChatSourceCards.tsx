@@ -1,5 +1,5 @@
 import React from "react";
-import { Globe, BookOpen } from "lucide-react";
+import { Globe, BookOpen } from "@phosphor-icons/react";
 import type { ChatCitation } from "../../api/chat";
 
 interface ChatSourceCardsProps {
@@ -44,7 +44,7 @@ export const ChatSourceCards: React.FC<ChatSourceCardsProps> = ({
             >
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-md bg-bg-surface-1 flex items-center justify-center shrink-0">
-                  <Icon className="w-3.5 h-3.5 text-text-main/70" />
+                  <Icon className="w-3.5 h-3.5 text-text-main/70" weight="duotone" />
                 </div>
                 <span className="text-[10px] font-bold text-text-main/60 truncate">
                   {isKnowledge

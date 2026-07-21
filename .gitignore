@@ -50,3 +50,5 @@ blueprint.md
 uc1-diary-crud.puml
 uc2-ai-chat.puml
 use-case-diagram.puml
+.agents/
+.hallmark/

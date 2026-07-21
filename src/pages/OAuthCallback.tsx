@@ -1,3 +1,8 @@
+/* Hallmark · page: oauth-callback · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
@@ -15,7 +20,6 @@ export default function OAuthCallback() {
       if (accessToken) {
         // Fetch user profile using the new token
         try {
-          // Temporarily set token in API client or localStorage to make the request
           localStorage.setItem('access_token', accessToken);
           
           const response = await api.get('/auth/me', {
@@ -51,10 +55,11 @@ export default function OAuthCallback() {
   }, [searchParams, navigate, setSession]);
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-bg-surface">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-container border-t-primary-main"></div>
-        <p className="text-text-main font-medium">Đang xử lý đăng nhập...</p>
+    <div className="flex h-screen w-full items-center justify-center bg-bg-main font-sans p-4 text-left">
+      <div className="card-bubble bg-white p-8 border-2 border-border-main shadow-lg rounded-3xl flex flex-col items-center gap-4 text-center max-w-sm">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-border-main border-t-[#008A5E]"></div>
+        <p className="text-text-h font-black text-lg">Đang xác thực thông tin...</p>
+        <p className="text-text-secondary font-bold text-xs">Bé Thóc đang đưa bạn tới nông trại thân yêu!</p>
       </div>
     </div>
   );

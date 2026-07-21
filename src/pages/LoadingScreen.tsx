@@ -1,3 +1,8 @@
+/* Hallmark · page: loading-screen · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -13,44 +18,36 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   showBethoc = true,
 }) => {
   return (
-    <div className="w-full min-h-[100svh] bg-[#FBFBFD] flex flex-col items-center justify-center px-4 py-8 gap-8">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main font-sans flex flex-col items-center justify-center px-4 py-8 gap-8 text-left">
       
       {/* Animated Bethoc or Loading Spinner */}
       <motion.div 
-        className="w-40 h-40 flex items-center justify-center relative"
-        animate={{ scale: [0.98, 1.02, 0.98] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        className="w-44 h-44 flex items-center justify-center relative card-bubble bg-white rounded-full border-4 border-border-main shadow-lg p-2"
+        animate={{ scale: [0.96, 1.04, 0.96] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        <motion.div 
-          className="absolute inset-0 bg-primary/5 rounded-[40px] blur-xl"
-          animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.9, 1.1, 0.9] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
         {showBethoc ? (
           <React.Suspense fallback={
-            <div className="w-32 h-32 bg-primary-container/20 rounded-full animate-pulse" />
+            <div className="w-32 h-32 bg-primary-light/20 rounded-full animate-pulse" />
           }>
             <div className="w-full h-full flex items-center justify-center">
-              {/* Bethoc Lottie Animation - if available, otherwise fallback */}
               <svg 
-                className="w-32 h-32 text-primary animate-bounce" 
+                className="w-32 h-32 text-[#008A5E] animate-bounce" 
                 viewBox="0 0 512 512" 
                 fill="none"
               >
-                {/* Simplified cute character for fallback */}
-                <circle cx="256" cy="256" r="120" fill="currentColor" opacity="0.2" />
+                <circle cx="256" cy="256" r="120" fill="currentColor" opacity="0.15" />
                 <circle cx="256" cy="200" r="50" fill="currentColor" />
-                <circle cx="230" cy="190" r="8" fill="#F1FCF1" />
-                <circle cx="282" cy="190" r="8" fill="#F1FCF1" />
+                <circle cx="230" cy="190" r="8" fill="#FFFFFF" />
+                <circle cx="282" cy="190" r="8" fill="#FFFFFF" />
                 <path d="M240 220 Q256 235 272 220" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
               </svg>
             </div>
           </React.Suspense>
         ) : (
-          // Default spinner
-          <div className="relative w-32 h-32">
-            <div className="absolute inset-0 rounded-full border-4 border-primary-container/20" />
-            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary animate-spin" />
+          <div className="relative w-28 h-28">
+            <div className="absolute inset-0 rounded-full border-4 border-border-main" />
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#008A5E] animate-spin" />
           </div>
         )}
       </motion.div>
@@ -62,9 +59,9 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
       >
-        <h2 className="text-xl font-bold text-text-h tracking-tight">{message}</h2>
+        <h2 className="text-2xl font-black text-text-h tracking-tight">{message}</h2>
         {subtitle && (
-          <p className="text-sm font-medium text-text-main/50 tracking-wide">
+          <p className="text-base font-bold text-text-secondary">
             {subtitle}
             <motion.span 
               initial={{ opacity: 0 }}
@@ -75,10 +72,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         )}
       </motion.div>
 
-      {/* Progress Bar */}
-      <div className="w-full max-w-xs h-1.5 bg-slate-100 rounded-full overflow-hidden">
+      {/* Progress Bar Track */}
+      <div className="w-full max-w-xs h-3 bg-bg-surface-2 rounded-full overflow-hidden border-2 border-border-main relative">
         <div 
-          className="h-full bg-slate-900 rounded-full"
+          className="h-full bg-[#008A5E] rounded-full"
           style={{
             animation: 'shimmer 2s infinite',
           }}
@@ -86,9 +83,9 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       </div>
 
       {/* Loading Tips */}
-      <div className="text-center max-w-sm">
-        <p className="text-xs text-text-main/40 leading-relaxed">
-          💡 Mẹo: Bảo dưỡng thường xuyên giữ cho nông trại luôn khỏe mạnh. Hãy ghi nhật ký hôm nay!
+      <div className="text-center max-w-sm card-bubble bg-white border-2 border-border-main p-4 shadow-xs">
+        <p className="text-xs font-bold text-text-secondary leading-relaxed">
+          💡 <strong className="text-text-h">Mẹo:</strong> Ghi nhật ký tưới cây và soi bệnh định kỳ sẽ giúp Bé Thóc thu thập dữ liệu nông vụ chuẩn xác nhất!
         </p>
       </div>
 

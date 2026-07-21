@@ -1,3 +1,8 @@
+/* Hallmark · page: shop · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -168,7 +173,7 @@ export const Shop: React.FC = () => {
   );
 
   return (
-    <div className="w-full min-h-[100svh] relative text-left bg-[#FBFBFD] overflow-x-hidden font-sans">
+    <div className="w-full min-h-[100svh] relative text-left bg-bg-main text-text-main overflow-x-hidden font-sans pb-24">
       {/* Custom Alert Modal */}
       <AnimatePresence>
         {modal && (
@@ -189,10 +194,10 @@ export const Shop: React.FC = () => {
               onDragEnd={(_: any, info: any) => {
                 if (info.offset.y > 100) setModal(null);
               }}
-              className="bg-white/80 backdrop-blur-xl rounded-[32px] border border-black/[0.04] p-6 max-w-sm w-full shadow-[0_24px_80px_rgba(0,0,0,0.08)] flex flex-col items-center text-center gap-4 cursor-grab active:cursor-grabbing"
+              className="card-bubble bg-white p-6 max-w-sm w-full shadow-lg flex flex-col items-center text-center gap-4 cursor-grab active:cursor-grabbing border-2 border-border-main"
             >
               {/* Drag Handle */}
-              <div className="w-12 h-1.5 bg-black/10 rounded-full mb-2"></div>
+              <div className="w-12 h-1.5 bg-border-main rounded-full mb-2"></div>
 
               {modal.type === "success" ? (
                 <motion.div
@@ -204,25 +209,25 @@ export const Shop: React.FC = () => {
                     stiffness: 200,
                     delay: 0.1,
                   }}
-                  className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-3xl"
+                  className="w-16 h-16 bg-[#E8F8F5] border-2 border-[#008A5E]/30 rounded-full flex items-center justify-center text-[#008A5E] text-3xl shadow-sm"
                 >
                   ✨
                 </motion.div>
               ) : (
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-3xl">
+                <div className="w-16 h-16 bg-red-100 border-2 border-red-300 rounded-full flex items-center justify-center text-red-600 text-3xl shadow-sm">
                   ⚠️
                 </div>
               )}
               <div>
-                <h3 className="text-lg font-extrabold text-text-h mb-1">
+                <h3 className="text-xl font-black text-text-h mb-1">
                   {modal.title}
                 </h3>
-                <p className="text-sm text-text-main/70">{modal.message}</p>
+                <p className="text-sm font-bold text-text-secondary">{modal.message}</p>
               </div>
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setModal(null)}
-                className="w-full py-3 bg-primary text-white font-bold rounded-2xl shadow-md hover:bg-primary-dark"
+                className="btn btn--cyan w-full py-3 font-extrabold cursor-pointer"
               >
                 Tuyệt vời
               </motion.button>
@@ -232,20 +237,20 @@ export const Shop: React.FC = () => {
       </AnimatePresence>
 
       {/* Page Content */}
-      <div className="w-full max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-12 flex flex-col gap-6">
+      <div className="w-full max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-20 flex flex-col gap-6">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-text-h">
+            <h1 className="text-3xl md:text-4xl font-black text-text-h">
               Cửa hàng
             </h1>
-            <p className="text-sm text-text-main/60 mt-0.5">
+            <p className="text-sm font-bold text-text-secondary mt-0.5">
               Trang trí cho Bé Thóc của bạn!
             </p>
           </div>
           {/* XP Badge */}
-          <div className="bg-white/80 backdrop-blur-sm border border-yellow-200 rounded-full px-4 py-2 flex items-center gap-1.5 shadow-sm">
-            <span className="font-extrabold text-yellow-800 text-sm bg-yellow-100/50 px-2 py-0.5 rounded-full font-mono">
+          <div className="card-bubble bg-white border-2 border-amber-300 px-4 py-2 flex items-center gap-2 shadow-sm">
+            <span className="font-black text-yellow-900 text-xs bg-amber-100 px-2.5 py-1 rounded-full font-mono border border-amber-300">
               Lv.{petStatus.level}
             </span>
             <svg
@@ -255,32 +260,25 @@ export const Shop: React.FC = () => {
             >
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
             </svg>
-            <span className="font-extrabold text-yellow-800 text-lg font-mono">
+            <span className="font-black text-yellow-900 text-lg font-mono">
               {petStatus.exp} XP
             </span>
           </div>
         </div>
 
         {/* Category Chips with Framer Motion Magic Pill */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`relative px-5 py-2 rounded-full font-bold whitespace-nowrap shadow-sm transition-colors ${
+              className={`relative px-5 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-colors cursor-pointer active:scale-95 ${
                 activeCategory === cat.id
-                  ? "text-white"
-                  : "bg-white/70 border border-border-main/30 text-text-main/70 hover:bg-white hover:text-text-main"
+                  ? "btn btn--cyan shadow-sm"
+                  : "card-bubble bg-white border-2 border-border-main text-text-secondary hover:bg-bg-surface-2 hover:text-text-main"
               }`}
               style={{ WebkitTapHighlightColor: "transparent" }}
             >
-              {activeCategory === cat.id && (
-                <motion.div
-                  layoutId="activeCategory"
-                  className="absolute inset-0 bg-primary rounded-full shadow-md"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
               <span className="relative z-10">{cat.label}</span>
             </button>
           ))}
@@ -290,14 +288,13 @@ export const Shop: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left: Preview Card */}
           <div className="w-full lg:w-[280px] flex-shrink-0">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[28px] border border-white/60 shadow-lg p-4 flex flex-col items-center gap-3">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <div className="card-bubble bg-white p-5 flex flex-col items-center gap-3 shadow-sm border-2 border-border-main">
+              <p className="text-xs font-black text-text-secondary uppercase tracking-widest">
                 Đang trang bị
               </p>
-              <div className="relative w-full h-[260px] rounded-[20px] flex items-center justify-center overflow-hidden">
+              <div className="relative w-full h-[260px] rounded-[20px] bg-bg-surface-1 border-2 border-border-main/50 flex items-center justify-center overflow-hidden">
                 <div
-                  className="relative z-10 animate-[bounce_4s_ease-in-out_infinite]"
-                  style={{ animation: "float 4s ease-in-out infinite" }}
+                  className="relative z-10 animate-bounce"
                 >
                   <div className="w-48 h-48">
                     <PetMascot
@@ -311,7 +308,7 @@ export const Shop: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <p className="text-sm font-bold text-text-main">
+              <p className="text-base font-extrabold text-text-h">
                 {currentlyEquippedInActiveCategory
                   ? currentlyEquippedInActiveCategory.name
                   : "Chưa trang bị"}
@@ -322,12 +319,12 @@ export const Shop: React.FC = () => {
           {/* Right: Grid */}
           <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
             {isLoading && (
-              <div className="col-span-full text-center py-10 text-text-main/50 font-bold">
+              <div className="col-span-full text-center py-10 text-text-secondary font-bold">
                 Đang tải cửa hàng...
               </div>
             )}
             {!isLoading && filteredItems.length === 0 && (
-              <div className="col-span-full text-center py-10 text-text-main/50 font-bold animate-pulse">
+              <div className="col-span-full text-center py-10 text-text-secondary font-bold animate-pulse">
                 Chưa có vật phẩm nào trong mục này
               </div>
             )}
@@ -347,12 +344,12 @@ export const Shop: React.FC = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     whileTap={!isLocked ? { scale: 0.96 } : {}}
                     transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                    className={`bg-white/80 backdrop-blur-sm border shadow-sm rounded-[24px] p-4 flex flex-col items-center group hover:shadow-md transition-all ${isEquipped ? "border-primary/50 ring-2 ring-primary/20 equip-card-glow" : "border-border-main/30"}`}
+                    className={`card-bubble bg-white p-4 flex flex-col items-center shadow-sm hover:shadow-md transition-all ${isEquipped ? "border-2 border-[#008A5E] ring-4 ring-[#008A5E]/10" : "border-2 border-border-main"}`}
                   >
-                    <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border border-border-main/20 mb-3 flex items-center justify-center overflow-hidden relative group-hover:bg-primary/5 transition-colors">
+                    <div className="w-full aspect-square rounded-2xl bg-bg-surface-1 border-2 border-border-main/50 mb-3 flex items-center justify-center overflow-hidden relative group-hover:bg-primary-light/10 transition-colors">
                       {/* Equipped badge */}
                       {isEquipped && (
-                        <div className="absolute top-2 right-2 z-20 bg-primary text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                        <div className="absolute top-2 right-2 z-20 bg-[#008A5E] text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1 border border-white/20">
                           <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
                           Đang mặc
                         </div>
@@ -365,7 +362,7 @@ export const Shop: React.FC = () => {
                           src={item.image_url}
                         />
                       ) : (
-                        <div className="text-text-main/30 flex flex-col items-center">
+                        <div className="text-text-secondary flex flex-col items-center">
                           <svg
                             className="w-8 h-8 mb-1"
                             fill="none"
@@ -379,24 +376,24 @@ export const Shop: React.FC = () => {
                               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                             />
                           </svg>
-                          <span className="font-bold text-xs uppercase tracking-wide">
+                          <span className="font-extrabold text-xs uppercase tracking-wide">
                             Cấp {item.required_level}
                           </span>
                         </div>
                       )}
                     </div>
-                    <h3 className="font-bold text-text-main text-center mb-1 w-full truncate text-sm">
+                    <h3 className="font-extrabold text-text-h text-center mb-1 w-full truncate text-sm">
                       {item.name}
                     </h3>
-                    <div className="flex items-center gap-1 bg-yellow-50 border border-yellow-200 rounded-full px-2 py-0.5 mb-3">
+                    <div className="flex items-center gap-1 bg-amber-50 border-2 border-amber-200 rounded-full px-2.5 py-0.5 mb-3">
                       <svg
-                        className="w-3 h-3 text-yellow-500"
+                        className="w-3.5 h-3.5 text-yellow-500"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                       </svg>
-                      <span className="font-bold text-yellow-800 text-xs font-mono">
+                      <span className="font-black text-yellow-900 text-xs font-mono">
                         {item.price}
                       </span>
                     </div>
@@ -406,10 +403,10 @@ export const Shop: React.FC = () => {
                       <button
                         onClick={() => handleUnequip(item._id)}
                         disabled={unequipMutation.isPending}
-                        className={`w-full py-2 rounded-full font-bold text-sm shadow-sm transition-all border-b-[3px] disabled:opacity-50 ${
+                        className={`w-full py-2.5 rounded-full font-black text-xs shadow-sm transition-all border-b-[3px] disabled:opacity-50 cursor-pointer active:scale-95 ${
                           unequipPendingId === item._id
-                            ? "bg-amber-500 border-amber-700 text-white animate-pulse"
-                            : "bg-primary border-primary-dark text-white"
+                            ? "btn btn--coral animate-pulse"
+                            : "btn btn--cyan"
                         }`}
                       >
                         {unequipMutation.isPending ? (
@@ -418,7 +415,7 @@ export const Shop: React.FC = () => {
                             Đang tháo...
                           </span>
                         ) : unequipPendingId === item._id ? (
-                          "Chạm lần nữa để tháo"
+                          "Chạm nữa để tháo"
                         ) : (
                           "✓ Đã trang bị"
                         )}
@@ -427,7 +424,7 @@ export const Shop: React.FC = () => {
                       <button
                         onClick={() => handleEquip(item._id)}
                         disabled={equipMutation.isPending}
-                        className="w-full py-2 bg-white border border-primary/50 text-primary rounded-full font-bold text-sm transition-transform hover:bg-primary/5 shadow-sm disabled:opacity-50"
+                        className="btn btn--soft w-full py-2.5 font-bold text-xs border-2 border-border-main cursor-pointer disabled:opacity-50 active:scale-95"
                       >
                         {equipMutation.isPending ? (
                           <span className="flex items-center justify-center gap-1.5">
@@ -441,7 +438,7 @@ export const Shop: React.FC = () => {
                     ) : isLocked ? (
                       <button
                         disabled
-                        className="w-full py-2 bg-bg-surface border border-border-main/20 text-text-main/30 rounded-full font-bold text-sm cursor-not-allowed"
+                        className="btn btn--outline opacity-50 w-full py-2.5 font-bold text-xs cursor-not-allowed active:scale-95"
                       >
                         Khóa
                       </button>
@@ -449,14 +446,14 @@ export const Shop: React.FC = () => {
                       <button
                         onClick={() => handleBuy(item._id)}
                         disabled={buyMutation.isPending}
-                        className="w-full py-2 bg-white border border-border-main/40 text-text-main rounded-full font-bold text-sm transition-transform hover:bg-bg-surface-1 shadow-sm disabled:opacity-50"
+                        className="btn w-full py-2.5 font-extrabold text-xs cursor-pointer disabled:opacity-50 active:scale-95"
                       >
                         {buyMutation.isPending ? "Đang mua..." : "Mua ngay"}
                       </button>
                     ) : (
                       <button
                         disabled
-                        className="w-full py-2 bg-bg-surface border border-border-main/20 text-text-main/40 rounded-full font-bold text-sm cursor-not-allowed"
+                        className="btn btn--outline opacity-50 w-full py-2.5 font-bold text-xs cursor-not-allowed active:scale-95"
                       >
                         Thiếu XP
                       </button>

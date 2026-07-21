@@ -1,5 +1,10 @@
+/* Hallmark · page: maintenance-mode · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React from 'react';
-import { Settings, Wrench, RefreshCw, Mail } from 'lucide-react';
+import { Gear, Wrench, ArrowsClockwise, Envelope } from '@phosphor-icons/react';
 
 interface MaintenanceModeProps {
   estimatedTime?: string;
@@ -13,85 +18,84 @@ export const MaintenanceMode: React.FC<MaintenanceModeProps> = ({
   contactEmail = 'support@farmy.ai',
 }) => {
   return (
-    <div className="w-full min-h-[100svh] bg-[#FBFBFD] flex flex-col items-center justify-center px-4 py-8">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main font-sans flex flex-col items-center justify-center px-4 py-8 text-left">
       
       {/* Top spacing */}
       <div className="flex-1" />
 
       {/* Maintenance Container */}
-      <div className="w-full max-w-md flex flex-col items-center gap-8">
+      <div className="w-full max-w-md flex flex-col items-center gap-6">
         
         {/* Maintenance Illustration */}
         <div className="relative w-40 h-40 flex items-center justify-center">
-          {/* Working Bethoc */}
           <div className="relative w-40 h-40">
-            <div className="absolute inset-0 bg-white rounded-3xl flex items-center justify-center shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/[0.04]">
-              <Settings className="w-24 h-24 text-slate-800 animate-[spin_10s_linear_infinite]" />
+            <div className="absolute inset-0 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-border-main card-bubble">
+              <Gear size={96} weight="duotone" className="text-[#008A5E] animate-[spin_10s_linear_infinite]" />
             </div>
-            <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-              <Wrench className="w-6 h-6 text-white animate-[bounce_2s_infinite]" />
+            <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center shadow-md border-2 border-border-main">
+              <Wrench size={24} weight="bold" className="text-amber-950 animate-bounce" />
             </div>
           </div>
         </div>
 
         {/* Maintenance Text */}
-        <div className="text-center space-y-3">
-          <h1 className="text-3xl font-bold text-text-h">Đang bảo trì</h1>
-          <p className="text-lg font-semibold text-text-main">{message}</p>
-          <p className="text-base text-text-main/60 leading-relaxed">
-            Tôi đang được cải thiện để phục vụ bạn tốt hơn. Xin vui lòng quay lại sau.
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-black text-text-h">Hệ thống đang bảo trì</h1>
+          <p className="text-base font-extrabold text-[#008A5E]">{message}</p>
+          <p className="text-sm font-bold text-text-secondary leading-relaxed">
+            Chúng tôi đang nâng cấp Bé Thóc để phục vụ nhà nông tốt hơn. Vui lòng quay lại sau ít phút nhé!
           </p>
         </div>
 
         {/* Maintenance Info Card */}
-        <div className="w-full bg-white rounded-[24px] border border-border-main/50 p-6 space-y-4">
+        <div className="w-full card-bubble bg-white rounded-3xl border-2 border-border-main p-5 space-y-4 shadow-sm">
           
           {/* Estimated Time */}
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-warning-container/20 rounded-full flex items-center justify-center shrink-0">
-              <RefreshCw className="w-6 h-6 text-warning" />
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center shrink-0 border border-amber-300">
+              <ArrowsClockwise size={24} weight="bold" className="text-amber-700 animate-spin" style={{ animationDuration: '4s' }} />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-text-main/60 font-semibold">Thời gian ước tính</p>
-              <p className="text-base font-bold text-text-main">{estimatedTime}</p>
+              <p className="text-xs text-text-secondary font-black uppercase">Thời gian ước tính</p>
+              <p className="text-base font-black text-text-h">{estimatedTime}</p>
             </div>
           </div>
 
           {/* What We're Doing */}
-          <div className="flex items-start gap-4 pt-4 border-t border-border-main/20">
-            <div className="w-12 h-12 bg-primary-container/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-              <Settings className="w-6 h-6 text-primary" />
+          <div className="flex items-start gap-4 pt-4 border-t-2 border-border-main/50">
+            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center shrink-0 border border-emerald-300 mt-0.5">
+              <Gear size={24} weight="duotone" className="text-[#008A5E]" />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-text-main/60 font-semibold">Chúng tôi đang:</p>
-              <ul className="text-sm text-text-main/70 mt-2 space-y-1">
-                <li>• Cập nhật tính năng mới</li>
-                <li>• Sửa lỗi và cải thiện hiệu suất</li>
-                <li>• Đảm bảo dữ liệu của bạn an toàn</li>
+              <p className="text-xs text-text-secondary font-black uppercase">Đội ngũ đang thực hiện:</p>
+              <ul className="text-xs font-bold text-text-main mt-2 space-y-1">
+                <li>• Nâng cấp AI chẩn đoán bệnh PlantScan</li>
+                <li>• Cải thiện tốc độ gửi thông báo nhắc nhở</li>
+                <li>• Bảo mật và tối ưu hóa bộ nhớ nhật ký</li>
               </ul>
             </div>
           </div>
         </div>
 
         {/* Stay Updated */}
-        <div className="w-full bg-bg-surface-1 rounded-[16px] p-4 text-center space-y-3">
-          <p className="text-sm font-semibold text-text-main">Muốn cập nhật thông tin?</p>
-          <p className="text-xs text-text-main/60 leading-relaxed">
-            Gửi email để nhận thông báo khi chúng tôi trở lại online
+        <div className="w-full card-bubble bg-bg-surface-1 rounded-2xl p-4 text-center space-y-2 border-2 border-border-main">
+          <p className="text-sm font-black text-text-h">Muốn cập nhật thông báo?</p>
+          <p className="text-xs font-bold text-text-secondary leading-relaxed">
+            Gửi email để nhận thông báo ngay khi ứng dụng hoạt động trở lại
           </p>
           <a 
             href={`mailto:${contactEmail}?subject=Notify me when FARMY is back online`}
-            className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
+            className="btn btn--cyan active:scale-95 rounded-2xl inline-flex items-center gap-2 font-black text-xs px-4 py-2 cursor-pointer shadow-xs mt-1"
           >
-            <Mail className="w-4 h-4" />
+            <Envelope size={16} weight="bold" />
             {contactEmail}
           </a>
         </div>
 
         {/* Thank You Message */}
         <div className="text-center">
-          <p className="text-sm text-text-main/60">
-            Cảm ơn bạn đã chờ đợi. Bé Thóc sẽ sớm quay lại! 🌱
+          <p className="text-xs font-extrabold text-text-secondary">
+            Cảm ơn bạn đã kiên nhẫn. Bé Thóc sẽ quay lại ngay! 🌱
           </p>
         </div>
       </div>
