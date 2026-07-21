@@ -1,4 +1,4 @@
-import { api, clearAccessToken, setAccessToken, type ApiResponse } from './client';
+import { api, clearAccessToken, setAccessToken, setRefreshToken, clearRefreshToken, type ApiResponse } from './client';
 
 export type AuthUser = {
   id: string;
@@ -67,6 +67,9 @@ export const login = async (payload: LoginPayload) => {
   const { data } = await api.post<ApiResponse<LoginResponseData>>('/auth/login', payload);
   const auth = normalizeAuthResponse(data.data);
   setAccessToken(auth.accessToken);
+  // Also store the raw refresh_token from the body as an in-memory fallback.
+  const rawRefreshToken = (data.data as Record<string, unknown>).refresh_token as string | undefined;
+  if (rawRefreshToken) setRefreshToken(rawRefreshToken);
   return auth;
 };
 
@@ -74,6 +77,8 @@ export const register = async (payload: RegisterPayload) => {
   const { data } = await api.post<ApiResponse<RegisterResponseData>>('/auth/register', payload);
   const auth = normalizeAuthResponse(data.data);
   setAccessToken(auth.accessToken);
+  const rawRefreshToken = (data.data as Record<string, unknown>).refresh_token as string | undefined;
+  if (rawRefreshToken) setRefreshToken(rawRefreshToken);
   return auth;
 };
 
@@ -87,6 +92,7 @@ export const logout = async () => {
     await api.post('/auth/logout');
   } finally {
     clearAccessToken();
+    clearRefreshToken();
   }
 };
 

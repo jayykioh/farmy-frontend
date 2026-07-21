@@ -1,17 +1,21 @@
- 
+/* Hallmark · page: chat-active · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   BookOpen,
   Camera,
   Clock,
-  Loader2,
+  CircleNotch,
   Paperclip,
-  Send,
+  PaperPlaneRight,
   ThumbsDown,
   ThumbsUp,
   X,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { PetMascot } from "../features/pet/components/PetMascot";
 import { usePetStatus } from "../features/pet/hooks/usePetStatus";
 import { PET_STATUS_FALLBACK } from "../features/pet/types/pet.types";
@@ -24,6 +28,7 @@ import {
 } from "../api/chat";
 import { uploadImageToR2 } from "../api/uploads";
 import { ChatSourceCards } from "../components/chat/ChatSourceCards";
+import toast from "react-hot-toast";
 
 type FeedbackValue = "positive" | "negative";
 
@@ -59,7 +64,7 @@ const parseMessageContent = (content: string) => {
           key={index}
           src={url}
           alt="Attached"
-          className="max-w-full h-auto max-h-60 rounded-xl mt-2 mb-2 border border-border-main/20 shadow-sm"
+          className="max-w-full h-auto max-h-60 rounded-xl mt-2 mb-2 border-2 border-border-main shadow-sm"
         />
       );
     }
@@ -69,7 +74,7 @@ const parseMessageContent = (content: string) => {
       return (
         <sup
           key={index}
-          className="text-primary font-bold cursor-pointer hover:underline bg-primary/10 px-1 rounded-sm mx-0.5"
+          className="text-primary font-bold cursor-pointer hover:underline bg-primary-light/20 px-1.5 rounded-md mx-0.5"
           onClick={() => {
             // Future: Scroll to the corresponding card
           }}
@@ -150,7 +155,7 @@ export const ChatActive: React.FC = () => {
       .catch((err) => {
         if (cancelled) return;
         console.error(err);
-        setErrorMessage("Không thể tải lịch sử trò chuyện.");
+        setErrorMessage("Không thể tải tin nhắn cuộc trò chuyện.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -162,201 +167,180 @@ export const ChatActive: React.FC = () => {
   }, [routeSessionId]);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    if (scrollRef.current) {
+      scrollRef.current?.scrollIntoView?.({ behavior: "smooth" });
+    }
   }, [messages, isStreaming]);
 
-  useEffect(() => () => abortRef.current?.abort(), []);
+  const handleFeedback = async (message: UiMessage, type: FeedbackValue) => {
+    const index = messages.findIndex((m) => m._id === message._id);
+    if (index === -1) return;
 
-  const updateMessage = (
-    messageId: string,
-    updater: (message: UiMessage) => UiMessage,
-  ) => {
-    setMessages((prev) =>
-      prev.map((message) =>
-        message._id === messageId || message.localId === messageId
-          ? updater(message)
-          : message,
+    setMessages((current) =>
+      current.map((m) =>
+        m._id === message._id
+          ? { ...m, feedbackSubmitting: true }
+          : m,
       ),
     );
-  };
-
-  const handleFeedback = async (
-    message: UiMessage,
-    feedback: FeedbackValue,
-  ) => {
-    if (
-      !sessionId ||
-      message.feedbackSubmitting ||
-      message._id.startsWith("local-")
-    ) {
-      return;
-    }
-
-    const previousFeedback = message.feedback;
-    updateMessage(message._id, (current) => ({
-      ...current,
-      feedback,
-      feedbackSubmitting: true,
-    }));
-    setErrorMessage("");
 
     try {
       await submitChatFeedback({
-        session_id: sessionId,
+        session_id: sessionId!,
         message_id: message._id,
-        rating: feedback === "positive" ? 1 : -1,
-        helpful: feedback === "positive",
+        rating: type === "positive" ? 1 : -1,
+        helpful: type === "positive",
       });
-      updateMessage(message._id, (current) => ({
-        ...current,
-        feedback,
-        feedbackSubmitting: false,
-      }));
+      setMessages((current) =>
+        current.map((m) =>
+          m._id === message._id
+            ? { ...m, feedback: type }
+            : m,
+      ),
+      );
+      toast.success("Cảm ơn bạn đã phản hồi! 🌱");
     } catch (err) {
       console.error(err);
-      updateMessage(message._id, (current) => ({
-        ...current,
-        feedback: previousFeedback,
-        feedbackSubmitting: false,
-      }));
-      setErrorMessage("Không thể gửi phản hồi. Bạn thử lại sau nhé.");
+      toast.error("Không thể gửi phản hồi. Vui lòng thử lại sau.");
+    } finally {
+      setMessages((current) =>
+        current.map((m) =>
+          m._id === message._id
+            ? { ...m, feedbackSubmitting: false }
+            : m,
+        ),
+      );
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const content = inputValue.trim();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const text = inputValue.trim();
+    if ((!text && !attachedImage) || isStreaming || isUploadingImage) return;
 
-    if ((!content && !attachedImage) || isStreaming) {
-      return;
-    }
-
-    let messageContent = content;
-    if (attachedImage) {
-      messageContent = content ? `${content}\n\n[IMAGE:${attachedImage}]` : `[IMAGE:${attachedImage}]`;
-    }
-
-    const userLocalId = createLocalId();
-    const assistantLocalId = createLocalId();
-    const now = new Date().toISOString();
-    const controller = new AbortController();
-
-    abortRef.current?.abort();
-    abortRef.current = controller;
-    setInputValue("");
-    setAttachedImage(null);
-    setErrorMessage("");
     setIsStreaming(true);
-    setMessages((prev) => [
-      ...prev,
-      {
-        _id: userLocalId,
-        localId: userLocalId,
-        role: "user",
-        content: messageContent,
-        status: "completed",
-        created_at: now,
-      },
-      {
-        _id: assistantLocalId,
-        localId: assistantLocalId,
-        role: "assistant",
-        content: "",
-        status: "pending",
-        created_at: now,
-        streaming: true,
-      },
-    ]);
+    setInputValue("");
+    setErrorMessage("");
+
+    const localUserMsgId = createLocalId();
+    const localAssistantMsgId = createLocalId();
+
+    const formattedContent = attachedImage ? `[IMAGE:${attachedImage}] ${text}`.trim() : text;
+
+    const userMessage: UiMessage = {
+      _id: localUserMsgId,
+      localId: localUserMsgId,
+      role: "user",
+      content: formattedContent,
+      status: "completed",
+      created_at: new Date().toISOString(),
+    };
+
+    const initialAssistantMessage: UiMessage = {
+      _id: localAssistantMsgId,
+      localId: localAssistantMsgId,
+      role: "assistant",
+      content: "",
+      status: "pending",
+      created_at: new Date().toISOString(),
+      streaming: true,
+    };
+
+    setMessages((current) => [...current, userMessage, initialAssistantMessage]);
+    setAttachedImage(null);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
-      await streamChatMessage(messageContent, sessionId, {
+      let currentAssistantText = "";
+      
+      await streamChatMessage(formattedContent, sessionId, {
         signal: controller.signal,
         onMeta: (meta) => {
-          setSessionId(meta.session_id);
-          if (!routeSessionId) {
-            window.history.replaceState(
-              null,
-              "",
-              `/chat/active/${meta.session_id}`,
-            );
+          if (!sessionId && meta.session_id) {
+            setSessionId(meta.session_id);
+            window.history.replaceState(null, "", `/chat/active/${meta.session_id}`);
           }
         },
         onToken: (delta) => {
           if (!delta) return;
-          updateMessage(assistantLocalId, (message) => ({
-            ...message,
-            content: `${message.content}${delta}`,
-          }));
+          currentAssistantText += delta;
+          setMessages((current) =>
+            current.map((msg) =>
+              msg.localId === localAssistantMsgId
+                ? { ...msg, content: currentAssistantText }
+                : msg,
+            ),
+          );
         },
         onDone: (done) => {
-          updateMessage(assistantLocalId, (message) => ({
-            ...message,
-            _id: done.assistant_message_id,
-            status: "completed",
-            streaming: false,
-            citations: done.citations,
-          }));
+          setMessages((current) =>
+            current.map((msg) =>
+              msg.localId === localAssistantMsgId
+                ? { ...msg, _id: done.assistant_message_id, streaming: false, status: "completed", citations: done.citations }
+                : msg,
+            ),
+          );
         },
       });
     } catch (err) {
-      if (controller.signal.aborted) {
+      if (err instanceof DOMException && err.name === "AbortError") {
         return;
       }
-
       console.error(err);
-      const errorMessageText = err instanceof Error ? err.message : "Không thể gửi tin nhắn.";
-      setErrorMessage(errorMessageText);
-      updateMessage(assistantLocalId, (current) => ({
-        ...current,
-        content:
-          current.content || `Lỗi hệ thống: ${errorMessageText}`,
-        status: "failed",
-        streaming: false,
-      }));
+      setErrorMessage(err instanceof Error ? `Lỗi hệ thống: ${err.message}` : "Lỗi hệ thống: Đã xảy ra lỗi kết nối.");
+      setMessages((current) =>
+        current.filter((msg) => msg.localId !== localAssistantMsgId),
+      );
     } finally {
-      if (!controller.signal.aborted) {
-        setIsStreaming(false);
-      }
+      setIsStreaming(false);
+      abortRef.current = null;
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, []);
+
   return (
-    <div className="w-full h-full min-h-[100svh] bg-white text-left font-sans flex flex-col overflow-hidden">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main pb-32 text-left font-sans relative">
       <PageHeader
-        title="FARMY AI"
-        subtitle={isStreaming ? "Bé Thóc đang trả lời" : "Tri Kỷ AI"}
-        leftButton="back"
-        rightButton="camera"
-        onRightClick={() => navigate("/scan")}
+        title={sessionId ? "Tư vấn cây trồng" : "Trò chuyện mới"}
+        subtitle="Bé Thóc - Trợ lý nông nghiệp AI"
+        leftButton="close"
+        rightButton="none"
+        onLeftClick={() => {
+          if (abortRef.current) abortRef.current.abort();
+          navigate("/chat");
+        }}
       />
 
-      <main
-        ref={scrollRef}
-        className="w-full max-w-3xl mx-auto flex-1 pt-[72px] pb-[120px] px-4 md:px-8 flex flex-col gap-6 overflow-y-auto scrollbar-hide bg-white z-0"
-      >
-        <div className="flex justify-center mt-6">
-          <span className="bg-[#f5f5f7] text-[#86868b] font-medium text-[11px] uppercase tracking-wider px-3 py-1 rounded-full">
-            {dateLabel}
-          </span>
-        </div>
+      <main className="w-full max-w-3xl mx-auto px-4 md:px-6 pt-24 pb-8 flex-1 flex flex-col gap-6">
+        {messages.length > 0 && (
+          <div className="w-full flex justify-center px-2">
+            <span className="text-xs font-bold text-text-secondary bg-white/70 border border-border-main/50 px-3 py-1 rounded-full font-mono">
+              {dateLabel}
+            </span>
+          </div>
+        )}
 
         {isLoading ? (
-          <div className="flex items-center justify-center gap-2 py-16 text-text-main/60 font-bold">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Đang tải trò chuyện...
+          <div className="flex-1 py-32 flex flex-col items-center justify-center gap-3">
+            <CircleNotch className="w-8 h-8 animate-spin text-primary" weight="bold" />
+            <p className="font-bold text-text-secondary">Đang tải cuộc trò chuyện...</p>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
             <div className="w-28 h-28 mb-4">
-              <PetMascot className="w-full h-full drop-shadow-md" status={petStatus} size={112} />
+              <PetMascot className="w-full h-full drop-shadow-md animate-bounce" status={petStatus} size={112} />
             </div>
-            <h2 className="text-[24px] font-bold text-[#1d1d1f] mb-2 tracking-tight">
+            <h2 className="text-[24px] font-black text-text-h mb-2 tracking-tight">
               Hỏi Bé Thóc về ruộng vườn
             </h2>
-            <p className="text-[#86868b] font-medium text-[15px] max-w-sm leading-relaxed">
+            <p className="text-text-secondary font-bold text-[15px] max-w-sm leading-relaxed">
               Nhập câu hỏi về cây trồng, sâu bệnh, lịch chăm sóc hoặc cách xử lý
               tình huống ngoài đồng.
             </p>
@@ -369,25 +353,25 @@ export const ChatActive: React.FC = () => {
             >
               {message.role === "assistant" ? (
                 <div className="flex items-end gap-2 mb-1.5 ml-1">
-                  <div className="w-9 h-9 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/[0.02] flex items-center justify-center overflow-hidden shrink-0 p-0.5">
+                  <div className="w-9 h-9 rounded-full bg-white border-2 border-border-main flex items-center justify-center overflow-hidden shrink-0 p-0.5 shadow-sm">
                     <PetMascot
                       className={`w-full h-full -mt-0.5 ${message.streaming ? "animate-pulse" : ""}`}
                       status={petStatus} size={36}
                     />
                   </div>
-                  <span className="font-medium text-[13px] text-[#86868b] ml-1 mb-1">
+                  <span className="font-bold text-[13px] text-text-secondary ml-1 mb-1">
                     Bé Thóc
                   </span>
                 </div>
               ) : null}
 
               <div
-                className={`${message.role === "user" ? "bg-[#34C759] text-white rounded-[20px] rounded-br-[4px]" : "bg-[#f5f5f7] text-[#1d1d1f] rounded-[20px] rounded-bl-[4px] border border-black/[0.02] ml-12"} p-4 max-w-[85%]`}
+                className={`${message.role === "user" ? "bg-[#008A5E] text-white rounded-[20px] rounded-br-[4px] border border-[#008A5E]/10 font-bold" : "bg-white text-text-main rounded-[20px] rounded-bl-[4px] border-2 border-border-main ml-12 shadow-sm"} p-4 max-w-[85%]`}
               >
                 {message.role === "assistant" && message.citations && message.citations.length > 0 && (
                   <ChatSourceCards citations={message.citations} />
                 )}
-                <p className="font-medium text-[15px] whitespace-pre-wrap leading-relaxed">
+                <p className="font-bold text-[15px] whitespace-pre-wrap leading-relaxed">
                   {message.content ? parseMessageContent(message.content) :
                     (message.streaming ? "Đang suy nghĩ..." : "")}
                 </p>
@@ -401,17 +385,17 @@ export const ChatActive: React.FC = () => {
                       disabled={message.feedbackSubmitting}
                       aria-pressed={message.feedback === "positive"}
                       aria-label="Đánh giá phản hồi hữu ích"
-                      className={`bg-white border px-3 py-1.5 rounded-full font-semibold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
+                      className={`bg-white border-2 px-3 py-1.5 rounded-full font-bold text-[13px] shadow-sm transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                         message.feedback === "positive"
-                          ? "text-[#34C759] border-[#34C759]/30 bg-[#34C759]/5"
-                          : "text-[#86868b] border-black/[0.04] hover:bg-[#e8e8ed] hover:text-[#1d1d1f]"
+                          ? "text-[#008A5E] border-[#008A5E]/30 bg-[#E8F8F5]"
+                          : "text-text-secondary border-border-main hover:bg-bg-surface-2"
                       }`}
                     >
                       {message.feedbackSubmitting &&
                       message.feedback === "positive" ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
                       ) : (
-                        <ThumbsUp className="w-3.5 h-3.5" />
+                        <ThumbsUp className="w-3.5 h-3.5" weight="duotone" />
                       )}
                     </button>
                     <button
@@ -420,31 +404,31 @@ export const ChatActive: React.FC = () => {
                       disabled={message.feedbackSubmitting}
                       aria-pressed={message.feedback === "negative"}
                       aria-label="Đánh giá phản hồi chưa hữu ích"
-                      className={`bg-white border px-3 py-1.5 rounded-full font-semibold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
+                      className={`bg-white border-2 px-3 py-1.5 rounded-full font-bold text-[13px] shadow-sm transition-all active:scale-95 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                         message.feedback === "negative"
                           ? "text-[#FF3B30] border-[#FF3B30]/30 bg-[#FF3B30]/5"
-                          : "text-[#86868b] border-black/[0.04] hover:bg-[#e8e8ed] hover:text-[#1d1d1f]"
+                          : "text-text-secondary border-border-main hover:bg-bg-surface-2"
                       }`}
                     >
                       {message.feedbackSubmitting &&
                       message.feedback === "negative" ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <CircleNotch className="w-4 h-4 animate-spin" weight="bold" />
                       ) : (
-                        <ThumbsDown className="w-3.5 h-3.5" />
+                        <ThumbsDown className="w-3.5 h-3.5" weight="duotone" />
                       )}
                     </button>
                     <button
                       onClick={() => navigate("/diary/create")}
-                      className="bg-white text-[#1d1d1f] border border-black/[0.04] px-3 py-1.5 rounded-full font-semibold text-[13px] hover:bg-[#e8e8ed] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                      className="bg-white text-text-main border-2 border-border-main px-3 py-1.5 rounded-full font-bold text-[13px] hover:bg-bg-surface-2 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <BookOpen className="w-3.5 h-3.5 text-[#34C759]" />
+                      <BookOpen className="w-3.5 h-3.5 text-[#008A5E]" weight="duotone" />
                       Ghi nhật ký
                     </button>
                     <button
                       onClick={() => navigate("/reminder/create")}
-                      className="bg-white text-[#1d1d1f] border border-black/[0.04] px-3 py-1.5 rounded-full font-semibold text-[13px] hover:bg-[#e8e8ed] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                      className="bg-white text-text-main border-2 border-border-main px-3 py-1.5 rounded-full font-bold text-[13px] hover:bg-bg-surface-2 shadow-sm transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Clock className="w-3.5 h-3.5 text-[#007AFF]" />
+                      <Clock className="w-3.5 h-3.5 text-secondary" weight="duotone" />
                       Đặt nhắc nhở
                     </button>
                   </div>
@@ -455,79 +439,79 @@ export const ChatActive: React.FC = () => {
         )}
 
         {errorMessage ? (
-          <div className="bg-red-50 border border-red-100 text-red-700 rounded-2xl px-4 py-3 font-bold text-sm">
+          <div className="bg-red-50 border-2 border-red-200 text-red-700 rounded-2xl px-4 py-3 font-bold text-sm">
             {errorMessage}
           </div>
         ) : null}
 
-        <div className="h-[20px]" />
+        <div ref={scrollRef} className="h-[20px]" />
       </main>
 
-      <div className="fixed bottom-0 md:bottom-0 left-0 right-0 w-full pt-10 pb-6 px-4 md:px-8 z-30 flex justify-center pointer-events-none bg-gradient-to-t from-white via-white/95 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 w-full pt-10 pb-6 px-4 md:px-8 z-30 flex justify-center pointer-events-none bg-gradient-to-t from-bg-main via-bg-main/95 to-transparent">
         <div className="w-full max-w-3xl flex flex-col pointer-events-auto">
           {attachedImage && (
-            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-black/[0.04] group animate-in slide-in-from-bottom-2 fade-in mb-3 ml-4">
+            <div className="relative w-20 h-20 bg-white p-1 rounded-xl shadow-sm border-2 border-border-main group animate-in slide-in-from-bottom-2 fade-in mb-3 ml-4">
               <img src={attachedImage} className="w-full h-full object-cover rounded-lg" alt="Attachment" />
               <button 
                 type="button"
                 onClick={() => setAttachedImage(null)}
                 className="absolute -top-2 -right-2 bg-[#FF3B30] text-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity active:scale-95 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" weight="bold" />
               </button>
             </div>
           )}
 
           <form
             onSubmit={handleSubmit}
-            className="w-full flex items-center gap-1 bg-white/80 backdrop-blur-xl saturate-150 border border-black/[0.08] rounded-full p-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.04)] focus-within:shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all"
+            className="w-full flex items-center gap-1.5 bg-white border-2 border-border-main rounded-full p-2 shadow-sm focus-within:border-primary-light transition-all"
           >
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploadingImage || isStreaming}
-            title="Đính kèm ảnh"
-            className="p-2 text-[#86868b] hover:text-[#34C759] transition-colors flex items-center justify-center rounded-full hover:bg-black/[0.04] cursor-pointer disabled:opacity-50"
-          >
-            {isUploadingImage ? <Loader2 className="w-[20px] h-[20px] animate-spin text-[#34C759]" /> : <Paperclip className="w-[20px] h-[20px]" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/scan")}
-            title="Chụp ảnh cây trồng (Scan)"
-            className="p-2 text-[#86868b] hover:text-[#34C759] transition-colors flex items-center justify-center rounded-full hover:bg-black/[0.04] cursor-pointer"
-          >
-            <Camera className="w-[20px] h-[20px]" />
-          </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingImage || isStreaming}
+              title="Đính kèm ảnh"
+              className="p-2.5 text-text-secondary hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 active:scale-95 cursor-pointer disabled:opacity-50"
+            >
+              {isUploadingImage ? <CircleNotch className="w-[20px] h-[20px] animate-spin text-primary" weight="bold" /> : <Paperclip className="w-[20px] h-[20px]" weight="duotone" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/scan")}
+              title="Chụp ảnh cây trồng (Scan)"
+              className="p-2.5 text-text-secondary hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-bg-surface-1 active:scale-95 cursor-pointer"
+            >
+              <Camera className="w-[20px] h-[20px]" weight="duotone" />
+            </button>
 
-          <input
-            className="flex-1 bg-transparent border-none focus:ring-0 font-medium text-[15px] text-[#1d1d1f] placeholder:text-[#86868b] h-full py-2.5 outline-none min-w-0"
-            placeholder="Nhắn tin Bé Thóc..."
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            disabled={isStreaming || isUploadingImage}
-          />
+            <input
+              className="flex-1 bg-transparent border-none focus:ring-0 font-bold text-[15px] text-text-main placeholder:text-text-secondary/60 h-full py-2.5 outline-none min-w-0"
+              placeholder="Nhắn tin Bé Thóc..."
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              disabled={isStreaming || isUploadingImage}
+            />
 
-          <button
-            type="submit"
-            disabled={!inputValue.trim() || isStreaming}
-            className="p-2.5 text-white bg-[#34C759] rounded-full hover:bg-[#248A3D] transition-colors flex items-center justify-center mr-1 shadow-[0_2px_8px_rgba(52,199,89,0.3)] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:bg-[#d1d1d6]"
-          >
-            {isStreaming ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-[20px] h-[20px] ml-0.5" />
-            )}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isStreaming}
+              className="p-3 text-white bg-[#008A5E] rounded-full hover:bg-[#248A3D] transition-colors flex items-center justify-center mr-1 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:bg-bg-surface-2 disabled:text-text-secondary"
+            >
+              {isStreaming ? (
+                <CircleNotch className="w-5 h-5 animate-spin" weight="bold" />
+              ) : (
+                <PaperPlaneRight className="w-[20px] h-[20px] ml-0.5" weight="bold" />
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>

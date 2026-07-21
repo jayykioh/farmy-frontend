@@ -1,6 +1,11 @@
+/* Hallmark · page: diary-history · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Activity, Archive, CheckCircle2, Clock, Droplets, Leaf, Shield, Sprout, Trash2, WifiOff } from 'lucide-react';
+import { Pulse, Archive, CheckCircle, Clock, Drop, Leaf, Shield, Plant, Trash, WifiSlash } from '@phosphor-icons/react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
@@ -13,7 +18,6 @@ import {
   useUpdateDiaryMutation,
   useDeleteDiaryMutation,
 } from '../store/api/farmApi';
-import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import {
   OFFLINE_DIARY_DRAFTS_CHANGED,
@@ -50,20 +54,20 @@ type TimelineEntry =
     };
 
 const localStatusMeta: Record<OfflineDiaryDraft['status'], { label: string; className: string }> = {
-  draft: { label: 'Bản nháp', className: 'bg-gray-100 text-gray-700' },
-  pending: { label: 'Chờ đồng bộ', className: 'bg-amber-100 text-amber-700' },
-  syncing: { label: 'Đang đồng bộ', className: 'bg-blue-100 text-blue-700' },
-  failed_retryable: { label: 'Sẽ thử lại', className: 'bg-orange-100 text-orange-700' },
-  failed_permanent: { label: 'Cần sửa', className: 'bg-red-100 text-red-700' },
-  sync_confirming: { label: 'Đang xác nhận', className: 'bg-emerald-100 text-emerald-700' },
+  draft: { label: 'Bản nháp', className: 'bg-gray-100 text-gray-700 border-gray-200' },
+  pending: { label: 'Chờ đồng bộ', className: 'bg-amber-100 text-amber-700 border-amber-200' },
+  syncing: { label: 'Đang đồng bộ', className: 'bg-blue-100 text-blue-700 border-blue-200' },
+  failed_retryable: { label: 'Sẽ thử lại', className: 'bg-orange-100 text-orange-700 border-orange-200' },
+  failed_permanent: { label: 'Cần sửa', className: 'bg-red-100 text-red-700 border-red-200' },
+  sync_confirming: { label: 'Đang xác nhận', className: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
 };
 
 const getActivityIcon = (activityType: string) => {
   const type = (activityType || '').toLowerCase();
-  if (type.includes('tưới')) return <Droplets className="w-6 h-6 text-blue-500" />;
-  if (type.includes('phân') || type.includes('dinh dưỡng')) return <Leaf className="w-6 h-6 text-emerald-500" />;
-  if (type.includes('thuốc') || type.includes('sâu')) return <Shield className="w-6 h-6 text-orange-500" />;
-  return <Sprout className="w-6 h-6 text-primary" />;
+  if (type.includes('tưới')) return <Drop className="w-6 h-6 text-blue-500" weight="duotone" />;
+  if (type.includes('phân') || type.includes('dinh dưỡng')) return <Leaf className="w-6 h-6 text-emerald-500" weight="duotone" />;
+  if (type.includes('thuốc') || type.includes('sâu')) return <Shield className="w-6 h-6 text-orange-500" weight="duotone" />;
+  return <Plant className="w-6 h-6 text-primary" weight="duotone" />;
 };
 
 const getActivityBg = (activityType: string) => {
@@ -71,7 +75,7 @@ const getActivityBg = (activityType: string) => {
   if (type.includes('tưới')) return 'bg-blue-50';
   if (type.includes('phân') || type.includes('dinh dưỡng')) return 'bg-emerald-50';
   if (type.includes('thuốc') || type.includes('sâu')) return 'bg-orange-50';
-  return 'bg-gray-50';
+  return 'bg-bg-surface-2';
 };
 
 export const DiaryHistory: React.FC = () => {
@@ -169,7 +173,7 @@ export const DiaryHistory: React.FC = () => {
       createdAt: log.activity_at || log.created_at,
       imageUrl: log.image_url,
       statusLabel: 'Đã ghi',
-      statusClass: 'bg-primary/10 text-primary-container',
+      statusClass: 'bg-primary-light/10 text-secondary-dark border border-primary-light/20',
     }));
 
     const localEntries: TimelineEntry[] = filterVisibleOfflineDrafts(visibleOfflineDrafts, logs).map((draft) => {
@@ -193,7 +197,7 @@ export const DiaryHistory: React.FC = () => {
   }, [logs, visibleOfflineDrafts]);
 
   return (
-    <div className="w-full min-h-screen bg-bg-surface-1">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main pb-24 text-left">
       <PageHeader 
         title={diary ? `Lịch sử: ${diary.crop_type}` : 'Nhật ký canh tác'} 
         subtitle="Chi tiết các hoạt động chăm sóc cây trồng" 
@@ -206,88 +210,95 @@ export const DiaryHistory: React.FC = () => {
             <div>
               <span className={`px-3 py-1.5 rounded-full text-sm font-bold shadow-sm border ${
                 diary.status === 'archived' 
-                  ? 'bg-slate-100 text-slate-600 border-slate-200' 
-                  : 'bg-primary/10 text-primary-dark border-primary/20'
+                  ? 'bg-bg-surface-2 text-text-secondary border-border-main/50' 
+                  : 'bg-primary-light/20 text-[#008A5E] border-primary-light/40'
               }`}>
                 {diary.status === 'active' ? '🌱 Đang canh tác' : '📦 Đã lưu trữ'}
               </span>
             </div>
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-3">
               {diary.status === 'active' && (
-                <Button size="sm" variant="outline" onClick={handleArchive} className="flex gap-2 items-center text-primary border-primary">
-                  <Archive className="w-4 h-4" /> Lưu trữ
-                </Button>
+                <button 
+                  onClick={handleArchive} 
+                  className="btn btn--soft text-xs px-3 py-2 font-bold cursor-pointer flex gap-1.5 items-center active:scale-95"
+                >
+                  <Archive className="w-3.5 h-3.5" weight="duotone" /> Lưu trữ
+                </button>
               )}
-              <Button size="sm" variant="outline" onClick={handleDelete} className="flex gap-2 items-center text-red-500 border-red-200 hover:bg-red-50">
-                <Trash2 className="w-4 h-4" /> Xóa vụ mùa
-              </Button>
+              <button 
+                onClick={handleDelete} 
+                className="btn btn--coral text-xs px-3 py-2 font-bold cursor-pointer flex gap-1.5 items-center active:scale-95"
+              >
+                <Trash className="w-3.5 h-3.5" weight="duotone" /> Xóa vụ
+              </button>
             </div>
           </div>
         )}
 
         {/* Bé Thóc Encouragement */}
-        <section className="flex items-end gap-4 w-full">
-          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-border-main/50 shrink-0 relative overflow-hidden p-1 shadow-sm">
+        <section className="flex items-start gap-4 w-full">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border-2 border-border-main shrink-0 relative overflow-hidden p-1 shadow-sm">
             <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
           </div>
-          <div className="relative bg-white border border-border-main/50 rounded-2xl p-4 mb-2 flex-1 shadow-sm">
-            <p className="text-base font-medium text-text-main">
+          <div className="relative pet-mood-bubble flex-1 shadow-sm mt-1">
+            <p className="text-sm font-bold text-text-main">
               {entries.length > 0
                 ? 'Bạn đang duy trì chăm sóc cây trồng đều đặn.'
                 : 'Bạn chưa ghi nhận hoạt động chăm sóc nào cho cây này.'}
             </p>
+            <span className="pet-mood-bubble__tail" aria-hidden="true" />
           </div>
         </section>
 
         {loading ? (
-          <div className="py-20 text-center font-bold text-text-main/70">
+          <div className="py-20 text-center font-bold text-text-secondary">
             Đang tải lịch sử chi tiết...
           </div>
         ) : diaryError || logsError ? (
           <div className="py-20 text-center flex flex-col gap-4 items-center">
-            <Sprout className="w-12 h-12 text-text-main/50" />
-            <p className="font-bold text-text-main/70">Không tải được dữ liệu nhật ký. Vui lòng thử lại.</p>
-            <Button onClick={() => navigate('/diary')} className="px-6 py-2">
+            <Plant className="w-12 h-12 text-text-secondary" weight="duotone" />
+            <p className="font-bold text-text-secondary">Không tải được dữ liệu nhật ký. Vui lòng thử lại.</p>
+            <button onClick={() => navigate('/diary')} className="btn btn--cyan px-6 py-2 active:scale-95">
               Xem danh sách Nhật ký
-            </Button>
+            </button>
           </div>
         ) : !diary ? (
           <div className="py-20 text-center flex flex-col gap-4 items-center">
-            <Sprout className="w-12 h-12 text-text-main/50" />
-            <p className="font-bold text-text-main/70">Không tìm thấy thông tin nhật ký vụ mùa.</p>
-            <Button onClick={() => navigate('/diary')} className="px-6 py-2">
+            <Plant className="w-12 h-12 text-text-secondary" weight="duotone" />
+            <p className="font-bold text-text-secondary">Không tìm thấy thông tin nhật ký vụ mùa.</p>
+            <button onClick={() => navigate('/diary')} className="btn btn--cyan px-6 py-2 active:scale-95">
               Xem danh sách Nhật ký
-            </Button>
+            </button>
           </div>
         ) : (
           <>
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white border border-border-main/50 rounded-3xl p-6 flex flex-col gap-4 row-span-2 shadow-sm">
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="card-bubble p-6 flex flex-col gap-4 row-span-2 shadow-sm text-left">
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-xl font-bold text-text-h">Chăm sóc tuần này</h3>
-                  <span className="bg-secondary-light/30 text-secondary-dark px-3 py-1 rounded-full font-bold text-sm">
+                  <h3 className="text-xl font-extrabold text-text-h">Chăm sóc tuần này</h3>
+                  <span className="bg-primary-light/20 text-[#008A5E] px-3 py-1 rounded-full font-bold text-sm">
                     Hiện tại
                   </span>
                 </div>
-                <div className="flex-1 flex items-end justify-between gap-2 h-48 mt-4 bg-bg-surface-1 border border-border-main/30 rounded-2xl p-4">
+                <div className="flex-1 flex items-end justify-between gap-2 h-48 mt-4 bg-bg-surface-1 border-2 border-border-main/50 rounded-[20px] p-4">
                   {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day, index) => {
                     const height = entries.length > index ? `${Math.min(90, 35 + index * 8)}%` : '10%';
                     return (
                       <div key={day} className="flex flex-col items-center gap-2 h-full justify-end w-full group">
-                        <div className="w-full bg-bg-surface h-32 relative flex items-end overflow-hidden rounded-full">
-                          <div className="bg-primary w-full rounded-full transition-all duration-500" style={{ height }} />
+                        <div className="w-full bg-white h-32 relative flex items-end overflow-hidden rounded-full border border-border-main/30">
+                          <div className="bg-[#008A5E] w-full rounded-full transition-all duration-500" style={{ height }} />
                         </div>
-                        <span className="font-bold text-text-main/70 text-xs">{day}</span>
+                        <span className="font-bold text-text-secondary text-xs">{day}</span>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="bg-white border border-border-main/50 rounded-3xl flex flex-col justify-center items-center text-center p-6 shadow-sm">
-                <Clock className="w-10 h-10 text-primary mb-2" />
-                <p className="text-base text-text-main/70 mb-1">Cập nhật lần cuối</p>
-                <h4 className="text-xl font-extrabold text-text-main">
+              <div className="card-bubble flex flex-col justify-center items-center text-center p-6 shadow-sm">
+                <Clock className="w-10 h-10 text-[#008A5E] mb-2" weight="duotone" />
+                <p className="text-sm font-semibold text-text-secondary mb-1">Cập nhật lần cuối</p>
+                <h4 className="text-xl font-extrabold text-text-main font-mono">
                   {entries.length > 0
                     ? new Date(entries[0].createdAt).toLocaleDateString('vi-VN')
                     : 'Chưa có hoạt động'}
@@ -295,58 +306,65 @@ export const DiaryHistory: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white border border-border-main/50 rounded-3xl flex flex-col justify-center items-center text-center p-4 shadow-sm">
-                  <Activity className="w-8 h-8 text-secondary mb-2" />
-                  <p className="font-bold text-sm text-text-main/70 mb-1">Tổng hoạt động</p>
-                  <h4 className="text-2xl font-extrabold text-text-main">{entries.length}</h4>
+                <div className="card-bubble flex flex-col justify-center items-center text-center p-4 shadow-sm">
+                  <Pulse className="w-8 h-8 text-secondary mb-2" weight="duotone" />
+                  <p className="font-bold text-xs text-text-secondary mb-1">Tổng hoạt động</p>
+                  <h4 className="text-2xl font-black text-text-main font-mono">{entries.length}</h4>
                 </div>
-                <div className="bg-white border border-border-main/50 rounded-3xl flex flex-col justify-center items-center text-center p-4 shadow-sm">
-                  <CheckCircle2 className="w-8 h-8 text-green-500 mb-2" />
-                  <p className="font-bold text-sm text-text-main/70 mb-1">Trạng thái</p>
-                  <h4 className="text-lg font-bold text-text-main uppercase">
+                <div className="card-bubble flex flex-col justify-center items-center text-center p-4 shadow-sm">
+                  <CheckCircle className="w-8 h-8 text-green-500 mb-2" weight="duotone" />
+                  <p className="font-bold text-xs text-text-secondary mb-1">Trạng thái</p>
+                  <h4 className="text-sm font-black text-[#008A5E] uppercase">
                     {diary.status === 'active' ? 'Đang trồng' : 'Hoàn thành'}
                   </h4>
                 </div>
               </div>
             </section>
 
-            <section className="flex flex-col gap-4 mt-2">
-              <h3 className="text-2xl font-bold text-text-h mb-2">Hoạt động chăm sóc ruộng vườn</h3>
+            <section className="flex flex-col gap-4 mt-6">
+              <h3 className="text-xl md:text-2xl font-black text-text-h mb-2">Hoạt động chăm sóc ruộng vườn</h3>
 
               {entries.length === 0 ? (
-                <div className="bg-white border border-border-main/50 rounded-2xl p-8 text-center text-text-main/50 font-bold">
+                <div className="card-bubble p-8 text-center text-text-secondary font-bold">
                   Không có bản ghi nhật ký hoạt động nào cho cây trồng này.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {entries.map((entry) => {
-                    const icon = entry.kind === 'local' ? <WifiOff className="w-6 h-6 text-amber-500" /> : getActivityIcon(entry.activityType);
+                    const icon = entry.kind === 'local' ? <WifiSlash className="w-6 h-6 text-amber-500" weight="duotone" /> : getActivityIcon(entry.activityType);
                     const bg = entry.kind === 'local' ? 'bg-amber-50' : getActivityBg(entry.activityType);
 
                     return (
                       <div
                         key={`${entry.kind}-${entry.id}`}
-                        className="bg-white border border-border-main/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm"
+                        className="card-bubble p-4 flex flex-col gap-3 text-left"
                       >
-                        <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center shrink-0`}>
-                          {icon}
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-full ${bg} border border-border-main/30 flex items-center justify-center shrink-0`}>
+                            {icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-base font-extrabold text-text-h truncate">{entry.activityType}</h4>
+                            <span className="font-bold text-xs text-text-secondary font-mono block">
+                              {new Date(entry.createdAt).toLocaleDateString('vi-VN')}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          {entry.imageUrl ? (
+                        
+                        {entry.imageUrl && (
+                          <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-border-main/50 bg-bg-surface-2 mt-1">
                             <img
-                              className="mb-3 h-28 w-full rounded-xl object-cover"
+                              className="h-full w-full object-cover"
                               src={entry.imageUrl}
                               alt={`Ảnh hoạt động ${entry.activityType}`}
                             />
-                          ) : null}
-                          <h4 className="text-lg font-bold text-text-main truncate">{entry.activityType}</h4>
-                          <p className="text-sm text-text-main/70 truncate">{entry.content}</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1 shrink-0">
-                          <span className="font-bold text-xs text-text-main/50">
-                            {new Date(entry.createdAt).toLocaleDateString('vi-VN')}
-                          </span>
-                          <span className={`${entry.statusClass} px-2 py-0.5 rounded-full font-bold text-[10px]`}>
+                          </div>
+                        )}
+                        
+                        <p className="text-sm font-medium text-text-main line-clamp-3 mt-1">{entry.content}</p>
+                        
+                        <div className="flex justify-end mt-1">
+                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] border ${entry.statusClass}`}>
                             {entry.statusLabel}
                           </span>
                         </div>
@@ -356,13 +374,13 @@ export const DiaryHistory: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex gap-4 mt-4">
-                <Button onClick={() => navigate(`/diary/create?diaryId=${activeDiaryId}`)} className="flex-1 py-4 text-lg">
+              <div className="flex gap-4 mt-6">
+                <button onClick={() => navigate(`/diary/create?diaryId=${activeDiaryId}`)} className="btn btn--cyan flex-1 py-4 text-base font-extrabold cursor-pointer active:scale-95">
                   Thêm hoạt động mới
-                </Button>
-                <Button onClick={() => navigate('/diary')} variant="outline" className="flex-1 py-4 text-lg bg-white">
+                </button>
+                <button onClick={() => navigate('/diary')} className="btn btn--soft flex-1 py-4 text-base font-bold cursor-pointer active:scale-95">
                   Quay lại danh sách
-                </Button>
+                </button>
               </div>
             </section>
           </>

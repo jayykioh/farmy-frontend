@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Reminder } from '../api/reminders';
-import { Check, Clock } from 'lucide-react';
+import { CheckCircle, Clock, Drop, Flask, Bug, Plant, NotePencil, ChartBar, Trophy, Warning } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale/vi';
 import { motion } from 'framer-motion';
@@ -11,74 +11,96 @@ interface ReminderCardProps {
   onSnooze?: () => void;
 }
 
-const activityIcons: Record<string, string> = {
-  water: '💧', 
-  fertilize: '🧪', 
-  pesticide: '🐛', 
-  harvest: '🌾', 
-  diary: '📝',
-  other: '📋',
-  plant_alert: '⚠️',
-  streak_milestone: '🏆',
-  weekly_insight: '📊'
+const activityConfig: Record<string, { icon: React.ReactNode; bg: string; iconBg: string; accent: string }> = {
+  water:            { icon: <Drop size={20} weight="duotone" />,        bg: 'bg-[#EDF8FF]',  iconBg: 'bg-[#C6EEFF] text-[#0284C7]', accent: 'text-[#0284C7]' },
+  fertilize:        { icon: <Flask size={20} weight="duotone" />,       bg: 'bg-[#F5F3FF]',  iconBg: 'bg-[#EDE9FE] text-[#7C3AED]', accent: 'text-[#7C3AED]' },
+  pesticide:        { icon: <Bug size={20} weight="duotone" />,         bg: 'bg-[#FFF7ED]',  iconBg: 'bg-[#FED7AA] text-[#C2410C]', accent: 'text-[#C2410C]' },
+  harvest:          { icon: <Plant size={20} weight="duotone" />,       bg: 'bg-[#F0FDF4]',  iconBg: 'bg-[#BBF7D0] text-[#15803D]', accent: 'text-[#15803D]' },
+  diary:            { icon: <NotePencil size={20} weight="duotone" />,  bg: 'bg-[#FFFBEB]',  iconBg: 'bg-[#FDE68A] text-[#B45309]', accent: 'text-[#B45309]' },
+  plant_alert:      { icon: <Warning size={20} weight="duotone" />,     bg: 'bg-[#FFF1F2]',  iconBg: 'bg-[#FFE4E6] text-[#BE123C]', accent: 'text-[#BE123C]' },
+  streak_milestone: { icon: <Trophy size={20} weight="duotone" />,      bg: 'bg-[#FFFBEB]',  iconBg: 'bg-[#FDE68A] text-[#B45309]', accent: 'text-[#B45309]' },
+  weekly_insight:   { icon: <ChartBar size={20} weight="duotone" />,    bg: 'bg-[#F0F9FF]',  iconBg: 'bg-[#BAE6FD] text-[#0369A1]', accent: 'text-[#0369A1]' },
+  other:            { icon: <NotePencil size={20} weight="duotone" />,  bg: 'bg-[var(--color-paper-2)]', iconBg: 'bg-[var(--color-paper-3)] text-[var(--color-ink-2)]', accent: 'text-[var(--color-ink-2)]' },
 };
 
 export const ReminderCard: React.FC<ReminderCardProps> = ({ reminder, onDone, onSnooze }) => {
   const remindAtDate = new Date(reminder.remind_at);
   const isPast = remindAtDate < new Date() && reminder.status !== 'completed';
-  
-  const icon = activityIcons[reminder.type || 'other'] || activityIcons['other'];
-  
+  const isCompleted = reminder.status === 'completed';
+
+  const config = activityConfig[reminder.type || 'other'] ?? activityConfig['other'];
+
   return (
-    <motion.div 
+    <motion.div
       layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`p-4 rounded-[24px] ring-1 transition-all ${
-        isPast 
-          ? 'bg-[#FFF9F9] ring-red-500/10 shadow-[0_8px_30px_rgba(239,68,68,0.08)]' 
-          : reminder.status === 'completed' 
-            ? 'bg-slate-50 ring-black/[0.02] opacity-60 shadow-none' 
-            : 'bg-white ring-black/[0.03] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)]'
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: isCompleted ? 0.55 : 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', damping: 22, stiffness: 320 }}
+      className={`relative overflow-hidden rounded-[20px] border transition-all select-none ${
+        isPast
+          ? 'bg-[#FFF1F2] border-red-200 shadow-[0_4px_20px_rgba(239,68,68,0.10)]'
+          : isCompleted
+          ? 'bg-[var(--color-paper-2)] border-[var(--color-border-main)]'
+          : `${config.bg} border-[var(--color-border-main)] shadow-[0_2px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.09)] hover:-translate-y-[1px]`
       }`}
     >
-      <div className="flex items-start gap-3">
-        <div className="text-3xl mt-0.5">{icon}</div>
+      {/* Accent left bar */}
+      {!isCompleted && (
+        <div className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-full ${isPast ? 'bg-red-400' : config.iconBg.split(' ')[1]}`} />
+      )}
+
+      <div className="flex items-center gap-3 px-4 py-3.5 pl-5">
+        {/* Icon badge */}
+        <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0 ${isPast ? 'bg-red-100 text-red-500' : config.iconBg}`}>
+          {config.icon}
+        </div>
+
+        {/* Content */}
         <div className="flex-1 min-w-0">
-          <h4 className={`font-bold text-[15px] leading-tight text-slate-800 tracking-tight mb-1 ${reminder.status === 'completed' ? 'line-through text-slate-400' : ''}`}>
+          <p className={`font-bold text-[14px] leading-snug tracking-tight ${
+            isCompleted
+              ? 'line-through text-[var(--color-ink-3)]'
+              : 'text-[var(--color-ink)]'
+          }`}>
             {reminder.title}
-          </h4>
-          
-          <div className="flex items-center flex-wrap gap-2 mt-0.5">
-            <p className={`text-[13px] flex items-center gap-1 ${isPast ? 'text-red-500 font-bold' : 'text-slate-500 font-medium'}`}>
-              <Clock className="w-3.5 h-3.5" />
+          </p>
+
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className={`text-[12px] font-semibold flex items-center gap-1 ${isPast ? 'text-red-500' : 'text-[var(--color-ink-2)]'}`}>
+              <Clock size={12} weight="bold" />
               {format(remindAtDate, 'HH:mm', { locale: vi })}
-              {isPast && <span className="ml-1 text-[10px] font-black uppercase tracking-wider bg-red-100 px-1.5 py-0.5 rounded-md text-red-600">Quá hạn</span>}
-            </p>
+            </span>
+            {isPast && (
+              <span className="text-[10px] font-black uppercase tracking-wider bg-red-500 text-white px-2 py-0.5 rounded-full">
+                Quá hạn
+              </span>
+            )}
           </div>
         </div>
+
+        {/* Done button inline */}
+        {!isCompleted && onDone && (
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={onDone}
+            className="w-9 h-9 rounded-full bg-[#008A5E]/10 text-[#008A5E] flex items-center justify-center shrink-0 hover:bg-[#008A5E]/20 transition-colors cursor-pointer"
+            title="Đánh dấu hoàn thành"
+          >
+            <CheckCircle size={20} weight="duotone" />
+          </motion.button>
+        )}
       </div>
-      
-      {reminder.status !== 'completed' && (onDone || onSnooze) && (
-        <div className="flex gap-2.5 mt-4 pl-[44px]">
-          {onDone && (
-            <motion.button 
-              whileTap={{ scale: 0.93 }}
-              onClick={onDone} 
-              className="flex-1 py-2 px-3 bg-[#E8F8F5] text-[#00A97F] rounded-full text-[13.5px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Check className="w-4 h-4 stroke-[2.5]" /> Đã xong
-            </motion.button>
-          )}
-          {onSnooze && (
-            <motion.button 
-              whileTap={{ scale: 0.93 }}
-              onClick={onSnooze} 
-              className="flex-[0.7] py-2 px-3 bg-slate-100 text-slate-600 rounded-full text-[13.5px] font-bold transition-colors cursor-pointer"
-            >
-              Hoãn
-            </motion.button>
-          )}
+
+      {/* Snooze row (only if provided separately) */}
+      {!isCompleted && onSnooze && (
+        <div className="px-5 pb-3 -mt-1">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onSnooze}
+            className="w-full py-1.5 text-[12px] font-bold text-[var(--color-ink-2)] bg-white/60 rounded-full border border-[var(--color-border-main)] hover:bg-white transition-colors cursor-pointer"
+          >
+            Hoãn lại
+          </motion.button>
         </div>
       )}
     </motion.div>

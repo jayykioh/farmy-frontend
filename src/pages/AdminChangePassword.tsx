@@ -1,7 +1,12 @@
+/* Hallmark · page: admin-change-password · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { changeAdminPassword } from '../api/admin';
-import { Lock, Eye, EyeOff } from 'lucide-react';
+import { LockKey, Eye, EyeSlash } from '@phosphor-icons/react';
 
 export const AdminChangePassword: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -56,83 +61,83 @@ export const AdminChangePassword: React.FC = () => {
   };
 
   return (
-    <div className="bg-white border border-border-main/55 rounded-[24px] p-6 max-w-lg mx-auto shadow-sm">
-      <h2 className="text-xl font-bold text-text-h mb-2 flex items-center gap-2">
-        <Lock className="w-5 h-5 text-[#08a855]" /> Thay đổi mật khẩu tài khoản
+    <div className="card-bubble bg-white border-2 border-border-main rounded-3xl p-6 max-w-lg mx-auto shadow-xs font-sans text-left">
+      <h2 className="text-xl font-black text-text-h mb-1 flex items-center gap-2">
+        <LockKey size={20} weight="duotone" className="text-[#008A5E]" /> Thay đổi mật khẩu tài khoản
       </h2>
-      <p className="text-sm text-text-main/70 mb-6 font-medium">
-        Đảm bảo sử dụng mật khẩu mạnh có chữ hoa, chữ thường và chữ số để giữ bảo mật cho tài khoản quản trị.
+      <p className="text-xs text-text-secondary mb-6 font-bold leading-relaxed">
+        Sử dụng mật khẩu mạnh gồm chữ hoa, chữ thường và chữ số để bảo vệ quyền truy cập tài khoản quản trị.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="space-y-1">
-          <label className="text-sm font-bold text-text-main" htmlFor="currentPassword">
+          <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="currentPassword">
             Mật khẩu hiện tại
           </label>
           <div className="relative">
             <input
               id="currentPassword"
               type={showCurrent ? 'text' : 'password'}
-              placeholder="Nhập mật khẩu hiện tại"
+              placeholder="Nhập mật khẩu hiện tại..."
               disabled={isSubmitting}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full rounded-2xl border border-border-main/55 bg-white py-3 px-4 text-base font-semibold shadow-sm outline-none focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
+              className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 py-3 px-4 text-base font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] disabled:opacity-60 transition-all"
             />
             <button
               type="button"
               onClick={() => setShowCurrent(!showCurrent)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-main/40 hover:text-text-main/70 cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main active:scale-95 transition-transform cursor-pointer"
             >
-              {showCurrent ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showCurrent ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
             </button>
           </div>
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-bold text-text-main" htmlFor="newPassword">
+          <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="newPassword">
             Mật khẩu mới
           </label>
           <div className="relative">
             <input
               id="newPassword"
               type={showNew ? 'text' : 'password'}
-              placeholder="Nhập mật khẩu mới"
+              placeholder="Tạo mật khẩu mới an toàn..."
               disabled={isSubmitting}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full rounded-2xl border border-border-main/55 bg-white py-3 px-4 text-base font-semibold shadow-sm outline-none focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
+              className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 py-3 px-4 text-base font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] disabled:opacity-60 transition-all"
             />
             <button
               type="button"
               onClick={() => setShowNew(!showNew)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-main/40 hover:text-text-main/70 cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main active:scale-95 transition-transform cursor-pointer"
             >
-              {showNew ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showNew ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
             </button>
           </div>
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-bold text-text-main" htmlFor="confirmNewPassword">
+          <label className="text-xs font-black uppercase tracking-wider text-text-secondary ml-1" htmlFor="confirmNewPassword">
             Xác nhận mật khẩu mới
           </label>
           <div className="relative">
             <input
               id="confirmNewPassword"
               type={showConfirm ? 'text' : 'password'}
-              placeholder="Nhập lại mật khẩu mới"
+              placeholder="Nhập lại mật khẩu mới..."
               disabled={isSubmitting}
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
-              className="w-full rounded-2xl border border-border-main/55 bg-white py-3 px-4 text-base font-semibold shadow-sm outline-none focus:border-primary/45 focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
+              className="w-full rounded-2xl border-2 border-border-main bg-bg-surface-1 py-3 px-4 text-base font-extrabold text-text-main outline-none focus:bg-white focus:border-[#008A5E] disabled:opacity-60 transition-all"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-main/40 hover:text-text-main/70 cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main active:scale-95 transition-transform cursor-pointer"
             >
-              {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showConfirm ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
             </button>
           </div>
         </div>
@@ -140,9 +145,9 @@ export const AdminChangePassword: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-4 w-full bg-[#08A855] text-white py-3.5 rounded-2xl font-bold hover:bg-[#07964b] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+          className="btn btn--cyan active:scale-95 rounded-2xl w-full py-4 text-base font-black flex items-center justify-center gap-2 cursor-pointer shadow-md disabled:opacity-50 mt-2"
         >
-          {isSubmitting ? 'Đang thực hiện...' : 'Cập nhật mật khẩu'}
+          {isSubmitting ? 'Đang thực hiện...' : 'Cập nhật mật khẩu ngay'}
         </button>
       </form>
     </div>

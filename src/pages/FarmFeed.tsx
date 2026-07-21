@@ -1,3 +1,8 @@
+/* Hallmark · page: farm-feed · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +15,7 @@ import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { fetchSnapFeed, reactToSnap } from '../api/snaps';
 import type { SnapCondition, SnapReactionType } from '../types/farmSnap';
 import { SnapFAB } from '../components/SnapFAB';
-import { Camera, Sprout, Leaf, AlertTriangle, Wheat, User } from 'lucide-react';
-import { Button } from '../components/ui/Button';
+import { Camera, Plant, Leaf, Warning, Grains, User } from '@phosphor-icons/react';
 
 type FeedFilter = 'all' | SnapCondition | 'mine';
 
@@ -45,49 +49,49 @@ export const FarmFeed: React.FC = () => {
   const snaps = feedQuery.data?.data ?? [];
 
   return (
-    <div className="w-full min-h-[100svh] bg-bg-surface-1 font-sans flex flex-col relative pb-[100px]">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main font-sans flex flex-col relative pb-24 text-left">
       <PageHeader 
         title={
           <span className="flex items-center gap-2">
-            Farm Feed <Sprout className="w-6 h-6 text-primary" />
+            Bản tin Vườn Ruộng <Plant size={24} weight="duotone" className="text-[#008A5E]" />
           </span>
         } 
+        subtitle="Khám phá & chia sẻ khoảnh khắc nhà nông"
         leftButton="back" 
         rightButton="none"
       />
-      <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-[88px] flex flex-col">
+      <main className="w-full max-w-7xl mx-auto px-4 md:px-8 pt-24 flex flex-col">
         
         {/* Header Actions & Filters */}
-        <div className="flex flex-col gap-4 mb-6 sticky top-[72px] bg-bg-surface-1 z-10 py-2 border-b border-border-main/20">
+        <div className="flex flex-col gap-4 mb-6 sticky top-[72px] bg-bg-main/90 backdrop-blur-md z-10 py-3 border-b-2 border-border-main/50">
           <div className="flex justify-between items-center">
-            <p className="text-text-main/70 font-medium text-sm">
-              Chia sẻ câu chuyện vườn nhà bạn
+            <p className="text-text-secondary font-bold text-sm">
+              Chia sẻ hình ảnh nông sản & thành quả chăm sóc
             </p>
-            <Button 
+            <button 
               onClick={() => setIsCaptureOpen(true)}
-              className="text-sm px-4 py-2"
-              icon={<Camera className="w-4 h-4" />}
+              className="btn btn--cyan font-extrabold text-sm px-4 py-2.5 cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
             >
-              Chụp ngay
-            </Button>
+              <Camera size={16} weight="bold" /> Chụp ngay
+            </button>
           </div>
 
           {/* Filter Chips */}
-          <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-2">
+          <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
             {[
               { id: 'all', label: 'Tất cả' },
-              { id: 'healthy', label: <span className="flex items-center gap-1"><Leaf className="w-3.5 h-3.5" /> Khỏe</span> },
-              { id: 'issue', label: <span className="flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Vấn đề</span> },
-              { id: 'harvest', label: <span className="flex items-center gap-1"><Wheat className="w-3.5 h-3.5" /> Thu hoạch</span> },
-              { id: 'mine', label: <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> Của tôi</span> },
+              { id: 'healthy', label: <span className="flex items-center gap-1"><Leaf size={14} weight="bold" /> Khỏe</span> },
+              { id: 'issue', label: <span className="flex items-center gap-1"><Warning size={14} weight="bold" /> Vấn đề</span> },
+              { id: 'harvest', label: <span className="flex items-center gap-1"><Grains size={14} weight="bold" /> Thu hoạch</span> },
+              { id: 'mine', label: <span className="flex items-center gap-1"><User size={14} weight="bold" /> Của tôi</span> },
             ].map(f => (
               <button
                 key={f.id}
                 onClick={() => setFilter(f.id as FeedFilter)}
-                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-bold transition-all border ${
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer active:scale-95 ${
                   filter === f.id 
-                    ? 'bg-text-main text-white border-text-main shadow-md' 
-                    : 'bg-white text-text-main/70 border-border-main/50 hover:bg-bg-surface-2'
+                    ? 'btn btn--cyan font-extrabold shadow-sm' 
+                    : 'card-bubble bg-white text-text-secondary border-2 border-border-main hover:text-text-main'
                 }`}
               >
                 {f.label}
@@ -102,7 +106,7 @@ export const FarmFeed: React.FC = () => {
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="aspect-[4/5] rounded-[24px] bg-white/70 border border-border-main/30 animate-pulse"
+                className="aspect-[4/5] rounded-[28px] bg-bg-surface-2 border-2 border-border-main/40 animate-pulse"
               />
             ))}
           </div>
@@ -110,16 +114,16 @@ export const FarmFeed: React.FC = () => {
 
         {feedQuery.isError ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border-2 border-border-main mb-4 shadow-sm">
               <PetMascot className="w-full h-full" status={petStatus} size={88} />
             </div>
-            <h3 className="text-xl font-bold text-text-h mb-2">Chưa tải được Farm Feed</h3>
-            <p className="text-text-main/70 mb-6 max-w-sm">
-              Kiểm tra kết nối rồi thử lại.
+            <h3 className="text-xl font-black text-text-h mb-2">Chưa tải được Bản tin Vườn</h3>
+            <p className="text-text-secondary font-bold mb-6 max-w-sm">
+              Kiểm tra kết nối mạng rồi thử lại nhé!
             </p>
-            <Button onClick={() => feedQuery.refetch()} size="lg">
-              Tải lại
-            </Button>
+            <button onClick={() => feedQuery.refetch()} className="btn btn--cyan font-extrabold px-6 py-3 cursor-pointer active:scale-95">
+              Tải lại bản tin
+            </button>
           </div>
         ) : null}
 
@@ -140,25 +144,26 @@ export const FarmFeed: React.FC = () => {
         {!feedQuery.isLoading && !feedQuery.isError && snaps.length === 0 ? (
           /* Empty State */
           (<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border border-border-main/50 mb-4 shadow-sm">
-              <PetMascot className="w-full h-full" status={petStatus} size={88} />
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center p-1 border-2 border-border-main mb-4 shadow-sm">
+              <PetMascot className="w-full h-full animate-bounce" status={petStatus} size={88} />
             </div>
-            <h3 className="text-xl font-bold text-text-h mb-2">Chưa có snap nào!</h3>
-            <p className="text-text-main/70 mb-6 max-w-sm flex items-center justify-center gap-1">
-              Hãy là người đầu tiên chia sẻ hình ảnh vườn ruộng của bạn <Wheat className="w-4 h-4" />
+            <h3 className="text-xl font-black text-text-h mb-2">Chưa có bài đăng Snap nào!</h3>
+            <p className="text-text-secondary font-bold mb-6 max-w-sm flex items-center justify-center gap-1">
+              Hãy là người đầu tiên chia sẻ hình ảnh vườn ruộng của bạn <Grains size={16} weight="duotone" className="text-amber-500" />
             </p>
-            <Button 
+            <button 
               onClick={() => setIsCaptureOpen(true)}
-              size="lg"
+              className="btn btn--cyan font-extrabold px-6 py-3.5 text-base cursor-pointer active:scale-95"
             >
               Chụp Farm Snap đầu tiên
-            </Button>
+            </button>
           </div>)
         ) : null}
         
         {snaps.length > 0 ? (
-          <div className="py-8 text-center text-text-main/50 font-bold text-sm">
-            Đã xem hết feed
+          <div className="py-8 flex flex-col items-center gap-1.5 text-center">
+            <span className="text-xl">✨</span>
+            <span className="text-text-secondary font-black text-[13px] tracking-wide">Bạn đã theo kịp mọi bài đăng mới nhất!</span>
           </div>
         ) : null}
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate, NavLink, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { LayoutDashboard, Users, Database, FileText, Settings, Bell, ChevronRight } from 'lucide-react';
+import { CaretRight } from '@phosphor-icons/react';
 
 export const AdminLayout: React.FC = () => {
   const { user, status } = useAuthStore();
@@ -10,7 +10,7 @@ export const AdminLayout: React.FC = () => {
   if (status === 'checking') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#08A855]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#008A5E]"></div>
       </div>
     );
   }
@@ -22,28 +22,27 @@ export const AdminLayout: React.FC = () => {
 
 
   return (
-    <div className="flex-1 flex flex-col min-h-screen w-full bg-[#f4f7f6]">
+    <div className="flex-1 flex flex-col min-h-screen w-full bg-bg-main font-sans text-left">
       {/* Top Header of Admin Dashboard */}
-      <div className="bg-white border-b border-black/[0.04] px-6 py-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-bg-main/90 backdrop-blur-xl border-b-2 border-border-main px-6 py-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto">
           <div>
-            <div className="flex items-center gap-2 text-[12px] text-[#86868b] font-medium mb-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-text-secondary mb-1">
               <span>Hệ thống</span>
-              <ChevronRight size={12} />
-              <span className="text-[#08A855]">Quản trị viên</span>
+              <CaretRight size={12} weight="bold" />
+              <span className="text-[#008A5E]">Quản trị viên</span>
             </div>
-            <h1 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">
+            <h1 className="text-2xl font-black text-text-h tracking-tight">
               Bảng điều khiển Admin
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[13px] bg-[#e6f7ee] text-[#08a855] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+            <span className="text-xs bg-[#E8F8F5] text-[#008A5E] font-black px-3 py-1 rounded-full border border-[#008A5E]/20 uppercase tracking-wider font-mono">
               {user.role === 'admin' ? 'Quản trị tối cao' : 'Điều phối viên'}
             </span>
-            <span className="text-[13px] text-[#86868b] font-medium">{user.name}</span>
+            <span className="text-xs text-text-secondary font-bold">{user.name}</span>
           </div>
         </div>
-
       </div>
 
       {/* Main Content Area */}

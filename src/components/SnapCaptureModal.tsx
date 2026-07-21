@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Leaf, AlertTriangle, Wheat } from 'lucide-react';
+import { Leaf, Warning, Grains } from '@phosphor-icons/react';
 import { PetMascot } from '../features/pet/components/PetMascot';
 import type { SnapCondition } from '../types/farmSnap';
 import { createSnap, uploadSnapPhoto } from '../api/snaps';
@@ -394,19 +394,19 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
                       onClick={() => setCondition('healthy')}
                       className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'healthy' ? 'bg-green-500 text-white' : 'text-white/70'}`}
                     >
-                      <span className="flex items-center gap-1"><Leaf className="w-3.5 h-3.5" /> Khỏe</span>
+                      <span className="flex items-center gap-1"><Leaf size={14} weight="bold" /> Khỏe</span>
                     </button>
                     <button
                       onClick={() => setCondition('issue')}
                       className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'issue' ? 'bg-yellow-500 text-white' : 'text-white/70'}`}
                     >
-                      <span className="flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Có vấn đề</span>
+                      <span className="flex items-center gap-1"><Warning size={14} weight="bold" /> Có vấn đề</span>
                     </button>
                     <button
                       onClick={() => setCondition('harvest')}
                       className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${condition === 'harvest' ? 'bg-amber-600 text-white' : 'text-white/70'}`}
                     >
-                      <span className="flex items-center gap-1"><Wheat className="w-3.5 h-3.5" /> Thu hoạch</span>
+                      <span className="flex items-center gap-1"><Grains size={14} weight="bold" /> Thu hoạch</span>
                     </button>
                   </div>
                 </div>
@@ -440,7 +440,7 @@ export const SnapCaptureModal: React.FC<SnapCaptureModalProps> = ({
                     <button
                       onClick={handleCapture}
                       disabled={!isCameraReady}
-                      className={`w-20 h-20 rounded-full border-4 flex justify-center items-center transition-transform ${isCameraReady ? 'border-white active:scale-90' : 'border-white/50 opacity-50'}`}
+                      className={`w-20 h-20 rounded-full border-4 flex justify-center items-center transition-transform ${isCameraReady ? 'border-white active:scale-95' : 'border-white/50 opacity-50'}`}
                     >
                       <div className={`w-16 h-16 rounded-full ${isCameraReady ? 'bg-white' : 'bg-white/50'}`}></div>
                     </button>

@@ -37,6 +37,7 @@ describe('ChatActive', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     HTMLElement.prototype.scrollTo = vi.fn();
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
   });
 
   it('shows stream error messages directly in the assistant chat bubble', async () => {

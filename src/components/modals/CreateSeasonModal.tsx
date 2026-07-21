@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ChevronLeft, Loader2, MapPin, Maximize2, CalendarDays, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { X, CaretLeft, CircleNotch, MapPin, ArrowsOut, Calendar, CheckCircle, Warning } from '@phosphor-icons/react';
 import { useCreatePlotMutation, useCreateDiaryMutation, useGetPlotsQuery } from '../../store/api/farmApi';
 import { CropPicker } from '../ui/CropPicker';
 import type { Diary, FarmPlot } from '../../api/farm';
@@ -204,9 +204,9 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
               <button
                 onClick={handleBack}
                 disabled={isBusy}
-                className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40"
+                className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 active:scale-95"
               >
-                <ChevronLeft className="w-5 h-5 text-slate-600" />
+                <CaretLeft className="w-5 h-5 text-slate-600" weight="bold" />
               </button>
             )}
             <div>
@@ -227,9 +227,9 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
           <button
             onClick={onClose}
             disabled={isBusy}
-            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40"
+            className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 active:scale-95"
           >
-            <X className="w-5 h-5 text-slate-500" />
+            <X className="w-5 h-5 text-slate-500" weight="bold" />
           </button>
         </div>
 
@@ -249,7 +249,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
           {/* Error / Progress message */}
           {progress.status === 'failed' && progress.errorMsg && (
             <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
-              <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <Warning className="w-4 h-4 text-red-500 shrink-0 mt-0.5" weight="duotone" />
               <p className="text-sm font-semibold text-red-700">{progress.errorMsg}</p>
             </div>
           )}
@@ -287,13 +287,13 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
                           onClick={() => setSelectedExistingPlotId(plot._id)}
                           className={`flex items-center gap-3 p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${selectedExistingPlotId === plot._id ? 'border-primary-container bg-primary/5' : 'border-border-main/40 hover:border-primary/30'}`}
                         >
-                          <MapPin className="w-4 h-4 text-primary shrink-0" />
+                          <MapPin className="w-4 h-4 text-primary shrink-0" weight="duotone" />
                           <div className="flex-1 min-w-0">
                             <p className="font-bold text-sm text-text-h">{plot.name}</p>
                             <p className="text-xs text-text-main/50 font-medium">{plot.area_size.toLocaleString()} m²</p>
                           </div>
                           {selectedExistingPlotId === plot._id && (
-                            <CheckCircle2 className="w-5 h-5 text-primary-container shrink-0" />
+                            <CheckCircle className="w-5 h-5 text-primary-container shrink-0" weight="duotone" />
                           )}
                         </button>
                       ))}
@@ -309,7 +309,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-bold text-text-main ml-1">Tên mảnh vườn</label>
                     <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" />
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" weight="duotone" />
                       <input
                         type="text"
                         value={plotName}
@@ -325,7 +325,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
                     <label className="text-sm font-bold text-text-main ml-1">Diện tích</label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
-                        <Maximize2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" />
+                        <ArrowsOut className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" weight="duotone" />
                         <input
                           type="number"
                           value={areaValue}
@@ -381,7 +381,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-bold text-text-main ml-1">Ngày bắt đầu vụ mùa</label>
                 <div className="relative">
-                  <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" />
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-main/40 pointer-events-none" weight="duotone" />
                   <input
                     type="date"
                     value={startDate}
@@ -408,7 +408,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
         <div className="px-6 py-4 border-t border-border-main/30 flex flex-col gap-2.5 bg-white">
           {progressLabel && (
             <div className="flex items-center justify-center gap-2 text-sm font-semibold text-text-main/70 py-1">
-              <Loader2 className="w-4 h-4 animate-spin text-primary-container" />
+              <CircleNotch className="w-4 h-4 animate-spin text-primary-container" weight="bold" />
               {progressLabel}
             </div>
           )}
@@ -416,7 +416,7 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
           {step === 'plot_info' ? (
             <button
               onClick={handleNext}
-              className="w-full h-13 bg-primary-container text-white font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all hover:bg-primary cursor-pointer"
+              className="w-full h-13 bg-primary-container text-white font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all hover:bg-primary cursor-pointer"
             >
               Tiếp tục →
             </button>
@@ -424,11 +424,11 @@ export const CreateSeasonModal: React.FC<CreateSeasonModalProps> = ({
             <button
               onClick={() => { void handleConfirm(); }}
               disabled={isBusy}
-              className="w-full h-13 bg-primary-container text-white font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all hover:bg-primary cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full h-13 bg-primary-container text-white font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all hover:bg-primary cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isBusy ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <CircleNotch className="w-5 h-5 animate-spin" weight="bold" />
                   Đang xử lý...
                 </>
               ) : progress.status === 'failed' && progress.createdPlotId ? (

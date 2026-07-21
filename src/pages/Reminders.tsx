@@ -1,3 +1,8 @@
+/* Hallmark · page: reminders · genre: playful · theme: Hum
+ * states: default · hover · focus · active
+ * contrast: pass (46-50)
+ */
+
 import React, { useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { ReminderCard } from '../components/ReminderCard';
@@ -5,7 +10,7 @@ import { useReminders } from '../hooks/useReminders';
 import { completeReminder } from '../api/reminders';
 import type { Reminder } from '../api/reminders';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Calendar, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Calendar, CheckCircle, Clock } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import { format, isToday, isFuture } from 'date-fns';
 import { vi } from 'date-fns/locale/vi';
@@ -64,45 +69,46 @@ const Reminders: React.FC = () => {
   });
 
   return (
-    <div className="w-full min-h-[100svh] bg-bg-surface-1 font-sans flex flex-col pb-[100px]">
+    <div className="w-full min-h-[100svh] bg-bg-main text-text-main font-sans flex flex-col pb-24 text-left">
       <PageHeader 
         title="Nhắc nhở của tôi" 
+        subtitle="Lịch tưới, bón phân & chăm sóc cây"
         leftButton="back" 
         rightButton="none"
       />
       
-      <main className="w-full max-w-2xl mx-auto pt-[72px] px-4 md:px-6 flex flex-col flex-1">
+      <main className="w-full max-w-2xl mx-auto pt-24 px-4 md:px-6 flex flex-col flex-1">
         
-        <div className="bg-white border border-primary/20 shadow-sm rounded-[24px] p-4 mt-4 mb-2 flex items-center gap-4 relative">
-          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-primary/20 shadow-sm relative flex-shrink-0 p-1">
+        <div className="card-bubble bg-white p-4 mt-4 mb-2 flex items-center gap-4 relative shadow-sm border-2 border-border-main">
+          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border-2 border-border-main shadow-sm relative flex-shrink-0 p-1">
             <PetMascot className="w-full h-full -mt-1" status={petStatus} size={56} />
           </div>
           <div className="flex-1">
-            <p className="font-medium text-base text-text-main">
-              Đừng quên chăm sóc cây đúng giờ để nhận được <strong className="text-secondary-dark bg-secondary-light/30 px-1 rounded font-extrabold">gấp đôi XP</strong> nhé!
+            <p className="font-bold text-base text-text-main">
+              Đừng quên chăm sóc cây đúng giờ để nhận được <strong className="text-[#008A5E] bg-primary-light/20 px-2 py-0.5 rounded-md font-black">gấp đôi XP</strong> nhé!
             </p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-gray-100 p-1 rounded-xl mb-6 mt-2">
+        <div className="flex bg-bg-surface-2 p-1.5 rounded-full border-2 border-border-main mb-6 mt-2 gap-1">
           <button 
             onClick={() => setTab('today')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-all ${tab === 'today' ? 'bg-white shadow-sm text-text-main' : 'text-text-main/60 hover:text-text-main/80'}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm rounded-full transition-all cursor-pointer active:scale-95 ${tab === 'today' ? 'btn btn--cyan font-extrabold' : 'font-bold text-text-secondary hover:text-text-main'}`}
           >
-            <Clock className="w-4 h-4" /> Hôm nay
+            <Clock className="w-4 h-4" weight="duotone" /> Hôm nay
           </button>
           <button 
             onClick={() => setTab('upcoming')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-all ${tab === 'upcoming' ? 'bg-white shadow-sm text-text-main' : 'text-text-main/60 hover:text-text-main/80'}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm rounded-full transition-all cursor-pointer active:scale-95 ${tab === 'upcoming' ? 'btn btn--cyan font-extrabold' : 'font-bold text-text-secondary hover:text-text-main'}`}
           >
-            <Calendar className="w-4 h-4" /> Sắp tới
+            <Calendar className="w-4 h-4" weight="duotone" /> Sắp tới
           </button>
           <button 
             onClick={() => setTab('done')}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-all ${tab === 'done' ? 'bg-white shadow-sm text-text-main' : 'text-text-main/60 hover:text-text-main/80'}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm rounded-full transition-all cursor-pointer active:scale-95 ${tab === 'done' ? 'btn btn--cyan font-extrabold' : 'font-bold text-text-secondary hover:text-text-main'}`}
           >
-            <CheckCircle2 className="w-4 h-4" /> Đã xong
+            <CheckCircle className="w-4 h-4" weight="duotone" /> Đã xong
           </button>
         </div>
 
@@ -111,22 +117,27 @@ const Reminders: React.FC = () => {
           {isLoading ? (
             <div className="flex flex-col gap-4 animate-pulse">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-24 bg-gray-200 rounded-xl"></div>
+                <div key={i} className="h-24 bg-bg-surface-2 rounded-2xl border-2 border-border-main/50"></div>
               ))}
             </div>
           ) : sortedDates.length === 0 ? (
-            <div className="flex flex-col items-center justify-center flex-1 text-center opacity-60 mt-10">
-              <CheckCircle2 className="w-16 h-16 text-gray-400 mb-3" />
-              <p className="text-gray-500">
+            <div className="flex flex-col items-center justify-center flex-1 text-center mt-12 py-12">
+              <div className="w-24 h-24 mb-4">
+                <PetMascot className="w-full h-full animate-bounce" status={petStatus} size={96} />
+              </div>
+              <p className="font-extrabold text-text-h text-lg">
                 {tab === 'done' 
                   ? 'Chưa có nhắc nhở nào hoàn thành' 
                   : 'Tuyệt vời! Bạn không có nhắc nhở nào đang chờ.'}
+              </p>
+              <p className="text-text-secondary text-sm font-bold mt-1">
+                Lên lịch chăm sóc vườn tược để Bé Thóc vui sướng mỗi ngày!
               </p>
             </div>
           ) : (
             sortedDates.map(date => (
               <section key={date} className="flex flex-col gap-3">
-                <h4 className="font-semibold text-text-main/80 text-sm">
+                <h4 className="font-black text-text-h text-sm tracking-tight px-1">
                   {isToday(new Date(date)) ? 'Hôm nay' : format(new Date(date), 'EEEE, dd/MM/yyyy', { locale: vi })}
                 </h4>
                 <div className="flex flex-col gap-3">
@@ -148,9 +159,9 @@ const Reminders: React.FC = () => {
       <div className="fixed bottom-[90px] md:bottom-8 right-4 md:right-8 z-30">
         <Link 
           to="/reminder/create"
-          className="w-14 h-14 bg-primary hover:bg-primary-dark text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all active:scale-95"
+          className="btn btn--cyan w-14 h-14 rounded-full flex items-center justify-center shadow-lg font-black cursor-pointer active:scale-95"
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="w-6 h-6 text-white" weight="bold" />
         </Link>
       </div>
     </div>
