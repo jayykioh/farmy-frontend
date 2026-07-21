@@ -50,27 +50,43 @@ export const GuidedResultView: React.FC<GuidedResultViewProps> = ({
   const stateBadge = getStateBadge(assessmentState);
 
   // Evidence list fallback
-  const evidenceList = diagnosis?.evidence_observed ?? diagnosis?.symptoms ?? [
-    'Xuất hiện đốm bất thường trên mặt lá',
-    'Viền lá chuyển màu khác biệt',
-  ];
+  const evidenceList =
+    diagnosis?.evidence_observed && diagnosis.evidence_observed.length > 0
+      ? diagnosis.evidence_observed
+      : diagnosis?.symptoms && diagnosis.symptoms.length > 0
+      ? diagnosis.symptoms
+      : [
+          'Xuất hiện đốm bất thường trên mặt lá',
+          'Viền lá chuyển màu nâu xám khác biệt',
+          'Lá có dấu hiệu mất sắc tố diệp lục nhẹ',
+        ];
 
   // Possible causes fallback
-  const possibleCauses = diagnosis?.possible_causes ?? [
-    {
-      name: diagnosis?.disease_name || 'Tổn thương lá do nấm / môi trường',
-      matched_points: ['Hình dạng đốm lá', 'Vùng bị ảnh hưởng'],
-      uncertain_points: ['Cần thêm ảnh mặt dưới lá để khẳng định'],
-    },
-  ];
+  const possibleCauses =
+    diagnosis?.possible_causes && diagnosis.possible_causes.length > 0
+      ? diagnosis.possible_causes
+      : [
+          {
+            name: diagnosis?.disease_name || 'Tổn thương lá do nấm / sâu hại',
+            matched_points:
+              diagnosis?.symptoms && diagnosis.symptoms.length > 0
+                ? diagnosis.symptoms
+                : ['Vết đốm biến dạng trên lá', 'Vùng bị ảnh hưởng'],
+            uncertain_points: ['Cần thêm ảnh chụp mặt dưới lá để khẳng định bào tử nấm'],
+          },
+        ];
 
   // Safe immediate actions fallback
-  const safeActions = diagnosis?.treatment?.safe_immediate_actions ?? [
-    'Khoanh vùng các cây có biểu hiện đốm lá',
-    'Tránh tưới nước trực tiếp lên vùng lá bị đốm',
-    'Theo dõi mật độ lan rộng sau 24-48 giờ',
-    'Hạn chế bón dư đạm trong giai đoạn này',
-  ];
+  const safeActions =
+    diagnosis?.treatment?.safe_immediate_actions &&
+    diagnosis.treatment.safe_immediate_actions.length > 0
+      ? diagnosis.treatment.safe_immediate_actions
+      : [
+          'Khoanh vùng các cây có biểu hiện đốm lá',
+          'Tránh tưới nước phun mưa trực tiếp lên vùng lá bị đốm',
+          'Theo dõi mật độ lan rộng sau 24-48 giờ',
+          'Hạn chế bón dư đạm (N) trong giai đoạn này',
+        ];
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-black/5 text-left flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200">
