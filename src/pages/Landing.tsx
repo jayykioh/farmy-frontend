@@ -90,7 +90,7 @@ export const Landing: React.FC = () => {
       >
         <div className="flex items-center justify-between px-6 md:px-12 max-w-7xl mx-auto">
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <Plant size={26} weight="duotone" className="text-[#008A5E]" />
+            <img src="/favicon.png" alt="Farmy Logo" className="w-[26px] h-[26px] object-contain" />
             <span className="text-xl font-black tracking-tight uppercase">FARMY</span>
           </div>
 
@@ -302,7 +302,7 @@ export const Landing: React.FC = () => {
       <footer className="bg-white py-12 border-t border-[var(--color-border-main)] relative z-10 w-full">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Plant size={20} weight="duotone" className="text-[#008A5E]" />
+            <img src="/favicon.png" alt="Farmy Logo" className="w-[20px] h-[20px] object-contain" />
             <span className="font-extrabold text-[var(--color-ink)] tracking-tight text-sm uppercase">FARMY</span>
           </div>
           <div className="text-[var(--color-ink-2)] text-xs font-bold font-mono flex items-center gap-4">

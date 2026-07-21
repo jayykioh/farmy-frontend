@@ -294,7 +294,7 @@ export const Shop: React.FC = () => {
               </p>
               <div className="relative w-full h-[260px] rounded-[20px] bg-bg-surface-1 border-2 border-border-main/50 flex items-center justify-center overflow-hidden">
                 <div
-                  className="relative z-10 animate-bounce"
+                  className="relative z-10 animate-[float_3s_ease-in-out_infinite]"
                 >
                   <div className="w-48 h-48">
                     <PetMascot

@@ -128,12 +128,12 @@ export const Home: React.FC = () => {
           <section className="flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
             <div className="inline-flex items-center gap-2 bg-white border border-[var(--color-border-main)] shadow-xs rounded-full px-4 py-1.5 mb-4">
               <Flame size={18} weight="duotone" className="text-[var(--color-accent-3)]" />
-              <span className="font-mono text-xs font-bold text-[var(--color-ink)]">{streak} ngay lien tiep</span>
+              <span className="font-mono text-xs font-bold text-[var(--color-ink)]">{streak} ngày liên tiếp</span>
             </div>
             <h2 className="text-[32px] md:text-[44px] font-extrabold text-[var(--color-ink)] tracking-tight leading-tight">
-              Chao buoi sang,<br /> <span className="hl">{(user as any)?.displayName || user?.email?.split('@')[0] || 'Nong Dan'}</span>!
+              Chào buổi sáng,<br /> <span className="hl">{(user as any)?.displayName || user?.email?.split('@')[0] || 'Nông Dân'}</span>!
             </h2>
-            <p className="text-[var(--color-ink-2)] mt-2 font-medium text-[16px]">Ban da san sang de cham soc nong trai hom nay chua?</p>
+            <p className="text-[var(--color-ink-2)] mt-2 font-medium text-[16px]">Bạn đã sẵn sàng để chăm sóc nông trại hôm nay chưa?</p>
           </section>
 
           <section className="flex flex-col items-center justify-center w-full mt-4 md:mt-2 mb-8 md:mb-6">
@@ -161,10 +161,10 @@ export const Home: React.FC = () => {
             <section className="flex flex-col gap-3">
               <div className="flex justify-between items-center px-1">
                 <h3 className="text-[15px] font-bold text-[var(--color-ink)] flex items-center gap-2">
-                  🔔 Nhac nho hom nay
+                  🔔 Nhắc nhở hôm nay
                   {todayReminders.length > 0 && (<span className="bg-[var(--color-accent-3)] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center font-mono">{todayReminders.length}</span>)}
                 </h3>
-                <button onClick={() => navigate('/reminders')} className="text-[var(--color-accent-2)] font-bold text-[12px] hover:underline cursor-pointer">Xem tat ca &rsaquo;</button>
+                <button onClick={() => navigate('/reminders')} className="text-[var(--color-accent-2)] font-bold text-[12px] hover:underline cursor-pointer">Xem tất cả &rsaquo;</button>
               </div>
               {todayReminders.length === 0 ? (
                 <div className="card-bubble bg-white rounded-[24px] px-4 py-5 flex flex-col items-center justify-center gap-1.5 flex-1 min-h-[220px]">
@@ -183,7 +183,7 @@ export const Home: React.FC = () => {
               <div className="flex flex-col gap-3">
                 <div onClick={() => navigate('/reminders')} className="card-bubble card-bubble--cyan bg-white p-4 cursor-pointer flex items-center gap-4 text-left select-none">
                   <div className="w-12 h-12 rounded-[16px] bg-[var(--color-accent-2)]/10 flex items-center justify-center shrink-0"><Drop size={24} weight="duotone" className="text-[var(--color-accent-2)]" /></div>
-                  <div className="flex-1 min-w-0"><p className="text-[16px] font-bold text-[var(--color-ink)] tracking-tight">Tuoi nuoc</p><p className="text-[13px] text-[var(--color-ink-2)] font-medium mt-0.5">Dat lich tuoi hom nay</p></div>
+                  <div className="flex-1 min-w-0"><p className="text-[16px] font-bold text-[var(--color-ink)] tracking-tight">Tưới nước</p><p className="text-[13px] text-[var(--color-ink-2)] font-medium mt-0.5">Đặt lịch tưới hôm nay</p></div>
                   <div className="w-8 h-8 rounded-full bg-[var(--color-paper-2)] border border-[var(--color-border-main)] flex items-center justify-center"><CaretRight size={16} weight="bold" className="text-[var(--color-ink-2)]" /></div>
                 </div>
                 <div onClick={() => navigate('/scan')} className="card-bubble card-bubble--pear bg-white p-4 cursor-pointer flex items-center gap-4 text-left select-none">

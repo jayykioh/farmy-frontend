@@ -52,8 +52,8 @@ export const Sidebar: React.FC = () => {
       
       {/* Brand / Logo */}
       <div className="h-16 flex items-center gap-3 px-6 mt-4 mb-2">
-        <div className="w-10 h-10 rounded-2xl bg-white border-2 border-border-main flex items-center justify-center cursor-pointer shadow-xs" onClick={() => navigate('/home')}>
-          <Plant size={24} weight="duotone" className="text-[#008A5E]" />
+        <div className="w-10 h-10 rounded-2xl bg-white border-2 border-border-main flex items-center justify-center cursor-pointer shadow-xs p-1" onClick={() => navigate('/home')}>
+          <img src="/favicon.png" alt="Farmy Logo" className="w-full h-full object-contain" />
         </div>
         <div className="flex flex-col cursor-pointer" onClick={() => navigate('/home')}>
           <span className="font-black text-lg text-text-h tracking-tight">FARMY</span>
