@@ -10,12 +10,26 @@ import { usePetStatus } from '../features/pet/hooks/usePetStatus';
 import { PET_STATUS_FALLBACK } from '../features/pet/types/pet.types';
 import { PageHeader } from '../components/PageHeader';
 import { useGetPlantScansQuery, useUploadPlantScanMutation } from '../store/api/farmApi';
-import { extractPlantScanErrorCode } from '../api/plantScan';
+import { extractPlantScanErrorCode, getPlantScanErrorMessage } from '../api/plantScan';
 import type { PlantScanResult } from '../types/plantScan';
 import toast from 'react-hot-toast';
 
-type ScanState = 'viewfinder' | 'analyzing' | 'result';
+type ScanState = 'viewfinder' | 'evidence' | 'context' | 'analyzing' | 'result';
 type ScanView = 'scan' | 'history';
+
+type ImageQuality = {
+  score: number;
+  label: 'Ảnh quá nhỏ' | 'Chất lượng kỹ thuật hạn chế' | 'Có thể gửi phân tích' | 'Chất lượng kỹ thuật tốt';
+  usable: boolean;
+};
+
+export const getImageQuality = (file: Pick<File, 'size'>): ImageQuality => {
+  const score = Math.max(35, Math.min(96, Math.round(58 + file.size / 45_000)));
+  if (score < 40) return { score, label: 'Ảnh quá nhỏ', usable: false };
+  if (score < 70) return { score, label: 'Chất lượng kỹ thuật hạn chế', usable: false };
+  if (score < 85) return { score, label: 'Có thể gửi phân tích', usable: true };
+  return { score, label: 'Chất lượng kỹ thuật tốt', usable: true };
+};
 
 export const PlantScan: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +42,13 @@ export const PlantScan: React.FC = () => {
   const [selectedCrop, setSelectedCrop] = useState('Lúa');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<PlantScanResult | null>(null);
+  const [primaryFile, setPrimaryFile] = useState<File | null>(null);
+  const [imageQuality, setImageQuality] = useState<ImageQuality | null>(null);
+  const [plantPart, setPlantPart] = useState('Lá');
+  const [symptomDuration, setSymptomDuration] = useState('Vài ngày');
+  const [progression, setProgression] = useState('Ổn định');
+  const [analysisStage, setAnalysisStage] = useState(0);
+  const [supplementalConfirmed, setSupplementalConfirmed] = useState(false);
   
   // Camera State
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -45,7 +66,7 @@ export const PlantScan: React.FC = () => {
     isLoading: isHistoryLoading,
     isError: isHistoryError,
     refetch: refetchHistory,
-  } = useGetPlantScansQuery(undefined, { skip: activeView !== 'history' });
+  } = useGetPlantScansQuery(undefined, { refetchOnMountOrArgChange: true });
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -69,7 +90,12 @@ export const PlantScan: React.FC = () => {
     stopCamera();
     const requestId = cameraRequestRef.current + 1;
     cameraRequestRef.current = requestId;
-    
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setIsCameraReady(false);
+      return;
+    }
+
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -138,12 +164,27 @@ export const PlantScan: React.FC = () => {
   const processScanFile = async (file: File) => {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    setPrimaryFile(file);
+    setImageQuality(getImageQuality(file));
     stopCamera();
+    setScanState('evidence');
+  };
 
+  const submitAnalysis = async () => {
+    if (!primaryFile) return;
     setScanState('analyzing');
+    setAnalysisStage(0);
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('image', primaryFile);
     formData.append('crop_type', selectedCrop);
+    formData.append('plant_part', plantPart);
+    formData.append('symptom_duration', symptomDuration);
+    formData.append('progression', progression);
+    formData.append('notes', JSON.stringify({ plantPart, symptomDuration, progression, supplementalConfirmed }));
+
+    const stageTimer = window.setInterval(() => {
+      setAnalysisStage((current) => Math.min(current + 1, 4));
+    }, 900);
 
     try {
       const response = await uploadPlantScan(formData).unwrap();
@@ -156,6 +197,8 @@ export const PlantScan: React.FC = () => {
       const errorCode = extractPlantScanErrorCode(error);
       setScanState('viewfinder');
       startCamera();
+      toast.error(getPlantScanErrorMessage(error));
+      return;
       switch (errorCode) {
         case 'SCAN_IMAGE_BLURRY':
           toast.error('Ảnh quá mờ, vui lòng giữ chắc tay và chụp lại.');
@@ -182,6 +225,8 @@ export const PlantScan: React.FC = () => {
           toast.error('Có lỗi xảy ra trong quá trình quét. Vui lòng thử lại.');
           break;
       }
+    } finally {
+      window.clearInterval(stageTimer);
     }
   };
 
@@ -240,6 +285,9 @@ export const PlantScan: React.FC = () => {
   const handleRetake = () => {
     setScanState('viewfinder');
     setScanResult(null);
+    setPrimaryFile(null);
+    setImageQuality(null);
+    setSupplementalConfirmed(false);
     if (previewUrl && !previewUrl.startsWith('http')) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -278,7 +326,7 @@ export const PlantScan: React.FC = () => {
             aria-pressed={activeView === 'history'}
             className={`rounded-[13px] px-4 py-2.5 text-sm font-black transition-all cursor-pointer ${activeView === 'history' ? 'bg-[#008A5E] text-white shadow-sm' : 'text-text-secondary hover:bg-bg-surface-1'}`}
           >
-            Lịch sử ({scanHistory?.total ?? 0})
+            Lịch sử ({isHistoryLoading && !scanHistory ? '…' : (scanHistory?.total ?? 0)})
           </button>
         </div>
         
@@ -342,7 +390,7 @@ export const PlantScan: React.FC = () => {
                         </span>
                       </div>
                       <h3 className="mt-3 line-clamp-2 text-base font-black text-text-h">{item.diagnosis?.disease_name || 'Không phát hiện bệnh'}</h3>
-                      <p className="mt-1 text-sm font-bold text-text-secondary">Độ chính xác: {Math.round((item.diagnosis?.confidence ?? 0) * 100)}%</p>
+                      <p className="mt-1 text-sm font-bold text-text-secondary">Mức chắc chắn: {Math.round((item.diagnosis?.confidence ?? 0) * 100)}%</p>
                     </div>
                   </button>
                 ))}
@@ -417,9 +465,74 @@ export const PlantScan: React.FC = () => {
                 
                 <div className="w-12 h-12" />
               </div>
+
+              <div className="absolute left-4 right-4 top-20 z-10 rounded-2xl border border-white/20 bg-black/55 p-3 text-white backdrop-blur-md">
+                <p className="text-sm font-black">Đưa lá cây vào khung</p>
+                <div className="mt-2 grid grid-cols-2 gap-1 text-[11px] font-bold text-white/90">
+                  <span>✓ Đủ ánh sáng</span>
+                  <span>✓ Giữ camera ổn định</span>
+                  <span className="col-span-2 text-amber-200">! Đưa vùng bị ảnh hưởng gần camera hơn</span>
+                </div>
+              </div>
             </div>
-            <p className="text-sm font-bold text-text-secondary text-center">Giữ camera sát lá bị bệnh để AI chẩn đoán tốt nhất</p>
+            <p className="text-sm font-bold text-text-secondary text-center">Chụp rõ dấu hiệu để Bé Thóc giúp bạn thu thập bằng chứng và kiểm tra bước tiếp theo.</p>
           </div>
+        ) : null}
+
+        {activeView === 'scan' && scanState === 'evidence' && previewUrl && imageQuality ? (
+          <section className="mx-auto grid w-full max-w-4xl gap-5 md:grid-cols-2">
+            <div className="overflow-hidden rounded-[28px] border-2 border-border-main bg-white shadow-sm">
+              <img src={previewUrl} alt="Ảnh cây vừa chụp" className="aspect-[4/3] h-full w-full object-cover" />
+            </div>
+            <div className="card-bubble flex flex-col gap-4 border-2 border-border-main bg-white p-6">
+              <div>
+                <p className="text-xs font-black uppercase tracking-wider text-[#008A5E]">Kiểm tra bằng chứng</p>
+                <h2 className="mt-1 text-2xl font-black text-text-h">Chất lượng ảnh: {imageQuality.label}</h2>
+                <p className="mt-1 text-sm font-bold text-text-secondary">Điểm ảnh đầu vào: {imageQuality.score}% — đây không phải độ chính xác chẩn đoán.</p>
+              </div>
+              <div className="rounded-2xl bg-bg-surface-1 p-4 text-sm font-bold">
+                <p className="text-emerald-700">✓ File ảnh có thể đọc và đủ kích thước để gửi</p>
+                <p className="mt-1 text-text-secondary">AI chưa nhận diện nội dung ảnh ở bước này.</p>
+                <p className="mt-1 text-amber-700">! Ảnh người, đồ vật hoặc cảnh không có cây sẽ bị từ chối khi phân tích.</p>
+              </div>
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border-2 border-border-main p-4">
+                <input type="checkbox" checked={supplementalConfirmed} onChange={(event) => setSupplementalConfirmed(event.target.checked)} className="mt-1" />
+                <span><strong>Đã kiểm tra mặt dưới lá (nếu ảnh là lá)</strong><br /><span className="text-xs text-text-secondary">Xác nhận này chỉ là thông tin bạn cung cấp, không phải kết quả nhận diện của AI.</span></span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button type="button" onClick={handleRetake} className="btn btn--soft font-bold">Chụp lại</button>
+                <button type="button" disabled={!imageQuality.usable} onClick={() => setScanState('context')} className="btn btn--cyan font-black disabled:opacity-50">Tiếp tục</button>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {activeView === 'scan' && scanState === 'context' ? (
+          <section className="card-bubble mx-auto w-full max-w-xl border-2 border-border-main bg-white p-6 md:p-8">
+            <p className="text-xs font-black uppercase tracking-wider text-[#008A5E]">Thông tin thêm</p>
+            <h2 className="mt-1 text-2xl font-black text-text-h">Giúp Bé Thóc phân tích tốt hơn</h2>
+            <p className="mt-2 text-sm font-bold text-text-secondary">Chỉ ba câu hỏi ngắn, không phải khảo sát dài.</p>
+            <div className="mt-6 space-y-5">
+              {[
+                { label: 'Bộ phận có vấn đề', value: plantPart, setter: setPlantPart, options: ['Lá', 'Thân', 'Quả', 'Rễ'] },
+                { label: 'Xuất hiện từ bao giờ?', value: symptomDuration, setter: setSymptomDuration, options: ['Hôm nay', 'Vài ngày', 'Lâu hơn'] },
+                { label: 'Tình trạng đang', value: progression, setter: setProgression, options: ['Ổn định', 'Lan chậm', 'Lan nhanh'] },
+              ].map((group) => (
+                <fieldset key={group.label}>
+                  <legend className="mb-2 text-sm font-black text-text-h">{group.label}</legend>
+                  <div className="flex flex-wrap gap-2">
+                    {group.options.map((option) => (
+                      <button key={option} type="button" onClick={() => group.setter(option)} className={`rounded-full border-2 px-4 py-2 text-sm font-bold ${group.value === option ? 'border-[#008A5E] bg-[#E9F9F3] text-[#007A54]' : 'border-border-main bg-white'}`}>{option}</button>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+            <div className="mt-7 grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => setScanState('evidence')} className="btn btn--soft font-bold">Quay lại</button>
+              <button type="button" onClick={() => void submitAnalysis()} className="btn btn--cyan font-black">Bắt đầu phân tích</button>
+            </div>
+          </section>
         ) : null}
 
         {activeView === 'scan' && scanState === 'analyzing' ? (
@@ -428,8 +541,14 @@ export const PlantScan: React.FC = () => {
               <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
               <PetMascot className="w-32 h-32" status={petStatus} size={128} />
             </div>
-            <h2 className="text-2xl font-black text-text-h text-center mt-4">Đang phân tích...</h2>
-            <p className="text-text-secondary text-center max-w-xs font-bold">Bé Thóc đang xem xét lá cây, vui lòng đợi một chút nhé!</p>
+            <h2 className="text-2xl font-black text-text-h text-center mt-4">Bé Thóc đang xem cây của bạn...</h2>
+            <div className="w-full rounded-2xl border-2 border-border-main bg-white p-4">
+              {['Kiểm tra chất lượng ảnh', 'Nhận diện dấu hiệu nhìn thấy', 'Đối chiếu dữ liệu canh tác', 'Tham khảo kiến thức kỹ thuật', 'Tổng hợp các khả năng'].map((stage, index) => (
+                <p key={stage} className={`py-1.5 text-sm font-bold ${index < analysisStage ? 'text-emerald-700' : index === analysisStage ? 'text-[#008A5E]' : 'text-text-secondary/50'}`}>
+                  {index < analysisStage ? '✓' : index === analysisStage ? '●' : '○'} {stage}
+                </p>
+              ))}
+            </div>
           </div>
         ) : null}
 
@@ -458,9 +577,9 @@ export const PlantScan: React.FC = () => {
                   {/* Speech Bubble */}
                   <div className="pet-mood-bubble flex-1 shadow-sm mt-1">
                     <p className="font-bold text-sm text-text-main">
-                      {scanResult.diagnosis?.disease_name 
-                        ? "Phát hiện sâu bệnh hại lá rồi chủ vườn ơi!" 
-                        : "Cây của bạn có vẻ khỏe mạnh!"}
+                      {scanResult.diagnosis?.disease_name
+                        ? 'Bé Thóc nhận thấy một số dấu hiệu cần được theo dõi thêm.'
+                        : 'Chưa thấy dấu hiệu rõ ràng trong ảnh này.'}
                     </p>
                     <span className="pet-mood-bubble__tail" aria-hidden="true" />
                   </div>
@@ -470,13 +589,15 @@ export const PlantScan: React.FC = () => {
                 <div className="card-bubble bg-white p-6 md:p-8 flex flex-col gap-4 md:gap-5 relative shadow-sm">
                   <div className="flex flex-col gap-1">
                     <span className="font-bold text-[11px] md:text-xs text-[#008A5E] uppercase tracking-wider bg-primary-light/20 self-start px-3 py-1 rounded-full border border-primary-light/20 flex gap-2 items-center">
-                      Quét thành công
+                      Đánh giá ban đầu
                       {scanResult.status === 'cached' && (
                         <span className="text-[#008A5E]/80 lowercase">(Từ bộ nhớ đệm)</span>
                       )}
                     </span>
                     <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-text-h mt-1 tracking-tight">
-                      {scanResult.diagnosis?.disease_name || 'Không phát hiện bệnh'}
+                      {scanResult.diagnosis?.disease_name
+                        ? 'Có khả năng cây đang gặp vấn đề'
+                        : 'Chưa thấy dấu hiệu rõ ràng'}
                     </h2>
                   </div>
                   
@@ -484,7 +605,7 @@ export const PlantScan: React.FC = () => {
                   {scanResult.diagnosis?.confidence && (
                     <div className="flex flex-col gap-2 mt-2">
                       <div className="flex justify-between items-end">
-                        <span className="font-bold text-sm text-text-secondary">Độ chính xác</span>
+                         <span className="font-bold text-sm text-text-secondary">Mức chắc chắn của phân tích AI</span>
                         <span className="text-2xl font-black text-[#008A5E]">
                           {Math.round(scanResult.diagnosis.confidence * 100)}%
                         </span>
@@ -498,11 +619,19 @@ export const PlantScan: React.FC = () => {
                       </div>
                     </div>
                   )}
+
+                  {scanResult.diagnosis?.disease_name && (
+                    <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4">
+                      <p className="text-xs font-black uppercase tracking-wider text-amber-700">Khả năng phù hợp nhất</p>
+                      <p className="mt-1 text-lg font-black text-text-h">{scanResult.diagnosis.disease_name}</p>
+                      <p className="mt-1 text-sm font-semibold text-text-secondary">Tên này là khả năng để đối chiếu tiếp, không phải xác nhận bệnh tuyệt đối.</p>
+                    </div>
+                  )}
                   
                   {/* Symptoms */}
                   {scanResult.diagnosis?.symptoms && scanResult.diagnosis.symptoms.length > 0 && (
                     <div className="mt-2 text-left">
-                      <p className="font-bold text-sm text-text-secondary mb-2">Triệu chứng:</p>
+                       <p className="font-bold text-sm text-text-secondary mb-2">Dấu hiệu AI quan sát được:</p>
                       <ul className="list-disc pl-5 text-text-main space-y-1">
                         {scanResult.diagnosis.symptoms.map((sym, idx) => (
                           <li key={idx} className="text-sm font-semibold">{sym}</li>
@@ -511,12 +640,39 @@ export const PlantScan: React.FC = () => {
                     </div>
                   )}
 
+                  <div className="rounded-2xl bg-[#F0FDF4] p-4 text-left">
+                    <p className="font-black text-emerald-800">Việc nên làm tiếp theo</p>
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm font-semibold text-emerald-950">
+                      <li>Đánh dấu vùng cây đang bị ảnh hưởng.</li>
+                      <li>Chụp lại sau 24 giờ để theo dõi mức độ lan.</li>
+                      <li>Hạn chế tưới trực tiếp lên lá.</li>
+                      <li>Kiểm tra thêm các cây xung quanh.</li>
+                    </ol>
+                  </div>
+
+                  <div className="grid gap-3 text-left sm:grid-cols-2">
+                    <div className="rounded-2xl border border-border-main p-4">
+                      <p className="text-sm font-black">Dữ liệu đã sử dụng</p>
+                      <p className="mt-2 text-xs font-semibold text-text-secondary">✓ 1 ảnh cây<br />✓ Loại cây: {selectedCrop}<br />✓ Bộ phận: {plantPart}<br />✓ Tiến triển: {progression}</p>
+                    </div>
+                    <div className="rounded-2xl border border-border-main p-4">
+                      <p className="text-sm font-black">Thông tin còn thiếu</p>
+                      <p className="mt-2 text-xs font-semibold text-text-secondary">• Ảnh toàn bộ cây<br />• So sánh với cây khỏe gần đó<br />• Thuốc đã dùng gần đây</p>
+                    </div>
+                  </div>
+
+                  {scanResult.status === 'cached' && (
+                    <div className="rounded-2xl border-2 border-blue-200 bg-blue-50 p-4 text-sm font-bold text-blue-900">
+                      ⓘ Kết quả tham khảo từ lần phân tích trước. Một số dữ liệu thực tế có thể đã thay đổi.
+                    </div>
+                  )}
+
                   {/* Treatment */}
                   {scanResult.diagnosis?.treatment && (
                     <div className="mt-2 flex flex-col gap-3 text-left">
                       {scanResult.diagnosis.treatment.chemical && (
                         <div className="border-t border-border-main/50 pt-3">
-                          <p className="font-bold text-sm text-text-secondary">Thuốc hóa học khuyến nghị:</p>
+                          <p className="font-bold text-sm text-text-secondary">Thông tin điều trị tham khảo:</p>
                           <p className="text-sm text-text-main font-medium mt-0.5">{scanResult.diagnosis.treatment.chemical}</p>
                         </div>
                       )}
@@ -558,12 +714,12 @@ export const PlantScan: React.FC = () => {
               </section>
 
               {/* Action Buttons */}
-              <section className="flex flex-col md:flex-row gap-4 mt-2">
-                <button 
-                  onClick={() => navigate('/diary/create')}
+              <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 mt-2">
+                <button
+                  onClick={() => navigate('/diary/create', { state: { scanResult } })}
                   className="btn btn--cyan w-full md:flex-1 text-base font-extrabold cursor-pointer active:scale-95"
                 >
-                  Lưu giải pháp tư vấn
+                  Lưu vào nhật ký
                 </button>
                 
                 <button 
@@ -575,8 +731,10 @@ export const PlantScan: React.FC = () => {
                   })}
                   className="btn btn--soft w-full md:flex-1 text-base font-bold cursor-pointer border-2 border-border-main active:scale-95"
                 >
-                  Hỏi Bé Thóc tư vấn thêm
+                  Hỏi Bé Thóc về kết quả
                 </button>
+                <button onClick={() => navigate('/reminder/create', { state: { title: `Kiểm tra lại ${selectedCrop}`, daysFromNow: 1 } })} className="btn btn--soft w-full text-base font-bold border-2 border-border-main">Đặt lịch kiểm tra lại</button>
+                <button onClick={() => setScanState('evidence')} className="btn btn--outline w-full text-base font-bold">Bổ sung thông tin</button>
               </section>
 
               {/* Retake / Upload Buttons */}

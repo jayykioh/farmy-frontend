@@ -1,40 +1,16 @@
-import { extractPlantScanErrorCode } from './plantScan';
+import { describe, expect, it } from 'vitest';
+import { getPlantScanErrorMessage } from './plantScan';
 
-describe('extractPlantScanErrorCode', () => {
-  it('should return UNKNOWN for null or undefined error', () => {
-    expect(extractPlantScanErrorCode(null)).toBe('UNKNOWN');
-    expect(extractPlantScanErrorCode(undefined)).toBe('UNKNOWN');
+describe('PlantScan error messages', () => {
+  it('maps each backend error code to a specific message', () => {
+    expect(getPlantScanErrorMessage({ data: { errorCode: 'SCAN_IMAGE_BLURRY' } })).toContain('bị mờ');
+    expect(getPlantScanErrorMessage({ data: { errorCode: 'INVALID_JSON' } })).toContain('không đọc được');
+    expect(getPlantScanErrorMessage({ data: { errorCode: 'PLANT_SCAN_PERSISTENCE_FAILED' } })).toContain('lưu kết quả');
   });
 
-  it('should return errorCode for RTK Query shape', () => {
-    const error = {
-      data: {
-        errorCode: 'SCAN_IMAGE_BLURRY',
-      },
-    };
-    expect(extractPlantScanErrorCode(error)).toBe('SCAN_IMAGE_BLURRY');
-  });
-
-  it('should return errorCode for Axios shape', () => {
-    const error = {
-      response: {
-        data: {
-          errorCode: 'AI_SCAN_QUOTA_BUSY',
-        },
-      },
-    };
-    expect(extractPlantScanErrorCode(error)).toBe('AI_SCAN_QUOTA_BUSY');
-  });
-
-  it('should return UNKNOWN for missing errorCode', () => {
-    const rtkError = { data: {} };
-    expect(extractPlantScanErrorCode(rtkError)).toBe('UNKNOWN');
-
-    const axiosError = { response: { data: {} } };
-    expect(extractPlantScanErrorCode(axiosError)).toBe('UNKNOWN');
-  });
-
-  it('should return UNKNOWN for arbitrary object', () => {
-    expect(extractPlantScanErrorCode({ message: 'Network Error' })).toBe('UNKNOWN');
+  it('distinguishes authentication, server and network failures', () => {
+    expect(getPlantScanErrorMessage({ status: 401 })).toContain('đăng nhập');
+    expect(getPlantScanErrorMessage({ status: 503 })).toContain('Máy chủ');
+    expect(getPlantScanErrorMessage({ status: 'FETCH_ERROR', message: 'Failed to fetch' })).toContain('kết nối');
   });
 });
