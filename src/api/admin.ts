@@ -39,8 +39,8 @@ export const getAdminChatSessions = async (params: { page?: number; limit?: numb
   return response.data.data;
 };
 
-export const getAdminRAGFiles = async () => {
-  const response = await api.get('/admin/knowledge');
+export const getAdminRAGFiles = async (params?: { sort?: string; min_score?: number; max_score?: number; limit?: number }) => {
+  const response = await api.get('/admin/knowledge', { params });
   return response.data.data;
 };
 

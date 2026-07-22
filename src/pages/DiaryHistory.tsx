@@ -171,7 +171,7 @@ export const DiaryHistory: React.FC = () => {
       activityType: log.activity_type,
       content: log.content,
       createdAt: log.activity_at || log.created_at,
-      imageUrl: log.image_url,
+      imageUrl: log.photo_urls?.[0] || log.image_url,
       statusLabel: 'Đã ghi',
       statusClass: 'bg-primary-light/10 text-secondary-dark border border-primary-light/20',
     }));
