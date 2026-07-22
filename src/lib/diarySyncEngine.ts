@@ -116,7 +116,8 @@ const syncDraft = async (draft: OfflineDiaryDraft, dispatch?: AppDispatch) => {
       lastError: undefined,
     }));
     invalidateDiaryData(dispatch, draft.diaryId);
-    queryClient.invalidateQueries({ queryKey: PET_STATUS_QUERY_KEY });
+    queryClient.invalidateQueries({ queryKey: PET_STATUS_QUERY_KEY, refetchType: 'all' });
+    queryClient.invalidateQueries({ queryKey: ['shopItems'], refetchType: 'all' });
     return true;
   } catch (error) {
     const retryStatus = isRetryableError(error);
