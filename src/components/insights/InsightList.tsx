@@ -15,8 +15,7 @@ import {
   Plus,
   SortDescending,
   SortAscending,
-  CaretLeft,
-  CaretRight,
+  CaretDown,
 } from '@phosphor-icons/react';
 import { api } from '../../api/client';
 import { CreateSeasonModal } from '../modals/CreateSeasonModal';
@@ -58,6 +57,7 @@ export const InsightList: React.FC = () => {
   const [selectedDiaryId, setSelectedDiaryId] = useState('');
   const [showCreateSeason, setShowCreateSeason] = useState(false);
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Filter state
   const [filterDiaryId, setFilterDiaryId] = useState<string>('all');
@@ -360,112 +360,110 @@ export const InsightList: React.FC = () => {
           </button>
         </div>
 
-        <div className="relative group">
-          {/* Nút cuộn trái */}
-          {diaries.length > 1 && (
-            <button
-              onClick={() => scrollSeasonContainer('left')}
-              className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md shadow-md border border-black/10 items-center justify-center text-slate-700 hover:bg-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
-              title="Cuộn sang trái"
-            >
-              <CaretLeft size={18} weight="bold" />
-            </button>
+        <div className="relative">
+          {isDropdownOpen && (
+            <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
           )}
-
-          {/* Nút cuộn phải */}
-          {diaries.length > 1 && (
-            <button
-              onClick={() => scrollSeasonContainer('right')}
-              className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md shadow-md border border-black/10 items-center justify-center text-slate-700 hover:bg-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
-              title="Cuộn sang phải"
-            >
-              <CaretRight size={18} weight="bold" />
-            </button>
-          )}
-
-          <div
-            ref={seasonScrollRef}
-            className="flex overflow-x-auto gap-3 pb-3 snap-x snap-mandatory scroll-smooth custom-scrollbar -mx-4 px-4 md:mx-0 md:px-1 items-stretch"
+          
+          <div 
+            onClick={() => !isBusy && setIsDropdownOpen(!isDropdownOpen)}
+            className={`flex items-center justify-between gap-3 px-5 py-4 bg-white rounded-[24px] border-2 border-border-main shadow-xs cursor-pointer transition-all ${
+              isBusy ? 'opacity-60 cursor-not-allowed' : 'hover:border-[#008A5E] hover:shadow-sm'
+            }`}
           >
-            {isLoadingDiaries && (
-              <>
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="min-w-[160px] h-16 bg-black/5 rounded-2xl animate-pulse flex-shrink-0" />
-                ))}
-              </>
-            )}
-
-            {/* Pill Tất cả mùa vụ */}
-            {!isLoadingDiaries && diaries.length > 0 && (
-              <div
-                onClick={() => {
-                  if (isBusy) return;
-                  setFilterDiaryId('all');
-                }}
-                className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start border ${
-                  filterDiaryId === 'all'
-                    ? 'bg-white border-[#34C759]/30 shadow-[0_8px_24px_rgba(52,199,89,0.12)] ring-1 ring-[#34C759]'
-                    : 'bg-white/50 border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-sm'
-                }`}
-              >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${filterDiaryId === 'all' ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-black/5 text-[#86868b]'}`}>
-                  <Plant size={20} weight={filterDiaryId === 'all' ? "fill" : "duotone"} />
-                </div>
-                <div className="flex flex-col pr-2">
-                  <span className={`text-[14px] font-bold ${filterDiaryId === 'all' ? 'text-[#1d1d1f]' : 'text-[#48484a]'}`}>
-                    Tất cả mùa vụ
-                  </span>
-                  <span className="text-[12px] font-medium text-[#86868b]">
-                    {diaries.length} mùa vụ
-                  </span>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#008A5E]/10 flex items-center justify-center text-[#008A5E]">
+                <Plant size={24} weight="fill" />
               </div>
-            )}
-
-            {!isLoadingDiaries && diaries.map((diary) => {
-              const isActive = diary._id === (filterDiaryId === 'all' ? effectiveDiaryId : filterDiaryId);
-              return (
-                <div
-                  key={diary._id}
-                  onClick={() => handleSelectDiary(diary._id)}
-                  className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start border ${
-                    isActive
-                      ? 'bg-white border-[#34C759]/30 shadow-[0_8px_24px_rgba(52,199,89,0.12)] ring-1 ring-[#34C759]'
-                      : 'bg-white/50 border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-sm'
-                  } ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isActive ? 'bg-[#34C759]/10 text-[#34C759]' : 'bg-black/5 text-[#86868b]'}`}>
-                    <Plant size={20} weight={isActive ? "fill" : "duotone"} />
-                  </div>
-                  <div className="flex flex-col pr-2">
-                    <span className={`text-[14px] font-bold ${isActive ? 'text-[#1d1d1f]' : 'text-[#48484a]'}`}>
-                      {diary.crop_type || 'Nông sản'}
-                    </span>
-                    {diary.season && (
-                      <span className="text-[12px] font-medium text-[#86868b]">
-                        {diary.season}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-            
-            {/* Nút Tạo Mùa vụ */}
-            {!isLoadingDiaries && (
-              <div
-                onClick={() => !isBusy && setShowCreateSeason(true)}
-                className={`flex items-center gap-3 min-w-fit px-4 py-3 rounded-[20px] cursor-pointer transition-all flex-shrink-0 snap-start bg-transparent border-2 border-dashed border-black/10 hover:border-black/20 hover:bg-black/5 ${isBusy ? 'opacity-60 cursor-not-allowed' : ''}`}
-              >
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 text-[#86868b]">
-                  <Plus size={20} weight="bold" />
-                </div>
-                <div className="flex flex-col pr-2">
-                  <span className="text-[14px] font-bold text-[#48484a]">Tạo mùa vụ</span>
-                </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-text-secondary">Mùa vụ đang xem</span>
+                <span className="text-base font-extrabold text-text-h">
+                  {filterDiaryId === 'all' 
+                    ? 'Tất cả mùa vụ' 
+                    : diaries.find(d => d._id === filterDiaryId)?.crop_type || 'Tất cả mùa vụ'}
+                  {filterDiaryId !== 'all' && diaries.find(d => d._id === filterDiaryId)?.season 
+                    ? ` · ${diaries.find(d => d._id === filterDiaryId)?.season}` 
+                    : ''}
+                </span>
               </div>
-            )}
+            </div>
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-bg-surface-1 text-text-secondary">
+              <CaretDown size={16} weight="bold" className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </div>
           </div>
+
+          {/* Dropdown Menu */}
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[24px] border-2 border-border-main shadow-[0_8px_30px_rgba(0,0,0,0.12)] z-50 overflow-hidden"
+              >
+                <div className="max-h-[300px] overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1">
+                  <div
+                    onClick={() => {
+                      setFilterDiaryId('all');
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-[16px] cursor-pointer transition-all ${
+                      filterDiaryId === 'all' 
+                        ? 'bg-[#008A5E]/10 text-[#008A5E]' 
+                        : 'hover:bg-bg-surface-1 text-text-h'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 shrink-0">
+                      <Plant size={20} weight={filterDiaryId === 'all' ? "fill" : "duotone"} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[14px] font-bold">Tất cả mùa vụ</span>
+                      <span className="text-[12px] font-medium opacity-70">{diaries.length} mùa vụ</span>
+                    </div>
+                  </div>
+
+                  {diaries.map(diary => {
+                    const isActive = filterDiaryId === diary._id;
+                    return (
+                      <div
+                        key={diary._id}
+                        onClick={() => {
+                          handleSelectDiary(diary._id);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-[16px] cursor-pointer transition-all ${
+                          isActive
+                            ? 'bg-[#008A5E]/10 text-[#008A5E]' 
+                            : 'hover:bg-bg-surface-1 text-text-h'
+                        }`}
+                      >
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-black/5 shrink-0">
+                          <Plant size={20} weight={isActive ? "fill" : "duotone"} />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[14px] font-bold">{diary.crop_type}</span>
+                          {diary.season && <span className="text-[12px] font-medium opacity-70">{diary.season}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="p-2 border-t border-border-main bg-bg-surface-1/50">
+                  <div
+                    onClick={() => {
+                      setShowCreateSeason(true);
+                      setIsDropdownOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-[16px] cursor-pointer hover:bg-white border-2 border-dashed border-border-main text-text-h transition-all"
+                  >
+                    <Plus size={18} weight="bold" />
+                    <span className="text-[14px] font-bold">Tạo mùa vụ mới</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

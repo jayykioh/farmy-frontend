@@ -347,7 +347,6 @@ export const ChatActive: React.FC = () => {
           </div>
         ) : (
           messages.map((message) => (
-          messages.map((message) => (
             <div
               key={message.localId ?? message._id}
               className={`flex w-full ${message.role === "user" ? "justify-end" : "justify-start"}`}
@@ -441,7 +440,6 @@ export const ChatActive: React.FC = () => {
                 </div>
               </div>
             </div>
-          ))
           ))
         )}
 

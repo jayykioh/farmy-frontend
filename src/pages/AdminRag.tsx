@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getAdminChatSessions, getAdminRAGFiles, deleteAdminRAGFile, validateAdminRAGFile, batchEmbedAdminRAGFiles } from '../api/admin';
-import { Database, ChatText, Trash, Calendar, FileText, CheckCircle, XCircle, WarningCircle, Question, UploadSimple, Checks, Play } from '@phosphor-icons/react';
+import { Database, ChatText, Trash, Calendar, FileText, CheckCircle, XCircle, WarningCircle, Question, UploadSimple, Checks, Play, Funnel } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
 import { UploadRAGModal } from '../components/admin/rag/UploadRAGModal';
 import { ReviewRAGModal } from '../components/admin/rag/ReviewRAGModal';
@@ -43,6 +43,11 @@ export const AdminRag: React.FC = () => {
   const [reviewFile, setReviewFile] = useState<RAGFile | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Filters for RAG files
+  const [fileSort, setFileSort] = useState<string>('created_at_desc');
+  const [minScore, setMinScore] = useState<string>('');
+  const [maxScore, setMaxScore] = useState<string>('');
+
   const fetchSessions = () => {
     setLoading(true);
     getAdminChatSessions({ page, limit: 10 })
@@ -60,7 +65,11 @@ export const AdminRag: React.FC = () => {
 
   const fetchFiles = () => {
     setLoading(true);
-    getAdminRAGFiles()
+    const params: any = { sort: fileSort };
+    if (minScore) params.min_score = Number(minScore);
+    if (maxScore) params.max_score = Number(maxScore);
+
+    getAdminRAGFiles(params)
       .then((res) => {
         setFiles(res);
       })
@@ -182,22 +191,69 @@ export const AdminRag: React.FC = () => {
         </div>
 
         {activeTab === 'files' && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleBatchEmbed}
-              disabled={actionLoading === 'batch_embed'}
-              className="btn active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <Play size={16} weight="bold" />
-              Nhúng Vector hàng loạt
-            </button>
-            <button
-              onClick={() => setIsUploadOpen(true)}
-              className="btn btn--cyan active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs"
-            >
-              <UploadSimple size={16} weight="bold" />
-              Tải tài liệu lên
-            </button>
+          <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-3 w-full sm:w-auto">
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-2 bg-bg-surface-1 p-2 rounded-2xl border-2 border-border-main">
+              <Funnel size={16} weight="bold" className="text-text-secondary ml-1" />
+              <select
+                value={fileSort}
+                onChange={(e) => setFileSort(e.target.value)}
+                className="bg-white border-2 border-border-main rounded-xl px-2 py-1.5 text-xs font-bold outline-none cursor-pointer"
+              >
+                <option value="created_at_desc">Mới nhất</option>
+                <option value="created_at_asc">Cũ nhất</option>
+                <option value="score_desc">Điểm AI cao</option>
+                <option value="score_asc">Điểm AI thấp</option>
+              </select>
+
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={minScore}
+                  onChange={(e) => setMinScore(e.target.value)}
+                  className="bg-white border-2 border-border-main rounded-xl px-2 py-1.5 text-xs font-bold outline-none w-16"
+                  min="0"
+                  max="100"
+                />
+                <span className="text-text-secondary text-xs font-black">-</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={maxScore}
+                  onChange={(e) => setMaxScore(e.target.value)}
+                  className="bg-white border-2 border-border-main rounded-xl px-2 py-1.5 text-xs font-bold outline-none w-16"
+                  min="0"
+                  max="100"
+                />
+              </div>
+              
+              <button
+                onClick={fetchFiles}
+                className="btn btn--soft active:scale-95 rounded-xl px-3 py-1.5 text-xs font-black border-2 border-border-main cursor-pointer"
+              >
+                Lọc
+              </button>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 xl:ml-auto">
+              <button
+                onClick={handleBatchEmbed}
+                disabled={actionLoading === 'batch_embed'}
+                className="btn active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <Play size={16} weight="bold" />
+                Nhúng Vector
+              </button>
+              <button
+                onClick={() => setIsUploadOpen(true)}
+                className="btn btn--cyan active:scale-95 rounded-2xl px-4 py-2.5 text-xs font-black flex items-center gap-2 cursor-pointer shadow-xs"
+              >
+                <UploadSimple size={16} weight="bold" />
+                Tải lên
+              </button>
+            </div>
           </div>
         )}
       </div>
