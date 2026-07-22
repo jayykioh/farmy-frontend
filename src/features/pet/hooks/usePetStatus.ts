@@ -15,7 +15,7 @@ export function usePetStatus() {
   return useQuery<PetStatus>({
     queryKey: [...PET_STATUS_QUERY_KEY, user?.id ?? 'guest'],
     queryFn : fetchPetStatus,
-    staleTime            : 5 * 60 * 1000, // 5 min
+    staleTime            : 10 * 1000, // 10 seconds for responsive XP updates
     refetchOnWindowFocus : true,
     retry                : 1,
     enabled              : !!user?.id,
